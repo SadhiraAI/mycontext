@@ -1,5 +1,5 @@
 [project]
-name = "mycontext"
+name = "mycontext-ai"
 version = "0.1.0"
 description = "Universal Context Transformation Engine - Transform questions into perfect, portable contexts"
 readme = "README.md"
@@ -76,7 +76,7 @@ docs = [
 
 # All features
 all = [
-    "mycontext[openai,anthropic,google,rag,redis,postgres,monitoring]",
+    "mycontext-ai[openai,anthropic,google,rag,redis,postgres,monitoring]",
 ]
 
 [project.urls]
