@@ -1,0 +1,213 @@
+"""
+Tests for Foundation classes (Directive, Guidance, Constraints)
+"""
+import pytest
+from src.mycontext.foundation import Directive, Guidance, Constraints
+
+
+class TestDirective:
+    """Test Directive class"""
+    
+    def test_simple_directive(self):
+        """Test creating a simple directive"""
+        directive = Directive(content="Analyze this code")
+        assert directive.content == "Analyze this code"
+        assert directive.priority == 1  # default
+    
+    def test_with_priority(self):
+        """Test directive with custom priority"""
+        directive = Directive(content="Critical task", priority=10)
+        assert directive.priority == 10
+    
+    def test_priority_validation(self):
+        """Test that priority is validated (1-10)"""
+        # Should work
+        Directive(content="Test", priority=1)
+        Directive(content="Test", priority=10)
+        
+        # Should fail
+        with pytest.raises(Exception):  # Pydantic validation error
+            Directive(content="Test", priority=0)
+        
+        with pytest.raises(Exception):
+            Directive(content="Test", priority=11)
+    
+    def test_render(self):
+        """Test rendering directive"""
+        directive = Directive(content="Do this task")
+        rendered = directive.render()
+        assert rendered == "Do this task"
+
+
+class TestGuidance:
+    """Test Guidance class"""
+    
+    def test_simple_guidance(self):
+        """Test creating simple guidance"""
+        guidance = Guidance(role="Expert Analyst")
+        assert guidance.role == "Expert Analyst"
+        assert guidance.rules == []  # default
+        assert guidance.style is None  # default
+    
+    def test_with_rules(self):
+        """Test guidance with rules"""
+        guidance = Guidance(
+            role="Code Reviewer",
+            rules=["Be thorough", "Focus on security", "Suggest improvements"]
+        )
+        assert len(guidance.rules) == 3
+        assert "Be thorough" in guidance.rules
+    
+    def test_with_style(self):
+        """Test guidance with communication style"""
+        guidance = Guidance(
+            role="Teacher",
+            style="patient, encouraging, uses examples"
+        )
+        assert guidance.style == "patient, encouraging, uses examples"
+    
+    def test_render_simple(self):
+        """Test rendering simple guidance"""
+        guidance = Guidance(role="Expert")
+        rendered = guidance.render()
+        assert "You are Expert" in rendered
+    
+    def test_render_with_rules(self):
+        """Test rendering guidance with rules"""
+        guidance = Guidance(
+            role="Analyst",
+            rules=["Be clear", "Use data"]
+        )
+        rendered = guidance.render()
+        assert "You are Analyst" in rendered
+        assert "Follow these rules:" in rendered
+        assert "- Be clear" in rendered
+        assert "- Use data" in rendered
+    
+    def test_render_with_style(self):
+        """Test rendering guidance with style"""
+        guidance = Guidance(
+            role="Assistant",
+            style="friendly and helpful"
+        )
+        rendered = guidance.render()
+        assert "Communication style: friendly and helpful" in rendered
+    
+    def test_render_complete(self):
+        """Test rendering guidance with all fields"""
+        guidance = Guidance(
+            role="Expert",
+            rules=["Rule 1", "Rule 2"],
+            style="professional"
+        )
+        rendered = guidance.render()
+        assert "You are Expert" in rendered
+        assert "Rule 1" in rendered
+        assert "Rule 2" in rendered
+        assert "professional" in rendered
+
+
+class TestConstraints:
+    """Test Constraints class"""
+    
+    def test_empty_constraints(self):
+        """Test creating empty constraints"""
+        constraints = Constraints()
+        assert constraints.must_include == []
+        assert constraints.must_not_include == []
+        assert constraints.format_rules == []
+    
+    def test_must_include(self):
+        """Test must_include constraints"""
+        constraints = Constraints(
+            must_include=["key metrics", "trends", "recommendations"]
+        )
+        assert len(constraints.must_include) == 3
+        assert "key metrics" in constraints.must_include
+    
+    def test_must_not_include(self):
+        """Test must_not_include constraints"""
+        constraints = Constraints(
+            must_not_include=["speculation", "personal opinions"]
+        )
+        assert len(constraints.must_not_include) == 2
+        assert "speculation" in constraints.must_not_include
+    
+    def test_format_rules(self):
+        """Test format_rules constraints"""
+        constraints = Constraints(
+            format_rules=[
+                "Use bullet points",
+                "Maximum 500 words",
+                "Include citations"
+            ]
+        )
+        assert len(constraints.format_rules) == 3
+    
+    def test_render_empty(self):
+        """Test rendering empty constraints"""
+        constraints = Constraints()
+        rendered = constraints.render()
+        assert rendered == ""  # Empty constraints render as empty string
+    
+    def test_render_must_include(self):
+        """Test rendering must_include"""
+        constraints = Constraints(
+            must_include=["data", "examples"]
+        )
+        rendered = constraints.render()
+        assert "MUST include:" in rendered
+        assert "- data" in rendered
+        assert "- examples" in rendered
+    
+    def test_render_must_not_include(self):
+        """Test rendering must_not_include"""
+        constraints = Constraints(
+            must_not_include=["speculation"]
+        )
+        rendered = constraints.render()
+        assert "MUST NOT include:" in rendered
+        assert "- speculation" in rendered
+    
+    def test_render_format_rules(self):
+        """Test rendering format_rules"""
+        constraints = Constraints(
+            format_rules=["Use markdown", "Be concise"]
+        )
+        rendered = constraints.render()
+        assert "Format requirements:" in rendered
+        assert "- Use markdown" in rendered
+        assert "- Be concise" in rendered
+    
+    def test_render_complete(self):
+        """Test rendering all constraint types"""
+        constraints = Constraints(
+            must_include=["metrics"],
+            must_not_include=["opinions"],
+            format_rules=["Bullet points"]
+        )
+        rendered = constraints.render()
+        assert "MUST include:" in rendered
+        assert "MUST NOT include:" in rendered
+        assert "Format requirements:" in rendered
+
+
+class TestFoundationIntegration:
+    """Test Foundation classes working together"""
+    
+    def test_combined_rendering(self):
+        """Test that all foundation components can be combined"""
+        guidance = Guidance(role="Expert", rules=["Be thorough"])
+        directive = Directive(content="Analyze data")
+        constraints = Constraints(must_include=["metrics"])
+        
+        # All should render to strings
+        assert isinstance(guidance.render(), str)
+        assert isinstance(directive.render(), str)
+        assert isinstance(constraints.render(), str)
+        
+        # Combined output
+        combined = f"{guidance.render()}\n\n{constraints.render()}\n\n{directive.render()}"
+        assert "Expert" in combined
+        assert "metrics" in combined
+        assert "Analyze data" in combined
