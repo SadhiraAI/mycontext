@@ -1,26 +1,29 @@
 """
-Intelligence Layer - Advanced AI capabilities for mycontext SDK.
+Intelligence Layer - Automatic cognitive pattern selection and transformation
 
-This layer provides:
-- RAG (Retrieval-Augmented Generation) - Knowledge as Code™
-
-Quick Start - RAG:
-    >>> from mycontext.intelligence.rag import create_retriever
-    >>> 
-    >>> retriever = create_retriever(
-    ...     documents=["Doc 1", "Doc 2"],
-    ...     embedder="sentence-transformers"
-    ... )
-    >>> 
-    >>> results = retriever.retrieve("query", k=5)
-
-Note: For agent orchestration examples, see examples/reference_implementations/
-      mycontext focuses on context engineering, not agent frameworks.
+This layer provides intelligent, automatic context transformation capabilities.
 """
 
-# RAG System
-from . import rag
+from .transformation_engine import (
+    TransformationEngine,
+    InputAnalysis,
+    InputType,
+    ComplexityLevel,
+    transform
+)
+from .quality_metrics import (
+    QualityMetrics,
+    QualityScore,
+    QualityDimension
+)
 
 __all__ = [
-    "rag",
+    "TransformationEngine",
+    "InputAnalysis",
+    "InputType",
+    "ComplexityLevel",
+    "transform",
+    "QualityMetrics",
+    "QualityScore",
+    "QualityDimension",
 ]

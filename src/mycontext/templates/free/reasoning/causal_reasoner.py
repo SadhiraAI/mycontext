@@ -5,8 +5,8 @@ Structured causal analysis for understanding relationships between events.
 """
 
 from typing import Optional
-from ...structure.pattern import Pattern
-from ...foundation import Guidance, Directive
+from mycontext.structure import Pattern
+from mycontext.foundation import Guidance, Directive
 
 
 class CausalReasoner(Pattern):

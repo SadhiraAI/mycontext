@@ -5,8 +5,8 @@ Structured analysis of competing objectives and constraints.
 """
 
 from typing import Optional
-from ...structure.pattern import Pattern
-from ...foundation import Guidance, Directive
+from mycontext.structure import Pattern
+from mycontext.foundation import Guidance, Directive
 
 
 class TradeoffAnalyzer(Pattern):

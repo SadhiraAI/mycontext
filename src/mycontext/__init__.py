@@ -1,10 +1,12 @@
 """
-mycontext - Revolutionary context engineering for LLM applications
+mycontext - Universal Context Transformation Engine
 
-Context as Code™ - Treat context with the same rigor as application code
+Transform raw questions into perfect, portable contexts for any AI system.
+
+Context as Code™ - Research-backed cognitive patterns for systematic context engineering.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Core exports
 from .core import Context
@@ -35,6 +37,9 @@ from . import utils
 # Intelligence module (lazy loading)
 from . import intelligence
 
+# Integrations module (lazy loading)
+from . import integrations
+
 __all__ = [
     # Core
     "Context",
@@ -59,4 +64,6 @@ __all__ = [
     "utils",
     # Intelligence
     "intelligence",
+    # Integrations
+    "integrations",
 ]

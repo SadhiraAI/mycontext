@@ -320,6 +320,225 @@ class Context(BaseModel):
         import json
         return cls.from_dict(json.loads(json_str))
     
+    def to_llamaindex(self) -> Dict[str, Any]:
+        """
+        Export context for LlamaIndex integration.
+        
+        Returns:
+            Dictionary compatible with LlamaIndex query engines
+            
+        Example:
+            ```python
+            from llama_index import VectorStoreIndex
+            context = Context(guidance="Expert", directive="Analyze")
+            
+            index = VectorStoreIndex.from_documents(docs)
+            query_engine = index.as_query_engine(
+                text_qa_template=context.to_llamaindex()['template']
+            )
+            ```
+        """
+        assembled = self.assemble()
+        return {
+            "template": assembled,
+            "system_prompt": self.guidance.render() if self.guidance else "",
+            "query_instruction": self.directive.render() if self.directive else "",
+            "context_str": assembled,
+            "metadata": self.metadata
+        }
+    
+    def to_crewai(self) -> Dict[str, Any]:
+        """
+        Export context for CrewAI integration.
+        
+        Returns:
+            Dictionary compatible with CrewAI agents and tasks
+            
+        Example:
+            ```python
+            from crewai import Agent, Task
+            context = Context(guidance="Expert Analyst", directive="Research topic")
+            
+            agent = Agent(
+                role=context.to_crewai()['role'],
+                goal=context.to_crewai()['goal'],
+                backstory=context.to_crewai()['backstory']
+            )
+            ```
+        """
+        return {
+            "role": self.guidance.role if self.guidance else "Assistant",
+            "goal": self.directive.content if self.directive else "",
+            "backstory": self.guidance.render() if self.guidance else "",
+            "context": self.assemble(),
+            "tools": [],  # User provides tools
+            "verbose": True
+        }
+    
+    def to_autogen(self) -> Dict[str, Any]:
+        """
+        Export context for AutoGen multi-agent integration.
+        
+        Returns:
+            Dictionary compatible with AutoGen agents
+            
+        Example:
+            ```python
+            from autogen import AssistantAgent
+            context = Context(guidance="Expert", directive="Solve problem")
+            
+            agent = AssistantAgent(
+                name="analyst",
+                system_message=context.to_autogen()['system_message']
+            )
+            ```
+        """
+        return {
+            "system_message": self.assemble(),
+            "description": self.directive.content if self.directive else "",
+            "max_consecutive_auto_reply": 10,
+            "human_input_mode": "NEVER",
+            "code_execution_config": False,
+        }
+    
+    def to_yaml(self) -> str:
+        """
+        Export context as YAML string.
+        
+        Returns:
+            YAML-formatted string
+            
+        Example:
+            ```python
+            context = Context(guidance="Expert")
+            yaml_str = context.to_yaml()
+            # Save to config file or transmit
+            ```
+        """
+        import yaml
+        return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
+    
+    def to_xml(self) -> str:
+        """
+        Export context as XML string.
+        
+        Returns:
+            XML-formatted string
+            
+        Example:
+            ```python
+            context = Context(guidance="Expert", directive="Analyze")
+            xml_str = context.to_xml()
+            # Use with XML-based systems
+            ```
+        """
+        from xml.etree.ElementTree import Element, SubElement, tostring
+        from xml.dom import minidom
+        
+        root = Element('context')
+        
+        if self.guidance:
+            guidance_elem = SubElement(root, 'guidance')
+            SubElement(guidance_elem, 'role').text = self.guidance.role
+            if self.guidance.rules:
+                rules_elem = SubElement(guidance_elem, 'rules')
+                for rule in self.guidance.rules:
+                    SubElement(rules_elem, 'rule').text = rule
+        
+        if self.directive:
+            directive_elem = SubElement(root, 'directive')
+            SubElement(directive_elem, 'content').text = self.directive.content
+            SubElement(directive_elem, 'priority').text = str(self.directive.priority)
+        
+        if self.knowledge:
+            SubElement(root, 'knowledge').text = self.knowledge
+        
+        # Pretty print
+        rough_string = tostring(root, encoding='unicode')
+        reparsed = minidom.parseString(rough_string)
+        return reparsed.toprettyxml(indent="  ")
+    
+    def to_anthropic(self) -> Dict[str, Any]:
+        """
+        Export context optimized for Anthropic Claude.
+        
+        Returns:
+            Dictionary with Anthropic-specific format
+            
+        Example:
+            ```python
+            from anthropic import Anthropic
+            context = Context(guidance="Expert")
+            
+            client = Anthropic()
+            response = client.messages.create(
+                **context.to_anthropic(),
+                model="claude-3-5-sonnet-20241022"
+            )
+            ```
+        """
+        messages = []
+        
+        # Anthropic prefers structured system messages
+        if self.guidance or self.directive or self.knowledge:
+            system_content = self.assemble()
+            return {
+                "system": system_content,
+                "messages": messages,
+                "max_tokens": 4096
+            }
+        
+        return {"messages": messages, "max_tokens": 4096}
+    
+    def to_openai(self) -> Dict[str, Any]:
+        """
+        Export context optimized for OpenAI.
+        
+        Returns:
+            Dictionary with OpenAI-specific format
+            
+        Example:
+            ```python
+            from openai import OpenAI
+            context = Context(guidance="Expert")
+            
+            client = OpenAI()
+            response = client.chat.completions.create(
+                **context.to_openai(),
+                model="gpt-4o-mini"
+            )
+            ```
+        """
+        return {
+            "messages": self.to_messages(),
+            "temperature": 0.7,
+            "max_tokens": 4096
+        }
+    
+    def to_google(self) -> Dict[str, Any]:
+        """
+        Export context optimized for Google Gemini.
+        
+        Returns:
+            Dictionary with Google-specific format
+            
+        Example:
+            ```python
+            from google import genai
+            context = Context(guidance="Expert")
+            
+            model = genai.GenerativeModel("gemini-2.0-flash-exp")
+            response = model.generate_content(**context.to_google())
+            ```
+        """
+        return {
+            "contents": self.assemble(),
+            "generation_config": {
+                "temperature": 0.7,
+                "max_output_tokens": 4096
+            }
+        }
+    
     def __repr__(self) -> str:
         """String representation"""
         parts = []

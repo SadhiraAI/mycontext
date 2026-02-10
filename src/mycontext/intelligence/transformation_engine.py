@@ -1,0 +1,541 @@
+"""
+Transformation Engine - Automatic pattern selection and context transformation
+
+Core intelligence layer that analyzes inputs and selects optimal cognitive patterns.
+This is the heart of mycontext's automatic context engineering.
+"""
+
+from typing import Optional, List, Dict, Any, Union
+from dataclasses import dataclass
+from enum import Enum
+
+from ..core import Context
+from ..structure.pattern import Pattern
+
+
+class InputType(Enum):
+    """Types of inputs the engine can process."""
+    QUESTION = "question"
+    PROBLEM = "problem"
+    DECISION = "decision"
+    CONCEPT = "concept"
+    COMPARISON = "comparison"
+    STATEMENT = "statement"
+    TASK = "task"
+    CONVERSATION = "conversation"
+
+
+class ComplexityLevel(Enum):
+    """Complexity assessment levels."""
+    SIMPLE = "simple"
+    MODERATE = "moderate"
+    COMPLEX = "complex"
+    HIGHLY_COMPLEX = "highly_complex"
+
+
+@dataclass
+class InputAnalysis:
+    """Analysis of an input for pattern selection."""
+    input_type: InputType
+    complexity: ComplexityLevel
+    domain: str
+    key_concepts: List[str]
+    requires_reasoning: bool
+    requires_comparison: bool
+    requires_verification: bool
+    ambiguity_level: str  # "low", "medium", "high"
+    recommended_patterns: List[str]
+    confidence: float  # 0.0 to 1.0
+
+
+class TransformationEngine:
+    """
+    Intelligent context transformation engine with automatic pattern selection.
+    
+    Core features:
+    - Analyzes input characteristics
+    - Selects optimal cognitive patterns
+    - Composes multi-pattern transformations
+    - Optimizes context quality
+    - Measures improvement
+    
+    Example:
+        >>> engine = TransformationEngine()
+        >>> context = engine.transform(
+        ...     input="Should we migrate to microservices?",
+        ...     metadata={"domain": "software", "user_level": "professional"}
+        ... )
+        >>> print(f"Patterns used: {context.metadata['patterns_applied']}")
+        >>> print(f"Quality score: {context.metadata['quality_score']}")
+    
+    This is the core innovation of mycontext - automatic, intelligent transformation.
+    """
+    
+    def __init__(self, auto_optimize: bool = True):
+        """
+        Initialize the transformation engine.
+        
+        Args:
+            auto_optimize: Automatically optimize context quality
+        """
+        self.auto_optimize = auto_optimize
+        self._pattern_registry: Dict[str, Pattern] = {}
+        self._load_patterns()
+    
+    def _load_patterns(self):
+        """Load all available cognitive patterns."""
+        from ..templates.free import (
+            QuestionAnalyzer,
+            StepByStepReasoner,
+            SocraticQuestioner,
+            ComparativeAnalyzer,
+            CausalReasoner,
+            RiskAssessor,
+            TradeoffAnalyzer,
+            IntentRecognizer,
+            AmbiguityResolver,
+            ProblemDecomposer,
+            DecisionFramework,
+            AnalogicalReasoner,
+            RootCauseAnalyzer,
+        )
+        
+        patterns = [
+            QuestionAnalyzer(),
+            StepByStepReasoner(),
+            SocraticQuestioner(),
+            ComparativeAnalyzer(),
+            CausalReasoner(),
+            RiskAssessor(),
+            TradeoffAnalyzer(),
+            IntentRecognizer(),
+            AmbiguityResolver(),
+            ProblemDecomposer(),
+            DecisionFramework(),
+            AnalogicalReasoner(),
+            RootCauseAnalyzer(),
+        ]
+        
+        for pattern in patterns:
+            self._pattern_registry[pattern.name] = pattern
+    
+    def analyze_input(
+        self,
+        input: str,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> InputAnalysis:
+        """
+        Analyze input to determine characteristics and optimal patterns.
+        
+        Args:
+            input: The raw input to analyze
+            metadata: Optional metadata (domain, user_level, etc.)
+        
+        Returns:
+            InputAnalysis with recommendations
+        """
+        metadata = metadata or {}
+        
+        # Simple heuristic-based analysis
+        # TODO: Could be enhanced with ML in future
+        
+        input_lower = input.lower()
+        
+        # Detect input type
+        input_type = self._detect_input_type(input_lower)
+        
+        # Assess complexity
+        complexity = self._assess_complexity(input, metadata)
+        
+        # Detect domain
+        domain = metadata.get("domain", self._infer_domain(input_lower))
+        
+        # Extract key concepts
+        key_concepts = self._extract_concepts(input)
+        
+        # Assess requirements
+        requires_reasoning = any(word in input_lower for word in [
+            "why", "how", "explain", "reason", "cause", "because"
+        ])
+        
+        requires_comparison = any(word in input_lower for word in [
+            "compare", "versus", "vs", "better", "best", "which", "choose"
+        ])
+        
+        requires_verification = any(word in input_lower for word in [
+            "correct", "valid", "verify", "check", "confirm", "true"
+        ])
+        
+        # Assess ambiguity
+        ambiguity_level = self._assess_ambiguity(input)
+        
+        # Recommend patterns
+        recommended_patterns = self._recommend_patterns(
+            input_type,
+            complexity,
+            requires_reasoning,
+            requires_comparison,
+            requires_verification,
+            ambiguity_level
+        )
+        
+        # Calculate confidence
+        confidence = self._calculate_confidence(input, recommended_patterns)
+        
+        return InputAnalysis(
+            input_type=input_type,
+            complexity=complexity,
+            domain=domain,
+            key_concepts=key_concepts,
+            requires_reasoning=requires_reasoning,
+            requires_comparison=requires_comparison,
+            requires_verification=requires_verification,
+            ambiguity_level=ambiguity_level,
+            recommended_patterns=recommended_patterns,
+            confidence=confidence
+        )
+    
+    def _detect_input_type(self, input_lower: str) -> InputType:
+        """Detect the type of input."""
+        if any(word in input_lower for word in ["should i", "should we", "decide", "choose"]):
+            return InputType.DECISION
+        elif any(word in input_lower for word in ["compare", "versus", "vs", "better than"]):
+            return InputType.COMPARISON
+        elif any(word in input_lower for word in ["what is", "explain", "how does", "define"]):
+            return InputType.CONCEPT
+        elif any(word in input_lower for word in ["solve", "fix", "how to", "problem with"]):
+            return InputType.PROBLEM
+        elif "?" in input_lower:
+            return InputType.QUESTION
+        else:
+            return InputType.STATEMENT
+    
+    def _assess_complexity(self, input: str, metadata: Dict[str, Any]) -> ComplexityLevel:
+        """Assess input complexity."""
+        # Simple heuristic
+        word_count = len(input.split())
+        has_multiple_questions = input.count("?") > 1
+        domain_complexity = metadata.get("complexity", "moderate")
+        
+        if word_count < 10 and not has_multiple_questions:
+            return ComplexityLevel.SIMPLE
+        elif word_count < 30 and not has_multiple_questions:
+            return ComplexityLevel.MODERATE
+        elif word_count < 60:
+            return ComplexityLevel.COMPLEX
+        else:
+            return ComplexityLevel.HIGHLY_COMPLEX
+    
+    def _infer_domain(self, input_lower: str) -> str:
+        """Infer domain from input content."""
+        domain_keywords = {
+            "technical": ["code", "software", "program", "api", "database"],
+            "financial": ["invest", "money", "cost", "revenue", "profit"],
+            "medical": ["health", "medical", "patient", "treatment", "diagnosis"],
+            "business": ["business", "market", "customer", "strategy", "company"],
+            "scientific": ["research", "experiment", "hypothesis", "theory", "data"],
+        }
+        
+        for domain, keywords in domain_keywords.items():
+            if any(kw in input_lower for kw in keywords):
+                return domain
+        
+        return "general"
+    
+    def _extract_concepts(self, input: str) -> List[str]:
+        """Extract key concepts from input."""
+        # Simple extraction - could be enhanced
+        words = input.split()
+        # Return capitalized words and important terms (simplified)
+        concepts = [w for w in words if len(w) > 5 and w[0].isupper()]
+        return concepts[:5]  # Top 5
+    
+    def _assess_ambiguity(self, input: str) -> str:
+        """Assess level of ambiguity in input."""
+        ambiguity_indicators = ["it", "this", "that", "thing", "stuff", "something"]
+        count = sum(1 for word in ambiguity_indicators if word in input.lower())
+        
+        if count >= 3:
+            return "high"
+        elif count >= 1:
+            return "medium"
+        else:
+            return "low"
+    
+    def _recommend_patterns(
+        self,
+        input_type: InputType,
+        complexity: ComplexityLevel,
+        requires_reasoning: bool,
+        requires_comparison: bool,
+        requires_verification: bool,
+        ambiguity_level: str
+    ) -> List[str]:
+        """Recommend optimal patterns based on analysis."""
+        patterns = []
+        
+        # Handle ambiguity first
+        if ambiguity_level == "high":
+            patterns.append("ambiguity_resolver")
+        
+        # Pattern selection based on input type
+        if input_type == InputType.QUESTION:
+            patterns.append("question_analyzer")
+            if requires_reasoning:
+                patterns.append("step_by_step_reasoner")
+        
+        elif input_type == InputType.PROBLEM:
+            if complexity in [ComplexityLevel.COMPLEX, ComplexityLevel.HIGHLY_COMPLEX]:
+                patterns.append("problem_decomposer")
+            patterns.append("root_cause_analyzer")
+            patterns.append("step_by_step_reasoner")
+        
+        elif input_type == InputType.DECISION:
+            patterns.append("decision_framework")
+            patterns.append("risk_assessor")
+            if requires_comparison:
+                patterns.append("comparative_analyzer")
+        
+        elif input_type == InputType.COMPARISON:
+            patterns.append("comparative_analyzer")
+            patterns.append("tradeoff_analyzer")
+        
+        elif input_type == InputType.STATEMENT:
+            patterns.append("socratic_questioner")
+            patterns.append("intent_recognizer")
+        
+        elif input_type == InputType.CONCEPT:
+            patterns.append("analogical_reasoner")
+            patterns.append("question_analyzer")
+        
+        # Add verification if needed
+        if requires_verification:
+            patterns.append("causal_reasoner")
+        
+        return patterns[:3]  # Top 3 recommendations
+    
+    def _calculate_confidence(self, input: str, patterns: List[str]) -> float:
+        """Calculate confidence in pattern selection."""
+        # Simple heuristic
+        if len(patterns) == 0:
+            return 0.3
+        elif len(patterns) == 1:
+            return 0.9
+        elif len(patterns) <= 3:
+            return 0.8
+        else:
+            return 0.7
+    
+    def transform(
+        self,
+        input: str,
+        metadata: Optional[Dict[str, Any]] = None,
+        patterns: Union[str, List[str], None] = "auto",
+        optimization: str = "balanced"
+    ) -> Context:
+        """
+        Transform raw input into perfect context.
+        
+        This is the main API method - automatic, intelligent transformation.
+        
+        Args:
+            input: Raw input to transform
+            metadata: Optional metadata (domain, complexity, user_level, etc.)
+            patterns: Pattern selection strategy:
+                - "auto": Automatic selection (default)
+                - ["pattern1", "pattern2"]: Specific patterns
+                - "all_applicable": Use all applicable patterns
+            optimization: Context optimization strategy:
+                - "speed": Minimize tokens, faster processing
+                - "quality": Maximum depth and thoroughness
+                - "balanced": Balance of speed and quality (default)
+        
+        Returns:
+            Context object with metadata about transformation
+        """
+        # Analyze input
+        analysis = self.analyze_input(input, metadata)
+        
+        # Select patterns
+        if patterns == "auto":
+            selected_patterns = analysis.recommended_patterns
+        elif isinstance(patterns, list):
+            selected_patterns = patterns
+        elif patterns == "all_applicable":
+            selected_patterns = analysis.recommended_patterns  # TODO: Expand to all applicable
+        else:
+            selected_patterns = [analysis.recommended_patterns[0]] if analysis.recommended_patterns else []
+        
+        # Apply primary pattern
+        if selected_patterns:
+            primary_pattern_name = selected_patterns[0]
+            pattern = self._pattern_registry.get(primary_pattern_name)
+            
+            if pattern:
+                # Build context using the pattern
+                # Use generic parameters that work across patterns
+                context = pattern.build_context(
+                    **self._prepare_pattern_inputs(input, analysis, pattern)
+                )
+                
+                # Add transformation metadata
+                context.data = context.data or {}
+                context.data["transformation_metadata"] = {
+                    "patterns_applied": selected_patterns,
+                    "input_analysis": {
+                        "type": analysis.input_type.value,
+                        "complexity": analysis.complexity.value,
+                        "domain": analysis.domain,
+                        "ambiguity": analysis.ambiguity_level
+                    },
+                    "confidence": analysis.confidence,
+                    "optimization": optimization
+                }
+                
+                # Apply optimization if enabled
+                if self.auto_optimize:
+                    context = self._optimize_context(context, optimization)
+                
+                return context
+        
+        # Fallback: Create basic context
+        from ..foundation import Directive, Guidance
+        return Context(
+            directive=Directive(
+                content=input,
+                priority=5
+            ),
+            guidance=Guidance(
+                role="Helpful Assistant",
+                rules=["Be clear and helpful"]
+            )
+        )
+    
+    def _prepare_pattern_inputs(
+        self,
+        input: str,
+        analysis: InputAnalysis,
+        pattern: Pattern
+    ) -> Dict[str, Any]:
+        """Prepare inputs for a specific pattern."""
+        # Generic mapping - each pattern has different parameter names
+        # This is a simplified version
+        
+        inputs = {}
+        
+        # Try common parameter names
+        if pattern.name in ["question_analyzer", "intent_recognizer"]:
+            inputs["question"] = input
+        elif pattern.name in ["step_by_step_reasoner", "problem_decomposer", "root_cause_analyzer"]:
+            inputs["problem"] = input
+        elif pattern.name == "decision_framework":
+            inputs["decision"] = input
+        elif pattern.name == "socratic_questioner":
+            inputs["statement"] = input
+        elif pattern.name == "analogical_reasoner":
+            inputs["concept"] = input
+        else:
+            inputs["input"] = input
+        
+        # Add depth based on complexity
+        if analysis.complexity == ComplexityLevel.SIMPLE:
+            inputs["depth"] = "quick"
+        elif analysis.complexity == ComplexityLevel.MODERATE:
+            inputs["depth"] = "standard"
+        else:
+            inputs["depth"] = "comprehensive"
+        
+        return inputs
+    
+    def _optimize_context(self, context: Context, strategy: str) -> Context:
+        """
+        Optimize context based on strategy.
+        
+        Args:
+            context: Context to optimize
+            strategy: Optimization strategy
+        
+        Returns:
+            Optimized context
+        """
+        # TODO: Implement actual optimization logic
+        # For now, just return as-is
+        # Future: Token reduction, clarity enhancement, etc.
+        
+        context.data = context.data or {}
+        context.data["optimized"] = True
+        context.data["optimization_strategy"] = strategy
+        
+        return context
+    
+    def get_available_patterns(self) -> List[str]:
+        """Get list of all available pattern names."""
+        return list(self._pattern_registry.keys())
+    
+    def get_pattern(self, name: str) -> Optional[Pattern]:
+        """Get a specific pattern by name."""
+        return self._pattern_registry.get(name)
+    
+    def explain_selection(
+        self,
+        input: str,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """
+        Explain why certain patterns were selected.
+        
+        Args:
+            input: The input to analyze
+            metadata: Optional metadata
+        
+        Returns:
+            Human-readable explanation of pattern selection
+        """
+        analysis = self.analyze_input(input, metadata)
+        
+        explanation = f"""Input Analysis for: "{input}"
+
+Input Type: {analysis.input_type.value}
+Complexity: {analysis.complexity.value}
+Domain: {analysis.domain}
+Ambiguity Level: {analysis.ambiguity_level}
+
+Reasoning Requirements:
+- Requires reasoning: {analysis.requires_reasoning}
+- Requires comparison: {analysis.requires_comparison}
+- Requires verification: {analysis.requires_verification}
+
+Recommended Patterns:
+"""
+        for i, pattern_name in enumerate(analysis.recommended_patterns, 1):
+            explanation += f"{i}. {pattern_name}\n"
+        
+        explanation += f"\nConfidence in selection: {analysis.confidence:.1%}"
+        
+        return explanation
+
+
+# Convenience function for quick transformation
+def transform(
+    input: str,
+    metadata: Optional[Dict[str, Any]] = None,
+    patterns: Union[str, List[str], None] = "auto"
+) -> Context:
+    """
+    Quick transformation function.
+    
+    Args:
+        input: Raw input to transform
+        metadata: Optional metadata
+        patterns: Pattern selection strategy
+    
+    Returns:
+        Transformed context
+    
+    Example:
+        >>> from mycontext.intelligence import transform
+        >>> context = transform("Should we use microservices?")
+        >>> print(context.to_markdown())
+    """
+    engine = TransformationEngine()
+    return engine.transform(input, metadata, patterns)

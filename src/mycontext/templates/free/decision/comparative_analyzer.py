@@ -5,8 +5,8 @@ Structured comparison framework for evaluating alternatives.
 """
 
 from typing import List, Optional
-from ...structure.pattern import Pattern
-from ...foundation import Guidance, Directive
+from mycontext.structure import Pattern
+from mycontext.foundation import Guidance, Directive
 
 
 class ComparativeAnalyzer(Pattern):
