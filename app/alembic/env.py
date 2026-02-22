@@ -25,6 +25,11 @@ if db_url.startswith("sqlite+aiosqlite"):
     db_url = db_url.replace("sqlite+aiosqlite", "sqlite", 1)
 elif db_url.startswith("postgresql+asyncpg"):
     db_url = db_url.replace("postgresql+asyncpg", "postgresql+psycopg2", 1)
+    # Strip query params that psycopg2 doesn't understand, keep only sslmode
+    from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
+    parsed = urlparse(db_url)
+    clean_params = {k: v[0] for k, v in parse_qs(parsed.query).items() if k == "sslmode"}
+    db_url = urlunparse(parsed._replace(query=urlencode(clean_params)))
 
 config.set_main_option("sqlalchemy.url", db_url)
 

@@ -23,11 +23,13 @@ docs
 examples
 tests
 scripts
-*.md
 *.ipynb
 .cursor
 .vscode
 .idea
+CONTRIBUTING.md
+CHANGELOG.md
+SDK_CODEBASE_AUDIT.md
 
 # SQLite dev database
 *.db

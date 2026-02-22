@@ -5,6 +5,7 @@ app = 'sadhiraai-api'
 primary_region = 'iad'  # US East (Washington DC) -- change to your nearest region
 
 [build]
+  dockerfile = "Dockerfile"
 
 [env]
   PORT = '8000'

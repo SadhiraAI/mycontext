@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174"
 
     # Trusted hosts (production only)
-    allowed_hosts: str = "sadhiraai.com,mycontext.sadhiraai.com,api.sadhiraai.com,localhost,127.0.0.1"
+    allowed_hosts: str = "sadhiraai.com,mycontext.sadhiraai.com,api.sadhiraai.com,sadhiraai-api.fly.dev,localhost,127.0.0.1"
 
     @property
     def is_production(self) -> bool:

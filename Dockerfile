@@ -13,12 +13,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY pyproject.toml /app/
+COPY README.md /app/
 COPY src/ /app/src/
 COPY app/ /app/app/
 COPY alembic.ini /app/
 
 # Install the mycontext SDK package
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir .
 
 EXPOSE 8000
 
