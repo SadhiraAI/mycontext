@@ -22,12 +22,16 @@ def _build_registry() -> dict[str, type[Pattern]]:
     keyed by their ``name`` attribute (set in __init__).
     """
     from ..structure import Pattern as PatternBase
-    from ..templates import enterprise as ent_pkg
     from ..templates import free as free_pkg
+
+    try:
+        from ..templates import enterprise as ent_pkg
+    except ImportError:
+        ent_pkg = None
 
     registry: dict[str, type[Pattern]] = {}
 
-    for pkg in (free_pkg, ent_pkg):
+    for pkg in (free_pkg, ent_pkg) if ent_pkg else (free_pkg,):
         for attr_name in dir(pkg):
             cls = getattr(pkg, attr_name)
             if (

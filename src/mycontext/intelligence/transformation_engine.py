@@ -82,11 +82,6 @@ class TransformationEngine:
 
     def _load_patterns(self):
         """Load all available cognitive patterns. Excludes enterprise when include_enterprise=False."""
-        from ..templates.enterprise import (
-            AmbiguityResolver,
-            AnalogicalReasoner,
-            CausalReasoner,
-        )
         from ..templates.free import (
             IntentRecognizer,
             QuestionAnalyzer,
@@ -104,19 +99,26 @@ class TransformationEngine:
             RootCauseAnalyzer(),
         ]
         if self.include_enterprise:
-            patterns.extend([
-                CausalReasoner(),
-                AmbiguityResolver(),
-                AnalogicalReasoner(),
-            ])
-        if self.include_enterprise:
-            from ..templates.enterprise.decision import (
-                ComparativeAnalyzer,
-                DecisionFramework,
-                TradeoffAnalyzer,
-            )
-            from ..templates.enterprise.problem_solving import ProblemDecomposer
-            patterns.extend([ComparativeAnalyzer(), TradeoffAnalyzer(), ProblemDecomposer(), DecisionFramework()])
+            try:
+                from ..templates.enterprise import (
+                    AmbiguityResolver,
+                    AnalogicalReasoner,
+                    CausalReasoner,
+                )
+                patterns.extend([
+                    CausalReasoner(),
+                    AmbiguityResolver(),
+                    AnalogicalReasoner(),
+                ])
+                from ..templates.enterprise.decision import (
+                    ComparativeAnalyzer,
+                    DecisionFramework,
+                    TradeoffAnalyzer,
+                )
+                from ..templates.enterprise.problem_solving import ProblemDecomposer
+                patterns.extend([ComparativeAnalyzer(), TradeoffAnalyzer(), ProblemDecomposer(), DecisionFramework()])
+            except ImportError:
+                pass
 
         for pattern in patterns:
             self._pattern_registry[pattern.name] = pattern

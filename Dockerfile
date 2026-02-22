@@ -18,8 +18,9 @@ COPY src/ /app/src/
 COPY app/ /app/app/
 COPY alembic.ini /app/
 
-# Install the mycontext SDK package
-RUN pip install --no-cache-dir .
+# Install the mycontext SDK (include enterprise templates for private deployment)
+RUN sed -i '/mycontext\/templates\/enterprise/d' pyproject.toml && \
+    pip install --no-cache-dir .
 
 EXPOSE 8000
 
