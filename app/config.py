@@ -38,7 +38,16 @@ class Settings(BaseSettings):
     encryption_key: str | None = None  # Set via env; base64 Fernet key
 
     # CORS
-    cors_origins: str = "http://localhost:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174"
+    cors_origins: str = (
+        "https://mycontext.sadhiraai.com,"
+        "https://mycontext.pages.dev,"
+        "https://sadhiraai.com,"
+        "http://localhost:5173,"
+        "http://localhost:5174,"
+        "http://localhost:3000,"
+        "http://127.0.0.1:5173,"
+        "http://127.0.0.1:5174"
+    )
 
     # Trusted hosts (production only)
     allowed_hosts: str = "sadhiraai.com,mycontext.sadhiraai.com,api.sadhiraai.com,sadhiraai-api.fly.dev,localhost,127.0.0.1"
