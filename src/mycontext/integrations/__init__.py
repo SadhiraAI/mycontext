@@ -17,6 +17,7 @@ from .helpers import (
     AutoGenHelper,
     DSPyHelper,
     SemanticKernelHelper,
+    GoogleADKHelper,
     auto_integrate
 )
 
@@ -27,5 +28,6 @@ __all__ = [
     "AutoGenHelper",
     "DSPyHelper",
     "SemanticKernelHelper",
+    "GoogleADKHelper",
     "auto_integrate",
 ]

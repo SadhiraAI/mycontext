@@ -25,7 +25,7 @@ class LangChainHelper:
         >>> messages = helper.to_messages(context)
         >>> 
         >>> # Use with LangChain
-        >>> from langchain.chat_models import ChatOpenAI
+        >>> from langchain_openai import ChatOpenAI
         >>> chat = ChatOpenAI()
         >>> response = chat(messages)
     """
@@ -34,30 +34,28 @@ class LangChainHelper:
     def to_messages(context: Context, user_message: Optional[str] = None):
         """Convert context to LangChain messages."""
         try:
-            from langchain.schema import SystemMessage, HumanMessage
-            
-            messages = []
-            
-            # Add system message from context
-            system_content = context.assemble()
-            if system_content:
-                messages.append(SystemMessage(content=system_content))
-            
-            # Add user message if provided
-            if user_message:
-                messages.append(HumanMessage(content=user_message))
-            
-            return messages
+            from langchain_core.messages import SystemMessage, HumanMessage
         except ImportError:
             raise ImportError(
-                "LangChain is not installed. Install with: pip install langchain"
+                "langchain-core is not installed. Install with: pip install langchain-core"
             )
+
+        messages = []
+
+        system_content = context.assemble()
+        if system_content:
+            messages.append(SystemMessage(content=system_content))
+
+        if user_message:
+            messages.append(HumanMessage(content=user_message))
+
+        return messages
     
     @staticmethod
     def to_prompt_template(context: Context):
         """Convert context to LangChain PromptTemplate."""
         try:
-            from langchain.prompts import PromptTemplate
+            from langchain_core.prompts import PromptTemplate
             
             template = context.assemble()
             if context.data:
@@ -68,14 +66,14 @@ class LangChainHelper:
             return PromptTemplate(template=template, input_variables=[])
         except ImportError:
             raise ImportError(
-                "LangChain is not installed. Install with: pip install langchain"
+                "langchain-core is not installed. Install with: pip install langchain-core"
             )
     
     @staticmethod
     def to_chat_prompt(context: Context):
         """Convert context to LangChain ChatPromptTemplate."""
         try:
-            from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate
+            from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate
             
             system_template = context.assemble()
             system_message = SystemMessagePromptTemplate.from_template(system_template)
@@ -83,7 +81,7 @@ class LangChainHelper:
             return ChatPromptTemplate.from_messages([system_message])
         except ImportError:
             raise ImportError(
-                "LangChain is not installed. Install with: pip install langchain"
+                "langchain-core is not installed. Install with: pip install langchain-core"
             )
 
 
@@ -194,6 +192,7 @@ class CrewAIHelper:
         context: Context,
         description: Optional[str] = None,
         agent: Optional[Any] = None,
+        expected_output: Optional[str] = None,
         **kwargs
     ):
         """Create a CrewAI task with mycontext context."""
@@ -203,9 +202,16 @@ class CrewAIHelper:
             task_description = description or (
                 context.directive.content if context.directive else "Complete the task"
             )
+            # CrewAI Task requires expected_output (required since crewai 1.x)
+            # Derive from context.to_crewai() so we generate per CrewAI framework
+            output = expected_output or kwargs.pop("expected_output", None)
+            if output is None:
+                crew_config = context.to_crewai()
+                output = crew_config.get("expected_output", "A complete, actionable response addressing the task.")
             
             return Task(
                 description=task_description,
+                expected_output=output,
                 agent=agent,
                 **kwargs
             )
@@ -334,23 +340,80 @@ class SemanticKernelHelper:
     
     @staticmethod
     def create_semantic_function(
-        kernel: Any,
-        context: Context,
+        kernel,
+        context,
         function_name: str = "mycontext_function",
+        plugin_name: str = "mycontext",
         **kwargs
     ):
-        """Create a Semantic Kernel function with mycontext context."""
+        """Create a Semantic Kernel function with mycontext context.
+
+        Compatible with Semantic Kernel 1.x (kernel.add_function).
+        """
         try:
+            from semantic_kernel.functions import KernelFunctionFromPrompt
+
             prompt_template = context.assemble()
-            
-            return kernel.create_semantic_function(
-                prompt_template=prompt_template,
+            fn = KernelFunctionFromPrompt(
                 function_name=function_name,
+                plugin_name=plugin_name,
+                prompt=prompt_template,
                 **kwargs
             )
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to create semantic function. Make sure Semantic Kernel is installed: {e}"
+            kernel.add_function(plugin_name=plugin_name, function=fn)
+            return fn
+        except ImportError:
+            raise ImportError(
+                "Semantic Kernel is not installed. Install with: pip install semantic-kernel"
+            )
+
+
+class GoogleADKHelper:
+    """
+    Helper for Google Agent Development Kit (ADK) integration.
+
+    Uses mycontext context as the agent's instruction.
+
+    Example:
+        >>> from mycontext import Context
+        >>> from mycontext.integrations import GoogleADKHelper
+        >>> context = Context(guidance="Expert explainer", directive="Explain X")
+        >>> agent = GoogleADKHelper.create_agent(context, name="explainer")
+    """
+
+    @staticmethod
+    def to_instruction(context: Context) -> str:
+        """Convert context to ADK agent instruction string."""
+        return context.assemble()
+
+    @staticmethod
+    def create_agent(
+        context: Context,
+        name: str = "agent",
+        model: str = "gemini-2.0-flash",
+        description: Optional[str] = None,
+        tools: Optional[List] = None,
+        **kwargs
+    ):
+        """Create a Google ADK Agent with mycontext context as instruction."""
+        try:
+            from google.adk.agents import Agent
+
+            instruction = context.assemble()
+            desc = description or (
+                context.directive.content[:200] if context.directive else "mycontext-powered agent"
+            )
+            return Agent(
+                model=model,
+                name=name,
+                instruction=instruction,
+                description=desc,
+                tools=tools or [],
+                **kwargs
+            )
+        except ImportError:
+            raise ImportError(
+                "Google ADK is not installed. Install with: pip install google-adk"
             )
 
 
@@ -390,8 +453,10 @@ def auto_integrate(context: Context, framework: str, **kwargs) -> Any:
         return DSPyHelper.to_prompt(context)
     elif framework == "semantic_kernel" or framework == "semantickernel":
         return SemanticKernelHelper.to_prompt_template(context)
+    elif framework == "google_adk" or framework == "adk":
+        return GoogleADKHelper.create_agent(context, **kwargs)
     else:
         raise ValueError(
             f"Unknown framework: {framework}. "
-            f"Supported: langchain, llamaindex, crewai, autogen, dspy, semantic_kernel"
+            f"Supported: langchain, llamaindex, crewai, autogen, dspy, semantic_kernel, google_adk"
         )

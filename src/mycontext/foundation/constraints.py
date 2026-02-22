@@ -87,7 +87,8 @@ class Constraints(BaseModel):
         if self.language:
             parts.append(f"Language: {self.language}")
         
-        return "\n".join(parts)
+        # Join sections with double newline so Markdown renders proper paragraph breaks
+        return "\n\n".join(parts)
     
     def __repr__(self) -> str:
         """String representation"""

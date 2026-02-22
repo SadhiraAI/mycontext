@@ -4,6 +4,7 @@ Core Context class - The heart of mycontext
 This is where Context as Code™ comes to life.
 """
 
+from pathlib import Path
 from typing import Any, Dict, Optional, Union
 from pydantic import BaseModel, Field
 
@@ -87,7 +88,40 @@ class Context(BaseModel):
             directive = Directive(content=directive)
         
         super().__init__(guidance=guidance, directive=directive, **kwargs)
-    
+
+    @classmethod
+    def from_skill(
+        cls,
+        skill_or_path: Union[Path, str, Any],
+        task: Optional[str] = None,
+        include_references: bool = True,
+        **params: Any,
+    ) -> "Context":
+        """
+        Build a Context from an Agent Skill (SKILL.md). Convenience for SkillRunner.build_context().
+
+        Args:
+            skill_or_path: Path to a directory containing SKILL.md, or a loaded Skill instance.
+            task: Optional task text (appended or fused with the skill).
+            include_references: Include the skill's references/ folder in knowledge.
+            **params: Skill parameters (for input_schema) and pattern inputs.
+
+        Returns:
+            Context built from the skill (with pattern fusion if the skill declares a pattern).
+
+        Example:
+            >>> from mycontext import Context
+            >>> from pathlib import Path
+            >>> ctx = Context.from_skill(Path("my_skill"), task="Compare A and B")
+        """
+        from .skills import SkillRunner
+        from .skills.skill import Skill
+        if isinstance(skill_or_path, (Path, str)):
+            skill = Skill.load(Path(skill_or_path))
+        else:
+            skill = skill_or_path
+        return SkillRunner().build_context(skill, task=task, include_references=include_references, **params)
+
     def assemble(self) -> str:
         """
         Assemble the complete context into a formatted string.
@@ -142,9 +176,93 @@ class Context(BaseModel):
         """
         from .providers import get_provider
         
-        provider_instance = get_provider(provider)
+        api_key = kwargs.pop("api_key", None)
+        provider_instance = get_provider(provider, api_key=api_key)
         return provider_instance.generate(self, **kwargs)
     
+    def to_prompt(
+        self,
+        refine: bool = False,
+        provider: str = "openai",
+        model: str = "gpt-4o-mini",
+        **kwargs,
+    ) -> str:
+        """
+        Convert this context into an optimized, self-contained prompt string.
+
+        Two modes:
+          - **Zero-cost** (``refine=False``): restructures the assembled
+            context into a clean prompt with no API call.
+          - **LLM-refined** (``refine=True``): uses a lightweight LLM call
+            to distill the cognitive framework into a concise, natural prompt.
+
+        The returned prompt is provider-agnostic — it can be sent to any LLM.
+
+        Args:
+            refine: If True, use an LLM to distill the context into a
+                    polished prompt.  If False, zero-cost formatting.
+            provider: LLM provider for refinement (only when refine=True).
+            model: Model for refinement (default ``gpt-4o-mini``).
+
+        Returns:
+            Optimized prompt string.
+
+        Example::
+
+            >>> ctx = RootCauseAnalyzer().build_context(problem="server outage")
+            >>> prompt = ctx.to_prompt()          # zero-cost
+            >>> prompt = ctx.to_prompt(refine=True)  # LLM-refined
+        """
+        assembled = self.assemble()
+
+        if not refine:
+            parts = []
+            if self.guidance:
+                role = getattr(self.guidance, "role", "")
+                rules = getattr(self.guidance, "rules", [])
+                if role:
+                    parts.append(f"Act as {role}.")
+                if rules:
+                    rules_text = " ".join(f"({i+1}) {r}" for i, r in enumerate(rules))
+                    parts.append(f"Rules: {rules_text}")
+            if self.directive:
+                content = getattr(self.directive, "content", "")
+                if content:
+                    parts.append(content)
+            return "\n\n".join(parts) if parts else assembled
+
+        meta_prompt = (
+            "You are a prompt engineer. Distill the analytical framework below "
+            "into a single, self-contained prompt (800-1200 characters) that "
+            "another LLM can execute directly to produce a high-quality answer.\n\n"
+            "RULES:\n"
+            "- Preserve the core reasoning methodology (e.g., root cause analysis, "
+            "comparative framework, ethical lenses).\n"
+            "- Include clear output structure expectations.\n"
+            "- Do NOT answer the question — produce only the optimized PROMPT.\n"
+            "- The prompt must be provider-agnostic (works with any LLM).\n\n"
+            f"FRAMEWORK TO DISTILL:\n{assembled[:6000]}\n\n"
+            "OUTPUT THE OPTIMIZED PROMPT ONLY:"
+        )
+
+        try:
+            from .foundation import Directive, Guidance
+            refine_ctx = self.__class__(
+                guidance=Guidance(
+                    role="Expert prompt engineer specializing in cognitive reasoning frameworks",
+                    rules=["Output ONLY the optimized prompt, nothing else"],
+                ),
+                directive=Directive(content=meta_prompt),
+            )
+            result = refine_ctx.execute(provider=provider, model=model, **kwargs)
+            refined = result.response.strip()
+            if refined.startswith("```"):
+                lines = refined.split("\n")
+                refined = "\n".join(lines[1:-1]).strip()
+            return refined
+        except Exception:
+            return self.to_prompt(refine=False)
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert context to dictionary for serialization.
@@ -200,7 +318,7 @@ class Context(BaseModel):
             lc_format = context.to_langchain()
             
             # Use in LangChain
-            from langchain.schema import SystemMessage
+            from langchain_core.messages import SystemMessage
             system_msg = SystemMessage(content=lc_format['system_message'])
             ```
         """
@@ -352,25 +470,31 @@ class Context(BaseModel):
         Export context for CrewAI integration.
         
         Returns:
-            Dictionary compatible with CrewAI agents and tasks
+            Dictionary compatible with CrewAI agents and tasks:
+            - role, goal, backstory: for Agent
+            - expected_output: for Task (derived from constraints.must_include)
             
         Example:
             ```python
             from crewai import Agent, Task
             context = Context(guidance="Expert Analyst", directive="Research topic")
-            
-            agent = Agent(
-                role=context.to_crewai()['role'],
-                goal=context.to_crewai()['goal'],
-                backstory=context.to_crewai()['backstory']
-            )
+            crew = context.to_crewai()
+            agent = Agent(role=crew['role'], goal=crew['goal'], backstory=crew['backstory'])
+            task = Task(description=crew['goal'], expected_output=crew['expected_output'])
             ```
         """
+        # Derive expected_output for CrewAI Task from constraints
+        expected_output = "A complete, actionable response addressing the task."
+        if self.constraints and self.constraints.must_include:
+            parts = ", ".join(self.constraints.must_include)
+            expected_output = f"Output must include: {parts}"
+        
         return {
             "role": self.guidance.role if self.guidance else "Assistant",
             "goal": self.directive.content if self.directive else "",
             "backstory": self.guidance.render() if self.guidance else "",
             "context": self.assemble(),
+            "expected_output": expected_output,
             "tools": [],  # User provides tools
             "verbose": True
         }
@@ -408,6 +532,9 @@ class Context(BaseModel):
         Returns:
             YAML-formatted string
             
+        Raises:
+            ImportError: If pyyaml is not installed.
+            
         Example:
             ```python
             context = Context(guidance="Expert")
@@ -415,49 +542,74 @@ class Context(BaseModel):
             # Save to config file or transmit
             ```
         """
-        import yaml
+        try:
+            import yaml
+        except ImportError:
+            raise ImportError(
+                "pyyaml is not installed. Install with: pip install pyyaml"
+            )
         return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
     
     def to_xml(self) -> str:
-        """
-        Export context as XML string.
-        
-        Returns:
-            XML-formatted string
-            
-        Example:
-            ```python
-            context = Context(guidance="Expert", directive="Analyze")
-            xml_str = context.to_xml()
-            # Use with XML-based systems
-            ```
-        """
+        """Export context as XML string including all fields."""
         from xml.etree.ElementTree import Element, SubElement, tostring
         from xml.dom import minidom
-        
-        root = Element('context')
-        
+
+        def _safe_text(value: object) -> str:
+            """Ensure text is XML-safe (no None values)."""
+            return str(value) if value is not None else ""
+
+        root = Element("context")
+
         if self.guidance:
-            guidance_elem = SubElement(root, 'guidance')
-            SubElement(guidance_elem, 'role').text = self.guidance.role
+            guidance_elem = SubElement(root, "guidance")
+            SubElement(guidance_elem, "role").text = _safe_text(self.guidance.role)
             if self.guidance.rules:
-                rules_elem = SubElement(guidance_elem, 'rules')
+                rules_elem = SubElement(guidance_elem, "rules")
                 for rule in self.guidance.rules:
-                    SubElement(rules_elem, 'rule').text = rule
-        
+                    SubElement(rules_elem, "rule").text = _safe_text(rule)
+            if self.guidance.style:
+                SubElement(guidance_elem, "style").text = _safe_text(self.guidance.style)
+
         if self.directive:
-            directive_elem = SubElement(root, 'directive')
-            SubElement(directive_elem, 'content').text = self.directive.content
-            SubElement(directive_elem, 'priority').text = str(self.directive.priority)
-        
+            directive_elem = SubElement(root, "directive")
+            SubElement(directive_elem, "content").text = _safe_text(self.directive.content)
+            SubElement(directive_elem, "priority").text = str(self.directive.priority)
+
+        if self.constraints:
+            constraints_elem = SubElement(root, "constraints")
+            if self.constraints.must_include:
+                mi_elem = SubElement(constraints_elem, "must_include")
+                for item in self.constraints.must_include:
+                    SubElement(mi_elem, "item").text = _safe_text(item)
+            if self.constraints.must_not_include:
+                mni_elem = SubElement(constraints_elem, "must_not_include")
+                for item in self.constraints.must_not_include:
+                    SubElement(mni_elem, "item").text = _safe_text(item)
+            if self.constraints.format_rules:
+                fr_elem = SubElement(constraints_elem, "format_rules")
+                for rule in self.constraints.format_rules:
+                    SubElement(fr_elem, "rule").text = _safe_text(rule)
+            if self.constraints.max_length:
+                SubElement(constraints_elem, "max_length").text = str(self.constraints.max_length)
+            if self.constraints.language:
+                SubElement(constraints_elem, "language").text = _safe_text(self.constraints.language)
+
         if self.knowledge:
-            SubElement(root, 'knowledge').text = self.knowledge
-        
-        # Pretty print
-        rough_string = tostring(root, encoding='unicode')
-        reparsed = minidom.parseString(rough_string)
-        return reparsed.toprettyxml(indent="  ")
-    
+            SubElement(root, "knowledge").text = _safe_text(self.knowledge)
+
+        if self.data:
+            data_elem = SubElement(root, "data")
+            for key, val in self.data.items():
+                SubElement(data_elem, str(key)).text = _safe_text(val)
+
+        try:
+            rough_string = tostring(root, encoding="unicode")
+            reparsed = minidom.parseString(rough_string)
+            return reparsed.toprettyxml(indent="  ")
+        except Exception:
+            return tostring(root, encoding="unicode")
+
     def to_anthropic(self) -> Dict[str, Any]:
         """
         Export context optimized for Anthropic Claude.

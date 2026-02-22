@@ -1,0 +1,125 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--accent-glow), transparent),
+    var(--bg);
+}
+
+.auth-theme {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-back {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.auth-back:hover {
+  color: var(--text);
+}
+
+.auth-page .auth-card {
+  margin-top: 3rem;
+}
+
+/* ── Glass auth card ───────────────────────────────────── */
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.auth-card h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.auth-sub {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Inputs ────────────────────────────────────────────── */
+.auth-card input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.auth-card input::placeholder {
+  color: var(--text-muted);
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.auth-error {
+  color: var(--error);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* ── Submit button ─────────────────────────────────────── */
+.auth-card button {
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.auth-card button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.auth-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  margin: 1.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.auth-switch a {
+  font-weight: 500;
+}

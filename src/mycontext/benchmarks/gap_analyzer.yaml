@@ -1,0 +1,11 @@
+template: gap_analyzer
+test_cases:
+  - question: "We want SOC2 compliance but have no formal security program"
+    expected:
+      min_score: 0.5
+      must_contain: ["gap", "current"]
+    tags: [compliance, security]
+  - question: "Our team wants to adopt microservices but we run a monolith"
+    expected:
+      min_score: 0.5
+    tags: [architecture, migration]

@@ -1,0 +1,65 @@
+{
+  "sprint": "Sprint 1 \u2014 Cognitive RAG Experiment",
+  "date": "2026-02-21T09:58:44.266299",
+  "provider": "openai",
+  "question": "Why did customer churn spike 40% last quarter and what should we do about it?",
+  "retrieved_docs_chars": 1441,
+  "conditions": {
+    "A_raw": {
+      "label": "A. Raw prompt",
+      "overall": 0.7375,
+      "dimensions": {
+        "instruction_following": 0.5,
+        "reasoning_depth": 1.0,
+        "actionability": 1.0,
+        "structure_compliance": 0.75,
+        "cognitive_scaffolding": 0.5
+      },
+      "time_seconds": 20.6,
+      "output_length": 3651,
+      "evidence_markers_found": 1
+    },
+    "B_rag_only": {
+      "label": "B. RAG only",
+      "overall": 0.8732,
+      "dimensions": {
+        "instruction_following": 1.0,
+        "reasoning_depth": 0.591,
+        "actionability": 1.0,
+        "structure_compliance": 0.7,
+        "cognitive_scaffolding": 1.0
+      },
+      "time_seconds": 8.67,
+      "output_length": 3420,
+      "evidence_markers_found": 9
+    },
+    "C_template_only": {
+      "label": "C. Template only",
+      "overall": 0.7416,
+      "dimensions": {
+        "instruction_following": 0.5,
+        "reasoning_depth": 0.787,
+        "actionability": 1.0,
+        "structure_compliance": 0.75,
+        "cognitive_scaffolding": 0.7333
+      },
+      "time_seconds": 21.75,
+      "output_length": 6093,
+      "evidence_markers_found": 1
+    },
+    "D_cognitive_rag": {
+      "label": "D. Cognitive RAG",
+      "overall": 0.7394,
+      "dimensions": {
+        "instruction_following": 0.4333,
+        "reasoning_depth": 0.808,
+        "actionability": 1.0,
+        "structure_compliance": 0.7,
+        "cognitive_scaffolding": 0.8222
+      },
+      "time_seconds": 21.86,
+      "output_length": 5685,
+      "evidence_markers_found": 7
+    }
+  }
+}

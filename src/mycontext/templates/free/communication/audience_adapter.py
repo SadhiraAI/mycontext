@@ -33,7 +33,32 @@ class AudienceAdapter(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a communication strategist and audience specialist. Adapt the "
+        "following content for a different audience:\n\n"
+        "Original message: {message}\n"
+        "Current audience: {current_audience}\n"
+        "Target audience: {target_audience}\n"
+        "{context_section}\n\n"
+        "Apply audience-centered adaptation: "
+        "(1) Profile the target audience — expertise level, interests, communication "
+        "preferences, and what they care about. "
+        "(2) Extract the core message that must survive the adaptation. "
+        "(3) Adjust language — match technical level, translate jargon, and "
+        "calibrate complexity. "
+        "(4) Reframe — choose examples, analogies, and framing that resonate with "
+        "the target audience's experience. "
+        "(5) Adapt tone and style — formal vs. casual, authoritative vs. "
+        "collaborative, detail-oriented vs. big-picture. "
+        "(6) Optimize structure for how this audience consumes information. "
+        "(7) Deliver the fully adapted message. "
+        "(8) Note key adaptations made and potential questions the new audience "
+        "might have.\n\n"
+        "Preserve the core message's accuracy while optimizing resonance for the "
+        "target audience."
+    )
+
     def __init__(self):
         super().__init__(
             name="audience_adapter",

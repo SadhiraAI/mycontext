@@ -42,7 +42,30 @@ class SocraticQuestioner(Pattern):
         - context_section (str, optional): Additional context
         - depth (str): Level of inquiry ("basic", "detailed", "thorough")
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a Socratic philosopher and critical thinking expert. Apply the "
+        "Socratic method to examine the following statement or topic:\n\n"
+        "Statement: {statement}\n"
+        "{context_section}\n"
+        "Depth: {depth}\n\n"
+        "Generate probing questions across six categories: "
+        "(1) Clarifying Questions — what exactly do you mean? Can you rephrase that? "
+        "What is the central claim? "
+        "(2) Assumption Questions — what are you assuming? Why do you believe that "
+        "assumption holds? What if the opposite were true? "
+        "(3) Evidence Questions — what evidence supports this? How do you know? What "
+        "would change your mind? "
+        "(4) Perspective Questions — how would someone who disagrees view this? What "
+        "alternative viewpoints exist? What are you not seeing? "
+        "(5) Implication Questions — if this is true, what follows? What are the "
+        "consequences? What does this connect to? "
+        "(6) Meta Questions — why is this question important? What would a better "
+        "question be?\n\n"
+        "Generate 2-3 penetrating questions per category. Then synthesize the most "
+        "important insights these questions reveal."
+    )
+
     def __init__(self):
         super().__init__(
             name="socratic_questioner",

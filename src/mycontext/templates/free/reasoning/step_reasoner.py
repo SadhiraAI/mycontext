@@ -32,7 +32,28 @@ class StepByStepReasoner(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are an expert problem solver and educator. Solve the following problem "
+        "using explicit, step-by-step reasoning:\n\n"
+        "Problem: {problem}\n"
+        "{context_section}\n"
+        "Domain: {domain}\n\n"
+        "Follow a structured problem-solving methodology: "
+        "(1) UNDERSTAND — restate the problem in your own words, identify the problem "
+        "type, and clarify what is being asked. "
+        "(2) PLAN — outline your solution strategy and explain why this approach is "
+        "appropriate. "
+        "(3) EXECUTE — work through each step methodically, showing what you are doing, "
+        "why, how, and the intermediate result at each stage. "
+        "(4) VERIFY — check your answer against the original problem, apply an "
+        "alternative verification method if possible. "
+        "(5) CONCLUDE — state the final answer, assess your confidence level, and "
+        "highlight key insights.\n\n"
+        "Show all work. Explain the reasoning behind each step. Make your thought "
+        "process transparent."
+    )
+
     def __init__(self):
         super().__init__(
             name="step_by_step_reasoner",

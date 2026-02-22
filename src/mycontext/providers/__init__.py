@@ -1,7 +1,12 @@
 """
 Provider Layer - LLM Provider Integration
 
-This layer provides the interface to different LLM providers.
+Uses LiteLLM as the unified backend for OpenAI, Anthropic, Google Gemini,
+and 100+ other providers through a single interface.
+
+Individual provider wrappers (openai.py, anthropic.py, gemini.py) have been
+removed in favour of the single LiteLLMProvider.  Custom providers can still
+be registered via register_provider().
 """
 
 from typing import Any, Dict, Optional
@@ -9,17 +14,19 @@ from typing import Any, Dict, Optional
 from .base import BaseProvider, ProviderResponse
 from .mock import MockProvider
 
-# Lazy imports for optional dependencies
 _PROVIDER_CACHE: Dict[str, BaseProvider] = {}
 
+_DEFAULT_MODELS: Dict[str, str] = {
+    "openai": "gpt-4o-mini",
+    "anthropic": "claude-3-5-haiku-20241022",
+    "gemini": "gemini-2.0-flash",
+}
 
 __all__ = [
     "BaseProvider",
     "ProviderResponse",
     "MockProvider",
-    "OpenAIProvider",
-    "AnthropicProvider",
-    "GeminiProvider",
+    "LiteLLMProvider",
     "get_provider",
     "register_provider",
     "list_providers",
@@ -27,46 +34,22 @@ __all__ = [
 
 
 def __getattr__(name: str) -> Any:
-    """Lazy import providers to avoid unnecessary dependencies"""
-    if name == "OpenAIProvider":
-        from .openai import OpenAIProvider
-        return OpenAIProvider
-    elif name == "AnthropicProvider":
-        from .anthropic import AnthropicProvider
-        return AnthropicProvider
-    elif name == "GeminiProvider":
-        from .gemini import GeminiProvider
-        return GeminiProvider
+    """Lazy import LiteLLMProvider to avoid requiring litellm at import time."""
+    if name == "LiteLLMProvider":
+        from .litellm_provider import LiteLLMProvider
+        return LiteLLMProvider
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-# Provider registry
 _PROVIDER_REGISTRY: Dict[str, type[BaseProvider]] = {
     "mock": MockProvider,
 }
 
 
 def register_provider(name: str, provider_class: type[BaseProvider]) -> None:
-    """
-    Register a custom provider.
-    
-    Args:
-        name: Provider name (used in get_provider)
-        provider_class: Provider class (must inherit from BaseProvider)
-        
-    Example:
-        >>> from mycontext.providers import register_provider
-        >>> from mycontext.providers.base import BaseProvider
-        >>> 
-        >>> class MyCustomProvider(BaseProvider):
-        ...     # implementation
-        ...     pass
-        >>> 
-        >>> register_provider("custom", MyCustomProvider)
-    """
+    """Register a custom provider."""
     if not issubclass(provider_class, BaseProvider):
         raise TypeError(f"{provider_class} must inherit from BaseProvider")
-    
     _PROVIDER_REGISTRY[name] = provider_class
 
 
@@ -75,86 +58,47 @@ def get_provider(
     api_key: Optional[str] = None,
     **kwargs: Any
 ) -> BaseProvider:
+    """Get a provider instance by name.
+
+    Supported built-in providers: ``"mock"``, ``"openai"``, ``"anthropic"``,
+    ``"gemini"`` (alias ``"google"``), plus any custom provider registered
+    via :func:`register_provider`.
+
+    OpenAI, Anthropic, and Gemini are routed through LiteLLM automatically.
     """
-    Get a provider instance by name.
-    
-    Args:
-        name: Provider name ('openai', 'anthropic', 'mock', etc.)
-        api_key: API key for the provider (optional, can use env var)
-        **kwargs: Additional provider-specific arguments
-        
-    Returns:
-        Provider instance
-        
-    Raises:
-        ValueError: If provider not found
-        ImportError: If provider package not installed
-        
-    Example:
-        >>> from mycontext.providers import get_provider
-        >>> 
-        >>> # Get OpenAI provider
-        >>> provider = get_provider("openai", api_key="sk-...")
-        >>> 
-        >>> # Get Anthropic provider
-        >>> provider = get_provider("anthropic", api_key="sk-ant-...")
-        >>> 
-        >>> # Get mock provider (for testing)
-        >>> provider = get_provider("mock")
-    """
-    # Check cache first
-    cache_key = f"{name}:{api_key}"
+    provider_name = {"google": "gemini"}.get(name, name)
+    model = kwargs.get("model", "")
+    cache_key = f"{provider_name}:{api_key}:{model}"
     if cache_key in _PROVIDER_CACHE:
         return _PROVIDER_CACHE[cache_key]
-    
-    # Lazy register providers on first use
-    if name == "openai" and name not in _PROVIDER_REGISTRY:
-        from .openai import OpenAIProvider
-        register_provider("openai", OpenAIProvider)
-    elif name == "anthropic" and name not in _PROVIDER_REGISTRY:
-        from .anthropic import AnthropicProvider
-        register_provider("anthropic", AnthropicProvider)
-    elif name == "gemini" and name not in _PROVIDER_REGISTRY:
-        from .gemini import GeminiProvider
-        register_provider("gemini", GeminiProvider)
-    
-    # Get provider class
-    provider_class = _PROVIDER_REGISTRY.get(name)
-    if not provider_class:
-        available = ", ".join(_PROVIDER_REGISTRY.keys())
-        raise ValueError(
-            f"Provider '{name}' not found. "
-            f"Available providers: {available}"
+
+    if provider_name in _PROVIDER_REGISTRY:
+        provider_class = _PROVIDER_REGISTRY[provider_name]
+        if api_key:
+            kwargs["api_key"] = api_key
+        provider = provider_class(**kwargs)
+        _PROVIDER_CACHE[cache_key] = provider
+        return provider
+
+    if provider_name in _DEFAULT_MODELS:
+        from .litellm_provider import LiteLLMProvider
+        kw = dict(kwargs)
+        resolved_model = kw.pop("model", _DEFAULT_MODELS[provider_name])
+        provider = LiteLLMProvider(
+            model=resolved_model,
+            provider=provider_name,
+            api_key=api_key,
+            **kw,
         )
-    
-    # Create instance
-    if api_key:
-        kwargs["api_key"] = api_key
-    
-    provider = provider_class(**kwargs)
-    
-    # Cache it
-    _PROVIDER_CACHE[cache_key] = provider
-    
-    return provider
+        _PROVIDER_CACHE[cache_key] = provider
+        return provider
+
+    available = sorted(set(_PROVIDER_REGISTRY.keys()) | set(_DEFAULT_MODELS.keys()))
+    raise ValueError(f"Provider '{name}' not found. Available: {', '.join(available)}")
 
 
 def list_providers() -> list[str]:
-    """
-    List all available providers.
-    
-    Returns:
-        List of provider names
-        
-    Example:
-        >>> from mycontext.providers import list_providers
-        >>> print(list_providers())
-        ['anthropic', 'gemini', 'mock', 'openai']
-    """
-    # Include lazy-loadable providers
+    """List all available providers."""
     available = set(_PROVIDER_REGISTRY.keys())
-    available.add("openai")
-    available.add("anthropic")
-    available.add("gemini")
-    
+    available.update(_DEFAULT_MODELS.keys())
     return sorted(available)

@@ -108,43 +108,29 @@ def test_mock_provider_estimate_cost():
 
 
 # ============================================================================
-# OpenAI Provider Tests (mocked)
+# LiteLLM-backed Provider Tests
 # ============================================================================
 
-@pytest.mark.skipif(True, reason="OpenAI not installed in test env")
-def test_openai_provider_import():
-    """Test importing OpenAI provider"""
-    from mycontext.providers.openai import OpenAIProvider
-    
-    assert OpenAIProvider is not None
+def test_openai_in_provider_list():
+    """Test that openai is available through LiteLLM routing"""
+    providers = list_providers()
+    assert "openai" in providers
 
 
-def test_openai_provider_not_installed():
-    """Test OpenAI provider when package not installed"""
-    with patch.dict('sys.modules', {'openai': None}):
-        # Should lazy load
-        providers = list_providers()
-        assert "openai" in providers
+def test_anthropic_in_provider_list():
+    """Test that anthropic is available through LiteLLM routing"""
+    providers = list_providers()
+    assert "anthropic" in providers
 
 
-# ============================================================================
-# Anthropic Provider Tests (mocked)
-# ============================================================================
-
-@pytest.mark.skipif(True, reason="Anthropic not installed in test env")
-def test_anthropic_provider_import():
-    """Test importing Anthropic provider"""
-    from mycontext.providers.anthropic import AnthropicProvider
-    
-    assert AnthropicProvider is not None
-
-
-def test_anthropic_provider_not_installed():
-    """Test Anthropic provider when package not installed"""
-    with patch.dict('sys.modules', {'anthropic': None}):
-        # Should lazy load
-        providers = list_providers()
-        assert "anthropic" in providers
+def test_get_litellm_provider():
+    """Test that known providers route to LiteLLMProvider when litellm is installed"""
+    try:
+        provider = get_provider("openai", api_key="test-key")
+        from mycontext.providers.litellm_provider import LiteLLMProvider
+        assert isinstance(provider, LiteLLMProvider)
+    except ImportError:
+        pytest.skip("LiteLLM not installed")
 
 
 # ============================================================================

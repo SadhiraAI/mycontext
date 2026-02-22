@@ -1,0 +1,104 @@
+.account-page { max-width: 680px; }
+
+.account-error { color: var(--error); margin-bottom: 1rem; }
+.account-success { color: var(--success); margin-bottom: 1rem; }
+
+.account-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.account-hint { color: var(--text-muted); font-size: 0.9rem; margin: -0.5rem 0 1rem; }
+
+.account-field { margin-bottom: 1.25rem; }
+.account-field label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text); margin-bottom: 0.3rem; }
+.account-field input {
+  width: 100%; max-width: 360px;
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); font-family: inherit;
+}
+.account-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.account-field input:disabled { opacity: 0.6; }
+.account-field-hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+.account-plan-badge {
+  display: inline-block; padding: 0.25rem 0.75rem; border-radius: 50px;
+  font-size: 0.82rem; font-weight: 600; background: var(--bg-surface); border: 1px solid var(--border);
+}
+.account-plan-badge.enterprise { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+
+.account-btn.primary {
+  background: var(--accent); color: white; border: none; padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; transition: all var(--transition-fast);
+}
+.account-btn.primary:hover { background: var(--accent-hover); }
+.account-btn.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Profile card ──────────────────────────────────────── */
+.account-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(74, 130, 120, 0.06), rgba(139, 92, 246, 0.06));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+}
+
+.account-profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5ba8a0, #8b5cf6);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.account-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.account-profile-info strong {
+  font-size: 1.15rem;
+}
+
+.account-profile-info span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.account-profile-info .account-plan-badge {
+  margin-top: 0.25rem;
+  width: fit-content;
+}
+
+.account-profile-form {
+  margin-bottom: 0.5rem;
+}
+
+.account-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2rem 0;
+}
+
+.account-subsection-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.account-pwd-form .account-field {
+  margin-bottom: 1rem;
+}

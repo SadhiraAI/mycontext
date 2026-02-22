@@ -1,0 +1,12 @@
+template: decision_matrix
+test_cases:
+  - question: "Should we migrate from PostgreSQL to MongoDB for our e-commerce platform?"
+    expected:
+      min_score: 0.5
+      must_contain: ["criteria", "option"]
+    tags: [database, architecture]
+  - question: "Which cloud provider should we choose: AWS, GCP, or Azure?"
+    expected:
+      min_score: 0.5
+      must_contain: ["criteria"]
+    tags: [cloud, infrastructure]

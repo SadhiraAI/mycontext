@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Provisional Patent Application - Specification</title>
+<style>
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  max-width: 8.5in;
+  margin: 1in auto;
+  padding: 0 1in;
+  color: #000;
+}
+h1 {
+  font-size: 14pt;
+  text-align: center;
+  margin: 0 0 18pt 0;
+  font-weight: bold;
+}
+h2 {
+  font-size: 12pt;
+  margin: 14pt 0 6pt 0;
+  font-weight: bold;
+}
+h3, h4 {
+  font-size: 12pt;
+  margin: 10pt 0 4pt 0;
+  font-weight: bold;
+}
+p {
+  margin: 0 0 8pt 0;
+  text-align: justify;
+}
+.header-block {
+  margin: 0 0 16pt 0;
+  line-height: 1.4;
+}
+.header-block p { margin: 2pt 0; text-align: left; }
+.pre {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10pt;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  background: #f5f5f5;
+  padding: 10pt;
+  margin: 8pt 0;
+  border: 1px solid #ccc;
+  overflow-x: auto;
+}
+ul, ol {
+  margin: 6pt 0 10pt 24pt;
+  padding-left: 24pt;
+}
+li {
+  margin: 2pt 0;
+  text-align: justify;
+}
+hr {
+  margin: 14pt 0;
+  border: none;
+  border-top: 1px solid #333;
+}
+.figure-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 12pt auto;
+  border: 1px solid #ccc;
+  page-break-inside: avoid;
+}
+.figure-caption { font-weight: bold; margin-top: 4pt; margin-bottom: 16pt; }
+@media print {
+  body { margin: 0.75in; }
+  .pre { break-inside: avoid; }
+  h2 { page-break-after: avoid; }
+  p { orphans: 2; widows: 2; }
+  .figure-img { max-width: 6.5in; }
+}
+</style>
+</head>
+<body>
+
+<div class="header-block"><h1>PROVISIONAL PATENT APPLICATION</h1>
+
+<strong>Filing Date</strong>: February 11, 2026
+
+<strong>Title of Invention</strong>: 
+<p>SYSTEM AND METHOD FOR MODULAR CONTEXT ASSEMBLY AND QUALITY-OPTIMIZED PROMPT GENERATION FOR LARGE LANGUAGE MODELS</p>
+
+<strong>Inventor(s)</strong>:
+<p>Dhiraj Kumar Pokhrel 6912 Hapsuburg Lane, Henrico, VA 23231, United States</p>
+
+<strong>Correspondence Address</strong> (where USPTO should send mail):
+<p>6912 Hapsuburg Lane, Henrico, VA 23231, United States</p></div>
+<hr>
+<h2>CROSS-REFERENCE TO RELATED APPLICATIONS</h2>
+
+<p>This application claims the benefit of priority and is entitled to the filing date pursuant to 35 U.S.C. §119(e).</p>
+
+<hr>
+
+<h2>FIELD OF THE INVENTION</h2>
+
+<p>This invention relates generally to artificial intelligence systems, and more specifically to systems and methods for structuring, assembling, validating, and optimizing contextual information (prompts) provided to Large Language Models (LLMs) to improve response quality, consistency, and reliability.</p>
+
+<hr>
+
+<h2>BACKGROUND OF THE INVENTION</h2>
+
+<h3>Current State of the Art</h3>
+
+<p>Large Language Models (LLMs) such as GPT, Claude, Gemini, and similar systems have revolutionized natural language processing. However, their effectiveness heavily depends on the quality and structure of the input prompts (contextual information) they receive.</p>
+
+<h3>Problems with Existing Approaches</h3>
+
+<p>Current prompt engineering methods suffer from several critical limitations:</p>
+
+<ol>
+<li><strong>Unstructured Prompts</strong>: Most implementations concatenate text strings without validation or structural organization, leading to inconsistent results.</li>
+<li><strong>No Quality Metrics</strong>: There is no systematic way to evaluate prompt quality before execution, resulting in trial-and-error approaches.</li>
+<li><strong>Provider Lock-in</strong>: Implementations are typically tied to specific LLM providers, requiring complete rewrites when switching providers.</li>
+<li><strong>Lack of Reusability</strong>: Effective prompt patterns cannot be easily packaged, shared, or reused across different use cases.</li>
+<li><strong>No Cognitive Structure</strong>: Prompts do not leverage established reasoning patterns (comparative analysis, causal reasoning, step-by-step decomposition, etc.) in a systematic way.</li>
+<li><strong>Manual Context Management</strong>: Multi-turn conversations require manual tracking and assembly of conversation history.</li>
+</ol>
+<h3>Need for the Invention</h3>
+
+<p>There is a need for a system that provides:</p>
+<ul>
+<li>Structured, modular context assembly with validation</li>
+<li>Automatic quality evaluation of prompts before execution</li>
+<li>Provider-agnostic abstraction layer</li>
+<li>Reusable cognitive templates for common reasoning patterns</li>
+<li>Intelligent context transformation and optimization</li>
+</ul>
+
+<hr>
+
+<h2>SUMMARY OF THE INVENTION</h2>
+
+<p>The present invention provides a novel system and method for assembling, validating, optimizing, and executing contextual information for Large Language Models through a modular, quality-aware architecture.</p>
+
+<h3>Key Innovations</h3>
+
+<strong>1. Modular Context Architecture</strong>: The invention introduces a multi-component structure comprising:
+<ul>
+<li><strong>Directive</strong>: The core task or instruction</li>
+<li><strong>Guidance</strong>: Role definition, behavioral rules, expertise areas, and communication style</li>
+<li><strong>Constraints</strong>: Boundaries, requirements, format specifications, and quality criteria</li>
+<li><strong>Sources</strong>: Reference materials, documents, data, and knowledge bases</li>
+</ul>
+
+<strong>2. Quality Metrics Engine</strong>: An automated system for evaluating context quality across multiple dimensions:
+<ul>
+<li>Clarity (lack of ambiguity, vague language)</li>
+<li>Specificity (concrete details, quantifiable metrics)</li>
+<li>Actionability (clear instructions, executable steps)</li>
+<li>Structure (logical organization, proper formatting)</li>
+<li>Completeness (coverage of requirements)</li>
+</ul>
+
+<strong>3. Cognitive Template System</strong>: Pre-engineered templates for structured reasoning:
+<ul>
+<li>Comparative Analysis</li>
+<li>Causal Reasoning</li>
+<li>Step-by-Step Decomposition</li>
+<li>Question Analysis</li>
+<li>Tradeoff Evaluation</li>
+<li>Risk Assessment</li>
+<li>Decision Frameworks</li>
+<li>And 40+ additional specialized templates</li>
+</ul>
+
+<strong>4. Provider Abstraction Layer</strong>: Unified interface for executing contexts across multiple LLM providers without code changes.
+
+<strong>5. Intelligent Context Transformation</strong>: Methods for converting contexts between different formats (LangChain, LlamaIndex, native formats) while preserving semantic meaning.
+
+<hr>
+
+<h2>DETAILED DESCRIPTION OF THE INVENTION</h2>
+
+<h3>System Architecture</h3>
+
+<p>The invention comprises several interconnected components:</p>
+
+<h4>1. Core Context Class</h4>
+
+<p>The Context class serves as the primary container for assembling modular components:</p>
+
+<pre class="pre">Context Object:
+<ul>
+<li>directive: Directive (required)</li>
+<li>guidance: Guidance (optional)</li>
+<li>constraints: Constraints (optional)</li>
+<li>sources: List[Source] (optional)</li>
+<li>metadata: Dict (system information)</li>
+</ul>
+
+<p>Methods:</p>
+<ul>
+<li>assemble() -&gt; String: Compiles all components into optimized prompt</li>
+<li>execute(provider, **kwargs) -&gt; Response: Sends to LLM and returns result</li>
+<li>validate() -&gt; ValidationResult: Checks structural integrity</li>
+<li>quality_score() -&gt; QualityScore: Evaluates prompt effectiveness</pre></li>
+</ul>
+
+<strong>Novel Aspect</strong>: Unlike existing systems that use simple string concatenation, this architecture enforces structural validation and provides automatic quality assessment.
+
+<h4>2. Component Classes</h4>
+
+<strong>Directive Class</strong>:
+<pre class="pre">Attributes:
+<ul>
+<li>content: String (the primary instruction)</li>
+<li>context: String (optional background)</li>
+<li>requirements: List[String] (specific needs)</li>
+</ul>
+
+<p>Validation Rules:</p>
+<ul>
+<li>Content must be non-empty</li>
+<li>Must contain actionable verbs</li>
+<li>Should specify expected output format</pre></li>
+</ul>
+
+<strong>Guidance Class</strong>:
+<pre class="pre">Attributes:
+<ul>
+<li>role: String (persona/perspective)</li>
+<li>rules: List[String] (behavioral guidelines)</li>
+<li>expertise: List[String] (knowledge domains)</li>
+<li>style: String (communication approach)</li>
+</ul>
+
+<p>Novel Aspect: Structured role definition with expertise mapping</pre></p>
+
+<strong>Constraints Class</strong>:
+<pre class="pre">Attributes:
+<ul>
+<li>boundaries: List[String] (what NOT to do)</li>
+<li>format: OutputFormat (structured output specification)</li>
+<li>quality: List[String] (quality criteria)</li>
+<li>requirements: List[String] (must-have elements)</pre></li>
+</ul>
+
+<strong>Source Class</strong>:
+<pre class="pre">Attributes:
+<ul>
+<li>content: String (reference material)</li>
+<li>metadata: Dict (title, author, date, type)</li>
+<li>relevance: Float (0-1 score)</li>
+</ul>
+
+<p>Methods:</p>
+<ul>
+<li>chunk() -&gt; List[Chunk]: Splits large sources</li>
+<li>embed() -&gt; Vector: Creates semantic embeddings</pre></li>
+</ul>
+
+<h4>3. Quality Metrics Engine</h4>
+
+<strong>Novel Algorithm for Context Quality Evaluation</strong>:
+
+<pre class="pre">QualityMetrics.evaluate(context) -&gt; QualityScore:
+
+<p>Step 1: Clarity Analysis</p>
+<ul>
+<li>Scan for vague words: "thing", "stuff", "maybe", "somehow"</li>
+<li>Check for ambiguous pronouns without clear antecedents</li>
+<li>Measure sentence complexity (Flesch-Kincaid)</li>
+<li>Score: 0-1 (1 = perfectly clear)</li>
+</ul>
+
+<p>Step 2: Specificity Analysis</p>
+<ul>
+<li>Count concrete nouns vs abstract nouns</li>
+<li>Identify quantifiable metrics and numbers</li>
+<li>Check for specific examples vs generalizations</li>
+<li>Score: 0-1 (1 = highly specific)</li>
+</ul>
+
+<p>Step 3: Actionability Analysis</p>
+<ul>
+<li>Identify action verbs (imperative mood)</li>
+<li>Check for clear success criteria</li>
+<li>Verify presence of deliverables/outputs</li>
+<li>Score: 0-1 (1 = completely actionable)</li>
+</ul>
+
+<p>Step 4: Structure Analysis</p>
+<ul>
+<li>Evaluate logical flow and organization</li>
+<li>Check formatting (bullets, numbering, sections)</li>
+<li>Assess information hierarchy</li>
+<li>Score: 0-1 (1 = well-structured)</li>
+</ul>
+
+<p>Step 5: Completeness Analysis</p>
+<ul>
+<li>Match requirements against content</li>
+<li>Identify missing critical information</li>
+<li>Check for necessary context</li>
+<li>Score: 0-1 (1 = fully complete)</li>
+</ul>
+
+<p>Step 6: Overall Score Calculation overall_score = weighted_average([ clarity * 0.25, specificity * 0.20, actionability * 0.25, structure * 0.15, completeness * 0.15 ])</p>
+
+<p>Output: QualityScore object with:</p>
+<ul>
+<li>overall: Float (0-1)</li>
+<li>dimensions: Dict[Dimension, Float]</li>
+<li>issues: List[Issue] (identified problems)</li>
+<li>suggestions: List[String] (improvement recommendations)</li>
+<li>strengths: List[String] (what's working well)</pre></li>
+</ul>
+
+<strong>Novel Aspect</strong>: This is the first automated system for evaluating prompt quality before execution, allowing developers to optimize contexts programmatically.
+
+<h4>4. Template System</h4>
+
+<strong>Base Template Class</strong>:
+<pre class="pre">Template:
+<ul>
+<li>name: String</li>
+<li>category: String (analysis, decision, reasoning, etc.)</li>
+<li>parameters: Dict[String, Type] (required inputs)</li>
+</ul>
+
+<p>Methods:</p>
+<ul>
+<li>build_context(**params) -&gt; Context: Constructs optimized context</li>
+<li>execute(provider, **params) -&gt; Response: Build and run</li>
+<li>validate_params(**params) -&gt; ValidationResult: Check inputs</pre></li>
+</ul>
+
+<strong>Example: Comparative Analyzer Template</strong>:
+<pre class="pre">ComparativeAnalyzer.build_context(
+<p>options: List[String], # Items to compare criteria: String, # Comparison dimensions context: String = None, # Background information depth: String = "detailed" # Analysis depth ) -&gt; Context:</p>
+
+<p>Generated Directive: "Conduct a comprehensive comparative analysis of the following options: [options formatted as numbered list]</p>
+
+<p>Evaluate each option across these criteria: [criteria formatted as bullet points]</p>
+
+<p>For each criterion: 1. Rate each option (0-10 scale) 2. Provide specific evidence 3. Note key tradeoffs</p>
+
+<p>Conclude with:</p>
+<ul>
+<li>Overall winner and why</li>
+<li>Use case recommendations</li>
+<li>Decision matrix summary"</li>
+</ul>
+
+<p>Generated Guidance: Role: "Expert Analyst with deep experience in comparative evaluation" Rules:</p>
+<ul>
+<li>Be objective and evidence-based</li>
+<li>Acknowledge limitations in available data</li>
+<li>Consider both quantitative and qualitative factors</li>
+</ul>
+<p>Expertise: ["comparative analysis", "decision science", "evaluation frameworks"]</p>
+
+<p>Generated Constraints:</p>
+<ul>
+<li>Use consistent rating scales</li>
+<li>Provide specific examples for each rating</li>
+<li>Format output as structured comparison table</li>
+<li>No unsupported claims</pre></li>
+</ul>
+
+<strong>Novel Aspect</strong>: Templates encapsulate proven cognitive patterns as reusable, parameterized components. The system includes 50+ specialized templates covering:
+<ul>
+<li>Analysis patterns (SWOT, Gap, Trend, Anomaly, Data analysis)</li>
+<li>Decision patterns (Comparative, Tradeoff, Cost-benefit, Multi-objective)</li>
+<li>Reasoning patterns (Causal, Step-by-step, Analogical, Root cause)</li>
+<li>Creative patterns (Brainstorming, Idea generation, Design thinking)</li>
+<li>Communication patterns (Simplification, Persuasion, Audience adaptation)</li>
+<li>Planning patterns (Scenario, Resource allocation, Stakeholder mapping)</li>
+<li>Problem-solving patterns (Decomposition, Bottleneck identification, Constraint optimization)</li>
+</ul>
+
+<h4>5. Provider Abstraction Layer</h4>
+
+<strong>Novel Architecture for Multi-Provider Support</strong>:
+
+<pre class="pre">Context.execute(provider: String, **kwargs) -&gt; Response:
+
+<p>Step 1: Assemble Context prompt = self.assemble()</p>
+
+<p>Step 2: Provider Routing if provider == "openai": client = OpenAI(api_key=kwargs.get('api_key')) response = client.chat.completions.create( model=kwargs.get('model', 'gpt-4'), messages=[{"role": "user", "content": prompt}], temperature=kwargs.get('temperature', 0.7), max_tokens=kwargs.get('max_tokens') )</p>
+
+<p>elif provider == "anthropic": client = Anthropic(api_key=kwargs.get('api_key')) response = client.messages.create( model=kwargs.get('model', 'claude-3-opus'), messages=[{"role": "user", "content": prompt}], temperature=kwargs.get('temperature', 0.7), max_tokens=kwargs.get('max_tokens') )</p>
+
+<p>elif provider == "google": # Google Gemini implementation</p>
+
+<p>elif provider == "azure": # Azure OpenAI implementation</p>
+
+<p>elif provider == "local": # Local model implementation (Ollama, LMStudio, etc.)</p>
+
+<p>Step 3: Response Normalization return Response( content=extract_text(response), tokens_used=extract_tokens(response), model=model_used, provider=provider, raw_response=response, metadata=extract_metadata(response) )</pre></p>
+
+<strong>Novel Aspect</strong>: Single API that works across all major LLM providers without code changes. Developers can switch providers by changing a single parameter.
+
+<h4>6. Session Management</h4>
+
+<strong>Method for Multi-Turn Context Persistence</strong>:
+
+<pre class="pre">Session:
+<ul>
+<li>id: String (unique identifier)</li>
+<li>messages: List[Message] (conversation history)</li>
+<li>context: Context (base context for all turns)</li>
+<li>metadata: Dict (tracking information)</li>
+</ul>
+
+<p>Methods:</p>
+<ul>
+<li>add_turn(user_input, assistant_response): Appends to history</li>
+<li>get_context(max_tokens=None) -&gt; Context: Returns assembled context with history</li>
+<li>summarize() -&gt; String: Compresses long histories</li>
+<li>export() -&gt; Dict: Saves session state</li>
+<li>load(data: Dict) -&gt; Session: Restores session</li>
+</ul>
+
+<p>Algorithm for Context Assembly with History: 1. Start with base context (directive, guidance, constraints) 2. Add conversation history (newest first, up to max_tokens limit) 3. If history exceeds limit: a. Summarize older turns b. Keep recent turns verbatim 4. Return assembled context</pre></p>
+
+<strong>Novel Aspect</strong>: Automatic context window management with intelligent summarization for long conversations.
+
+<h4>7. Transformation Engine</h4>
+
+<strong>Method for Format Conversion</strong>:
+
+<pre class="pre">Context.to_langchain() -&gt; LangChainPrompt:
+<p>Converts Context object to LangChain PromptTemplate format</p>
+
+<p>Context.to_llamaindex() -&gt; LlamaIndexPrompt: Converts Context object to LlamaIndex prompt format</p>
+
+<p>Context.to_dict() -&gt; Dict: Serializes to JSON-compatible dictionary</p>
+
+<p>Context.from_dict(data: Dict) -&gt; Context: Deserializes from dictionary</p>
+
+<p>Novel Aspect: Semantic-preserving transformations between frameworks</pre></p>
+
+<hr>
+
+<h2>CLAIMS</h2>
+
+<h3>Independent Claims</h3>
+
+<strong>Claim 1</strong>: A computer-implemented method for assembling and optimizing contextual information for large language models, comprising:
+<ol>
+<li>receiving a plurality of modular components comprising at least a directive component specifying a task;</li>
+<li>validating structural integrity of said components according to predefined rules;</li>
+<li>evaluating quality of assembled context across multiple dimensions including clarity, specificity, and actionability;</li>
+<li>assembling said components into an optimized prompt structure;</li>
+<li>executing said prompt against a selected language model provider; and</li>
+<li>returning a normalized response object.</li>
+</ol>
+<strong>Claim 2</strong>: A system for quality-aware context assembly for artificial intelligence systems, comprising:
+<ol>
+<li>a modular component architecture for structuring contextual information;</li>
+<li>a quality metrics engine for evaluating prompt effectiveness before execution;</li>
+<li>a provider abstraction layer for unified execution across multiple language model providers;</li>
+<li>a template system for encapsulating cognitive reasoning patterns; and</li>
+<li>a transformation engine for converting contexts between different frameworks.</li>
+</ol>
+<h3>Dependent Claims</h3>
+
+<strong>Claim 3</strong>: The method of Claim 1, wherein said quality evaluation comprises:
+<ol>
+<li>analyzing clarity by detecting vague language and ambiguous references;</li>
+<li>measuring specificity by quantifying concrete versus abstract content;</li>
+<li>assessing actionability by identifying imperative verbs and success criteria;</li>
+<li>evaluating structure by analyzing logical organization and formatting; and</li>
+<li>computing an overall quality score as a weighted combination of said dimensions.</li>
+</ol>
+<strong>Claim 4</strong>: The method of Claim 1, wherein said modular components further comprise:
+<ol>
+<li>a guidance component specifying role, behavioral rules, expertise areas, and communication style;</li>
+<li>a constraints component defining boundaries, format requirements, and quality criteria; and</li>
+<li>a sources component containing reference materials with relevance scoring.</li>
+</ol>
+<strong>Claim 5</strong>: The system of Claim 2, wherein said template system comprises:
+<ol>
+<li>a base template class with parameterized context generation;</li>
+<li>a plurality of specialized templates for different cognitive patterns;</li>
+<li>automatic parameter validation; and</li>
+<li>built-in quality optimization for each template type.</li>
+</ol>
+<strong>Claim 6</strong>: The method of Claim 1, wherein said provider abstraction layer enables switching between language model providers by changing a single parameter without modifying context structure.
+
+<strong>Claim 7</strong>: The system of Claim 2, further comprising a session management component for multi-turn conversations with automatic context window management and intelligent history summarization.
+
+<strong>Claim 8</strong>: The method of Claim 3, wherein said quality metrics engine generates improvement suggestions based on identified issues in the context.
+
+<strong>Claim 9</strong>: The system of Claim 2, wherein said transformation engine preserves semantic meaning while converting contexts between LangChain, LlamaIndex, and native formats.
+
+<strong>Claim 10</strong>: The method of Claim 1, wherein said template system includes at least 50 specialized templates covering analysis, decision-making, reasoning, creative thinking, communication, planning, and problem-solving patterns.
+
+<hr>
+
+<h2>ABSTRACT</h2>
+
+<p>A system and method for assembling, validating, and optimizing contextual information (prompts) for Large Language Models through a modular architecture comprising directive, guidance, constraints, and sources components. The invention includes a quality metrics engine that automatically evaluates prompt effectiveness across multiple dimensions, a provider abstraction layer enabling unified execution across different LLM providers, and a template system encapsulating 50+ cognitive reasoning patterns. The system enables developers to programmatically construct high-quality prompts, evaluate them before execution, and switch between providers without code changes, significantly improving consistency, reliability, and reusability of AI-powered applications.</p>
+
+<hr>
+
+<h2>DRAWINGS</h2>
+
+<p class="figure-caption">Figure 1: System architecture for context assembly.</p>
+<img class="figure-img" src="../patent_figures/Figure_1_System_Architecture.png" alt="Figure 1 - System Architecture" width="800">
+
+<p class="figure-caption">Figure 2: Quality metrics evaluation flow.</p>
+<img class="figure-img" src="../patent_figures/Figure_2_Quality_Metrics.png" alt="Figure 2 - Quality Metrics" width="800">
+
+<p class="figure-caption">Figure 3: Template system hierarchy.</p>
+<img class="figure-img" src="../patent_figures/Figure_3_Template_System.png" alt="Figure 3 - Template System" width="800">
+
+<p class="figure-caption">Figure 4: Provider abstraction layer.</p>
+<img class="figure-img" src="../patent_figures/Figure_4_Provider_Abstraction.png" alt="Figure 4 - Provider Abstraction" width="800">
+
+<p class="figure-caption">Figure 5: Session management flow.</p>
+<img class="figure-img" src="../patent_figures/Figure_5_Session_Management.png" alt="Figure 5 - Session Management" width="800">
+
+<hr>
+
+<h2>INVENTOR DECLARATION</h2>
+
+<p>I hereby declare that I am the original inventor of the subject matter which is claimed and for which a patent is sought.</p>
+
+<p>I hereby declare that all statements made herein of my own knowledge are true and that all statements made on information and belief are believed to be true.</p>
+
+<p><strong>Signature</strong>: /Dhiraj Kumar Pokhrel/ &nbsp; <strong>Date</strong>: February 11, 2026</p>
+<p><strong>Printed Name</strong>: Dhiraj Kumar Pokhrel</p>
+
+</body>
+</html>

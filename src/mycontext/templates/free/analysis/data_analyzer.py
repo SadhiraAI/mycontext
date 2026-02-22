@@ -28,10 +28,34 @@ class DataAnalyzer(Pattern):
         ...     data_description="Monthly sales data for past year",
         ...     goal="Identify growth opportunities"
         ... )
+        >>>
+        >>> # Generic prompt mode
+        >>> prompt = analyzer.generic_prompt(data_description="Monthly sales data", goal="Find growth")
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are an expert data analyst. Analyze the following data and extract "
+        "actionable insights:\n\n"
+        "Data: {data_description}\n"
+        "{context_section}\n"
+        "Goal: {goal}\n\n"
+        "Apply a structured analytical approach: "
+        "(1) Summarize the data — type, scope, variables, and quality. "
+        "(2) Identify patterns including trends, seasonality, and clusters with "
+        "supporting evidence. "
+        "(3) Detect anomalies and outliers, noting severity and possible causes. "
+        "(4) Examine correlations between variables, distinguishing correlation from "
+        "causation. "
+        "(5) Compare segments and highlight key differences. "
+        "(6) Synthesize 3-5 key insights ranked by confidence and significance, each "
+        "with a recommended action. "
+        "(7) Note data limitations and confidence caveats. "
+        "(8) Provide immediate action recommendations and areas for further investigation.\n\n"
+        "Be analytical, evidence-based, and actionable."
+    )
+
     def __init__(self):
         super().__init__(
             name="data_analyzer",

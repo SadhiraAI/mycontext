@@ -1,647 +1,554 @@
-# 🚀 mycontext - Universal Context Transformation Engine
+# mycontext-ai
 
 <div align="center">
 
-**Transform raw questions into perfect, portable contexts for any AI system**
+**Context engineering for LLMs. Build once, run anywhere, measure everything.**
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://badge.fury.io/py/mycontext-ai.svg)](https://pypi.org/project/mycontext-ai/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/pypi/v/mycontext-ai.svg)](https://pypi.org/project/mycontext-ai/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[Features](#-key-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Examples](#-examples) • [API Reference](#-api-reference)
+[The Problem](#the-problem) · [Core Strengths](#core-strengths) · [Quick Start](#quick-start) · [Use Cases](#use-cases) · [Patterns](#85-cognitive-patterns)
 
 </div>
 
 ---
 
-## 🎯 What is mycontext?
+## The Problem
 
-**mycontext** is the world's first **Universal Context Transformation Engine**. It's not just another LLM framework—it's a specialized context engineering library that transforms raw questions into research-backed, high-quality contexts that work with any AI system.
+Every team building with LLMs hits the same wall:
 
-### The Problem
-You spend hours crafting perfect prompts. Each LLM needs different formatting. Context quality is inconsistent. There's no way to measure improvement.
+- **Prompt roulette.** You tweak wording for hours. Sometimes it works, sometimes it doesn't. There's no way to know *why*.
+- **Vendor lock-in.** Your prompts are written for OpenAI. Now the team wants Claude. Rewrite everything.
+- **No structure.** System messages, user messages, constraints, output format — every developer invents their own convention.
+- **No measurement.** Is this prompt good? Better than yesterday's? Nobody knows until production breaks.
+- **Reinventing the wheel.** Root cause analysis, decision frameworks, comparative reasoning — proven cognitive methods exist, but teams write ad-hoc prompts from scratch every time.
+- **No way to prove templates help.** You built a prompt template, but can you *prove* it produces better output than a raw question?
 
-### The Solution
-```python
-from mycontext.intelligence import transform
+## How It Works
 
-# One line transforms any question into an optimized context
-context = transform("How should we scale our database?")
+mycontext-ai gives you a **structured `Context` object** that separates *what the AI should know* (guidance) from *what it should do* (directive) and *what it must not do* (constraints). You build the context once and export it to any LLM or framework.
 
-# Use with any LLM or framework
-openai_format = context.to_openai()
-claude_format = context.to_anthropic()
-langchain_msgs = context.to_langchain()
+```
+Raw question
+    ↓
+[ Intelligence Layer ] — auto-selects the right cognitive pattern
+    ↓
+Three execution tiers:
+  ├─ Static Generic  — zero-cost compiled prompt (1 LLM call)
+  ├─ Dynamic Compiled — LLM-refined prompt artifact (2-3 calls)
+  └─ Full Response    — complete template execution (2-3 calls)
+    ↓
+Export: OpenAI │ Anthropic │ Gemini │ LangChain │ YAML │ 13 formats
+    ↓
+[ Quality Metrics ] — score, compare, improve
+    ↓
+[ CAI ] — prove the template made a measurable difference
 ```
 
-**Result:** Perfect contexts, automatic pattern selection, measurable quality, universal compatibility.
+The engine doesn't generate answers. It generates the *best possible question* for the LLM you're sending it to — and it can *prove* it.
 
 ---
 
-## ✨ Key Features
+## Core Strengths
 
-### 🧠 **50 Research-Backed Cognitive Patterns**
-Not just templates—scientifically-grounded reasoning frameworks organized into 8 categories:
-- **Analysis** (6) - Question analysis, data analysis, trend identification
-- **Reasoning** (5) - Step-by-step, causal, analogical reasoning
-- **Decision** (5) - Decision frameworks, comparisons, tradeoffs
-- **Creative** (5) - Idea generation, brainstorming, innovation
-- **Communication** (7) - Simplification, clarity, persuasion
-- **Planning** (5) - Scenarios, stakeholders, priorities
-- **Problem Solving** (6) - Decomposition, constraints, optimization
-- **Specialized** (11) - Code review, risk assessment, conflict resolution
+These are capabilities that exist in mycontext-ai and, to our knowledge, do not exist in any other open-source context or prompt engineering library.
 
-### 🤖 **Automatic Pattern Selection**
-The Transformation Engine analyzes your input and automatically selects the optimal cognitive pattern:
+### 1. 85 Research-Backed Cognitive Patterns
+
+Not generic "write a poem" templates. Each pattern implements a real cognitive framework — Five Whys, fishbone analysis, Socratic method, temporal reasoning, systems archetypes, ethical frameworks — backed by **150+ peer-reviewed papers** from cognitive science, decision theory, and systems thinking.
+
+Every pattern has a structured `build_context()` method with validated inputs, a research-grounded directive, and constraints tuned for the method.
+
 ```python
-from mycontext.intelligence import TransformationEngine
+from mycontext.templates.free.reasoning import RootCauseAnalyzer
 
-engine = TransformationEngine()
-analysis = engine.analyze_input("Should we migrate to microservices?")
-# → Detects: decision question
-# → Selects: DecisionFramework
-# → Confidence: 92%
+ctx = RootCauseAnalyzer().build_context(
+    problem="API response times tripled after last deployment",
+    depth="comprehensive",
+)
 ```
 
-### 📊 **Measurable Quality Metrics**
-Stop guessing—measure context quality across 6 scientific dimensions:
-- **Clarity** - How clear and unambiguous
-- **Completeness** - How thorough and comprehensive
-- **Specificity** - How detailed and concrete
-- **Relevance** - How focused on the task
-- **Structure** - How well-organized
-- **Efficiency** - How concise vs verbose
+### 2. Quality Metrics — Score Any Context on 6 Dimensions
+
+No more guessing. `QualityMetrics` evaluates any context across six calibrated dimensions: **clarity, completeness, specificity, relevance, structure, efficiency**. Returns a numeric score, concrete issues, strengths, and actionable suggestions.
+
+Compare two contexts to measure improvement:
 
 ```python
 from mycontext.intelligence import QualityMetrics
 
 metrics = QualityMetrics()
-score = metrics.evaluate(context)
-print(f"Quality: {score.overall:.2f}")  # 0.92
-# Get actionable improvement suggestions
+score = metrics.evaluate(ctx)
+print(metrics.report(score))
+# → Overall: 0.87 | Clarity: 0.92 | Completeness: 0.85 | ...
+# → Issues: ["Directive could be more specific about output format"]
+# → Suggestions: ["Add constraints for response length"]
+
+# Compare before/after
+diff = metrics.compare(old_ctx, new_ctx)
 ```
 
-### 🔄 **13 Universal Export Formats**
-One context → Any platform. No vendor lock-in:
+### 3. Context Amplification Index (CAI) — Prove Templates Work
 
-**Data Formats:**
-- JSON, YAML, XML, Markdown, Dictionary
+CAI is a quantitative metric that answers: *"Did this template actually produce better LLM output than a raw prompt?"*
 
-**LLM Providers:**
-- OpenAI (GPT-4), Anthropic (Claude), Google (Gemini)
+It runs the same question through a raw prompt and a template-built context, evaluates both outputs, and computes the ratio:
 
-**AI Frameworks:**
-- LangChain, LlamaIndex, CrewAI, AutoGen
+**CAI = templated_score / raw_score**
+
+A CAI of 1.3x means the template produced 30% better output. No opinions — numbers.
 
 ```python
-# Export to any format
-context.to_openai()      # → OpenAI Chat API
-context.to_anthropic()   # → Claude Messages API
-context.to_langchain()   # → LangChain messages
-context.to_yaml()        # → YAML configuration
-# ... and 9 more!
+from mycontext.intelligence import ContextAmplificationIndex
+
+cai = ContextAmplificationIndex(provider="openai")
+result = cai.measure(
+    question="Why are API response times 3x slower after deploy?",
+    template_name="root_cause_analyzer",
+)
+print(f"CAI: {result.cai_overall:.2f}x ({result.verdict})")
+# → CAI: 1.42x (significant lift)
 ```
 
-### 🔌 **6 Framework Integrations**
-Drop-in compatibility with popular AI frameworks:
+### 4. Output Evaluator — Score LLM Responses, Not Just Prompts
+
+Other tools score prompts. mycontext also scores the *output*. The Output Evaluator measures LLM responses across five dimensions that are distinct from prompt quality:
+
+- **Instruction Following** — did it do what the context asked?
+- **Reasoning Depth** — shallow bullet points or genuine analysis?
+- **Actionability** — can you act on the recommendations?
+- **Structure Compliance** — did it follow the requested format?
+- **Cognitive Scaffolding** — did it use the reasoning framework from the template?
+
 ```python
-from mycontext.integrations import LangChainHelper
+from mycontext.intelligence import OutputEvaluator, OutputDimension
 
-# Instant LangChain compatibility
-messages = LangChainHelper.to_messages(context)
-# Ready for LangChain pipelines!
+evaluator = OutputEvaluator()
+score = evaluator.evaluate(ctx, llm_response)
+print(f"Output quality: {score.overall:.2f}")
+print(f"Reasoning depth: {score.dimensions[OutputDimension.REASONING_DEPTH]:.2f}")
 ```
 
-Supports: **LangChain**, **LlamaIndex**, **CrewAI**, **AutoGen**, **DSPy**, **Semantic Kernel**
+### 5. Template Integrator Agent — Fuse Multiple Patterns Into One
 
-### ⚡ **Blazing Fast Performance**
-- **100 pattern executions** in 5.6ms (0.06ms average)
-- **13 export formats** in <10ms
-- **Quality evaluation** in <1ms
-- **Pattern selection** in <2ms
+When a question needs multiple cognitive methods (e.g., root cause *and* scenario planning *and* stakeholder analysis), the Template Integrator doesn't just concatenate them. It uses an LLM to **intelligently merge** methodologies from multiple templates into a single unified context — one role, one set of rules, one directive.
+
+```python
+from mycontext.intelligence import TemplateIntegratorAgent
+
+integrator = TemplateIntegratorAgent()
+result = integrator.suggest_and_integrate(
+    "Revenue dropped 40% — what happened, what are the scenarios, who's affected?",
+    provider="openai",
+)
+ctx = result.to_context()
+ctx.execute(provider="openai")
+```
+
+### 6. Chain Orchestration Agent — Auto-Build Multi-Step Workflows
+
+Complex questions need multiple reasoning steps. The Chain Orchestration Agent analyzes your question, selects and orders patterns from the full catalog, and generates the `build_context()` parameters for each step — automatically.
+
+```python
+from mycontext.intelligence import build_workflow_chain
+
+result = build_workflow_chain(
+    "Outage last week caused churn spike. What happened, root cause, and recovery plan?",
+    provider="openai",
+)
+print(result.chain)        # ['temporal_sequence_analyzer', 'root_cause_analyzer', 'future_scenario_planner']
+print(result.chain_params) # auto-generated build_context params for each step
+```
+
+### 7. Intelligent Pattern Suggestion — Keyword, LLM, or Hybrid
+
+Don't know which pattern fits? `suggest_patterns()` maps your question to the best patterns using keyword matching, LLM reasoning, or both:
+
+```python
+from mycontext.intelligence import suggest_patterns
+
+result = suggest_patterns(
+    "Why did revenue drop? Timeline, root cause, and what to do next.",
+    mode="hybrid",
+    llm_provider="openai",
+    suggest_chain=True,
+)
+print(result.suggested_chain)
+# → ['temporal_sequence_analyzer', 'root_cause_analyzer', 'future_scenario_planner']
+print(result.to_markdown())
+```
+
+### 8. Auto-Transform Any Question → Perfect Context
+
+One call. No pattern selection needed. The Transformation Engine analyzes your input (type, complexity, domain, key concepts) and builds the right context automatically:
+
+```python
+from mycontext.intelligence import transform
+
+ctx = transform("Should we migrate to microservices? Compare tradeoffs.")
+# Engine detects: comparison + decision → selects ComparativeAnalyzer
+print(ctx.to_markdown())
+```
+
+### 9. Blueprint — Multi-Component Context Architecture
+
+For production applications that need more than a single template. Blueprints orchestrate multiple components (guidance, knowledge, reasoning) with **token budget management** and strategy-based optimization (speed / quality / cost / balanced):
+
+```python
+from mycontext.structure import Blueprint
+from mycontext.foundation import Guidance
+
+blueprint = Blueprint(
+    name="research_assistant",
+    guidance=Guidance(role="Expert research analyst"),
+    directive_template="Research and explain: {topic}",
+    token_budget=4000,
+    optimization="balanced",
+)
+ctx = blueprint.build(topic="Quantum computing advances in 2025")
+```
+
+### 10. 13 Export Formats — True Vendor Neutrality
+
+Build once, export everywhere. One context works with every LLM and framework:
+
+```python
+ctx.to_openai()       # OpenAI Chat API
+ctx.to_anthropic()    # Claude
+ctx.to_google()       # Gemini
+ctx.to_langchain()    # LangChain messages
+ctx.to_llamaindex()   # LlamaIndex
+ctx.to_crewai()       # CrewAI
+ctx.to_autogen()      # AutoGen
+ctx.to_yaml()         # Portable config
+ctx.to_json()         # JSON
+ctx.to_xml()          # XML
+ctx.to_markdown()     # Human-readable
+ctx.to_messages()     # Universal message list
+ctx.to_dict()         # Python dict
+```
+
+Plus dedicated integration helpers for **LangChain, LlamaIndex, CrewAI, AutoGen, DSPy, Semantic Kernel, and Google ADK**.
+
+### 11. Agent Skills with Quality Gates
+
+Define reusable skills as SKILL.md files. Fuse them with cognitive patterns. Gate execution on quality — if the generated context scores below threshold, it blocks *before* wasting an API call:
+
+```python
+from mycontext.skills import SkillRunner, improvement_report, suggested_edits
+
+runner = SkillRunner()
+result = runner.run(
+    Path("skills/compare_options"),
+    task="Compare microservices vs monolith",
+    quality_threshold=0.7,
+)
+print(f"Quality: {result.quality_score.overall}, Gated: {result.gated}")
+
+# Get concrete improvement suggestions for the skill
+print(improvement_report(result))
+for edit in suggested_edits(result):
+    print(f"  → {edit}")
+```
+
+Skills can declare `pattern: comparative_analyzer` in frontmatter — the runner fuses the skill body with that cognitive pattern automatically.
+
+### 12. Template Benchmarking with CAI
+
+Automated test suites for cognitive templates. Load YAML test cases, run templates through questions, evaluate output quality, and compute CAI scores — in CI or from the CLI:
+
+```bash
+python -m mycontext.benchmark_cli run --template diagnostic_root_cause_analyzer
+python -m mycontext.benchmark_cli run-all --output results.json
+```
+
+### 13. Generic Prompts — Zero-Cost Cognitive Scaffolding
+
+Every template carries a hand-crafted `GENERIC_PROMPT` (~600-1200 chars) that distills its core methodology into a self-contained prompt. No LLM call needed — just string substitution.
+
+Two modes per template: **generic** (fast, lightweight) or **full** (rich, structured):
+
+```python
+from mycontext.templates.free.reasoning import RootCauseAnalyzer
+
+# Generic mode — zero-cost prompt
+rca = RootCauseAnalyzer()
+prompt = rca.generic_prompt(problem="Server crashes during peak hours")
+print(len(prompt))  # ~946 chars
+
+# Or get any template's generic prompt with automatic fallback
+from mycontext.intelligence import get_generic_prompt_for
+
+prompt = get_generic_prompt_for("root_cause_analyzer", "Why did sales drop?")
+```
+
+### 14. Prompt Compilation Pipeline — Reusable Prompt Artifacts
+
+Instead of executing templates and getting responses, compile them into **reusable, provider-agnostic prompts** that can be executed on any LLM:
+
+```python
+from mycontext.intelligence import smart_prompt
+
+composed = smart_prompt("Should we migrate to microservices?", provider="openai")
+print(composed.to_string())    # reusable prompt artifact
+response = composed.execute()  # or execute directly
+```
+
+### 15. Static Generic Compilation — Maximum Cost Efficiency
+
+Compile generic prompts from multiple templates with **zero LLM calls for compilation**. The only LLM call is the complexity assessment:
+
+```python
+from mycontext.intelligence import smart_generic_prompt
+
+# 1 LLM call (assessment) + 0 (compilation) → optimized prompt
+composed = smart_generic_prompt(
+    "Our team has communication breakdowns. Diagnose and solve.",
+    provider="openai"
+)
+print(composed.source_templates)  # e.g. ['root_cause_analyzer']
+response = composed.execute()     # execute with 1 more call
+```
+
+### 16. Three-Tier Execution Model
+
+Choose your cost/quality tradeoff:
+
+| Tier | Function | LLM Calls | Validated Quality |
+|------|----------|-----------|-------------------|
+| **Static Generic** | `smart_generic_prompt()` | 1 + 0 | ~95% avg |
+| **Dynamic Compiled** | `smart_prompt()` | 1 + 1-3 | ~95% avg |
+| **Full Response** | `smart_execute()` | 1 + 1-2 | ~96% avg |
+
+All three tiers validated across 6 sprints of controlled experimentation (60+ experimental runs, 10 diverse questions, 5 evaluation dimensions).
+
+### 17. Complexity Router — Automatic Template Selection
+
+`assess_complexity()` classifies your question and decides the optimal approach *before* running anything:
+
+```python
+from mycontext.intelligence import assess_complexity, smart_execute
+
+# Automatic: routes to raw, single template, or integrated
+response, meta = smart_execute("Why did churn spike 40%?", provider="openai")
+print(meta['mode'])            # 'single_template' or 'integrated'
+print(meta['templates_used'])  # ['root_cause_analyzer']
+```
+
+### 18. Built-In Retry & Timeout
+
+All LLM calls include automatic retry with exponential backoff (rate limits, timeouts, server errors) and configurable timeout — production-ready out of the box.
 
 ---
 
-## 📦 Installation
+## At a Glance
+
+| Capability | mycontext-ai | Typical prompt libraries |
+|-----------|-------------|------------------------|
+| Cognitive patterns | 85 research-backed (16 free + 69 enterprise) | 10-20 generic templates |
+| Generic prompts (zero-cost) | 85 pre-authored, compilable | None |
+| Prompt compilation pipeline | Static + dynamic + full (3 tiers) | None |
+| Complexity router | Auto-selects optimal approach per question | None |
+| Context quality scoring | 6 dimensions + issues + suggestions | None |
+| Output quality scoring | 5 dimensions (separate from prompt quality) | None |
+| Template effectiveness proof | CAI (quantitative lift measurement) | None |
+| Pattern suggestion | Keyword + LLM + hybrid modes | Manual selection |
+| Multi-template fusion | Intelligent merge (not concatenation) | None |
+| Workflow chain generation | Auto-select + auto-parameterize | Manual |
+| Export formats | 13 (OpenAI, Anthropic, LangChain, YAML, ...) | 1-2 |
+| Framework integrations | 7 (LangChain, CrewAI, AutoGen, DSPy, ...) | 0-1 |
+| Agent Skills + quality gate | Pattern-fused skills with threshold gating | None |
+| Retry + timeout | Built-in exponential backoff | DIY |
+| Research citations | 150+ peer-reviewed papers | 0-5 |
+
+---
+
+## Quick Start
 
 ```bash
 pip install mycontext-ai
+
+# Add LLM execution (recommended)
+pip install litellm
 ```
-
-**Requirements:** Python 3.8+
-
----
-
-## 🚀 Quick Start
-
-### 1. Your First Context (30 seconds)
-
-```python
-from mycontext import Context
-
-# Simple context
-context = Context(
-    guidance="Expert Python Developer",
-    directive="Review this code for security issues"
-)
-
-print(context.assemble())
-```
-
-### 2. Using Cognitive Patterns (1 minute)
-
-```python
-from mycontext.templates.free.analysis import QuestionAnalyzer
-
-# Use a research-backed pattern
-analyzer = QuestionAnalyzer()
-context = analyzer.build_context(
-    question="How can I improve database query performance?",
-    depth="comprehensive"
-)
-
-# Use with any LLM
-openai_format = context.to_openai()
-```
-
-### 3. Automatic Intelligence (30 seconds)
-
-```python
-from mycontext.intelligence import transform
-
-# One line—auto pattern selection!
-context = transform("Should we use REST or GraphQL?")
-
-# Already optimized and ready to use
-claude_format = context.to_anthropic()
-```
-
-### 4. Measure Quality (30 seconds)
-
-```python
-from mycontext.intelligence import QualityMetrics
-
-metrics = QualityMetrics()
-score = metrics.evaluate(context)
-
-print(f"Quality Score: {score.overall:.2f}")
-print(f"Clarity: {score.dimensions['CLARITY']:.2f}")
-print(f"Completeness: {score.dimensions['COMPLETENESS']:.2f}")
-```
-
----
-
-## 💡 Examples
-
-### Example 1: Data Science Workflow
-
-```python
-from mycontext.templates.free.analysis import DataAnalyzer
-from mycontext.intelligence import QualityMetrics
-
-# Create analysis context
-analyzer = DataAnalyzer()
-context = analyzer.build_context(
-    data_description="Customer churn data (50K records, 30 features)",
-    analysis_goals=["Identify drivers", "Predict at-risk customers"],
-    domain="SaaS business"
-)
-
-# Check quality
-metrics = QualityMetrics()
-score = metrics.evaluate(context)
-print(f"Context quality: {score.overall:.2f}")
-
-# Export for different tools
-markdown_doc = context.to_markdown()  # Documentation
-openai_chat = context.to_openai()     # GPT-4 analysis
-yaml_config = context.to_yaml()        # Team sharing
-```
-
-### Example 2: Business Decision Making
-
-```python
-from mycontext.templates.free.decision import DecisionFramework
-
-# Frame a complex decision
-df = DecisionFramework()
-context = df.build_context(
-    decision="Choose cloud provider for new application",
-    options=["AWS", "Google Cloud", "Azure"],
-    criteria=["Cost", "Performance", "Ease of use", "Team expertise"],
-    constraints=["Budget: $50K/month", "Must support Kubernetes"]
-)
-
-# Use with Claude for analysis
-claude_format = context.to_anthropic()
-
-# Export for team discussion
-team_doc = context.to_markdown()
-```
-
-### Example 3: Code Review
 
 ```python
 from mycontext import Context, Guidance, Directive
 
-code = """
-def process_payment(amount, user_id):
-    query = f"INSERT INTO payments VALUES ({amount}, {user_id})"
-    db.execute(query)
-"""
-
-context = Context(
+ctx = Context(
     guidance=Guidance(
-        role="Senior Security Engineer",
-        rules=[
-            "Identify security vulnerabilities",
-            "Provide specific fixes with code examples",
-            "Explain why each issue matters"
-        ]
+        role="Senior security reviewer",
+        rules=["Flag every injection risk", "Suggest concrete fixes"],
+        style="concise, actionable",
     ),
-    directive=Directive(
-        content=f"Review this payment code for security issues:\n\n{code}",
-        priority=10  # Critical
-    )
+    directive=Directive(content="Review this API for auth and input validation."),
 )
 
-# Get detailed security review from Claude
-claude_review = context.to_anthropic()
+# Export to any LLM
+ctx.to_openai()      # → OpenAI messages
+ctx.to_anthropic()   # → Claude format
+ctx.to_langchain()   # → LangChain messages
+
+# Or execute directly (requires litellm)
+result = ctx.execute(provider="openai")
+```
+
+All providers route through LiteLLM, giving you access to 100+ models. You can also register custom providers (e.g., Ollama for local models).
+
+---
+
+## Use Cases
+
+### Chain patterns for complex analysis
+
+Strategic questions need multiple reasoning steps. Chain patterns so each stage feeds the next:
+
+```python
+# Enterprise templates — requires license (see Enterprise Patterns section)
+from mycontext.templates.enterprise.temporal import TemporalSequenceAnalyzer
+from mycontext.templates.free.reasoning import RootCauseAnalyzer
+from mycontext.templates.enterprise.synthesis import HolisticIntegrator
+
+# Stage 1: Timeline
+ctx1 = TemporalSequenceAnalyzer().build_context(
+    events="Q1: Support tickets doubled. Q2: Competitor launched. Q3: Complaints up 40%.",
+    time_span="12 months",
+)
+
+# Stage 2: Root cause (fed by Stage 1 output)
+ctx2 = RootCauseAnalyzer().build_context(
+    problem="Customer satisfaction collapse",
+    symptoms=ctx1.directive.content[:2500],
+)
+
+# Stage 3: Synthesis
+ctx3 = HolisticIntegrator().build_context(
+    topic="Recovery strategy",
+    perspectives=f"Timeline: {ctx1.directive.content[:600]}\nRCA: {ctx2.directive.content[:600]}",
+)
+result = ctx3.execute(provider="openai")
+```
+
+### Drop into any orchestrator
+
+mycontext contexts work as tools inside LangChain, CrewAI, smolagents, AutoGen, Semantic Kernel, and Google ADK:
+
+```python
+from mycontext.intelligence import transform
+from mycontext.integrations import LangChainHelper
+
+ctx = transform("What are the top 3 risks for this launch?")
+messages = LangChainHelper.to_messages(ctx)
+# → Use in your LangChain chain or agent
+```
+
+Integration helpers are available for all 7 frameworks out of the box.
+
+### Enforce structured output
+
+```python
+from mycontext.utils.structured_output import output_format
+
+instruction = output_format("json", schema={"summary": "str", "risks": "list", "recommendation": "str"})
+ctx = Context(directive=Directive(content=f"Analyze this proposal.\n\n{instruction}"))
 ```
 
 ---
 
-## 📚 API Reference
+## 85 Cognitive Patterns
 
-### Core Classes
+### Free Patterns (16)
 
-#### `Context`
-The main container for context engineering.
+Included in every install. Production-ready for analysis, decision-making, reasoning, and communication.
 
-```python
-from mycontext import Context, Guidance, Directive, Constraints
+| Pattern | What it does |
+|---------|-------------|
+| **RootCauseAnalyzer** | Five Whys + fishbone + systematic diagnosis |
+| **DataAnalyzer** | Data description → analysis plan → insights |
+| **QuestionAnalyzer** | Decompose complex questions into structured inquiry |
+| **StepByStepReasoner** | Chain-of-thought with explicit reasoning steps |
+| **HypothesisGenerator** | Generate and evaluate competing hypotheses |
+| **ScenarioPlanner** | Future scenarios with probability assessment |
+| **RiskAssessor** | Risk identification, scoring, and mitigation |
+| **Brainstormer** | Structured ideation with divergent/convergent phases |
+| **CodeReviewer** | Security, performance, and maintainability review |
+| **TechnicalTranslator** | Translate technical content for different audiences |
+| **AudienceAdapter** | Adapt message for specific audience and context |
+| **SocraticQuestioner** | Guided inquiry through Socratic method |
+| **SynthesisBuilder** | Integrate multiple sources into coherent synthesis |
+| **StakeholderMapper** | Map stakeholders, interests, and influence |
+| **ConflictResolver** | Mediate conflicts by identifying interests and common ground |
+| **IntentRecognizer** | Identify core intent, goals, and motivations behind a statement |
 
-context = Context(
-    guidance=Guidance(
-        role="Expert role description",
-        rules=["Rule 1", "Rule 2"],
-        knowledge=["Domain expertise"],
-        style="Communication style"
-    ),
-    directive=Directive(
-        content="What to do",
-        priority=5  # 1-10
-    ),
-    constraints=Constraints(
-        must_include=["Required elements"],
-        must_not_include=["Excluded elements"],
-        style_guide="Formatting guidelines"
-    )
-)
-```
+### Enterprise Patterns (+69)
 
-**Key Methods:**
-- `context.assemble()` - Get the full assembled context
-- `context.to_openai()` - Export to OpenAI format
-- `context.to_anthropic()` - Export to Anthropic format
-- `context.to_langchain()` - Export to LangChain format
-- `context.to_json()` - Export to JSON
-- `context.to_yaml()` - Export to YAML
-- `context.to_markdown()` - Export to Markdown
+Advanced patterns for temporal reasoning, diagnostics, systems thinking, ethical analysis, metacognition, learning science, and cross-domain synthesis. **Enterprise patterns require a valid license key.** Contact us to obtain a license.
 
-### Cognitive Patterns
-
-#### Pattern Categories
-
-**Analysis Patterns:**
-```python
-from mycontext.templates.free.analysis import (
-    QuestionAnalyzer,
-    DataAnalyzer,
-    TrendIdentifier,
-    GapAnalyzer,
-    SWOTAnalyzer,
-    AnomalyDetector
-)
-```
-
-**Decision Patterns:**
-```python
-from mycontext.templates.free.decision import (
-    DecisionFramework,
-    ComparativeAnalyzer,
-    TradeoffAnalyzer,
-    MultiObjectiveOptimizer,
-    CostBenefitAnalyzer
-)
-```
-
-**Creative Patterns:**
-```python
-from mycontext.templates.free.creative import (
-    IdeaGenerator,
-    Brainstormer,
-    InnovationFramework,
-    DesignThinker,
-    MetaphorGenerator
-)
-```
-
-**All patterns follow the same interface:**
-```python
-pattern = PatternName()
-context = pattern.build_context(
-    # Pattern-specific parameters
-)
-```
-
-### Intelligence Layer
-
-#### Transformation Engine
-```python
-from mycontext.intelligence import TransformationEngine, transform
-
-# Method 1: Using the engine
-engine = TransformationEngine()
-analysis = engine.analyze_input("Your question")
-context = engine.transform("Your question")
-
-# Method 2: Convenience function
-context = transform("Your question")
-```
-
-#### Quality Metrics
-```python
-from mycontext.intelligence import QualityMetrics
-
-metrics = QualityMetrics()
-score = metrics.evaluate(context)
-
-# Access scores
-print(score.overall)           # Overall quality (0.0-1.0)
-print(score.dimensions)        # Dict of all 6 dimensions
-print(score.suggestions)       # List of improvement suggestions
-
-# Compare contexts
-comparison = metrics.compare(score1, score2)
-
-# Generate report
-report = metrics.report(score)
-print(report)
-```
-
-### Integration Helpers
+The SDK will warn you when an enterprise template is accessed without a license and automatically suggest free alternatives:
 
 ```python
-from mycontext.integrations import (
-    LangChainHelper,
-    LlamaIndexHelper,
-    CrewAIHelper,
-    AutoGenHelper,
-    DSPyHelper,
-    SemanticKernelHelper,
-    auto_integrate
-)
+import mycontext
 
-# Use helpers
-langchain_msgs = LangChainHelper.to_messages(context)
-llamaindex_prompt = LlamaIndexHelper.to_prompt(context)
+# Without license — SDK warns and falls back to best free template
+from mycontext.intelligence import smart_execute
+response, meta = smart_execute("Analyze this...", include_enterprise=False)
+# → UserWarning: Template 'causal_reasoner' requires an enterprise license.
+#   Free alternatives (16 templates) are available.
 
-# Auto-detect framework
-result = auto_integrate(context, "langchain")
+# With license — full access
+mycontext.activate_license("MC-ENT-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+response, meta = smart_execute("Analyze this...", include_enterprise=True)
 ```
+
+**Categories:** Metacognition · Ethical Reasoning · Systems Thinking · Learning & Knowledge Building · Evaluation & Assessment · Temporal Reasoning · Diagnostic & Troubleshooting · Synthesis & Integration · Advanced Decision · Advanced Problem Solving · Advanced Planning · Advanced Analysis · Advanced Reasoning · Advanced Creative · Advanced Communication · Advanced Specialized
 
 ---
 
-## 🎯 Use Cases
+## Web Application
 
-### For Data Scientists
-```python
-# Analyze complex datasets with structured context
-from mycontext.templates.free.analysis import DataAnalyzer
-
-analyzer = DataAnalyzer()
-context = analyzer.build_context(
-    data_description="Time series sales data",
-    analysis_goals=["Forecast Q4 revenue", "Identify anomalies"]
-)
-```
-
-### For Engineers
-```python
-# Get architecture recommendations
-from mycontext.templates.free.decision import TradeoffAnalyzer
-
-analyzer = TradeoffAnalyzer()
-context = analyzer.build_context(
-    option_a="Monolithic architecture",
-    option_b="Microservices",
-    dimensions=["Scalability", "Complexity", "Cost"]
-)
-```
-
-### For Product Managers
-```python
-# Plan features and scenarios
-from mycontext.templates.free.planning import ScenarioPlanner
-
-planner = ScenarioPlanner()
-context = planner.build_context(
-    situation="Launching premium tier",
-    scenarios=["Best case", "Expected", "Worst case"]
-)
-```
+mycontext also ships as a full-featured **web application** — a context engineering workbench with a visual pattern library, chain builder, and an AI-powered Context Copilot that guides you through building and refining contexts step by step. The web app is available separately from the SDK.
 
 ---
 
-## 🧪 Production Ready
+## Installation
 
-### Test Coverage
-- ✅ 37/37 Core Tests Passed
-- ✅ 12/12 Stress Tests Passed  
-- ✅ 10/10 Real-World Scenarios Passed
-- **Total: 59/59 tests passing (100%)**
-
-### Performance Benchmarks
-- Instantiate 50 patterns: **458ms**
-- 100 pattern executions: **5.6ms** (0.06ms avg)
-- Quality evaluation: **<1ms**
-- Export to all formats: **<10ms**
-
-### Quality Assurance
-- Type hints throughout
-- Pydantic data validation
-- Comprehensive error handling
-- Graceful degradation
-
----
-
-## 🛠️ Advanced Features
-
-### Context Chaining
-```python
-# Build contexts incrementally
-base = Context(guidance="Technical Architect")
-
-enhanced = Context(
-    guidance=base.guidance,
-    directive="Design microservices architecture"
-)
-
-final = Context(
-    guidance=enhanced.guidance,
-    directive=enhanced.directive,
-    constraints="Must use Kubernetes"
-)
-```
-
-### Quality Iteration
-```python
-from mycontext.intelligence import QualityMetrics
-
-metrics = QualityMetrics()
-
-# Version 1
-v1 = Context(guidance="Analyst")
-score1 = metrics.evaluate(v1)  # 0.59
-
-# Version 2 (enhanced)
-v2 = Context(
-    guidance="Senior Data Analyst with 5+ years experience",
-    directive="Analyze Q4 sales with statistical rigor"
-)
-score2 = metrics.evaluate(v2)  # 0.92
-
-# Compare improvement
-comparison = metrics.compare(score1, score2)
-```
-
-### Multi-Pattern Workflows
-```python
-# Combine multiple patterns
-from mycontext.templates.free.analysis import QuestionAnalyzer
-from mycontext.templates.free.problem_solving import ProblemDecomposer
-from mycontext.templates.free.planning import ScenarioPlanner
-
-# Step 1: Analyze question
-qa = QuestionAnalyzer()
-analysis = qa.build_context(question="How to scale our app?")
-
-# Step 2: Decompose problem
-pd = ProblemDecomposer()
-breakdown = pd.build_context(problem="Scale to 10x traffic")
-
-# Step 3: Plan scenarios
-sp = ScenarioPlanner()
-plan = sp.build_context(scenarios=["Best", "Expected", "Worst"])
-```
-
----
-
-## 🌟 What Makes It Unique?
-
-### Not Another LLM Framework
-mycontext doesn't try to be everything. It does **one thing exceptionally well**: context engineering.
-
-| Feature | mycontext | Other Frameworks |
-|---------|-----------|------------------|
-| **Focus** | Context engineering only | Full LLM orchestration |
-| **Portability** | Works with any LLM | Vendor-specific |
-| **Quality Metrics** | Scientific measurement | None |
-| **Cognitive Patterns** | 50 research-backed | Generic templates |
-| **Intelligence** | Auto pattern selection | Manual configuration |
-
-### Research-Backed Patterns
-Every pattern is based on published research in cognitive science, decision theory, and AI:
-- Question analysis from IBM Zurich research
-- Decision frameworks from organizational psychology
-- Problem decomposition from systems thinking
-- Reasoning patterns from cognitive science
-
-### Measurable Improvement
-Stop guessing if your context is good—measure it:
-```python
-score = metrics.evaluate(context)
-# Returns: Clarity, Completeness, Specificity, Relevance, Structure, Efficiency
-# Plus: Actionable suggestions for improvement
-```
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Whether it's:
-- 🐛 Bug fixes
-- ✨ New cognitive patterns
-- 📚 Documentation improvements
-- 🎨 Examples and tutorials
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-Built on the shoulders of giants:
-- IBM Zurich cognitive tools research
-- Context engineering best practices
-- The amazing Python AI community
-
----
-
-## 🔗 Links
-
-- **PyPI**: [pypi.org/project/mycontext-ai/](https://pypi.org/project/mycontext-ai/)
-- **GitHub**: [github.com/yourusername/mycontext](https://github.com/yourusername/mycontext)
-- **Issues**: [Report bugs or request features](https://github.com/yourusername/mycontext/issues)
-
----
-
-## 🚀 Quick Reference
-
-```python
-# Installation
+```bash
+# Core SDK (includes 16 free patterns, intelligence layer, quality metrics)
 pip install mycontext-ai
 
-# Simple context
-from mycontext import Context
-context = Context(guidance="Expert", directive="Task")
+# Add LLM execution support (recommended)
+pip install mycontext-ai litellm
 
-# Use cognitive pattern
-from mycontext.templates.free.analysis import QuestionAnalyzer
-analyzer = QuestionAnalyzer()
-context = analyzer.build_context(question="Your question?")
-
-# Auto intelligence
-from mycontext.intelligence import transform
-context = transform("Any question or problem")
-
-# Measure quality
-from mycontext.intelligence import QualityMetrics
-score = QualityMetrics().evaluate(context)
-
-# Export anywhere
-context.to_openai()      # GPT-4
-context.to_anthropic()   # Claude
-context.to_langchain()   # LangChain
-context.to_yaml()        # YAML
+# Optional: provider-specific SDKs
+pip install "mycontext-ai[openai]"       # OpenAI SDK
+pip install "mycontext-ai[anthropic]"    # Anthropic SDK
+pip install "mycontext-ai[google]"       # Google GenAI SDK
+pip install "mycontext-ai[all]"          # All provider SDKs
 ```
+
+---
+
+## What This Is (and Isn't)
+
+**mycontext-ai is a context engineering library.** It structures and transforms your questions into high-quality prompts using research-backed cognitive patterns. It measures prompt quality *and* output quality. It proves templates work with quantitative metrics. It exports to any LLM format.
+
+**It is not** a prompt template string library. It is not an LLM wrapper. It is not an agent framework. It works *with* your existing agent framework (LangChain, CrewAI, AutoGen, etc.) by giving it better inputs.
+
+The core insight: **the quality of an LLM's output is bounded by the quality of its input.** mycontext engineers that input — and proves it.
+
+---
+
+## License
+
+MIT. Free edition includes 16 patterns and the full intelligence layer. Enterprise edition (+69 advanced patterns) requires a license key.
 
 ---
 
 <div align="center">
 
-**Made with ❤️ for the AI community**
+**The quality of an LLM's output is bounded by the quality of its input.**
 
-⭐ **Star us on GitHub** if you find mycontext useful!
-
-[Get Started](#-quick-start) • [View Examples](#-examples) • [API Reference](#-api-reference)
+[Get Started](#quick-start)
 
 </div>

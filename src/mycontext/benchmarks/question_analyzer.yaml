@@ -1,0 +1,11 @@
+template: question_analyzer
+test_cases:
+  - question: "How can we reduce technical debt while maintaining feature velocity?"
+    expected:
+      min_score: 0.5
+      must_contain: ["analysis"]
+    tags: [engineering, strategy]
+  - question: "What is the impact of AI on healthcare diagnostics in developing countries?"
+    expected:
+      min_score: 0.5
+    tags: [ai, healthcare]

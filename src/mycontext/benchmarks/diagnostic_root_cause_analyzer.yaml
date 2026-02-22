@@ -1,0 +1,17 @@
+template: diagnostic_root_cause_analyzer
+test_cases:
+  - question: "Our API response times increased 3x after the last deployment"
+    expected:
+      min_score: 0.5
+      must_contain: ["root cause", "factor"]
+    tags: [performance, debugging]
+  - question: "Customer churn rate doubled in Q4 despite no pricing changes"
+    expected:
+      min_score: 0.5
+      must_contain: ["cause", "churn"]
+    tags: [business, retention]
+  - question: "The CI/CD pipeline fails intermittently every few hours"
+    expected:
+      min_score: 0.5
+      must_contain: ["cause"]
+    tags: [devops, reliability]

@@ -32,7 +32,30 @@ class ConflictResolver(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are an expert mediator and conflict resolution specialist. Analyze "
+        "and resolve the following conflict:\n\n"
+        "Conflict: {conflict}\n"
+        "Parties involved: {parties}\n"
+        "{context_section}\n\n"
+        "Apply structured mediation methodology: "
+        "(1) Analyze the conflict — classify its type (interpersonal, structural, "
+        "value-based, interest-based), assess severity, duration, and key triggers. "
+        "(2) Map each party's perspective — their stated position, underlying "
+        "interests, core concerns, and what they fear losing. "
+        "(3) Identify common ground — shared goals, values, constraints, and mutual "
+        "dependencies. "
+        "(4) Diagnose root causes — what underlying issues are driving the "
+        "surface-level disagreement? "
+        "(5) Generate resolution options: (a) Compromise — each side gives something; "
+        "(b) Collaboration — expand the pie; (c) Creative — reframe the problem "
+        "entirely. For each option, outline pros, cons, and feasibility. "
+        "(6) Recommend the best resolution with a clear rationale, implementation "
+        "steps, and follow-up plan.\n\n"
+        "Stay neutral. Understand all perspectives before proposing solutions."
+    )
+
     def __init__(self):
         super().__init__(
             name="conflict_resolver",

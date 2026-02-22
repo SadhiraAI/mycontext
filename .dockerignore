@@ -1,0 +1,37 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*.egg-info
+.venv
+venv
+env
+
+# Environment secrets
+.env
+.env.*
+
+# Frontend (built separately via Cloudflare Pages)
+app/web/node_modules
+app/web/dist
+
+# Development / docs (not needed in production image)
+docs
+examples
+tests
+scripts
+*.md
+*.ipynb
+.cursor
+.vscode
+.idea
+
+# SQLite dev database
+*.db
+
+# OS
+.DS_Store
+Thumbs.db

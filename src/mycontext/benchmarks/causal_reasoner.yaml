@@ -1,0 +1,11 @@
+template: causal_reasoner
+test_cases:
+  - question: "Remote work policies led to decreased collaboration but increased productivity"
+    expected:
+      min_score: 0.5
+      must_contain: ["cause", "effect"]
+    tags: [workplace, analysis]
+  - question: "Increasing free trial from 7 to 30 days reduced conversion but increased revenue"
+    expected:
+      min_score: 0.5
+    tags: [business, pricing]

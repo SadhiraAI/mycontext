@@ -127,18 +127,20 @@ class TestPatternParameterSeparation:
     """Test that Pattern correctly separates template vs provider parameters"""
     
     def test_provider_params_not_in_context(self):
-        """Test that provider params don't go into context data"""
+        """Test that provider params don't leak into context data"""
         analyzer = QuestionAnalyzer()
         
-        # Build context with template params only
         context = analyzer.build_context(
             question="Test question",
             depth="basic"
         )
         
-        # Context data should only have template inputs
-        assert "question" not in context.data  # Goes to directive template
-        assert "model" not in context.data  # Should never be here
+        # Template inputs are stored in context.data (by design)
+        assert "question" in context.data
+        assert "depth" in context.data
+        # Provider-level params should never appear
+        assert "model" not in context.data
+        assert "api_key" not in context.data
     
     def test_metadata_is_set(self):
         """Test that pattern metadata is set correctly"""

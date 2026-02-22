@@ -20,6 +20,7 @@ class InputType(Enum):
     DECISION = "decision"
     CONCEPT = "concept"
     COMPARISON = "comparison"
+    CAUSAL = "causal"
     STATEMENT = "statement"
     TASK = "task"
     CONVERSATION = "conversation"
@@ -56,8 +57,6 @@ class TransformationEngine:
     - Analyzes input characteristics
     - Selects optimal cognitive patterns
     - Composes multi-pattern transformations
-    - Optimizes context quality
-    - Measures improvement
     
     Example:
         >>> engine = TransformationEngine()
@@ -66,56 +65,59 @@ class TransformationEngine:
         ...     metadata={"domain": "software", "user_level": "professional"}
         ... )
         >>> print(f"Patterns used: {context.metadata['patterns_applied']}")
-        >>> print(f"Quality score: {context.metadata['quality_score']}")
     
     This is the core innovation of mycontext - automatic, intelligent transformation.
     """
     
-    def __init__(self, auto_optimize: bool = True):
+    def __init__(self, include_enterprise: bool = True):
         """
         Initialize the transformation engine.
         
         Args:
-            auto_optimize: Automatically optimize context quality
+            include_enterprise: If False, only free patterns are used (for non-enterprise users)
         """
-        self.auto_optimize = auto_optimize
+        self.include_enterprise = include_enterprise
         self._pattern_registry: Dict[str, Pattern] = {}
         self._load_patterns()
     
     def _load_patterns(self):
-        """Load all available cognitive patterns."""
+        """Load all available cognitive patterns. Excludes enterprise when include_enterprise=False."""
         from ..templates.free import (
             QuestionAnalyzer,
             StepByStepReasoner,
             SocraticQuestioner,
-            ComparativeAnalyzer,
-            CausalReasoner,
             RiskAssessor,
-            TradeoffAnalyzer,
             IntentRecognizer,
-            AmbiguityResolver,
-            ProblemDecomposer,
-            DecisionFramework,
-            AnalogicalReasoner,
             RootCauseAnalyzer,
         )
-        
-        patterns = [
+        from ..templates.enterprise import (
+            CausalReasoner,
+            AmbiguityResolver,
+            AnalogicalReasoner,
+        )
+        patterns: List[Pattern] = [
             QuestionAnalyzer(),
             StepByStepReasoner(),
             SocraticQuestioner(),
-            ComparativeAnalyzer(),
-            CausalReasoner(),
             RiskAssessor(),
-            TradeoffAnalyzer(),
             IntentRecognizer(),
-            AmbiguityResolver(),
-            ProblemDecomposer(),
-            DecisionFramework(),
-            AnalogicalReasoner(),
             RootCauseAnalyzer(),
         ]
-        
+        if self.include_enterprise:
+            patterns.extend([
+                CausalReasoner(),
+                AmbiguityResolver(),
+                AnalogicalReasoner(),
+            ])
+        if self.include_enterprise:
+            from ..templates.enterprise.decision import (
+                ComparativeAnalyzer,
+                TradeoffAnalyzer,
+                DecisionFramework,
+            )
+            from ..templates.enterprise.problem_solving import ProblemDecomposer
+            patterns.extend([ComparativeAnalyzer(), TradeoffAnalyzer(), ProblemDecomposer(), DecisionFramework()])
+
         for pattern in patterns:
             self._pattern_registry[pattern.name] = pattern
     
@@ -135,9 +137,6 @@ class TransformationEngine:
             InputAnalysis with recommendations
         """
         metadata = metadata or {}
-        
-        # Simple heuristic-based analysis
-        # TODO: Could be enhanced with ML in future
         
         input_lower = input.lower()
         
@@ -178,7 +177,9 @@ class TransformationEngine:
             requires_verification,
             ambiguity_level
         )
-        
+        # Filter to only patterns we have loaded (excludes enterprise when include_enterprise=False)
+        recommended_patterns = [p for p in recommended_patterns if p in self._pattern_registry]
+
         # Calculate confidence
         confidence = self._calculate_confidence(input, recommended_patterns)
         
@@ -197,14 +198,28 @@ class TransformationEngine:
     
     def _detect_input_type(self, input_lower: str) -> InputType:
         """Detect the type of input."""
-        if any(word in input_lower for word in ["should i", "should we", "decide", "choose"]):
+        if any(phrase in input_lower for phrase in [
+            "root cause", "why did", "why is", "why does", "why are", "why was",
+            "what caused", "five whys", "fishbone", "led to", "resulted in",
+            "cause of", "causes of", "reason for", "spike", "drop", "churn",
+            "incident", "outage", "failure", "diagnos",
+        ]):
+            return InputType.CAUSAL
+        elif any(word in input_lower for word in ["should i", "should we", "decide", "choose"]):
             return InputType.DECISION
         elif any(word in input_lower for word in ["compare", "versus", "vs", "better than"]):
             return InputType.COMPARISON
         elif any(word in input_lower for word in ["what is", "explain", "how does", "define"]):
             return InputType.CONCEPT
-        elif any(word in input_lower for word in ["solve", "fix", "how to", "problem with"]):
+        elif any(word in input_lower for word in [
+            "solve", "fix", "how to", "problem with", "troubleshoot",
+            "issue", "bug", "broken", "error",
+        ]):
             return InputType.PROBLEM
+        elif any(word in input_lower for word in [
+            "why", "cause", "causal", "because",
+        ]):
+            return InputType.CAUSAL
         elif "?" in input_lower:
             return InputType.QUESTION
         else:
@@ -279,7 +294,13 @@ class TransformationEngine:
             patterns.append("ambiguity_resolver")
         
         # Pattern selection based on input type
-        if input_type == InputType.QUESTION:
+        if input_type == InputType.CAUSAL:
+            patterns.append("root_cause_analyzer")
+            patterns.append("causal_reasoner")
+            if complexity in [ComplexityLevel.COMPLEX, ComplexityLevel.HIGHLY_COMPLEX]:
+                patterns.append("step_by_step_reasoner")
+
+        elif input_type == InputType.QUESTION:
             patterns.append("question_analyzer")
             if requires_reasoning:
                 patterns.append("step_by_step_reasoner")
@@ -308,11 +329,18 @@ class TransformationEngine:
             patterns.append("analogical_reasoner")
             patterns.append("question_analyzer")
         
-        # Add verification if needed
+        if requires_reasoning and "causal_reasoner" not in patterns:
+            patterns.append("causal_reasoner")
         if requires_verification:
             patterns.append("causal_reasoner")
         
-        return patterns[:3]  # Top 3 recommendations
+        seen = set()
+        deduped = []
+        for p in patterns:
+            if p not in seen:
+                seen.add(p)
+                deduped.append(p)
+        return deduped[:3]
     
     def _calculate_confidence(self, input: str, patterns: List[str]) -> float:
         """Calculate confidence in pattern selection."""
@@ -331,7 +359,6 @@ class TransformationEngine:
         input: str,
         metadata: Optional[Dict[str, Any]] = None,
         patterns: Union[str, List[str], None] = "auto",
-        optimization: str = "balanced"
     ) -> Context:
         """
         Transform raw input into perfect context.
@@ -344,11 +371,6 @@ class TransformationEngine:
             patterns: Pattern selection strategy:
                 - "auto": Automatic selection (default)
                 - ["pattern1", "pattern2"]: Specific patterns
-                - "all_applicable": Use all applicable patterns
-            optimization: Context optimization strategy:
-                - "speed": Minimize tokens, faster processing
-                - "quality": Maximum depth and thoroughness
-                - "balanced": Balance of speed and quality (default)
         
         Returns:
             Context object with metadata about transformation
@@ -361,8 +383,6 @@ class TransformationEngine:
             selected_patterns = analysis.recommended_patterns
         elif isinstance(patterns, list):
             selected_patterns = patterns
-        elif patterns == "all_applicable":
-            selected_patterns = analysis.recommended_patterns  # TODO: Expand to all applicable
         else:
             selected_patterns = [analysis.recommended_patterns[0]] if analysis.recommended_patterns else []
         
@@ -389,12 +409,7 @@ class TransformationEngine:
                         "ambiguity": analysis.ambiguity_level
                     },
                     "confidence": analysis.confidence,
-                    "optimization": optimization
                 }
-                
-                # Apply optimization if enabled
-                if self.auto_optimize:
-                    context = self._optimize_context(context, optimization)
                 
                 return context
         
@@ -426,7 +441,7 @@ class TransformationEngine:
         # Try common parameter names
         if pattern.name in ["question_analyzer", "intent_recognizer"]:
             inputs["question"] = input
-        elif pattern.name in ["step_by_step_reasoner", "problem_decomposer", "root_cause_analyzer"]:
+        elif pattern.name in ["step_by_step_reasoner", "problem_decomposer", "root_cause_analyzer", "diagnostic_root_cause_analyzer"]:
             inputs["problem"] = input
         elif pattern.name == "decision_framework":
             inputs["decision"] = input
@@ -434,6 +449,17 @@ class TransformationEngine:
             inputs["statement"] = input
         elif pattern.name == "analogical_reasoner":
             inputs["concept"] = input
+        elif pattern.name in ["comparative_analyzer"]:
+            inputs["options"] = input
+        elif pattern.name in ["data_analyzer"]:
+            inputs["data_description"] = input
+            inputs["goal"] = "Analyze the data"
+        elif pattern.name in ["stakeholder_mapper"]:
+            inputs["situation"] = input
+        elif pattern.name in ["scenario_planner"]:
+            inputs["situation"] = input
+        elif pattern.name in ["risk_assessor"]:
+            inputs["situation"] = input
         else:
             inputs["input"] = input
         
@@ -446,27 +472,6 @@ class TransformationEngine:
             inputs["depth"] = "comprehensive"
         
         return inputs
-    
-    def _optimize_context(self, context: Context, strategy: str) -> Context:
-        """
-        Optimize context based on strategy.
-        
-        Args:
-            context: Context to optimize
-            strategy: Optimization strategy
-        
-        Returns:
-            Optimized context
-        """
-        # TODO: Implement actual optimization logic
-        # For now, just return as-is
-        # Future: Token reduction, clarity enhancement, etc.
-        
-        context.data = context.data or {}
-        context.data["optimized"] = True
-        context.data["optimization_strategy"] = strategy
-        
-        return context
     
     def get_available_patterns(self) -> List[str]:
         """Get list of all available pattern names."""
@@ -519,7 +524,8 @@ Recommended Patterns:
 def transform(
     input: str,
     metadata: Optional[Dict[str, Any]] = None,
-    patterns: Union[str, List[str], None] = "auto"
+    patterns: Union[str, List[str], None] = "auto",
+    include_enterprise: bool = True
 ) -> Context:
     """
     Quick transformation function.
@@ -528,6 +534,7 @@ def transform(
         input: Raw input to transform
         metadata: Optional metadata
         patterns: Pattern selection strategy
+        include_enterprise: If False, only free patterns are used
     
     Returns:
         Transformed context
@@ -537,5 +544,5 @@ def transform(
         >>> context = transform("Should we use microservices?")
         >>> print(context.to_markdown())
     """
-    engine = TransformationEngine()
+    engine = TransformationEngine(include_enterprise=include_enterprise)
     return engine.transform(input, metadata, patterns)

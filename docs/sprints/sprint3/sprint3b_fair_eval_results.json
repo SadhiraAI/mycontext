@@ -1,0 +1,872 @@
+{
+  "sprint": "Sprint 3B \u2014 Fair Evaluation Re-Test",
+  "date": "2026-02-21T12:48:58.898418",
+  "provider": "openai",
+  "eval_mode": "llm",
+  "num_questions": 10,
+  "fixes_applied": [
+    "Evaluate ALL conditions against raw context (fair comparison)",
+    "Evaluator output window: 4000 \u2192 8000 chars",
+    "Enriched catalog fed to assess_complexity() (best_template fix)",
+    "Removed QUESTION COVERAGE CHECK from integration prompt",
+    "Added output length guidance (3500-4500 chars) to integration prompt"
+  ],
+  "summary": {
+    "avg_overall": {
+      "raw": 0.944,
+      "smart": 0.96,
+      "integrated_v2": 0.966
+    },
+    "wins": {
+      "Raw": 0,
+      "Smart": 3,
+      "IntV2": 4,
+      "Tie": 3
+    },
+    "s3_comparison": {
+      "s3_raw_avg": 0.916,
+      "s3_smart_avg": 0.8685,
+      "s3_intv2_avg": 0.8605
+    }
+  },
+  "results": [
+    {
+      "question": "Why did customer churn spike 40% last quarter and what should we do about it?",
+      "assessment": {
+        "complexity": "medium",
+        "domains": [
+          "business",
+          "data"
+        ],
+        "reasoning_type": "diagnostic",
+        "recommendation": "single_template",
+        "reasoning": "The question involves understanding the reasons behind a significant increase in customer churn, which requires a systematic investigation of potential causes. The root_cause_analyzer template will help identify the underlying issues contributing to the churn spike.",
+        "best_template": "root_cause_analyzer"
+      },
+      "raw": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 8.71,
+        "output_length": 3272,
+        "strengths": [
+          "Comprehensive analysis of potential causes of churn.",
+          "Clear and actionable recommendations for each identified cause.",
+          "Well-structured format that enhances readability."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples or case studies to illustrate points.",
+          "Might benefit from a summary or conclusion to reinforce key takeaways."
+        ]
+      },
+      "smart": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 19.91,
+        "output_length": 6579,
+        "strengths": [
+          "Thorough analysis of the problem with clear identification of symptoms and root causes.",
+          "Well-structured format that enhances readability and comprehension.",
+          "Actionable recommendations that can be implemented to address the identified issues."
+        ],
+        "weaknesses": [
+          "While the reasoning is deep, some areas could benefit from more quantitative data to support claims."
+        ],
+        "templates_used": [
+          "root_cause_analyzer"
+        ],
+        "smart_mode": "single_template"
+      },
+      "integrated_v2": {
+        "overall": 1.0,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 1.0,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 25.67,
+        "output_length": 5106,
+        "strengths": [
+          "Thorough analysis of the problem and its causes.",
+          "Clear and actionable recommendations.",
+          "Well-structured format that enhances readability."
+        ],
+        "weaknesses": [],
+        "source_templates": [
+          "diagnostic_root_cause_analyzer",
+          "causal_reasoner",
+          "decision_framework"
+        ]
+      }
+    },
+    {
+      "question": "Should we migrate our monolithic architecture to microservices? What are the trade-offs?",
+      "assessment": {
+        "complexity": "high",
+        "domains": [
+          "business",
+          "technical"
+        ],
+        "reasoning_type": "strategic",
+        "recommendation": "integrated",
+        "reasoning": "The question involves evaluating a significant architectural shift that impacts both technical and business domains, requiring a nuanced understanding of trade-offs and strategic implications. It is complex enough to benefit from multiple frameworks to analyze the decision comprehensively.",
+        "best_template": null
+      },
+      "raw": {
+        "overall": 0.9200000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.8,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 10.93,
+        "output_length": 3676,
+        "strengths": [
+          "Comprehensive analysis of advantages and trade-offs.",
+          "Clear structure and organization.",
+          "Actionable recommendations provided."
+        ],
+        "weaknesses": [
+          "Could include more specific examples or case studies to enhance understanding."
+        ]
+      },
+      "smart": {
+        "overall": 0.9800000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 29.51,
+        "output_length": 5519,
+        "strengths": [
+          "Comprehensive analysis of trade-offs",
+          "Clear and actionable recommendations",
+          "Well-structured format"
+        ],
+        "weaknesses": [],
+        "templates_used": [
+          "problem_decomposer",
+          "tradeoff_analyzer"
+        ],
+        "smart_mode": "integrated"
+      },
+      "integrated_v2": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 34.02,
+        "output_length": 4653,
+        "strengths": [
+          "Comprehensive analysis of the trade-offs between monolithic and microservices architectures.",
+          "Clear and actionable recommendations for next steps.",
+          "Well-structured format that enhances readability."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples or case studies to illustrate points.",
+          "Might benefit from a more explicit summary of key takeaways."
+        ],
+        "source_templates": [
+          "problem_decomposer",
+          "tradeoff_analyzer",
+          "decision_framework"
+        ]
+      }
+    },
+    {
+      "question": "Our AI model is producing biased hiring recommendations. How do we diagnose and fix this?",
+      "assessment": {
+        "complexity": "high",
+        "domains": [
+          "technical",
+          "business",
+          "ethical"
+        ],
+        "reasoning_type": "diagnostic",
+        "recommendation": "integrated",
+        "reasoning": "The question involves diagnosing bias in an AI model, which requires understanding technical aspects of AI, business implications of hiring practices, and ethical considerations regarding fairness and discrimination. This multi-domain complexity necessitates an integrated approach.",
+        "best_template": null
+      },
+      "raw": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 11.05,
+        "output_length": 3366,
+        "strengths": [
+          "Comprehensive and systematic approach to diagnosing and fixing bias.",
+          "Clear, actionable steps that can be implemented in practice.",
+          "Well-structured format that enhances readability and understanding."
+        ],
+        "weaknesses": [
+          "Could provide more explicit connections to the overarching goals of fairness and equity in hiring."
+        ]
+      },
+      "smart": {
+        "overall": 1.0,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 1.0,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 32.45,
+        "output_length": 5006,
+        "strengths": [
+          "Thorough analysis of biases in hiring recommendations.",
+          "Clear and actionable steps for mitigation.",
+          "Well-structured and easy to follow."
+        ],
+        "weaknesses": [],
+        "templates_used": [
+          "root_cause_analyzer",
+          "differential_diagnoser"
+        ],
+        "smart_mode": "integrated"
+      },
+      "integrated_v2": {
+        "overall": 1.0,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 1.0,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 28.24,
+        "output_length": 4718,
+        "strengths": [
+          "Thorough analysis of the problem and its causes.",
+          "Clear and actionable recommendations for addressing bias.",
+          "Well-structured format that enhances readability and understanding."
+        ],
+        "weaknesses": [],
+        "source_templates": [
+          "root_cause_analyzer",
+          "differential_diagnoser",
+          "ethical_framework_analyzer"
+        ]
+      }
+    },
+    {
+      "question": "Design a go-to-market strategy for a B2B SaaS product entering the healthcare vertical.",
+      "assessment": {
+        "complexity": "high",
+        "domains": [
+          "business",
+          "technical",
+          "medical"
+        ],
+        "reasoning_type": "strategic",
+        "recommendation": "integrated",
+        "reasoning": "The question involves multiple domains including business strategy, technical considerations of a SaaS product, and the specific regulatory and operational nuances of the healthcare sector. This complexity necessitates an integrated approach to develop a comprehensive go-to-market strategy.",
+        "best_template": null
+      },
+      "raw": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 16.75,
+        "output_length": 5165,
+        "strengths": [
+          "Comprehensive coverage of the go-to-market strategy.",
+          "Clear segmentation and understanding of the healthcare market.",
+          "Actionable recommendations for each component of the strategy."
+        ],
+        "weaknesses": [
+          "Could include more specific examples or case studies to enhance credibility.",
+          "Might benefit from a more detailed analysis of potential challenges in implementation."
+        ]
+      },
+      "smart": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 32.17,
+        "output_length": 5345,
+        "strengths": [
+          "Comprehensive understanding of the healthcare market",
+          "Clear identification of target segments and their needs",
+          "Detailed competitive analysis with differentiation strategies",
+          "Actionable recommendations with a timeline"
+        ],
+        "weaknesses": [
+          "Could include more specific examples or case studies to illustrate points",
+          "Limited discussion on potential risks and mitigation strategies"
+        ],
+        "templates_used": [
+          "problem_decomposer",
+          "swot_analyzer"
+        ],
+        "smart_mode": "integrated"
+      },
+      "integrated_v2": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 30.11,
+        "output_length": 5261,
+        "strengths": [
+          "Thorough market analysis",
+          "Clear customer segmentation",
+          "Detailed SWOT analysis",
+          "Actionable recommendations"
+        ],
+        "weaknesses": [
+          "Could provide more specific examples or case studies",
+          "Limited discussion on potential risks and mitigation strategies"
+        ],
+        "source_templates": [
+          "problem_decomposer",
+          "swot_analyzer",
+          "decision_framework"
+        ]
+      }
+    },
+    {
+      "question": "Our API response times tripled after the last deployment. Find the root cause and propose fixes.",
+      "assessment": {
+        "complexity": "medium",
+        "domains": [
+          "technical",
+          "business"
+        ],
+        "reasoning_type": "diagnostic",
+        "recommendation": "single_template",
+        "reasoning": "The question involves identifying the root cause of a performance issue following a deployment, which benefits from a structured analytical framework. The 'root_cause_analyzer' template provides a systematic approach to uncovering the underlying reasons for the observed problem.",
+        "best_template": "root_cause_analyzer"
+      },
+      "raw": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 12.81,
+        "output_length": 3808,
+        "strengths": [
+          "Comprehensive troubleshooting steps",
+          "Clear and actionable recommendations",
+          "Well-structured format"
+        ],
+        "weaknesses": [
+          "Could enhance connections to the specific context of the deployment"
+        ]
+      },
+      "smart": {
+        "overall": 1.0,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 1.0,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 17.72,
+        "output_length": 6006,
+        "strengths": [
+          "Thorough analysis of the problem with clear identification of root causes.",
+          "Well-organized structure that makes it easy to follow the reasoning.",
+          "Actionable recommendations that can be implemented to resolve the issues."
+        ],
+        "weaknesses": [],
+        "templates_used": [
+          "root_cause_analyzer"
+        ],
+        "smart_mode": "single_template"
+      },
+      "integrated_v2": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 29.38,
+        "output_length": 4435,
+        "strengths": [
+          "Comprehensive analysis of the problem.",
+          "Clear and actionable recommendations.",
+          "Well-organized structure that enhances readability."
+        ],
+        "weaknesses": [
+          "Could provide more quantitative metrics or examples to support recommendations."
+        ],
+        "source_templates": [
+          "diagnostic_root_cause_analyzer",
+          "causal_reasoner",
+          "bottleneck_identifier"
+        ]
+      }
+    },
+    {
+      "question": "How should a startup allocate its $2M seed funding across engineering, marketing, and operations?",
+      "assessment": {
+        "complexity": "medium",
+        "domains": [
+          "business",
+          "financial",
+          "strategic"
+        ],
+        "reasoning_type": "strategic",
+        "recommendation": "single_template",
+        "reasoning": "The question involves allocating a significant budget across different functions, which requires a structured approach to resource distribution. A single template focused on optimal resource allocation will add value to ensure effective decision-making.",
+        "best_template": "resource_allocator"
+      },
+      "raw": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 10.12,
+        "output_length": 2700,
+        "strengths": [
+          "Comprehensive breakdown of funding allocation",
+          "Clear rationale for each category of spending",
+          "Practical recommendations for startups"
+        ],
+        "weaknesses": [
+          "Could provide more specific examples of metrics to track",
+          "Might benefit from a brief discussion on potential risks"
+        ]
+      },
+      "smart": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 11.08,
+        "output_length": 3722,
+        "strengths": [
+          "Comprehensive analysis of resource allocation",
+          "Clear and actionable recommendations",
+          "Well-structured format with tables for clarity"
+        ],
+        "weaknesses": [
+          "Could improve on summarizing key points for better cognitive scaffolding"
+        ],
+        "templates_used": [
+          "resource_allocator"
+        ],
+        "smart_mode": "single_template"
+      },
+      "integrated_v2": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 26.33,
+        "output_length": 4179,
+        "strengths": [
+          "Comprehensive analysis of funding allocation.",
+          "Clear and actionable recommendations.",
+          "Well-structured and easy to follow."
+        ],
+        "weaknesses": [
+          "Could provide more specific metrics for evaluating success beyond KPIs."
+        ],
+        "source_templates": [
+          "resource_allocator",
+          "tradeoff_analyzer",
+          "decision_framework"
+        ]
+      }
+    },
+    {
+      "question": "Evaluate the ethical implications of using facial recognition in public schools.",
+      "assessment": {
+        "complexity": "high",
+        "domains": [
+          "ethical",
+          "legal",
+          "technical",
+          "organizational"
+        ],
+        "reasoning_type": "ethical",
+        "recommendation": "integrated",
+        "reasoning": "The question involves evaluating the ethical implications of facial recognition technology in public schools, which spans multiple domains including ethics, law, and technology. This complexity requires an integrated approach to adequately address the various perspectives and implications involved.",
+        "best_template": null
+      },
+      "raw": {
+        "overall": 0.8800000000000001,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.7,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.8
+        },
+        "time_seconds": 10.88,
+        "output_length": 3487,
+        "strengths": [
+          "Thorough analysis of ethical implications",
+          "Well-structured and easy to follow",
+          "Addresses multiple dimensions of the issue"
+        ],
+        "weaknesses": [
+          "Lacks specific actionable recommendations",
+          "Could further elaborate on potential solutions"
+        ]
+      },
+      "smart": {
+        "overall": 0.9200000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.8,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 39.91,
+        "output_length": 6237,
+        "strengths": [
+          "Thorough exploration of ethical implications.",
+          "Clear and logical structure.",
+          "Concrete recommendations for implementation."
+        ],
+        "weaknesses": [
+          "Could further elaborate on specific examples of misuse.",
+          "Might benefit from more diverse stakeholder perspectives."
+        ],
+        "templates_used": [
+          "ethical_framework_analyzer",
+          "stakeholder_ethics_assessor"
+        ],
+        "smart_mode": "integrated"
+      },
+      "integrated_v2": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 31.56,
+        "output_length": 6103,
+        "strengths": [
+          "Comprehensive analysis of ethical implications",
+          "Clear and actionable recommendations",
+          "Well-structured format"
+        ],
+        "weaknesses": [
+          "Could provide more specific examples or case studies to illustrate points"
+        ],
+        "source_templates": [
+          "ethical_framework_analyzer",
+          "stakeholder_ethics_assessor",
+          "consequentialist_analyzer"
+        ]
+      }
+    },
+    {
+      "question": "Our cross-functional team has persistent communication breakdowns. Diagnose and solve.",
+      "assessment": {
+        "complexity": "medium",
+        "domains": [
+          "business",
+          "organizational"
+        ],
+        "reasoning_type": "diagnostic",
+        "recommendation": "single_template",
+        "reasoning": "The question involves diagnosing persistent communication breakdowns within a cross-functional team, which requires a structured approach to identify root causes. The 'root_cause_analyzer' template will provide a systematic method to uncover underlying issues.",
+        "best_template": "root_cause_analyzer"
+      },
+      "raw": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 12.0,
+        "output_length": 4181,
+        "strengths": [
+          "Comprehensive diagnosis and solution framework.",
+          "Clear and actionable recommendations.",
+          "Well-structured and easy to follow."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples or case studies to illustrate points."
+        ]
+      },
+      "smart": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 20.76,
+        "output_length": 6189,
+        "strengths": [
+          "Thorough analysis of the communication breakdown issue.",
+          "Clear identification of root causes and contributing factors.",
+          "Actionable recommendations for improvement."
+        ],
+        "weaknesses": [
+          "While the output is comprehensive, it could benefit from more specific examples of communication protocols or tools to be implemented."
+        ],
+        "templates_used": [
+          "root_cause_analyzer"
+        ],
+        "smart_mode": "single_template"
+      },
+      "integrated_v2": {
+        "overall": 1.0,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 1.0,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 36.0,
+        "output_length": 3873,
+        "strengths": [
+          "Comprehensive problem definition and analysis.",
+          "Clear and actionable recommendations.",
+          "Logical structure and flow of information."
+        ],
+        "weaknesses": [],
+        "source_templates": [
+          "root_cause_analyzer",
+          "differential_diagnoser",
+          "feedback_loop_identifier"
+        ]
+      }
+    },
+    {
+      "question": "Compare three database options (PostgreSQL, MongoDB, DynamoDB) for a real-time analytics platform.",
+      "assessment": {
+        "complexity": "medium",
+        "domains": [
+          "technical",
+          "business"
+        ],
+        "reasoning_type": "comparative",
+        "recommendation": "single_template",
+        "reasoning": "The question involves comparing three different database options, which requires a structured analysis of their features, strengths, and weaknesses. A comparative analysis framework will help in systematically evaluating these options.",
+        "best_template": "comparative_analyzer"
+      },
+      "raw": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 13.34,
+        "output_length": 4532,
+        "strengths": [
+          "Comprehensive comparison of three databases",
+          "Detailed strengths and weaknesses for each option",
+          "Clear recommendations based on use cases"
+        ],
+        "weaknesses": [
+          "Could include more specific examples or scenarios for each database"
+        ]
+      },
+      "smart": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 27.93,
+        "output_length": 7314,
+        "strengths": [
+          "Comprehensive comparison of databases",
+          "Clear and actionable recommendations",
+          "Well-structured and easy to follow"
+        ],
+        "weaknesses": [
+          "Could provide more specific use case examples",
+          "Some criteria could benefit from additional detail"
+        ],
+        "templates_used": [
+          "comparative_analyzer"
+        ],
+        "smart_mode": "single_template"
+      },
+      "integrated_v2": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 45.45,
+        "output_length": 5995,
+        "strengths": [
+          "Comprehensive analysis of each database option.",
+          "Clear recommendations based on detailed evaluations.",
+          "Well-organized structure with logical flow."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples or use cases for each database."
+        ],
+        "source_templates": [
+          "comparative_analyzer",
+          "decision_framework",
+          "swot_analyzer"
+        ]
+      }
+    },
+    {
+      "question": "Develop a 12-month roadmap for transitioning from waterfall to agile across a 200-person org.",
+      "assessment": {
+        "complexity": "high",
+        "domains": [
+          "business",
+          "organizational",
+          "project management"
+        ],
+        "reasoning_type": "strategic",
+        "recommendation": "integrated",
+        "reasoning": "The question involves transitioning a large organization from one methodology to another, which requires consideration of multiple domains including business strategy, organizational change, and project management. This complexity necessitates an integrated approach to effectively address the various challenges and dependencies involved.",
+        "best_template": null
+      },
+      "raw": {
+        "overall": 0.9600000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 15.4,
+        "output_length": 4754,
+        "strengths": [
+          "Comprehensive and detailed roadmap",
+          "Clear actionable steps for each month",
+          "Well-structured and easy to follow"
+        ],
+        "weaknesses": [
+          "Could include more specific examples of agile practices or tools in the action items"
+        ]
+      },
+      "smart": {
+        "overall": 0.9400000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 37.61,
+        "output_length": 5703,
+        "strengths": [
+          "Comprehensive understanding of the transition from waterfall to agile.",
+          "Detailed and actionable roadmap with specific timelines and priorities.",
+          "Clear identification of gaps and quantification of needs."
+        ],
+        "weaknesses": [
+          "While the output is strong overall, it could benefit from more specific examples of agile practices or frameworks to enhance understanding."
+        ],
+        "templates_used": [
+          "problem_decomposer",
+          "gap_analyzer"
+        ],
+        "smart_mode": "integrated"
+      },
+      "integrated_v2": {
+        "overall": 0.9800000000000002,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 32.67,
+        "output_length": 4571,
+        "strengths": [
+          "Comprehensive analysis of the current and desired states.",
+          "Clear identification of gaps and actionable options.",
+          "Well-defined 12-month roadmap with specific milestones."
+        ],
+        "weaknesses": [],
+        "source_templates": [
+          "problem_decomposer",
+          "gap_analyzer",
+          "decision_framework"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+.smart-exec {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+}
+
+.smart-exec--compact {
+  padding: 0.8rem;
+  margin-top: 1rem;
+}
+
+.smart-exec-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.smart-exec-header h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.smart-exec-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #6366f1, #5ba8a0);
+  color: white;
+  letter-spacing: 0.03em;
+}
+
+.smart-exec-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+  line-height: 1.45;
+}
+
+.smart-exec-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.smart-exec-input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+}
+
+.smart-exec-btn {
+  width: fit-content;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1, #5ba8a0);
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.smart-exec-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.smart-exec-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.smart-exec-error {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  color: #ef4444;
+  font-size: 0.85rem;
+}
+
+.smart-exec-result {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.smart-exec-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(99, 102, 241, 0.05);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.smart-exec-tier {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: #6366f1;
+  color: white;
+}
+
+.smart-exec-tier[data-mode="raw"] {
+  background: #64748b;
+}
+
+.smart-exec-tier[data-mode="single_template"] {
+  background: #6366f1;
+}
+
+.smart-exec-tier[data-mode="integrated"] {
+  background: #5ba8a0;
+}
+
+.smart-exec-mode-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.smart-exec-templates {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.smart-exec-response {
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.smart-exec-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.4rem 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.smart-exec-copy {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.smart-exec-copy:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

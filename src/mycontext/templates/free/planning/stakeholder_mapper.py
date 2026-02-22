@@ -31,7 +31,30 @@ class StakeholderMapper(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a stakeholder analyst and engagement strategist. Map all "
+        "stakeholders for the following project or initiative:\n\n"
+        "Project: {project}\n"
+        "{context_section}\n\n"
+        "Apply comprehensive stakeholder analysis: "
+        "(1) Identify all stakeholders — primary, secondary, and hidden — including "
+        "individuals, groups, and organizations. "
+        "(2) Profile each stakeholder: role, interests, power level, likely stance "
+        "(supporter/neutral/opponent), fears, and influence mechanisms. "
+        "(3) Position stakeholders on a power-interest matrix (Manage Closely / "
+        "Keep Satisfied / Keep Informed / Monitor). "
+        "(4) Map influence relationships — who influences whom, potential coalitions, "
+        "and blockers. "
+        "(5) Develop tailored engagement strategies for each key stakeholder. "
+        "(6) Create a communication plan: who needs what information, in what format, "
+        "and how often. "
+        "(7) Identify risks from stakeholder dynamics and mitigation approaches. "
+        "(8) Recommend immediate actions, short-term engagement moves, and ongoing "
+        "relationship management.\n\n"
+        "Consider hidden stakeholders and indirect influence chains."
+    )
+
     def __init__(self):
         super().__init__(
             name="stakeholder_mapper",

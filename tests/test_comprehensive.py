@@ -48,22 +48,26 @@ print("=" * 80)
 
 def test_analysis_imports():
     from mycontext.templates.free.analysis import (
-        QuestionAnalyzer, DataAnalyzer, TrendIdentifier,
-        GapAnalyzer, SWOTAnalyzer, AnomalyDetector
+        QuestionAnalyzer, DataAnalyzer,
+    )
+    from mycontext.templates.enterprise.analysis import (
+        TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector,
     )
     assert QuestionAnalyzer is not None
     assert len([QuestionAnalyzer, DataAnalyzer, TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector]) == 6
 
 def test_reasoning_imports():
     from mycontext.templates.free.reasoning import (
-        StepByStepReasoner, AnalogicalReasoner, CausalReasoner,
-        RootCauseAnalyzer, HypothesisGenerator
+        StepByStepReasoner, RootCauseAnalyzer, HypothesisGenerator,
+    )
+    from mycontext.templates.enterprise.reasoning import (
+        AnalogicalReasoner, CausalReasoner,
     )
     assert StepByStepReasoner is not None
     assert len([StepByStepReasoner, AnalogicalReasoner, CausalReasoner, RootCauseAnalyzer, HypothesisGenerator]) == 5
 
 def test_decision_imports():
-    from mycontext.templates.free.decision import (
+    from mycontext.templates.enterprise.decision import (
         DecisionFramework, ComparativeAnalyzer, TradeoffAnalyzer,
         MultiObjectiveOptimizer, CostBenefitAnalyzer
     )
@@ -71,29 +75,34 @@ def test_decision_imports():
     assert len([DecisionFramework, ComparativeAnalyzer, TradeoffAnalyzer, MultiObjectiveOptimizer, CostBenefitAnalyzer]) == 5
 
 def test_creative_imports():
-    from mycontext.templates.free.creative import (
-        IdeaGenerator, Brainstormer, InnovationFramework,
-        DesignThinker, MetaphorGenerator
+    from mycontext.templates.free.creative import Brainstormer
+    from mycontext.templates.enterprise.creative import (
+        IdeaGenerator, InnovationFramework,
+        DesignThinker, MetaphorGenerator,
     )
-    assert IdeaGenerator is not None
+    assert Brainstormer is not None
 
 def test_communication_imports():
     from mycontext.templates.free.communication import (
-        SimplificationEngine, ClarityOptimizer, AudienceAdapter,
-        PersuasionFramework, NarrativeBuilder, TechnicalTranslator,
-        FeedbackComposer
+        AudienceAdapter, TechnicalTranslator,
     )
-    assert SimplificationEngine is not None
+    from mycontext.templates.enterprise.communication import (
+        SimplificationEngine, ClarityOptimizer,
+        PersuasionFramework, NarrativeBuilder, FeedbackComposer,
+    )
+    assert AudienceAdapter is not None
 
 def test_planning_imports():
     from mycontext.templates.free.planning import (
-        ScenarioPlanner, StakeholderMapper, PrioritySetter,
-        DeadlineManager, ResourceAllocator
+        ScenarioPlanner, StakeholderMapper,
+    )
+    from mycontext.templates.enterprise.planning import (
+        PrioritySetter, DeadlineManager, ResourceAllocator,
     )
     assert ScenarioPlanner is not None
 
 def test_problem_solving_imports():
-    from mycontext.templates.free.problem_solving import (
+    from mycontext.templates.enterprise.problem_solving import (
         ProblemDecomposer, BottleneckIdentifier, ConstraintOptimizer,
         DependencyMapper, EfficiencyAnalyzer, TradeSpaceExplorer
     )
@@ -101,10 +110,13 @@ def test_problem_solving_imports():
 
 def test_specialized_imports():
     from mycontext.templates.free.specialized import (
-        CodeReviewer, ContentOutliner, SocraticQuestioner,
-        IntentRecognizer, AmbiguityResolver, RiskAssessor,
-        RiskMitigator, ImpactAssessor, ConflictResolver,
-        ConceptExplainer, SynthesisBuilder
+        CodeReviewer, SocraticQuestioner,
+        IntentRecognizer, RiskAssessor,
+        ConflictResolver, SynthesisBuilder,
+    )
+    from mycontext.templates.enterprise.specialized import (
+        ContentOutliner, AmbiguityResolver, RiskMitigator,
+        ImpactAssessor, ConceptExplainer,
     )
     assert CodeReviewer is not None
 
@@ -123,9 +135,10 @@ print("=" * 80)
 
 def test_main_imports():
     from mycontext.templates.free import (
-        QuestionAnalyzer, DataAnalyzer, DecisionFramework,
-        IdeaGenerator, SimplificationEngine, ScenarioPlanner
+        QuestionAnalyzer, DataAnalyzer, Brainstormer,
+        AudienceAdapter, ScenarioPlanner
     )
+    from mycontext.templates.enterprise.decision import DecisionFramework
     assert QuestionAnalyzer is not None
     assert DataAnalyzer is not None
 
@@ -137,16 +150,16 @@ print("=" * 80)
 
 def test_pattern_instantiation():
     from mycontext.templates.free.analysis import QuestionAnalyzer
-    from mycontext.templates.free.decision import DecisionFramework
-    from mycontext.templates.free.creative import IdeaGenerator
+    from mycontext.templates.enterprise.decision import DecisionFramework
+    from mycontext.templates.free.creative import Brainstormer
     
     qa = QuestionAnalyzer()
     df = DecisionFramework()
-    ig = IdeaGenerator()
+    br = Brainstormer()
     
     assert qa.name == "question_analyzer"
     assert df.name == "decision_framework"
-    assert ig.name == "idea_generator"
+    assert br.name == "brainstormer"
 
 test("Pattern instantiation", test_pattern_instantiation)
 
@@ -367,7 +380,7 @@ def test_question_analyzer_execution():
     assert "How can I improve performance?" in context.directive.content
 
 def test_decision_framework_execution():
-    from mycontext.templates.free.decision import DecisionFramework
+    from mycontext.templates.enterprise.decision import DecisionFramework
     
     df = DecisionFramework()
     context = df.build_context(
@@ -379,7 +392,7 @@ def test_decision_framework_execution():
     assert "AWS" in context.directive.content
 
 def test_idea_generator_execution():
-    from mycontext.templates.free.creative import IdeaGenerator
+    from mycontext.templates.enterprise.creative import IdeaGenerator
     
     ig = IdeaGenerator()
     context = ig.build_context(
@@ -419,9 +432,9 @@ print("=" * 80)
 
 def test_mixed_category_usage():
     from mycontext.templates.free.analysis import DataAnalyzer
-    from mycontext.templates.free.decision import ComparativeAnalyzer
+    from mycontext.templates.enterprise.decision import ComparativeAnalyzer
     from mycontext.templates.free.creative import Brainstormer
-    from mycontext.templates.free.communication import SimplificationEngine
+    from mycontext.templates.enterprise.communication import SimplificationEngine
     
     da = DataAnalyzer()
     ca = ComparativeAnalyzer()
@@ -543,10 +556,9 @@ print("TEST 17: PATTERN PARAMETER HANDLING")
 print("=" * 80)
 
 def test_pattern_parameters():
-    from mycontext.templates.free.analysis import TrendIdentifier
-    from mycontext.templates.free.planning import PrioritySetter
+    from mycontext.templates.enterprise.analysis import TrendIdentifier
+    from mycontext.templates.enterprise.planning import PrioritySetter
     
-    # Test with various parameters
     ti = TrendIdentifier()
     context1 = ti.build_context(
         data_description="Monthly sales",

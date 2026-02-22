@@ -49,33 +49,48 @@ print("=" * 80)
 
 def test_all_50_patterns():
     from mycontext.templates.free import (
-        # Analysis (6)
-        QuestionAnalyzer, DataAnalyzer, TrendIdentifier,
-        GapAnalyzer, SWOTAnalyzer, AnomalyDetector,
-        # Reasoning (5)
-        StepByStepReasoner, AnalogicalReasoner, CausalReasoner,
-        RootCauseAnalyzer, HypothesisGenerator,
-        # Decision (5)
+        # Free Analysis (2)
+        QuestionAnalyzer, DataAnalyzer,
+        # Free Reasoning (3)
+        StepByStepReasoner, RootCauseAnalyzer, HypothesisGenerator,
+        # Free Creative (1)
+        Brainstormer,
+        # Free Communication (2)
+        AudienceAdapter, TechnicalTranslator,
+        # Free Planning (2)
+        ScenarioPlanner, StakeholderMapper,
+        # Free Specialized (6)
+        CodeReviewer, SocraticQuestioner,
+        IntentRecognizer, RiskAssessor,
+        ConflictResolver, SynthesisBuilder,
+    )
+    from mycontext.templates.enterprise.analysis import (
+        TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector,
+    )
+    from mycontext.templates.enterprise.reasoning import (
+        AnalogicalReasoner, CausalReasoner,
+    )
+    from mycontext.templates.enterprise.creative import (
+        IdeaGenerator, InnovationFramework, DesignThinker, MetaphorGenerator,
+    )
+    from mycontext.templates.enterprise.communication import (
+        SimplificationEngine, ClarityOptimizer,
+        PersuasionFramework, NarrativeBuilder, FeedbackComposer,
+    )
+    from mycontext.templates.enterprise.planning import (
+        PrioritySetter, DeadlineManager, ResourceAllocator,
+    )
+    from mycontext.templates.enterprise.specialized import (
+        ContentOutliner, AmbiguityResolver,
+        RiskMitigator, ImpactAssessor, ConceptExplainer,
+    )
+    from mycontext.templates.enterprise.decision import (
         DecisionFramework, ComparativeAnalyzer, TradeoffAnalyzer,
         MultiObjectiveOptimizer, CostBenefitAnalyzer,
-        # Creative (5)
-        IdeaGenerator, Brainstormer, InnovationFramework,
-        DesignThinker, MetaphorGenerator,
-        # Communication (7)
-        SimplificationEngine, ClarityOptimizer, AudienceAdapter,
-        PersuasionFramework, NarrativeBuilder, TechnicalTranslator,
-        FeedbackComposer,
-        # Planning (5)
-        ScenarioPlanner, StakeholderMapper, PrioritySetter,
-        DeadlineManager, ResourceAllocator,
-        # Problem Solving (6)
+    )
+    from mycontext.templates.enterprise.problem_solving import (
         ProblemDecomposer, BottleneckIdentifier, ConstraintOptimizer,
         DependencyMapper, EfficiencyAnalyzer, TradeSpaceExplorer,
-        # Specialized (11)
-        CodeReviewer, ContentOutliner, SocraticQuestioner,
-        IntentRecognizer, AmbiguityResolver, RiskAssessor,
-        RiskMitigator, ImpactAssessor, ConflictResolver,
-        ConceptExplainer, SynthesisBuilder
     )
     
     patterns = [
@@ -111,9 +126,9 @@ print("=" * 80)
 
 def test_sequential_execution():
     from mycontext.templates.free.analysis import QuestionAnalyzer
-    from mycontext.templates.free.decision import DecisionFramework
-    from mycontext.templates.free.creative import IdeaGenerator
-    from mycontext.templates.free.problem_solving import ProblemDecomposer
+    from mycontext.templates.enterprise.decision import DecisionFramework
+    from mycontext.templates.enterprise.creative import IdeaGenerator
+    from mycontext.templates.enterprise.problem_solving import ProblemDecomposer
     
     qa = QuestionAnalyzer()
     df = DecisionFramework()

@@ -1,7 +1,7 @@
 [project]
 name = "mycontext-ai"
-version = "0.2.0"
-description = "Universal Context Transformation Engine - Transform questions into perfect, portable contexts"
+version = "0.3.0"
+description = "Context engineering for LLMs — 85 cognitive patterns, prompt compilation, 3-tier execution, 13 export formats"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -20,39 +20,27 @@ classifiers = [
 ]
 
 dependencies = [
-    "pydantic>=2.9.0",
-    "tiktoken>=0.8.0",
-    "jinja2>=3.1.4",
+    "pydantic>=2.11.0",
     "pyyaml>=6.0.2",
-    "structlog>=24.4.0",
-    "httpx>=0.27.2",
+    "litellm>=1.55.0",  # Required for ctx.execute() — routes to OpenAI, Anthropic, Gemini, 100+ providers
 ]
 
 [project.optional-dependencies]
 # LLM Provider integrations
-openai = ["openai>=1.54.0"]
-anthropic = ["anthropic>=0.39.0"]
-google = ["google-genai>=0.3.0"]  # New official SDK (fallback to google-generativeai if needed)
-aws = ["boto3>=1.35.0"]
-azure = ["azure-ai-inference>=1.0.0b4"]
+openai = ["openai>=2.0.0"]
+anthropic = ["anthropic>=0.79.0"]
+google = ["google-genai>=1.0.0"]  # google-generativeai is EOL; use google-genai
+tokens = ["tiktoken>=0.7.0"]
 
-# Knowledge & RAG features
-rag = [
-    "chromadb>=0.5.17",
-    "faiss-cpu>=1.9.0",
-    "sentence-transformers>=3.3.0",
-]
-
-# Storage backends
-redis = ["redis>=5.2.0"]
-postgres = ["psycopg[binary]>=3.2.0"]
-sqlite = ["aiosqlite>=0.20.0"]
-
-# Observability
-monitoring = [
-    "prometheus-client>=0.21.0",
-    "opentelemetry-api>=1.28.0",
-    "opentelemetry-sdk>=1.28.0",
+# Orchestrator integrations (for examples/orchestration notebooks)
+orchestration = [
+    "langchain>=0.3.0",
+    "langchain-openai>=0.3.0",
+    "langgraph>=0.2.0",
+    "crewai>=0.76.0",
+    "crewai-tools>=0.16.0",
+    "pyautogen>=0.2.0",
+    "semantic-kernel>=1.0.0",
 ]
 
 # Development tools
@@ -76,7 +64,7 @@ docs = [
 
 # All features
 all = [
-    "mycontext-ai[openai,anthropic,google,rag,redis,postgres,monitoring]",
+    "mycontext-ai[openai,anthropic,google,tokens]",
 ]
 
 [project.urls]
@@ -92,6 +80,16 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mycontext"]
+# Exclude enterprise for free-only PyPI release (remove these lines to include enterprise)
+exclude = [
+    "src/mycontext/templates/enterprise",
+]
+
+[tool.hatch.build.targets.sdist]
+# Exclude enterprise for free-only PyPI release
+exclude = [
+    "src/mycontext/templates/enterprise",
+]
 
 [tool.ruff]
 line-length = 100

@@ -5,7 +5,7 @@ Patterns are like functions in traditional programming - reusable,
 composable units that encapsulate context engineering best practices.
 """
 
-from typing import Any, Dict, Optional, Type
+from typing import Any, ClassVar, Dict, Optional, Type
 from pydantic import BaseModel, Field
 import yaml
 import json
@@ -116,6 +116,39 @@ class Pattern(BaseModel):
         description="Additional metadata"
     )
     
+    GENERIC_PROMPT: ClassVar[Optional[str]] = None
+
+    def generic_prompt(self, **kwargs) -> str:
+        """Return a concise, pre-authored prompt that captures this template's essence.
+
+        Generic prompts are static, hand-crafted paragraphs (~600-1200 chars)
+        that distill the template's core methodology into a self-contained prompt
+        any LLM can execute directly.  User inputs are injected via keyword
+        arguments matching the template's ``build_context`` signature.
+
+        Two modes are available to users:
+          * **generic** — fast, zero-cost, lighter prompt (this method)
+          * **full**    — the rich, structured directive template (``build_context``)
+
+        Raises:
+            NotImplementedError: If the template has no generic prompt defined.
+        """
+        if self.GENERIC_PROMPT is None:
+            raise NotImplementedError(
+                f"Template '{self.name}' does not have a generic prompt. "
+                "Use build_context() for the full template instead."
+            )
+        filled = self.GENERIC_PROMPT
+        for key, value in kwargs.items():
+            placeholder = "{" + key + "}"
+            if placeholder in filled:
+                filled = filled.replace(placeholder, str(value))
+
+        import re
+        filled = re.sub(r"\{context_section\}", "", filled)
+        filled = re.sub(r"\n{3,}", "\n\n", filled).strip()
+        return filled
+
     def build_context(self, **inputs) -> "Context":
         """
         Build a Context from this pattern with the given inputs.
@@ -153,22 +186,21 @@ class Pattern(BaseModel):
         
         return context
     
-    def execute(self, provider: str = "openai", **inputs) -> Any:
+    def execute(self, provider: str = "openai", mode: str = "full", **inputs) -> Any:
         """
         Execute this pattern directly.
         
         Args:
             provider: LLM provider to use
+            mode: "full" for the rich template, "generic" for the concise prompt
             **inputs: Input values (template inputs + provider kwargs like 'model')
             
         Returns:
             Execution result
         """
-        # Separate template inputs from provider kwargs
         template_inputs = {}
         provider_kwargs = {}
         
-        # Known provider parameters
         provider_params = {'model', 'temperature', 'max_tokens', 'top_p', 'frequency_penalty', 
                           'presence_penalty', 'stop', 'user', 'api_key', 'base_url'}
         
@@ -178,10 +210,14 @@ class Pattern(BaseModel):
             else:
                 template_inputs[key] = value
         
-        # Build context with template inputs only
-        context = self.build_context(**template_inputs)
+        if mode == "generic":
+            from ..core import Context
+            from ..foundation import Directive
+            prompt_text = self.generic_prompt(**template_inputs)
+            ctx = Context(directive=Directive(content=prompt_text))
+            return ctx.execute(provider=provider, **provider_kwargs)
         
-        # Execute with provider kwargs
+        context = self.build_context(**template_inputs)
         return context.execute(provider=provider, **provider_kwargs)
     
     def _validate_inputs(self, inputs: Dict[str, Any]) -> None:
@@ -271,66 +307,3 @@ class Pattern(BaseModel):
         """String representation"""
         return f"Pattern(name='{self.name}', version={self.version})"
 
-
-# Pre-built patterns will be loaded from YAML files
-# For now, let's define a few in code
-
-CODE_REVIEW_PATTERN = Pattern(
-    name="code_review",
-    description="Review code for quality, security, and best practices",
-    guidance=Guidance(
-        role="Expert code reviewer with 10+ years experience",
-        rules=[
-            "Focus on security vulnerabilities",
-            "Check for performance issues",
-            "Verify best practices are followed",
-            "Suggest concrete improvements"
-        ],
-        style="Professional and constructive"
-    ),
-    directive_template="Review this {language} code:\n\n{code}\n\nFocus on: {focus_areas}",
-    input_schema={
-        "code": str,
-        "language": str,
-        "focus_areas": list
-    },
-    output_schema={
-        "issues": list,
-        "score": float,
-        "suggestions": list
-    },
-    tags=["code", "review", "quality"]
-)
-
-DECISION_MATRIX_PATTERN = Pattern(
-    name="decision_matrix",
-    description="Multi-criteria decision analysis",
-    guidance=Guidance(
-        role="Strategic advisor and decision analyst",
-        rules=[
-            "Consider all options objectively",
-            "Weight criteria appropriately",
-            "Explain reasoning clearly",
-            "Provide actionable recommendation"
-        ]
-    ),
-    directive_template=(
-        "Analyze this decision:\n\n"
-        "Question: {question}\n"
-        "Options: {options}\n"
-        "Criteria: {criteria}\n"
-        "Context: {context}"
-    ),
-    input_schema={
-        "question": str,
-        "options": list,
-        "criteria": dict,
-        "context": str
-    },
-    output_schema={
-        "recommendation": str,
-        "scores": dict,
-        "reasoning": list
-    },
-    tags=["decision", "analysis", "business"]
-)

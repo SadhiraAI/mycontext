@@ -1,0 +1,898 @@
+/* ── Templates Page — Simplified ────────────────────────── */
+.templates-page h1 { margin-bottom: 0.5rem; }
+
+.templates-header {
+  margin-bottom: 1.5rem;
+}
+
+.tpl-intro {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  max-width: 720px;
+  margin: 0 0 0.5rem;
+}
+
+.tpl-intro p {
+  margin: 0 0 0.5rem;
+}
+
+.tpl-intro-options {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.tpl-intro-options li {
+  margin-bottom: 0.3rem;
+}
+
+.templates-error {
+  color: var(--error);
+  margin-bottom: 1rem;
+}
+
+.templates-error .templates-retry {
+  margin-left: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tpl-selector-loading {
+  color: var(--text-muted);
+  padding: 2rem 0;
+}
+
+/* ── Template Selector ─────────────────────────────────── */
+.tpl-selector {
+  margin-bottom: 1.5rem;
+}
+
+.tpl-selector-bar {
+  display: flex;
+}
+
+.tpl-selector-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  font-family: inherit;
+}
+
+.tpl-selector-toggle:hover {
+  border-color: var(--accent);
+}
+
+.tpl-selector-chosen {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tpl-selector-chosen-name {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.tpl-selector-change {
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.tpl-selector-placeholder {
+  color: var(--text-muted);
+}
+
+.tpl-selector-chevron {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  margin-left: 0.5rem;
+}
+
+/* ── Selector Panel (expanded) ─────────────────────────── */
+.tpl-selector-panel {
+  margin-top: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.tpl-selector-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.tpl-filter-select {
+  padding: 0.4rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tpl-filter-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tpl-filter-search {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.4rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.tpl-filter-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tpl-selector-count {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 0.4rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tpl-selector-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.tpl-selector-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tpl-selector-item:last-child {
+  border-bottom: none;
+}
+
+.tpl-selector-item:hover {
+  background: var(--bg-hover);
+}
+
+.tpl-selector-item.active {
+  background: var(--bg-hover);
+  border-left: 3px solid var(--accent);
+}
+
+.tpl-selector-item.locked {
+  opacity: 0.75;
+}
+
+.tpl-selector-item-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tpl-selector-item-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-transform: capitalize;
+}
+
+.tpl-selector-item-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tpl-selector-item-cat {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.tpl-selector-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ── Badges ────────────────────────────────────────────── */
+.tpl-badge-ent {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tpl-badge-lock {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.tpl-badge-generic {
+  font-size: 0.8rem;
+  cursor: help;
+}
+
+/* ── Action Panel ──────────────────────────────────────── */
+.tpl-action-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+}
+
+.tpl-action-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tpl-action-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.tpl-action-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+}
+
+.tpl-action-close {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tpl-action-close:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+/* ── Detail Tags (category / theme) ───────────────────── */
+.tpl-detail-category,
+.tpl-detail-theme {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.tpl-detail-category {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+}
+
+.tpl-detail-theme {
+  background: rgba(74, 130, 120, 0.1);
+  color: var(--accent);
+}
+
+/* ── About This Pattern ───────────────────────────────── */
+.tpl-detail-about {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.25rem;
+}
+
+.tpl-detail-about h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tpl-detail-about p {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.tpl-detail-research {
+  font-size: 0.82rem !important;
+  color: var(--text-muted) !important;
+  opacity: 0.85;
+}
+
+/* ── Use Cases & Example Prompts Table ────────────────── */
+.tpl-detail-usecases {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.25rem;
+}
+
+.tpl-detail-usecases h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tpl-usecase-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.tpl-usecase-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.tpl-usecase-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tpl-usecase-table thead {
+  background: var(--bg-surface);
+}
+
+.tpl-usecase-table th {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.tpl-usecase-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.tpl-usecase-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tpl-usecase-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.tpl-uc-name {
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text);
+  min-width: 140px;
+}
+
+.tpl-uc-prompt {
+  color: var(--text-muted);
+  max-width: 520px;
+}
+
+.tpl-uc-na {
+  opacity: 0.4;
+}
+
+.tpl-uc-action {
+  text-align: right;
+  white-space: nowrap;
+  width: 64px;
+}
+
+.tpl-uc-copy {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.tpl-uc-copy:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* ── Enterprise Lock Banner ───────────────────────────── */
+.tpl-locked-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px dashed rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.tpl-locked-banner .tpl-locked-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tpl-locked-banner strong {
+  display: block;
+  font-size: 0.92rem;
+  margin-bottom: 0.15rem;
+}
+
+.tpl-locked-banner p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.tpl-unlock-btn {
+  padding: 0.45rem 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.tpl-unlock-btn:hover { opacity: 0.9; }
+
+/* ── Context Create Options ────────────────────────────── */
+.tpl-action-choices-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.tpl-action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.tpl-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.tpl-action-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.tpl-action-card-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.tpl-action-card-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.tpl-action-card-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.tpl-action-card-cost {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  margin-top: 0.25rem;
+}
+
+.tpl-action-card--generic .tpl-action-card-cost {
+  background: rgba(74, 130, 120, 0.08);
+  color: var(--accent);
+}
+
+.tpl-action-card--template .tpl-action-card-cost {
+  background: rgba(139, 92, 246, 0.08);
+  color: #7c3aed;
+}
+
+/* ── Back Button ───────────────────────────────────────── */
+.tpl-back-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.tpl-back-btn:hover { text-decoration: underline; }
+
+/* ── Generic Prompt Mode ───────────────────────────────── */
+.tpl-generic-mode h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.tpl-generic-info {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.tpl-generic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 600px;
+}
+
+.tpl-generic-input {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.92rem;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.tpl-generic-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tpl-generic-result {
+  margin-top: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tpl-generic-preview {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 1rem;
+  background: var(--bg);
+  margin: 0;
+}
+
+/* ── Template Build Mode ───────────────────────────────── */
+.tpl-template-mode h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.tpl-template-controls {
+  margin-bottom: 1rem;
+}
+
+.tpl-example-btn {
+  padding: 0.35rem 0.8rem;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tpl-example-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.tpl-template-form {
+  margin-bottom: 1.25rem;
+}
+
+.tpl-template-param {
+  margin-bottom: 1rem;
+}
+
+.tpl-template-param label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.tpl-param-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tpl-param-hint {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  display: block;
+  margin-top: 0.1rem;
+}
+
+.tpl-template-param textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.tpl-template-param textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tpl-template-llm {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.65rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.tpl-template-llm-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tpl-template-llm-row label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tpl-template-llm-row select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+}
+
+.tpl-template-llm-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── Primary Button ────────────────────────────────────── */
+.tpl-primary-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.92rem;
+  transition: all var(--transition-fast);
+}
+
+.tpl-primary-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.tpl-primary-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Result Header ─────────────────────────────────────── */
+.tpl-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.tpl-result-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.tpl-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tpl-result-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.tpl-copy-btn, .tpl-download-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tpl-copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.tpl-copy-btn:hover { color: var(--text); border-color: var(--text-muted); }
+
+.tpl-download-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
+
+.tpl-download-btn:hover { opacity: 0.9; }
+
+/* ── Template Output ───────────────────────────────────── */
+.tpl-template-output {
+  margin-top: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tpl-format-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tpl-format-tab {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+  border: none;
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.tpl-format-tab:last-child { border-right: none; }
+
+.tpl-format-tab:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.tpl-format-tab.active {
+  background: var(--accent);
+  color: white;
+}
+
+.tpl-output-content {
+  padding: 1rem;
+  background: var(--bg);
+}
+
+.tpl-output-content .markdown-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.tpl-output-content pre {
+  background: transparent;
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* ── Shared animation ──────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

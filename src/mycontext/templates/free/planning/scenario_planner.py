@@ -31,7 +31,30 @@ class ScenarioPlanner(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a strategic foresight analyst and scenario planner. Develop multiple "
+        "future scenarios for the following:\n\n"
+        "Topic: {topic}\n"
+        "Timeframe: {timeframe}\n"
+        "{context_section}\n\n"
+        "Apply structured scenario methodology: "
+        "(1) Assess the current state — key trends, forces, and baseline trajectory. "
+        "(2) Identify the two most critical uncertainties as scenario axes. "
+        "(3) Construct four distinct scenarios from the 2x2 matrix — give each a "
+        "memorable name and describe its characteristics, driving forces, probability, "
+        "and early indicators. "
+        "(4) For each scenario, analyze opportunities, threats, and capabilities needed. "
+        "(5) Identify robust strategies that perform well across most scenarios "
+        "(no-regret moves). "
+        "(6) Define scenario-specific strategies for high-impact scenarios. "
+        "(7) Establish signposts — concrete, observable events that signal which "
+        "scenario is unfolding. "
+        "(8) Recommend a preparedness plan with immediate actions, monitoring "
+        "framework, and contingency triggers.\n\n"
+        "Create diverse, plausible scenarios — not just optimistic and pessimistic."
+    )
+
     def __init__(self):
         super().__init__(
             name="scenario_planner",

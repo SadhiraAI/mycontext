@@ -81,6 +81,12 @@ Thumbs.db
 temp/
 tmp/
 
+# SQLite database files
+*.db
+
+# Node modules
+node_modules/
+
 # Testing artifacts
 test_fix.py
 DIAGNOSTIC.py

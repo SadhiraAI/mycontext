@@ -1,0 +1,124 @@
+.guided-tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.guided-tour-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.guided-tour-modal {
+  position: relative;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem 2rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.guided-tour-progress {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.guided-tour-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+
+.guided-tour-body {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.guided-tour-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.guided-tour-btn {
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.guided-tour-btn.primary {
+  background: var(--accent-gradient);
+  color: white;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.guided-tour-btn.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.guided-tour-btn.secondary {
+  background: var(--bg-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.guided-tour-btn.secondary:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.guided-tour-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guided-tour-skip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.guided-tour-dont-show {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.guided-tour-dont-show input {
+  accent-color: var(--accent);
+}
+
+.guided-tour-skip {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.guided-tour-skip:hover {
+  color: var(--text);
+}

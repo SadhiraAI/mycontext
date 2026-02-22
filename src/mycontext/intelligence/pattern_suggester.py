@@ -1,0 +1,856 @@
+"""
+Pattern Suggester - Auto-suggest essential templates for any question.
+
+Maps question intent/keywords to optimal patterns (all 85 free + enterprise).
+Always suggests from full catalog; enterprise patterns show license note when include_enterprise=False.
+"""
+
+from dataclasses import dataclass, field, asdict
+from typing import Any, Dict, List, Optional, Tuple
+
+
+from .pattern_catalog import (
+    ENTERPRISE_LICENSE_NOTE,
+    FULL_PATTERN_CATALOG,
+    NAME_TO_CATEGORY,
+    NAME_TO_DESCRIPTION,
+    VALID_PATTERN_NAMES,
+    PATTERN_CATALOG,
+    CATALOG_FOR_LLM,
+    ENRICHED_CATALOG_TEXT,
+    PATTERN_MAP,
+)
+
+
+@dataclass
+class PatternSuggestion:
+    """A suggested pattern with reasoning."""
+    name: str
+    category: str  # "free" | "enterprise"
+    reason: str
+    confidence: float  # 0.0 to 1.0
+    chain_position: Optional[int] = None  # 1, 2, 3... if part of chain
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Export as dictionary."""
+        return asdict(self)
+
+
+@dataclass
+class SuggestionResult:
+    """Result of pattern suggestion."""
+    question: str
+    suggested_patterns: List[PatternSuggestion] = field(default_factory=list)
+    suggested_chain: Optional[List[str]] = None  # Ordered pattern names for chaining
+    reasoning: str = ""
+    source: str = "keyword"  # "keyword" | "llm" | "hybrid"
+    llm_reasoning: Optional[str] = None  # LLM's explanation (when hybrid/llm)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Export as dictionary (for JSON, YAML, APIs)."""
+        return {
+            "question": self.question,
+            "suggested_patterns": [s.to_dict() for s in self.suggested_patterns],
+            "suggested_chain": self.suggested_chain,
+            "reasoning": self.reasoning,
+            "source": self.source,
+            "llm_reasoning": self.llm_reasoning,
+        }
+
+    def to_markdown(self) -> str:
+        """Export as human-readable Markdown (for display in notebooks, docs)."""
+        lines = [f"### {self.question}\n"]
+        lines.append(f"- **Source**: `{self.source}`")
+        lines.append(f"- **Suggested**: `{', '.join(s.name for s in self.suggested_patterns)}`")
+        if self.suggested_chain:
+            lines.append(f"- **Workflow chain**: `{self.suggested_chain}`")
+        else:
+            lines.append("")
+        lines.append("**Reasoning**:")
+        for s in self.suggested_patterns:
+            step = f" (step {s.chain_position})" if s.chain_position else ""
+            lines.append(f"- `{s.name}`{step}: {s.reason}")
+        if self.llm_reasoning:
+            lines.append("\n**LLM raw**:")
+            lines.append(f"> {self.llm_reasoning[:500]}{'...' if len(self.llm_reasoning) > 500 else ''}")
+        return "\n".join(lines)
+
+    def to_json(self) -> str:
+        """Export as JSON string (for APIs, storage)."""
+        import json
+        return json.dumps(self.to_dict(), indent=2)
+
+    def to_yaml(self) -> str:
+        """Export as YAML string (for configs, pipelines)."""
+        import yaml
+        return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
+
+    def to_xml(self) -> str:
+        """Export as XML string (for XML-based systems)."""
+        from xml.etree.ElementTree import Element, SubElement, tostring
+        from xml.dom import minidom
+        root = Element("suggestion_result")
+        SubElement(root, "question").text = self.question
+        SubElement(root, "source").text = self.source
+        SubElement(root, "reasoning").text = self.reasoning
+        if self.llm_reasoning:
+            SubElement(root, "llm_reasoning").text = self.llm_reasoning
+        chain_elem = SubElement(root, "suggested_chain")
+        if self.suggested_chain:
+            for name in self.suggested_chain:
+                SubElement(chain_elem, "pattern").text = name
+        patterns_elem = SubElement(root, "suggested_patterns")
+        for s in self.suggested_patterns:
+            p = SubElement(patterns_elem, "pattern")
+            SubElement(p, "name").text = s.name
+            SubElement(p, "category").text = s.category
+            SubElement(p, "reason").text = s.reason
+            SubElement(p, "confidence").text = str(s.confidence)
+            if s.chain_position is not None:
+                SubElement(p, "chain_position").text = str(s.chain_position)
+        rough = tostring(root, encoding="unicode")
+        reparsed = minidom.parseString(rough)
+        return reparsed.toprettyxml(indent="  ")
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "SuggestionResult":
+        """Create from dictionary (round-trip with to_dict)."""
+        patterns = [
+            PatternSuggestion(**p) if isinstance(p, dict) else p
+            for p in data.get("suggested_patterns", [])
+        ]
+        return cls(
+            question=data.get("question", ""),
+            suggested_patterns=patterns,
+            suggested_chain=data.get("suggested_chain"),
+            reasoning=data.get("reasoning", ""),
+            source=data.get("source", "keyword"),
+            llm_reasoning=data.get("llm_reasoning"),
+        )
+
+    @classmethod
+    def from_json(cls, json_str: str) -> "SuggestionResult":
+        """Create from JSON string (round-trip with to_json)."""
+        import json
+        return cls.from_dict(json.loads(json_str))
+
+
+
+def suggest_patterns(
+    question: str,
+    include_enterprise: bool = True,
+    suggest_chain: bool = True,
+    max_patterns: int = 5,
+    mode: str = "keyword",
+    llm_provider: str = "openai",
+    temperature: float = 0,
+    model: Optional[str] = None,
+    **llm_kwargs: Any,
+) -> SuggestionResult:
+    """
+    Suggest essential patterns for a given question.
+
+    Always suggests from all 85 templates (free + enterprise). When include_enterprise=False,
+    enterprise patterns still appear but with a note: "Requires enterprise license. Set include_enterprise=True to use."
+
+    Args:
+        question: The user's question or problem description
+        include_enterprise: If False, enterprise patterns show license note (default True)
+        suggest_chain: Suggest a chain order when multiple patterns apply
+        max_patterns: Maximum patterns to suggest (default 5)
+        mode: "keyword" (no LLM), "llm" (LLM only), "hybrid" (keyword + LLM merge)
+        llm_provider: Provider for LLM mode ("openai", "anthropic", "gemini")
+        temperature: LLM temperature (default 0 for determinism)
+        model: Override model name
+        **llm_kwargs: Extra kwargs passed to provider.generate()
+
+    Returns:
+        SuggestionResult with patterns, optional chain, and reasoning
+    """
+    keyword_result = _suggest_with_keywords(
+        question, include_enterprise, suggest_chain, max_patterns
+    )
+
+    if mode == "keyword":
+        return keyword_result
+
+    if mode in ("llm", "hybrid"):
+        kw_hints = [s.name for s in keyword_result.suggested_patterns]
+        llm_selections, integration_note, llm_raw = _suggest_with_llm(
+            question, llm_provider, temperature=temperature, model=model,
+            keyword_hints=kw_hints if mode == "hybrid" else None,
+            **llm_kwargs,
+        )
+        llm_names = [s[0] for s in llm_selections]
+        llm_reasons = {s[0]: s[1] for s in llm_selections}
+
+        if not llm_names and mode == "llm":
+            return SuggestionResult(
+                question=question,
+                suggested_patterns=[],
+                reasoning="LLM returned no valid patterns. Try keyword mode.",
+                source="llm",
+            )
+        if mode == "llm":
+            return _names_to_result(
+                question, llm_names, suggest_chain, max_patterns, "llm",
+                llm_raw, include_enterprise, llm_reasons, integration_note,
+            )
+        # hybrid: LLM selections are primary, keyword fills gaps
+        kw_reasons = {s.name: s.reason for s in keyword_result.suggested_patterns}
+        merged = llm_names + [n for n in kw_hints if n not in set(llm_names)]
+        merged = merged[:max_patterns]
+        merged_reasons = {**kw_reasons, **llm_reasons}
+        return _names_to_result(
+            question, merged, suggest_chain, max_patterns, "hybrid",
+            llm_raw, include_enterprise, merged_reasons, integration_note,
+        )
+
+    return keyword_result
+
+
+def _suggest_with_keywords(
+    question: str,
+    include_enterprise: bool,
+    suggest_chain: bool,
+    max_patterns: int,
+) -> SuggestionResult:
+    """Keyword-based suggestion. Always suggests from ALL patterns; adds license note for enterprise when include_enterprise=False."""
+    question_lower = question.lower().strip()
+    suggestions: List[PatternSuggestion] = []
+    seen: set = set()
+
+    for keywords, (pattern_name, category, reason) in PATTERN_MAP:
+        if pattern_name in seen:
+            continue
+        for kw in keywords:
+            if kw in question_lower:
+                reason_text = f"Question mentions '{kw}' -> {reason}"
+                if category == "enterprise" and not include_enterprise:
+                    reason_text += ENTERPRISE_LICENSE_NOTE
+                suggestions.append(PatternSuggestion(
+                    name=pattern_name,
+                    category=category,
+                    reason=reason_text,
+                    confidence=0.85,
+                ))
+                seen.add(pattern_name)
+                break
+
+    seen_unique: set = set()
+    unique = []
+    for s in suggestions:
+        if s.name not in seen_unique:
+            seen_unique.add(s.name)
+            unique.append(s)
+    suggestions = unique[:max_patterns]
+
+    chain = None
+    if suggest_chain and len(suggestions) >= 2:
+        chain = _order_chain([s.name for s in suggestions])
+        for s in suggestions:
+            if s.name in chain:
+                s.chain_position = chain.index(s.name) + 1
+        by_name = {s.name: s for s in suggestions}
+        suggestions = [by_name[n] for n in chain if n in by_name]
+
+    reasoning_parts = []
+    for s in suggestions:
+        pos = f" (chain step {s.chain_position})" if s.chain_position else ""
+        reasoning_parts.append(f"- {s.name}{pos}: {s.reason}")
+    reasoning = "\n".join(reasoning_parts) if reasoning_parts else "No strong match. Try question_analyzer."
+
+    return SuggestionResult(
+        question=question,
+        suggested_patterns=suggestions,
+        suggested_chain=chain,
+        reasoning=reasoning,
+        source="keyword",
+    )
+
+
+def _suggest_with_llm(
+    question: str,
+    provider: str,
+    temperature: float = 0,
+    model: Optional[str] = None,
+    keyword_hints: Optional[List[str]] = None,
+    **kwargs: Any,
+) -> tuple:
+    """Call LLM to suggest patterns. Returns (list of (name, reason) tuples, integration_note, raw_text)."""
+    from ..core import Context
+    from ..foundation import Directive, Guidance
+
+    hint_block = ""
+    if keyword_hints:
+        hint_block = (
+            f"\nKeyword analysis already identified these candidates: {', '.join(keyword_hints)}\n"
+            "You may keep, replace, or add to these. Think beyond the obvious.\n"
+        )
+
+    prompt = f"""USER QUESTION: "{question}"
+{hint_block}
+TEMPLATE CATALOG (85 cognitive reasoning frameworks, grouped by theme):
+{ENRICHED_CATALOG_TEXT}
+
+INSTRUCTIONS:
+Think step-by-step about which templates would best address this question.
+1. Identify the DOMAINS involved (business, technical, ethical, legal, scientific, etc.)
+2. Identify the REASONING TYPE needed (diagnostic, comparative, strategic, creative, ethical, etc.)
+3. Select 2-4 templates that DIRECTLY address the question's core requirements. Each must earn its place — do not add templates for marginal relevance.
+4. Order them as a pipeline (what to apply first → last).
+5. Explain WHY each template is needed for THIS specific question.
+
+RESPOND IN THIS EXACT FORMAT:
+
+TEMPLATE: exact_template_name
+REASON: 1-2 sentences explaining why this is needed for the user's specific question
+
+TEMPLATE: exact_template_name
+REASON: 1-2 sentences...
+
+(repeat for each)
+
+INTEGRATION: 2-3 sentences explaining how these templates work together as a pipeline — what each stage contributes and why the combination produces better results than any single template."""
+
+    try:
+        ctx = Context(
+            guidance=Guidance(
+                role="Expert cognitive pattern architect. You match reasoning frameworks to questions with surgical precision, selecting from a catalog of 85 templates.",
+                rules=[
+                    "Use ONLY template names from the catalog. Exact snake_case names.",
+                    "Select 2-4 templates. Quality over quantity — each template must directly address a core aspect of the question.",
+                    "Order them as a pipeline: investigation/analysis first, then reasoning/comparison, then synthesis/decision last.",
+                    "Each REASON must be specific to the user's question, not generic.",
+                ],
+            ),
+            directive=Directive(content=prompt),
+        )
+        exec_kw = {"temperature": temperature, **kwargs}
+        if model:
+            exec_kw["model"] = model
+        result = ctx.execute(provider=provider, **exec_kw)
+        raw = result.response.strip()
+        return _parse_llm_structured_response(raw)
+    except Exception as e:
+        return ([], "", str(e))
+
+
+def _parse_llm_structured_response(raw: str) -> tuple:
+    """Parse structured LLM response into (list of (name, reason), integration_note, raw_text)."""
+    import re
+    selections: List[tuple] = []
+    integration = ""
+
+    template_pattern = re.compile(r"TEMPLATE:\s*(\S+)", re.IGNORECASE)
+    reason_pattern = re.compile(r"REASON:\s*(.+)", re.IGNORECASE)
+    integration_pattern = re.compile(r"INTEGRATION:\s*(.+)", re.IGNORECASE | re.DOTALL)
+
+    int_match = integration_pattern.search(raw)
+    if int_match:
+        integration = int_match.group(1).strip().split("\n")[0].strip()
+
+    template_matches = list(template_pattern.finditer(raw))
+    for i, tm in enumerate(template_matches):
+        name = tm.group(1).strip().lower().replace("-", "_").replace(" ", "_")
+        if name not in VALID_PATTERN_NAMES:
+            continue
+        search_start = tm.end()
+        search_end = template_matches[i + 1].start() if i + 1 < len(template_matches) else (int_match.start() if int_match else len(raw))
+        chunk = raw[search_start:search_end]
+        rm = reason_pattern.search(chunk)
+        reason = rm.group(1).strip() if rm else "Selected by AI"
+        selections.append((name, reason))
+
+    if not selections:
+        for part in raw.replace("\n", ",").split(","):
+            name = part.strip().lower().replace("-", "_").replace(" ", "_")
+            if name in VALID_PATTERN_NAMES:
+                selections.append((name, "Selected by AI"))
+
+    return (selections[:5], integration, raw)
+
+
+def _names_to_result(
+    question: str,
+    names: List[str],
+    suggest_chain: bool,
+    max_patterns: int,
+    source: str,
+    llm_reasoning: Optional[str] = None,
+    include_enterprise: bool = True,
+    per_template_reasons: Optional[dict] = None,
+    integration_note: Optional[str] = None,
+) -> SuggestionResult:
+    """Convert list of pattern names to SuggestionResult. Adds license note when include_enterprise=False."""
+    per_template_reasons = per_template_reasons or {}
+    suggestions = []
+    for name in names[:max_patterns]:
+        cat = NAME_TO_CATEGORY.get(name, "free")
+        reason = per_template_reasons.get(name, f"Selected by {source}")
+        if cat == "enterprise" and not include_enterprise:
+            reason += ENTERPRISE_LICENSE_NOTE
+        suggestions.append(PatternSuggestion(
+            name=name,
+            category=cat,
+            reason=reason,
+            confidence=0.9 if source in ("llm", "hybrid") else 0.85,
+        ))
+
+    chain = _order_chain(names) if suggest_chain and len(names) >= 2 else None
+    if chain:
+        for s in suggestions:
+            if s.name in chain:
+                s.chain_position = chain.index(s.name) + 1
+        by_chain = {s.name: s for s in suggestions}
+        suggestions = [by_chain[n] for n in chain if n in by_chain]
+
+    reasoning = integration_note or ""
+    return SuggestionResult(
+        question=question,
+        suggested_patterns=suggestions,
+        suggested_chain=chain,
+        reasoning=reasoning,
+        source=source,
+        llm_reasoning=llm_reasoning,
+    )
+
+
+def _order_chain(pattern_names: List[str]) -> List[str]:
+    """Order patterns into a sensible workflow chain."""
+    order_priority = {
+        "temporal_sequence_analyzer": 1,
+        "historical_context_mapper": 2,
+        "diagnostic_root_cause_analyzer": 3,
+        "root_cause_analyzer": 3,  # free RCA
+        "causal_reasoner": 4,
+        "differential_diagnoser": 5,
+        "future_scenario_planner": 6,
+        "pattern_recognition_engine": 7,
+        "cross_domain_synthesizer": 8,
+        "holistic_integrator": 9,
+    }
+    others = [p for p in pattern_names if p not in order_priority]
+    ordered = sorted(
+        [p for p in pattern_names if p in order_priority],
+        key=lambda x: order_priority[x],
+    )
+    return ordered + others
+
+def get_pattern_class(pattern_name: str, include_enterprise: bool = True):
+    """
+    Get the Pattern class for a given pattern name.
+
+    Delegates to the unified pattern registry. When include_enterprise=False
+    and pattern is enterprise, returns None and emits a warning directing the
+    user to either activate an enterprise license or use a free template.
+    """
+    import warnings
+
+    category = NAME_TO_CATEGORY.get(pattern_name)
+    if category is None:
+        return None
+    if category == "enterprise" and not include_enterprise:
+        warnings.warn(
+            f"Template '{pattern_name}' requires an enterprise license. "
+            f"Activate with: mycontext.activate_license('MC-ENT-...'). "
+            f"Free alternatives (16 templates) are available — use "
+            f"include_enterprise=False to route to them automatically.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return None
+    from ..skills.pattern_registry import get_pattern_registry
+    registry = get_pattern_registry()
+    return registry.get(pattern_name)
+
+
+# ---------------------------------------------------------------------------
+# Complexity Router — decide IF templates will help before selecting them
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ComplexityResult:
+    """Result of question complexity assessment."""
+    complexity: str  # "low", "medium", "high"
+    domains: List[str]  # e.g. ["business", "technical", "ethical"]
+    reasoning_type: str  # "diagnostic", "comparative", "strategic", etc.
+    recommendation: str  # "raw", "single_template", "integrated"
+    reasoning: str  # why this recommendation
+    best_template: Optional[str] = None  # for "single_template" recommendation
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "complexity": self.complexity,
+            "domains": self.domains,
+            "reasoning_type": self.reasoning_type,
+            "recommendation": self.recommendation,
+            "reasoning": self.reasoning,
+            "best_template": self.best_template,
+        }
+
+
+def assess_complexity(
+    question: str,
+    provider: str = "openai",
+    temperature: float = 0,
+    model: Optional[str] = None,
+    **kwargs: Any,
+) -> ComplexityResult:
+    """Assess question complexity to decide if templates will help.
+
+    Routes:
+    - low complexity (single domain, well-known): recommend "raw"
+    - medium (single domain, specialized): recommend "single_template"
+    - high (multi-domain, ambiguous, novel): recommend "integrated"
+    """
+    from ..core import Context
+    from ..foundation import Directive, Guidance
+
+    prompt = f"""Assess this question's complexity for deciding whether cognitive reasoning templates will add value.
+
+QUESTION: "{question}"
+
+AVAILABLE TEMPLATE CATALOG (use exact snake_case names):
+{ENRICHED_CATALOG_TEXT}
+
+Classify along these dimensions:
+
+1. COMPLEXITY: "low" | "medium" | "high"
+   - low: Single domain, well-known topic, straightforward answer structure
+   - medium: Single domain but specialized, benefits from structured analytical framework
+   - high: Multi-domain (spans technical + business + ethical + legal etc.), ambiguous, or requires novel reasoning
+
+2. DOMAINS: List the knowledge domains involved (e.g. "business", "technical", "ethical", "legal", "medical", "organizational")
+
+3. REASONING_TYPE: What kind of reasoning is needed?
+   - diagnostic (why did X happen?)
+   - comparative (A vs B vs C?)
+   - strategic (what should we do?)
+   - creative (generate new ideas)
+   - ethical (evaluate moral implications)
+   - analytical (analyze data/information)
+   - explanatory (explain or teach something)
+
+4. RECOMMENDATION: "raw" | "single_template" | "integrated"
+   - raw: LLM can answer well without scaffolding (simple, well-known topics)
+   - single_template: One specialized template adds clear value
+   - integrated: Multiple frameworks needed for multi-domain complexity
+
+5. BEST_TEMPLATE: If recommendation is "single_template", pick the SINGLE best template from the catalog above. Use the exact snake_case name. Leave empty string for "raw" or "integrated".
+
+Respond in this EXACT JSON format:
+{{"complexity": "...", "domains": [...], "reasoning_type": "...", "recommendation": "...", "best_template": "...", "reasoning": "1-2 sentences explaining why"}}
+
+Respond with ONLY valid JSON."""
+
+    try:
+        ctx = Context(
+            guidance=Guidance(
+                role="Question complexity assessor",
+                rules=[
+                    "Be conservative: recommend templates ONLY when they clearly add value.",
+                    "Most straightforward questions are best answered raw.",
+                    "Recommend integration only for genuinely multi-domain problems.",
+                ],
+            ),
+            directive=Directive(content=prompt),
+        )
+        exec_kw: dict = {"temperature": temperature, **kwargs}
+        if model:
+            exec_kw["model"] = model
+        result = ctx.execute(provider=provider, **exec_kw)
+        raw = result.response.strip()
+        if raw.startswith("```"):
+            lines = raw.split("\n")
+            raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+
+        import json
+        data = json.loads(raw)
+        best_tpl = data.get("best_template", "") or None
+        if best_tpl and best_tpl not in VALID_PATTERN_NAMES:
+            best_tpl = None
+        return ComplexityResult(
+            complexity=data.get("complexity", "medium"),
+            domains=data.get("domains", []),
+            reasoning_type=data.get("reasoning_type", "analytical"),
+            recommendation=data.get("recommendation", "raw"),
+            reasoning=data.get("reasoning", ""),
+            best_template=best_tpl,
+        )
+    except Exception as e:
+        return ComplexityResult(
+            complexity="medium",
+            domains=[],
+            reasoning_type="analytical",
+            recommendation="raw",
+            reasoning=f"Assessment failed ({e}), defaulting to raw.",
+        )
+
+
+def smart_execute(
+    question: str,
+    provider: str = "openai",
+    include_enterprise: bool = True,
+    model: Optional[str] = None,
+    **kwargs: Any,
+):
+    """Intelligently execute a question using the complexity router.
+
+    Automatically decides whether to use raw execution, a single template,
+    or integrated templates based on question complexity.
+
+    Returns:
+        tuple: (response_text, execution_metadata_dict)
+    """
+    from ..core import Context
+    from ..foundation import Directive
+    from .template_integrator_agent import TemplateIntegratorAgent
+    from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
+
+    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
+    meta = {
+        "assessment": assessment.to_dict(),
+        "mode": assessment.recommendation,
+    }
+
+    exec_kw: dict = dict(kwargs)
+    if model:
+        exec_kw["model"] = model
+
+    if assessment.recommendation == "raw":
+        ctx = Context(directive=Directive(content=question))
+        result = ctx.execute(provider=provider, **exec_kw)
+        meta["templates_used"] = []
+        return result.response, meta
+
+    if assessment.recommendation == "single_template" and assessment.best_template:
+        tpl_name = assessment.best_template
+        klass = get_pattern_class(tpl_name, include_enterprise=include_enterprise)
+        if klass:
+            reg = PATTERN_BUILD_CONTEXT_REGISTRY.get(tpl_name, ("input", {}))
+            primary_key, defaults = reg
+            params = dict(defaults)
+            params[primary_key] = question
+            ctx = klass().build_context(**params)
+            result = ctx.execute(provider=provider, **exec_kw)
+            meta["templates_used"] = [tpl_name]
+            return result.response, meta
+
+    # Fallback to integrated (or if single_template failed)
+    integrator = TemplateIntegratorAgent(include_enterprise=include_enterprise)
+    integration = integrator.suggest_and_integrate(
+        question=question,
+        provider=provider,
+        max_patterns=3,
+        integration_mode="focused",
+        **kwargs,
+    )
+    ctx = integration.to_context()
+    result = ctx.execute(provider=provider, **exec_kw)
+    meta["templates_used"] = integration.source_templates
+    return result.response, meta
+
+
+def smart_prompt(
+    question: str,
+    provider: str = "openai",
+    include_enterprise: bool = True,
+    model: Optional[str] = None,
+    refine: bool = True,
+    **kwargs: Any,
+):
+    """One-liner: analyze question, select templates, compose an optimized prompt.
+
+    Uses the complexity router to decide which templates to apply, then
+    generates and composes their prompts into a single, provider-agnostic
+    prompt string.
+
+    Args:
+        question: The user's question or problem description.
+        provider: LLM provider for prompt generation/refinement.
+        include_enterprise: Include enterprise templates if licensed.
+        model: Override model name.
+        refine: Whether to LLM-refine individual template prompts before composing.
+
+    Returns:
+        ComposedPrompt that can be executed (``.execute()``) or exported
+        (``.to_string()``).
+
+    Example::
+
+        >>> from mycontext.intelligence import smart_prompt
+        >>> cp = smart_prompt("Why did churn spike 40%?")
+        >>> print(cp.to_string())   # get the optimized prompt
+        >>> print(cp.execute())     # or execute it directly
+    """
+    from .prompt_composer import PromptComposer, ComposedPrompt
+    from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
+    from ..core import Context
+    from ..foundation import Directive
+
+    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
+
+    if assessment.recommendation == "raw":
+        raw_prompt = f"Answer this question thoroughly and provide actionable recommendations:\n\n{question}"
+        return ComposedPrompt(
+            prompt=raw_prompt,
+            source_templates=[],
+            question=question,
+            metadata={
+                "assessment": assessment.to_dict(),
+                "mode": "raw",
+            },
+        )
+
+    if assessment.recommendation == "single_template" and assessment.best_template:
+        tpl_name = assessment.best_template
+        klass = get_pattern_class(tpl_name, include_enterprise=include_enterprise)
+        if klass:
+            reg = PATTERN_BUILD_CONTEXT_REGISTRY.get(tpl_name, ("input", {}))
+            primary_key, defaults = reg
+            params = dict(defaults)
+            params[primary_key] = question
+            ctx = klass().build_context(**params)
+            prompt = ctx.to_prompt(refine=refine, provider=provider, model=model)
+            return ComposedPrompt(
+                prompt=prompt,
+                source_templates=[tpl_name],
+                question=question,
+                component_prompts=[prompt],
+                metadata={
+                    "assessment": assessment.to_dict(),
+                    "mode": "single_template",
+                },
+            )
+
+    composer = PromptComposer(
+        include_enterprise=include_enterprise,
+        provider=provider,
+        model=model or "gpt-4o-mini",
+    )
+    suggestion = suggest_patterns(
+        question,
+        include_enterprise=include_enterprise,
+        max_patterns=3,
+        mode="hybrid",
+        llm_provider=provider,
+        model=model,
+    )
+    template_names = [s.name for s in suggestion.suggested_patterns[:3]]
+
+    if not template_names:
+        raw_prompt = f"Answer this question thoroughly and provide actionable recommendations:\n\n{question}"
+        return ComposedPrompt(
+            prompt=raw_prompt,
+            source_templates=[],
+            question=question,
+            metadata={
+                "assessment": assessment.to_dict(),
+                "mode": "integrated_fallback",
+            },
+        )
+
+    result = composer.compose_from_templates(
+        question=question,
+        template_names=template_names,
+        refine=refine,
+        provider=provider,
+        model=model,
+    )
+    result.metadata["assessment"] = assessment.to_dict()
+    result.metadata["mode"] = "composed"
+    return result
+
+
+def smart_generic_prompt(
+    question: str,
+    provider: str = "openai",
+    include_enterprise: bool = True,
+    model: Optional[str] = None,
+    **kwargs: Any,
+):
+    """One-liner: select templates via complexity router, compile generic prompts statically.
+
+    This is the zero-cost counterpart to ``smart_prompt()``.  Instead of
+    LLM-refined prompts, it uses the pre-authored generic prompts and
+    merges them via pure string operations — **no LLM calls for compilation**.
+
+    The only LLM call is the complexity assessment itself (one cheap call).
+
+    Args:
+        question: The user's question or problem description.
+        provider: LLM provider for the complexity assessment.
+        include_enterprise: Include enterprise templates if licensed.
+        model: Override model name.
+
+    Returns:
+        ComposedPrompt with a statically compiled generic prompt.
+
+    Example::
+
+        >>> from mycontext.intelligence import smart_generic_prompt
+        >>> cp = smart_generic_prompt("Why did churn spike 40%?")
+        >>> print(cp.to_string())   # zero-LLM-cost prompt
+        >>> print(cp.execute())     # execute it with one LLM call
+    """
+    from .prompt_composer import PromptComposer, ComposedPrompt
+
+    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
+
+    if assessment.recommendation == "raw":
+        raw_prompt = (
+            f"Answer this question thoroughly and provide actionable "
+            f"recommendations:\n\n{question}"
+        )
+        return ComposedPrompt(
+            prompt=raw_prompt,
+            source_templates=[],
+            question=question,
+            metadata={
+                "assessment": assessment.to_dict(),
+                "mode": "raw",
+            },
+        )
+
+    composer = PromptComposer(
+        include_enterprise=include_enterprise,
+        provider=provider,
+        model=model or "gpt-4o-mini",
+    )
+
+    if assessment.recommendation == "single_template" and assessment.best_template:
+        template_names = [assessment.best_template]
+    else:
+        suggestion = suggest_patterns(
+            question,
+            include_enterprise=include_enterprise,
+            max_patterns=3,
+            mode="hybrid",
+            llm_provider=provider,
+            model=model,
+        )
+        template_names = [s.name for s in suggestion.suggested_patterns[:3]]
+
+    if not template_names:
+        raw_prompt = (
+            f"Answer this question thoroughly and provide actionable "
+            f"recommendations:\n\n{question}"
+        )
+        return ComposedPrompt(
+            prompt=raw_prompt,
+            source_templates=[],
+            question=question,
+            metadata={
+                "assessment": assessment.to_dict(),
+                "mode": "generic_fallback",
+            },
+        )
+
+    result = composer.compile_generic(
+        question=question,
+        template_names=template_names,
+    )
+    result.metadata["assessment"] = assessment.to_dict()
+    result.metadata["mode"] = "generic_compiled"
+    return result

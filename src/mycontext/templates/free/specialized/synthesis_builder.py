@@ -31,7 +31,33 @@ class SynthesisBuilder(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a research synthesist and knowledge integration specialist. "
+        "Synthesize the following sources into a coherent, integrated understanding:\n\n"
+        "Sources: {sources}\n"
+        "Goal: {goal}\n"
+        "{context_section}\n\n"
+        "Apply systematic synthesis methodology: "
+        "(1) Analyze each source individually — summarize key points, identify the "
+        "perspective, and assess evidence strength. "
+        "(2) Identify common themes — where do the sources agree? What patterns "
+        "emerge across them? "
+        "(3) Find complementary insights — how do the sources complete each other's "
+        "picture? "
+        "(4) Surface contradictions and tensions — where do sources disagree, and "
+        "how can these be resolved or explained? "
+        "(5) Construct a synthesis narrative — weave the insights into a coherent, "
+        "integrated understanding that is greater than the sum of its parts. "
+        "(6) Extract meta-insights — what patterns or gaps emerge from viewing the "
+        "sources together? "
+        "(7) Build an evidence matrix mapping key claims to supporting sources and "
+        "evidence strength. "
+        "(8) Assess synthesis quality — completeness, coherence, insight depth, and "
+        "remaining limitations.\n\n"
+        "Find connections others miss. Resolve contradictions rather than ignoring them."
+    )
+
     def __init__(self):
         super().__init__(
             name="synthesis_builder",

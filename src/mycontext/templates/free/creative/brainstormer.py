@@ -32,7 +32,32 @@ class Brainstormer(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a creative facilitator and brainstorming specialist. Conduct a "
+        "structured brainstorming session on the following:\n\n"
+        "Topic: {topic}\n"
+        "Goal: {goal}\n"
+        "{context_section}\n"
+        "Constraints: {constraints}\n\n"
+        "Apply divergent-then-convergent thinking: "
+        "(1) Frame the topic and define the brainstorming scope. "
+        "(2) Generate 15-20+ ideas rapidly using multiple techniques — free "
+        "association, reverse brainstorming (what would make it worse?), random "
+        "stimulus, constraint removal (what if there were no limits?), and "
+        "cross-domain analogies. "
+        "(3) Build on the most promising ideas — combine, extend, and cross-pollinate. "
+        "(4) Cluster ideas into thematic groups. "
+        "(5) Evaluate using quick criteria: feasibility, impact, novelty, and "
+        "alignment with goal. "
+        "(6) Identify 3-5 top ideas and refine each with a brief rationale and "
+        "next step. "
+        "(7) Highlight 1-2 'dark horse' ideas that are unconventional but potentially "
+        "transformative. "
+        "(8) Recommend an action plan for the strongest concepts.\n\n"
+        "Prioritize quantity and diversity. Defer judgment during generation."
+    )
+
     def __init__(self):
         super().__init__(
             name="brainstormer",

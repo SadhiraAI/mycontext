@@ -28,10 +28,30 @@ class QuestionAnalyzer(Pattern):
         ...     depth="comprehensive"
         ... )
         >>> print(result.response)
+        >>>
+        >>> # Generic prompt mode — lighter, zero-cost
+        >>> prompt = analyzer.generic_prompt(question="How does quantum entanglement work?", depth="comprehensive")
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        'You are an expert question analyst. Systematically analyze the following '
+        'question before answering it: "{question}"\n\n'
+        "{context_section}"
+        "Perform a {depth} analysis covering: "
+        "(1) Classify the question type (factual, conceptual, analytical, evaluative, "
+        "procedural, or causal). "
+        "(2) Identify what cognitive action is required and the expected output format. "
+        "(3) List the primary concepts, related domains, and scope boundaries. "
+        "(4) Surface any implicit assumptions, potential ambiguities, and unstated context. "
+        "(5) Rate complexity on a 1-10 scale considering conceptual difficulty, breadth, "
+        "and reasoning depth. "
+        "(6) Recommend an optimal answer strategy with structure and key considerations. "
+        "(7) Restate the question making all implicit elements explicit.\n\n"
+        "Do NOT answer the question — only analyze it."
+    )
+
     def __init__(self):
         super().__init__(
             name="question_analyzer",

@@ -1,0 +1,487 @@
+{
+  "sprint": "Sprint 2 \u2014 Cognitive RAG (LLM Eval)",
+  "date": "2026-02-21T10:39:55.805568",
+  "provider": "openai",
+  "eval_mode": "llm",
+  "num_questions": 5,
+  "summary": {
+    "avg_overall": {
+      "raw": 0.92,
+      "rag_only": 0.932,
+      "template_only": 0.861,
+      "cognitive_rag": 0.816
+    },
+    "avg_evidence_recall": {
+      "raw": 0.0333,
+      "rag_only": 0.6524,
+      "template_only": 0.0143,
+      "cognitive_rag": 0.519
+    },
+    "wins": {
+      "Raw": 3,
+      "RAG": 1,
+      "Template": 1,
+      "CogRAG": 0
+    }
+  },
+  "results": [
+    {
+      "question": "Why did customer churn spike 40% last quarter and what should we do about it?",
+      "template": "root_cause_analyzer",
+      "num_markers": 12,
+      "raw": {
+        "overall": 0.96,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 19.23,
+        "output_length": 3579,
+        "evidence_count": 0,
+        "strengths": [
+          "Comprehensive analysis of potential churn causes.",
+          "Clear and actionable recommendations for each identified issue.",
+          "Well-organized structure that enhances readability."
+        ],
+        "weaknesses": [
+          "Could improve on explicitly linking each cause to its corresponding action more clearly."
+        ]
+      },
+      "rag_only": {
+        "overall": 0.94,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 17.52,
+        "output_length": 3694,
+        "evidence_count": 8,
+        "strengths": [
+          "Thorough analysis of multiple factors contributing to churn.",
+          "Clear and actionable recommendations.",
+          "Well-structured response."
+        ],
+        "weaknesses": [
+          "Could provide more quantitative data to support recommendations."
+        ]
+      },
+      "template_only": {
+        "overall": 0.88,
+        "dimensions": {
+          "instruction_following": 0.9,
+          "reasoning_depth": 0.9,
+          "actionability": 0.8,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 21.6,
+        "output_length": 6179,
+        "evidence_count": 0,
+        "strengths": [
+          "Thorough analysis of the problem and its causes.",
+          "Clear identification of symptoms versus causes.",
+          "Well-structured presentation of findings."
+        ],
+        "weaknesses": [
+          "Could provide more specific actionable steps.",
+          "Some sections could benefit from additional detail or examples."
+        ]
+      },
+      "cognitive_rag": {
+        "overall": 0.88,
+        "dimensions": {
+          "instruction_following": 0.9,
+          "reasoning_depth": 0.9,
+          "actionability": 0.8,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 23.14,
+        "output_length": 6139,
+        "evidence_count": 6,
+        "strengths": [
+          "Thorough analysis of the problem with clear definitions and symptoms.",
+          "Effective use of the five whys technique to identify root causes.",
+          "Well-organized structure that aligns with the requested format."
+        ],
+        "weaknesses": [
+          "Could provide more specific actionable steps for implementation.",
+          "Some areas of the Ishikawa analysis could be expanded for clarity."
+        ]
+      }
+    },
+    {
+      "question": "Our AI model is producing biased hiring recommendations. How do we diagnose and fix this?",
+      "template": "diagnostic_root_cause_analyzer",
+      "num_markers": 12,
+      "raw": {
+        "overall": 0.96,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 13.66,
+        "output_length": 3631,
+        "evidence_count": 1,
+        "strengths": [
+          "Comprehensive approach to diagnosing and fixing biases.",
+          "Clear and actionable recommendations.",
+          "Well-structured format enhances readability."
+        ],
+        "weaknesses": [
+          "Could provide more examples or case studies to illustrate points."
+        ]
+      },
+      "rag_only": {
+        "overall": 0.96,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 13.2,
+        "output_length": 3404,
+        "evidence_count": 8,
+        "strengths": [
+          "Thorough analysis of biases in the hiring model.",
+          "Clear and actionable recommendations for improvement.",
+          "Well-organized structure that enhances readability."
+        ],
+        "weaknesses": [
+          "Could provide more explicit connections to the context in some areas.",
+          "Minor lack of depth in discussing the implications of proposed changes."
+        ]
+      },
+      "template_only": {
+        "overall": 0.96,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 48.88,
+        "output_length": 11122,
+        "evidence_count": 0,
+        "strengths": [
+          "Thorough analysis of the problem with clear identification of root causes.",
+          "Well-structured and systematic approach to root cause analysis.",
+          "Actionable recommendations provided for addressing the identified issues."
+        ],
+        "weaknesses": [
+          "Some potential root causes could be further elaborated for clarity.",
+          "Additional evidence or examples could strengthen the verification process."
+        ]
+      },
+      "cognitive_rag": {
+        "overall": 0.87,
+        "dimensions": {
+          "instruction_following": 0.9,
+          "reasoning_depth": 0.85,
+          "actionability": 0.8,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 32.58,
+        "output_length": 9054,
+        "evidence_count": 4,
+        "strengths": [
+          "Thorough analysis of the problem and its root causes.",
+          "Clear structure and adherence to the required format.",
+          "Actionable insights with evidence-based verification."
+        ],
+        "weaknesses": [
+          "Some areas could benefit from more specific corrective actions.",
+          "The depth of reasoning could be expanded in the corrective actions section."
+        ]
+      }
+    },
+    {
+      "question": "Compare three database options (PostgreSQL, MongoDB, DynamoDB) for a real-time analytics platform.",
+      "template": "comparative_analyzer",
+      "num_markers": 12,
+      "raw": {
+        "overall": 0.84,
+        "dimensions": {
+          "instruction_following": 0.9,
+          "reasoning_depth": 0.8,
+          "actionability": 0.8,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.8
+        },
+        "time_seconds": 16.22,
+        "output_length": 4233,
+        "evidence_count": 1,
+        "strengths": [
+          "Comprehensive comparison of three database options.",
+          "Clear structure with pros, cons, and use cases.",
+          "Addresses specific requirements for real-time analytics."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples of use cases.",
+          "Some sections could benefit from deeper analysis of trade-offs."
+        ]
+      },
+      "rag_only": {
+        "overall": 0.94,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 28.64,
+        "output_length": 3884,
+        "evidence_count": 12,
+        "strengths": [
+          "Comprehensive analysis of each database option.",
+          "Clear and actionable recommendation based on the requirements.",
+          "Well-structured format that enhances readability."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples of use cases for each database."
+        ]
+      },
+      "template_only": {
+        "overall": 0.65,
+        "dimensions": {
+          "instruction_following": 0.6,
+          "reasoning_depth": 0.7,
+          "actionability": 0.5,
+          "structure_compliance": 0.8,
+          "cognitive_scaffolding": 0.7
+        },
+        "time_seconds": 32.37,
+        "output_length": 7382,
+        "evidence_count": 0,
+        "strengths": [
+          "Provides a clear overview of each database option.",
+          "Includes ratings and explanations for performance, scalability, and flexibility."
+        ],
+        "weaknesses": [
+          "Incomplete sections such as pros and cons, scenarios, decision matrix, and recommendations.",
+          "Lacks comprehensive trade-off discussions and evidence-based assessments."
+        ]
+      },
+      "cognitive_rag": {
+        "overall": 0.82,
+        "dimensions": {
+          "instruction_following": 0.9,
+          "reasoning_depth": 0.8,
+          "actionability": 0.7,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.8
+        },
+        "time_seconds": 37.95,
+        "output_length": 5791,
+        "evidence_count": 10,
+        "strengths": [
+          "Well-structured and comprehensive analysis.",
+          "Clear identification of trade-offs and evidence-based assessments.",
+          "Balanced comparison of options with pros and cons."
+        ],
+        "weaknesses": [
+          "Could provide more depth in certain areas, particularly in scenarios and decision matrix.",
+          "Recommendations could be more actionable with specific implementation steps."
+        ]
+      }
+    },
+    {
+      "question": "Evaluate the ethical implications of using facial recognition in public schools.",
+      "template": "ethical_framework_analyzer",
+      "num_markers": 14,
+      "raw": {
+        "overall": 0.88,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.7,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.8
+        },
+        "time_seconds": 16.18,
+        "output_length": 3248,
+        "evidence_count": 0,
+        "strengths": [
+          "Comprehensive coverage of ethical implications",
+          "Clear and logical structure",
+          "Depth of analysis on privacy, consent, and bias"
+        ],
+        "weaknesses": [
+          "Lacks specific actionable recommendations",
+          "Could further explore stakeholder engagement strategies"
+        ]
+      },
+      "rag_only": {
+        "overall": 0.88,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.7,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.8
+        },
+        "time_seconds": 17.87,
+        "output_length": 4078,
+        "evidence_count": 10,
+        "strengths": [
+          "Thorough analysis of ethical implications",
+          "Well-structured and easy to follow",
+          "Addresses multiple dimensions of the issue"
+        ],
+        "weaknesses": [
+          "Lacks specific actionable recommendations",
+          "Could further elaborate on potential solutions or alternatives"
+        ]
+      },
+      "template_only": {
+        "overall": 0.835,
+        "dimensions": {
+          "instruction_following": 0.8,
+          "reasoning_depth": 0.9,
+          "actionability": 0.7,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 33.52,
+        "output_length": 8335,
+        "evidence_count": 1,
+        "strengths": [
+          "Comprehensive application of ethical frameworks",
+          "Thorough stakeholder analysis",
+          "Clear and structured presentation"
+        ],
+        "weaknesses": [
+          "Lacks specific actionable recommendations",
+          "Incomplete discussion of ethical tensions and trade-offs"
+        ]
+      },
+      "cognitive_rag": {
+        "overall": 0.65,
+        "dimensions": {
+          "instruction_following": 0.6,
+          "reasoning_depth": 0.7,
+          "actionability": 0.5,
+          "structure_compliance": 0.8,
+          "cognitive_scaffolding": 0.7
+        },
+        "time_seconds": 36.85,
+        "output_length": 8159,
+        "evidence_count": 6,
+        "strengths": [
+          "Includes a clear identification of stakeholders.",
+          "Provides a structured analysis using multiple ethical frameworks."
+        ],
+        "weaknesses": [
+          "Does not apply all six ethical frameworks systematically.",
+          "Lacks concrete recommendations for implementation.",
+          "Incomplete sections in the analysis."
+        ]
+      }
+    },
+    {
+      "question": "How should a startup allocate its $2M seed funding across engineering, marketing, and operations?",
+      "template": "resource_allocator",
+      "num_markers": 14,
+      "raw": {
+        "overall": 0.96,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 10.79,
+        "output_length": 2601,
+        "evidence_count": 0,
+        "strengths": [
+          "Clear and detailed allocation breakdown",
+          "Actionable recommendations for each category",
+          "Well-structured format with a summary"
+        ],
+        "weaknesses": [
+          "Could provide more specific examples of marketing strategies or operational tools"
+        ]
+      },
+      "rag_only": {
+        "overall": 0.94,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 0.9,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 0.9
+        },
+        "time_seconds": 14.13,
+        "output_length": 3268,
+        "evidence_count": 3,
+        "strengths": [
+          "Thorough analysis of funding allocation based on current metrics and benchmarks.",
+          "Clear rationale for each allocation category.",
+          "Actionable recommendations for product development and user acquisition."
+        ],
+        "weaknesses": [
+          "Could provide more specific examples of marketing strategies or channels to explore.",
+          "Might benefit from a more detailed plan for tracking and adjusting allocations over time."
+        ]
+      },
+      "template_only": {
+        "overall": 0.98,
+        "dimensions": {
+          "instruction_following": 1.0,
+          "reasoning_depth": 0.9,
+          "actionability": 1.0,
+          "structure_compliance": 1.0,
+          "cognitive_scaffolding": 1.0
+        },
+        "time_seconds": 22.2,
+        "output_length": 3679,
+        "evidence_count": 0,
+        "strengths": [
+          "Comprehensive analysis of competing needs and resource allocation.",
+          "Clear justification for each allocation decision.",
+          "Detailed ROI analysis that supports the recommendations."
+        ],
+        "weaknesses": [
+          "Could provide more explicit metrics for measuring success beyond ROI."
+        ]
+      },
+      "cognitive_rag": {
+        "overall": 0.86,
+        "dimensions": {
+          "instruction_following": 0.9,
+          "reasoning_depth": 0.8,
+          "actionability": 0.9,
+          "structure_compliance": 0.9,
+          "cognitive_scaffolding": 0.8
+        },
+        "time_seconds": 18.16,
+        "output_length": 4344,
+        "evidence_count": 7,
+        "strengths": [
+          "Comprehensive analysis of needs and resource allocation.",
+          "Clear and actionable recommendations.",
+          "Well-structured and easy to follow."
+        ],
+        "weaknesses": [
+          "Could provide more detailed metrics on expected outcomes.",
+          "Some areas could benefit from deeper analysis of dependencies."
+        ]
+      }
+    }
+  ]
+}

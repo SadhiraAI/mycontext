@@ -74,7 +74,7 @@ def test_business_decision():
     Scenario: CTO deciding between cloud providers
     Uses: DecisionFramework, QualityMetrics, export
     """
-    from mycontext.templates.free.decision import DecisionFramework
+    from mycontext.templates.enterprise.decision import DecisionFramework
     from mycontext.intelligence import QualityMetrics
     
     # Create decision context
@@ -139,8 +139,9 @@ def test_creative_workflow():
     Scenario: Marketing team brainstorming campaign ideas
     Uses: IdeaGenerator, Brainstormer, NarrativeBuilder
     """
-    from mycontext.templates.free.creative import IdeaGenerator, Brainstormer
-    from mycontext.templates.free.communication import NarrativeBuilder
+    from mycontext.templates.enterprise.creative import IdeaGenerator
+    from mycontext.templates.free.creative import Brainstormer
+    from mycontext.templates.enterprise.communication import NarrativeBuilder
     
     # Phase 1: Generate ideas
     ig = IdeaGenerator()
@@ -222,8 +223,9 @@ def test_risk_workflow():
     Scenario: Project manager assessing project risks
     Uses: RiskAssessor, RiskMitigator, ImpactAssessor
     """
-    from mycontext.templates.free.specialized import (
-        RiskAssessor, RiskMitigator, ImpactAssessor
+    from mycontext.templates.free.specialized import RiskAssessor
+    from mycontext.templates.enterprise.specialized import (
+        RiskMitigator, ImpactAssessor,
     )
     
     # Phase 1: Identify risks
@@ -356,7 +358,7 @@ def test_problem_decomposition():
     Scenario: Breaking down complex architecture problem
     Uses: ProblemDecomposer, DependencyMapper, ConstraintOptimizer
     """
-    from mycontext.templates.free.problem_solving import (
+    from mycontext.templates.enterprise.problem_solving import (
         ProblemDecomposer, DependencyMapper, ConstraintOptimizer
     )
     

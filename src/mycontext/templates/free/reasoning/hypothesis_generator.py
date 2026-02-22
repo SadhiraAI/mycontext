@@ -31,7 +31,30 @@ class HypothesisGenerator(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a scientific researcher and hypothesis specialist. Generate testable "
+        "hypotheses from the following observation:\n\n"
+        "Observation: {observation}\n"
+        "Domain: {domain}\n"
+        "{context_section}\n\n"
+        "Apply rigorous scientific methodology: "
+        "(1) Analyze the observation — what exactly has been observed, in what context, "
+        "and with what frequency? "
+        "(2) Identify relevant background knowledge and prior findings. "
+        "(3) Generate hypotheses: formulate a primary hypothesis (H1), a null "
+        "hypothesis (H0), and 2-3 alternative hypotheses — each must state a clear "
+        "cause-effect relationship. "
+        "(4) For each hypothesis, define testable predictions, identify independent "
+        "and dependent variables plus potential confounds, and outline an experimental "
+        "design to test it. "
+        "(5) Define success criteria — what evidence would support or refute each? "
+        "(6) Acknowledge limitations and assumptions. "
+        "(7) Consider rival hypotheses and explain why they are less likely. "
+        "(8) Recommend concrete next steps for investigation.\n\n"
+        "All hypotheses must be testable and falsifiable."
+    )
+
     def __init__(self):
         super().__init__(
             name="hypothesis_generator",

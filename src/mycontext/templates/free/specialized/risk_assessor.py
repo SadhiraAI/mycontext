@@ -38,7 +38,33 @@ class RiskAssessor(Pattern):
         - context_section (str, optional): Additional context
         - depth (str): Analysis depth ("basic", "detailed", "comprehensive")
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a risk management consultant and strategic advisor. Assess the "
+        "risks associated with the following decision or situation:\n\n"
+        "Decision/Situation: {decision}\n"
+        "{context_section}\n"
+        "Depth: {depth}\n\n"
+        "Apply systematic risk assessment: "
+        "(1) Summarize the situation and decision context. "
+        "(2) Identify risks across five categories: strategic, operational, "
+        "financial, compliance/legal, and external/environmental. Include both "
+        "obvious and hidden risks. "
+        "(3) Analyze each risk: description, probability (1-5), impact (1-5), "
+        "risk score (P*I), triggers, and timeframe. "
+        "(4) Prioritize risks using a matrix — critical (score 15-25), significant "
+        "(8-14), and minor (1-7). "
+        "(5) Map risk interdependencies — cascading risks, compounding effects, and "
+        "risk chains. "
+        "(6) Develop mitigation strategies for top risks: avoid, reduce, transfer, "
+        "accept, or contingency plan. "
+        "(7) Perform a risk-benefit analysis — do the potential gains justify the risks? "
+        "(8) Define a monitoring plan with key risk indicators, review frequency, and "
+        "escalation triggers. "
+        "(9) Provide an overall risk level assessment and a go/no-go recommendation.\n\n"
+        "Consider cascading and compounding risks. Be thorough but pragmatic."
+    )
+
     def __init__(self):
         super().__init__(
             name="risk_assessor",

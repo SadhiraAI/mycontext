@@ -1,0 +1,113 @@
+.feedback-trigger {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  z-index: 900;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-trigger:hover {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-lg);
+}
+
+.feedback-panel {
+  position: fixed;
+  bottom: 5rem;
+  left: 1.5rem;
+  width: 320px;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 901;
+}
+
+.feedback-panel h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+.feedback-types {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.feedback-type {
+  padding: 0.3rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.feedback-type:hover { border-color: var(--accent); color: var(--text); }
+.feedback-type.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+.feedback-panel textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.88rem;
+  resize: vertical;
+  margin-bottom: 0.75rem;
+  transition: border-color var(--transition-fast);
+}
+
+.feedback-panel textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.feedback-submit {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.feedback-submit:hover:not(:disabled) { transform: translateY(-1px); }
+.feedback-submit:disabled { opacity: 0.5; }
+
+.feedback-thanks {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.feedback-thanks p {
+  color: var(--accent);
+  font-weight: 600;
+  margin: 0;
+}

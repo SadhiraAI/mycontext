@@ -1,0 +1,197 @@
+.quality-score {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.quality-score h4 {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+.quality-score-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.quality-score-actions select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  transition: border-color var(--transition-fast);
+}
+
+.quality-score-actions select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.quality-score-btn {
+  padding: 0.4rem 0.85rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quality-score-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.quality-score-btn:disabled { opacity: 0.6; }
+
+/* ── Score result ──────────────────────────────────────── */
+.quality-result { margin-top: 0.75rem; }
+
+/* ── Overall badge ─────────────────────────────────────── */
+.quality-overall {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  border: 2px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.quality-overall.score-excellent {
+  border-color: #5ba8a0;
+  background: rgba(74, 130, 120, 0.06);
+}
+
+.quality-overall.score-good {
+  border-color: #0d9488;
+  background: rgba(13, 148, 136, 0.06);
+}
+
+.quality-overall.score-adequate {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.quality-overall.score-poor {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.quality-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.score-excellent .quality-value { color: #5ba8a0; }
+.score-good .quality-value { color: #0d9488; }
+.score-adequate .quality-value { color: #d97706; }
+.score-poor .quality-value { color: #ef4444; }
+
+.quality-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Dimension bars ────────────────────────────────────── */
+.quality-dimensions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.quality-dim {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+}
+
+.quality-dim-name {
+  color: var(--text-muted);
+  text-transform: capitalize;
+  font-size: 0.82rem;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.quality-dim-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-surface);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.quality-dim-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.score-excellent .quality-dim-bar-fill { background: #5ba8a0; }
+.score-good .quality-dim-bar-fill { background: #0d9488; }
+.score-adequate .quality-dim-bar-fill { background: #f59e0b; }
+.score-poor .quality-dim-bar-fill { background: #ef4444; }
+
+.quality-dim-value {
+  font-weight: 600;
+  font-size: 0.82rem;
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.score-excellent .quality-dim-value { color: #5ba8a0; }
+.score-good .quality-dim-value { color: #0d9488; }
+.score-adequate .quality-dim-value { color: #d97706; }
+.score-poor .quality-dim-value { color: #ef4444; }
+
+/* ── Sections (issues, strengths, suggestions) ─────────── */
+.quality-section {
+  margin-bottom: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg);
+}
+
+.quality-section h5 {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.quality-section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.quality-section li {
+  font-size: 0.82rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.quality-issues { border-left: 3px solid #ef4444; }
+.quality-issues h5 { color: #ef4444; }
+
+.quality-strengths { border-left: 3px solid #5ba8a0; }
+.quality-strengths h5 { color: #5ba8a0; }
+
+.quality-suggestions { border-left: 3px solid #0d9488; }
+.quality-suggestions h5 { color: #0d9488; }

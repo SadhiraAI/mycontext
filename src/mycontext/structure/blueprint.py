@@ -248,32 +248,3 @@ class Blueprint(BaseModel):
             f"budget={self.token_budget})"
         )
 
-
-# Example blueprints
-
-SIMPLE_ASSISTANT_BLUEPRINT = Blueprint(
-    name="simple_assistant",
-    description="Basic conversational assistant",
-    guidance=Guidance(
-        role="Helpful AI assistant",
-        rules=["Be clear and concise", "Ask clarifying questions if needed"]
-    ),
-    token_budget=2000,
-    optimization="speed"
-)
-
-RESEARCH_ASSISTANT_BLUEPRINT = Blueprint(
-    name="research_assistant",
-    description="Research assistant with knowledge retrieval",
-    guidance=Guidance(
-        role="Expert research assistant",
-        rules=[
-            "Cite sources",
-            "Provide comprehensive analysis",
-            "Explain complex concepts clearly"
-        ]
-    ),
-    directive_template="Research and explain: {query}",
-    token_budget=8000,
-    optimization="quality"
-)

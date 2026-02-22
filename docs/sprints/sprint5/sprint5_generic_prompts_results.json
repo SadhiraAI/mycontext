@@ -1,0 +1,277 @@
+{
+  "sprint": "sprint5_generic_prompts",
+  "timestamp": "2026-02-21T15:00:13.630147",
+  "provider": "openai",
+  "eval_mode": "llm",
+  "num_questions": 10,
+  "conditions": [
+    "raw",
+    "smartexec",
+    "generic_single",
+    "generic_compiled"
+  ],
+  "results": [
+    {
+      "question": "Why did customer churn spike 40% last quarter and what should we do about it?",
+      "qi": 1,
+      "raw_score": 0.9200000000000002,
+      "raw_dims": "92.0% [IF=100% RD=90% AC=90% SC=100% CS=80%]",
+      "raw_len": 2453,
+      "raw_time": 14.146942377090454,
+      "smartexec_score": 1.0,
+      "smartexec_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "smartexec_len": 4227,
+      "smartexec_time": 38.299538135528564,
+      "smartexec_templates": [
+        "root_cause_analyzer",
+        "causal_reasoner"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.9400000000000002,
+      "generic_compiled_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "generic_compiled_len": 4894,
+      "generic_compiled_time": 27.262211799621582,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 110
+    },
+    {
+      "question": "Should we migrate our monolithic architecture to microservices? What are the trade-offs?",
+      "qi": 2,
+      "raw_score": 0.9200000000000002,
+      "raw_dims": "92.0% [IF=100% RD=90% AC=80% SC=100% CS=90%]",
+      "raw_len": 3776,
+      "raw_time": 13.357246160507202,
+      "smartexec_score": 0.9400000000000002,
+      "smartexec_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "smartexec_len": 5170,
+      "smartexec_time": 34.85429334640503,
+      "smartexec_templates": [
+        "problem_decomposer",
+        "tradeoff_analyzer"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.9200000000000002,
+      "generic_compiled_dims": "92.0% [IF=100% RD=90% AC=80% SC=100% CS=90%]",
+      "generic_compiled_len": 4164,
+      "generic_compiled_time": 20.83722472190857,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 121
+    },
+    {
+      "question": "Our AI model is producing biased hiring recommendations. How do we diagnose and fix this?",
+      "qi": 3,
+      "raw_score": 0.9400000000000002,
+      "raw_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "raw_len": 3391,
+      "raw_time": 14.410216331481934,
+      "smartexec_score": 0.9800000000000002,
+      "smartexec_dims": "98.0% [IF=100% RD=90% AC=100% SC=100% CS=100%]",
+      "smartexec_len": 4313,
+      "smartexec_time": 45.934049129486084,
+      "smartexec_templates": [
+        "root_cause_analyzer",
+        "differential_diagnoser"
+      ],
+      "generic_single_score": 1.0,
+      "generic_single_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "generic_single_len": 5114,
+      "generic_single_time": 35.80743646621704,
+      "generic_single_template": "root_cause_analyzer",
+      "generic_single_prompt_len": 1008,
+      "generic_compiled_score": 1.0,
+      "generic_compiled_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "generic_compiled_len": 5273,
+      "generic_compiled_time": 50.159263372421265,
+      "generic_compiled_templates": [
+        "root_cause_analyzer"
+      ],
+      "generic_compiled_prompt_len": 1008
+    },
+    {
+      "question": "Design a go-to-market strategy for a B2B SaaS product entering the healthcare vertical.",
+      "qi": 4,
+      "raw_score": 0.9400000000000002,
+      "raw_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "raw_len": 4802,
+      "raw_time": 16.671074628829956,
+      "smartexec_score": 0.9400000000000002,
+      "smartexec_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "smartexec_len": 4675,
+      "smartexec_time": 44.89651942253113,
+      "smartexec_templates": [
+        "problem_decomposer",
+        "swot_analyzer"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.9400000000000002,
+      "generic_compiled_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "generic_compiled_len": 5918,
+      "generic_compiled_time": 27.387057542800903,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 120
+    },
+    {
+      "question": "Our API response times tripled after the last deployment. Find the root cause and propose fixes.",
+      "qi": 5,
+      "raw_score": 1.0,
+      "raw_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "raw_len": 4015,
+      "raw_time": 15.397710084915161,
+      "smartexec_score": 1.0,
+      "smartexec_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "smartexec_len": 6613,
+      "smartexec_time": 33.12222456932068,
+      "smartexec_templates": [
+        "root_cause_analyzer"
+      ],
+      "generic_single_score": 1.0,
+      "generic_single_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "generic_single_len": 4732,
+      "generic_single_time": 30.048413038253784,
+      "generic_single_template": "root_cause_analyzer",
+      "generic_single_prompt_len": 1015,
+      "generic_compiled_score": 1.0,
+      "generic_compiled_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "generic_compiled_len": 4276,
+      "generic_compiled_time": 24.495771646499634,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 129
+    },
+    {
+      "question": "How should a startup allocate its $2M seed funding across engineering, marketing, and operations?",
+      "qi": 6,
+      "raw_score": 0.9200000000000002,
+      "raw_dims": "92.0% [IF=100% RD=90% AC=90% SC=100% CS=80%]",
+      "raw_len": 2417,
+      "raw_time": 11.595001935958862,
+      "smartexec_score": 0.9800000000000002,
+      "smartexec_dims": "98.0% [IF=100% RD=90% AC=100% SC=100% CS=100%]",
+      "smartexec_len": 3567,
+      "smartexec_time": 15.159078598022461,
+      "smartexec_templates": [
+        "resource_allocator"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.9600000000000002,
+      "generic_compiled_dims": "96.0% [IF=100% RD=90% AC=100% SC=100% CS=90%]",
+      "generic_compiled_len": 4413,
+      "generic_compiled_time": 27.106532335281372,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 130
+    },
+    {
+      "question": "Evaluate the ethical implications of using facial recognition in public schools.",
+      "qi": 7,
+      "raw_score": 0.8800000000000001,
+      "raw_dims": "88.0% [IF=100% RD=90% AC=70% SC=100% CS=80%]",
+      "raw_len": 3448,
+      "raw_time": 14.264388799667358,
+      "smartexec_score": 0.9400000000000002,
+      "smartexec_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "smartexec_len": 5828,
+      "smartexec_time": 39.14327120780945,
+      "smartexec_templates": [
+        "ethical_framework_analyzer",
+        "stakeholder_ethics_assessor"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.8800000000000001,
+      "generic_compiled_dims": "88.0% [IF=100% RD=90% AC=70% SC=100% CS=80%]",
+      "generic_compiled_len": 3971,
+      "generic_compiled_time": 22.71662712097168,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 113
+    },
+    {
+      "question": "Our cross-functional team has persistent communication breakdowns. Diagnose and solve.",
+      "qi": 8,
+      "raw_score": 0.9600000000000002,
+      "raw_dims": "96.0% [IF=100% RD=90% AC=100% SC=100% CS=90%]",
+      "raw_len": 3564,
+      "raw_time": 12.908938884735107,
+      "smartexec_score": 1.0,
+      "smartexec_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "smartexec_len": 6342,
+      "smartexec_time": 23.24244451522827,
+      "smartexec_templates": [
+        "root_cause_analyzer"
+      ],
+      "generic_single_score": 0.9400000000000002,
+      "generic_single_dims": "94.0% [IF=100% RD=90% AC=90% SC=100% CS=90%]",
+      "generic_single_len": 5171,
+      "generic_single_time": 16.385594606399536,
+      "generic_single_template": "root_cause_analyzer",
+      "generic_single_prompt_len": 1005,
+      "generic_compiled_score": 1.0,
+      "generic_compiled_dims": "100.0% [IF=100% RD=100% AC=100% SC=100% CS=100%]",
+      "generic_compiled_len": 5257,
+      "generic_compiled_time": 18.821505546569824,
+      "generic_compiled_templates": [
+        "root_cause_analyzer"
+      ],
+      "generic_compiled_prompt_len": 1005
+    },
+    {
+      "question": "Compare three database options (PostgreSQL, MongoDB, DynamoDB) for a real-time analytics platform.",
+      "qi": 9,
+      "raw_score": 0.9200000000000002,
+      "raw_dims": "92.0% [IF=100% RD=90% AC=80% SC=100% CS=90%]",
+      "raw_len": 4103,
+      "raw_time": 16.317596435546875,
+      "smartexec_score": 0.9600000000000002,
+      "smartexec_dims": "96.0% [IF=100% RD=90% AC=100% SC=100% CS=90%]",
+      "smartexec_len": 7238,
+      "smartexec_time": 25.40970778465271,
+      "smartexec_templates": [
+        "comparative_analyzer"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.9200000000000002,
+      "generic_compiled_dims": "92.0% [IF=100% RD=90% AC=80% SC=100% CS=90%]",
+      "generic_compiled_len": 5097,
+      "generic_compiled_time": 21.795796155929565,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 131
+    },
+    {
+      "question": "Develop a 12-month roadmap for transitioning from waterfall to agile across a 200-person org.",
+      "qi": 10,
+      "raw_score": 0.9600000000000002,
+      "raw_dims": "96.0% [IF=100% RD=90% AC=100% SC=100% CS=90%]",
+      "raw_len": 5583,
+      "raw_time": 19.429903268814087,
+      "smartexec_score": 0.9600000000000002,
+      "smartexec_dims": "96.0% [IF=100% RD=90% AC=100% SC=100% CS=90%]",
+      "smartexec_len": 3996,
+      "smartexec_time": 31.524874210357666,
+      "smartexec_templates": [
+        "problem_decomposer",
+        "gap_analyzer"
+      ],
+      "generic_single_score": 0,
+      "generic_compiled_score": 0.9600000000000002,
+      "generic_compiled_dims": "96.0% [IF=100% RD=90% AC=100% SC=100% CS=90%]",
+      "generic_compiled_len": 5833,
+      "generic_compiled_time": 20.036428689956665,
+      "generic_compiled_templates": [],
+      "generic_compiled_prompt_len": 126
+    }
+  ],
+  "summary": {
+    "raw_avg": 0.9360000000000002,
+    "smartexec_avg": 0.9700000000000003,
+    "generic_single_avg": 0.29400000000000004,
+    "generic_compiled_avg": 0.9520000000000002,
+    "wins": {
+      "SmartExec": 5
+    },
+    "ties": 5,
+    "avg_generic_single_prompt_len": 302.8,
+    "avg_generic_compiled_prompt_len": 299.3
+  },
+  "previous_sprints": {
+    "s3b_raw": 0.9440000000000002,
+    "s3b_smart": 0.96,
+    "s4_smartprompt": 0.9540000000000001
+  }
+}

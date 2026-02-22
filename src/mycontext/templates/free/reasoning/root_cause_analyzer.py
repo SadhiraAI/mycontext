@@ -31,7 +31,28 @@ class RootCauseAnalyzer(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a root cause analysis specialist and systems thinker. "
+        "Investigate the following problem to identify its true root cause:\n\n"
+        "Problem: {problem}\n"
+        "{context_section}\n"
+        "Analysis depth: {depth}\n\n"
+        "Apply a rigorous diagnostic methodology: "
+        "(1) Define the problem precisely, separating symptoms from underlying causes. "
+        "(2) Conduct a Five Whys analysis — ask 'why' iteratively to drill beneath "
+        "surface-level explanations. "
+        "(3) Perform an Ishikawa (fishbone) analysis examining causes across people, "
+        "process, technology, environment, management, and materials. "
+        "(4) Identify contributing factors and their interactions. "
+        "(5) Verify each candidate cause with available evidence. "
+        "(6) Assess systemic factors and feedback loops. "
+        "(7) State the root cause clearly and explain the causal chain from root to "
+        "symptoms. "
+        "(8) Recommend specific prevention strategies and lessons learned.\n\n"
+        "Distinguish symptoms from causes throughout. Be systematic and evidence-driven."
+    )
+
     def __init__(self):
         super().__init__(
             name="root_cause_analyzer",

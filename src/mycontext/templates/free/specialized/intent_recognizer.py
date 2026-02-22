@@ -31,7 +31,33 @@ class IntentRecognizer(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are an intent analyst and communication specialist. Analyze the following "
+        "input to uncover the true intent behind it:\n\n"
+        "Input: {input}\n"
+        "{context_section}\n"
+        "Depth: {depth}\n\n"
+        "Apply multi-layer intent analysis: "
+        "(1) Surface Analysis — what is explicitly stated? What are the key terms "
+        "and the literal request type? "
+        "(2) Goal Inference — what is the immediate goal, the underlying goal, and "
+        "the long-term goal? What does success look like? "
+        "(3) Motivation Analysis — what is driving this request? What pain points, "
+        "constraints, or urgency exist? "
+        "(4) Context Interpretation — what situation, background, and stakeholders "
+        "are involved? "
+        "(5) Implicit Assumptions — what beliefs, biases, knowledge gaps, or "
+        "misconceptions are unstated? "
+        "(6) Need Classification — is this primarily an information need, a decision "
+        "need, an action need, or a validation need? "
+        "(7) Reformulated Intent — state the true intent, the real question being "
+        "asked, and the optimal response type. "
+        "(8) Recommendation — the best approach to address the real need, what to "
+        "emphasize, and what to avoid.\n\n"
+        "Look beyond the surface. The stated question is rarely the full picture."
+    )
+
     def __init__(self):
         super().__init__(
             name="intent_recognizer",

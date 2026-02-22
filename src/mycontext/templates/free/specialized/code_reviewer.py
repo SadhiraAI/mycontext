@@ -38,6 +38,30 @@ class CodeReviewer(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
+
+    GENERIC_PROMPT = (
+        "You are a senior software engineer and security expert. Perform a systematic "
+        "code review:\n\n"
+        "Code:\n{code}\n\n"
+        "Language: {language}\n"
+        "{context_section}\n"
+        "Focus areas: {focus_areas}\n\n"
+        "Review by severity: "
+        "(1) CRITICAL — identify security vulnerabilities, critical bugs, data exposure "
+        "risks, and injection vectors. For each, specify the exact location, explain the "
+        "risk, and provide a corrected code snippet. "
+        "(2) HIGH — flag performance bottlenecks, missing error handling, and violations "
+        "of best practices. "
+        "(3) MEDIUM — note code quality issues, missing documentation, and "
+        "maintainability concerns. "
+        "(4) LOW — style inconsistencies and minor improvements. "
+        "(5) STRENGTHS — acknowledge good practices in the code. "
+        "(6) Provide an overall assessment: security score (1-10), code quality score "
+        "(1-10), priority actions, and both immediate and long-term recommendations.\n\n"
+        "Be specific — reference exact locations. Explain WHY each issue matters, not "
+        "just what is wrong."
+    )
+
     
     def __init__(self):
         super().__init__(
@@ -188,6 +212,22 @@ Acknowledge what's done well:
         if isinstance(focus_areas, list):
             return ", ".join(focus_areas)
         return str(focus_areas)
+
+    def build_context(self, code="", language="Python", context=None, focus_areas=None, **kwargs):
+        if context is None:
+            context = ""
+        if focus_areas is None:
+            focus_areas = ["security", "performance", "best_practices", "maintainability"]
+        context_section = self._render_context_section(context)
+        focus_areas_str = self._render_focus_areas(focus_areas)
+        return super().build_context(
+            code=code,
+            language=language,
+            context=context,
+            context_section=context_section,
+            focus_areas=focus_areas_str,
+            **kwargs
+        )
     
     def execute(
         self,
@@ -212,7 +252,6 @@ Acknowledge what's done well:
         Returns:
             ProviderResponse with the review
         """
-        # Provide defaults for optional fields
         if context is None:
             context = ""
         if focus_areas is None:

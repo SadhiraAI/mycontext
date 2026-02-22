@@ -30,7 +30,27 @@ class TechnicalTranslator(Pattern):
     
     Free Template - Part of mycontext open source edition.
     """
-    
+
+    GENERIC_PROMPT = (
+        "You are a technical communicator and plain language specialist. Translate "
+        "the following technical content into clear, accessible language:\n\n"
+        "Technical content: {technical_text}\n"
+        "Target audience: {target_audience}\n"
+        "{context_section}\n\n"
+        "Follow a structured translation approach: "
+        "(1) Identify all jargon, acronyms, and domain-specific terms. "
+        "(2) Create a translation map — for each technical term, provide the "
+        "plain-language equivalent and a brief explanation. "
+        "(3) Rewrite the entire content for the target audience, replacing jargon "
+        "with common words, using concrete examples and everyday analogies, and "
+        "maintaining factual accuracy. "
+        "(4) Verify: apply the '12-year-old test' — would someone outside the field "
+        "understand this? Confirm all key concepts are preserved, examples are "
+        "relatable, and the tone is appropriate for the audience.\n\n"
+        "Maintain accuracy while maximizing clarity. Never sacrifice correctness "
+        "for simplicity."
+    )
+
     def __init__(self):
         super().__init__(
             name="technical_translator",

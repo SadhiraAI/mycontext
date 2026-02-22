@@ -1,0 +1,92 @@
+.help-page h1 { margin-bottom: 0.25rem; }
+.help-intro { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+.help-section { margin-bottom: 2.5rem; }
+.help-section h2 { font-size: 1.25rem; margin: 0 0 1rem; }
+
+.help-concepts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.help-concept {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.help-concept h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.35rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.help-concept p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.help-faq { max-width: 700px; }
+
+.help-faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.help-faq-item summary {
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  background: var(--bg-card);
+  transition: background var(--transition-fast);
+}
+
+.help-faq-item summary:hover { background: var(--bg-hover); }
+
+.help-faq-item[open] summary { border-bottom: 1px solid var(--border-subtle); }
+
+.help-faq-item p {
+  padding: 0.85rem 1.1rem;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  background: var(--bg);
+}
+
+.help-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.help-link-card {
+  display: block;
+  padding: 1.15rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--text);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.help-link-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.help-link-card strong { display: block; margin-bottom: 0.2rem; }
+.help-link-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
