@@ -5,7 +5,8 @@ Based on "understand_question" cognitive tool from IBM research and Context-Engi
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Constraints, Guidance, Pattern
+from mycontext.foundation import Constraints, Guidance
+from mycontext.structure import Pattern
 
 
 class QuestionAnalyzer(Pattern):

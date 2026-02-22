@@ -15,9 +15,9 @@ from unittest.mock import patch
 
 import pytest
 
+from mycontext.intelligence.pattern_catalog import FULL_PATTERN_CATALOG
 from mycontext.intelligence.pattern_suggester import (
     ENTERPRISE_LICENSE_NOTE,
-    FULL_PATTERN_CATALOG,
     get_pattern_class,
     suggest_patterns,
 )

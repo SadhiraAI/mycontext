@@ -12,10 +12,10 @@ Research Foundation:
 
 from dataclasses import dataclass, field
 
+from ..intelligence.pattern_catalog import NAME_TO_DESCRIPTION
 from ..intelligence.pattern_suggester import (
     ENTERPRISE_LICENSE_NOTE,
     NAME_TO_CATEGORY,
-    NAME_TO_DESCRIPTION,
     VALID_PATTERN_NAMES,
 )
 

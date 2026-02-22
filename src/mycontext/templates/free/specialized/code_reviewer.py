@@ -5,7 +5,8 @@ Based on industry best practices and cognitive tools methodology.
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Constraints, Guidance, Pattern
+from mycontext.foundation import Constraints, Guidance
+from mycontext.structure import Pattern
 
 
 class CodeReviewer(Pattern):

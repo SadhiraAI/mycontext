@@ -5,7 +5,8 @@ Based on "step-by-step reasoning" cognitive tool and Chain-of-Thought methodolog
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Constraints, Guidance, Pattern
+from mycontext.foundation import Constraints, Guidance
+from mycontext.structure import Pattern
 
 
 class StepByStepReasoner(Pattern):
