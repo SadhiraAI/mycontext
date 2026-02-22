@@ -5,7 +5,7 @@ from typing import Any
 try:
     from mycontext.intelligence import get_pattern_class
     from mycontext.intelligence.chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
-    from mycontext.intelligence.pattern_suggester import FULL_PATTERN_CATALOG
+    from mycontext.intelligence.pattern_catalog import FULL_PATTERN_CATALOG
     from mycontext.intelligence.prompt_composer import get_generic_prompt_for
 except ImportError:
     get_pattern_class = None
