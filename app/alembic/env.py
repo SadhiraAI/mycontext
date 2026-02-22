@@ -1,15 +1,13 @@
 """Alembic migration environment -- reads DB URL from app settings."""
 
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config, pool
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 from app.config import get_settings
 from app.db.database import Base
-
-# Import all models so Base.metadata sees them
 from app.db.models import CustomTemplate, Feedback, LicenseKey, User, UserAPIKey  # noqa: F401
 
 config = context.config
@@ -25,8 +23,6 @@ if db_url.startswith("sqlite+aiosqlite"):
     db_url = db_url.replace("sqlite+aiosqlite", "sqlite", 1)
 elif db_url.startswith("postgresql+asyncpg"):
     db_url = db_url.replace("postgresql+asyncpg", "postgresql+psycopg2", 1)
-    # Strip query params that psycopg2 doesn't understand, keep only sslmode
-    from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
     parsed = urlparse(db_url)
     clean_params = {k: v[0] for k, v in parse_qs(parsed.query).items() if k == "sslmode"}
     db_url = urlunparse(parsed._replace(query=urlencode(clean_params)))
