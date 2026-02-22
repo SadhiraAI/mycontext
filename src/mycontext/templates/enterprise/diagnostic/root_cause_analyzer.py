@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class DiagnosticRootCauseAnalyzer(Pattern):
     """
@@ -377,7 +378,7 @@ class DiagnosticRootCauseAnalyzer(Pattern):
                 style_guide="Systematic and thorough. Distinguish symptoms from root causes. Multiple methods. Actionable solutions."
             )
         )
-    
+
     def build_context(self, problem="", symptoms="", **kwargs):
         """Build context for root cause analysis."""
         return super().build_context(
@@ -385,7 +386,7 @@ class DiagnosticRootCauseAnalyzer(Pattern):
             symptoms=symptoms,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", problem="", symptoms="", **kwargs):
         """Execute root cause analysis."""
         return super().execute(

@@ -7,14 +7,13 @@ for deterministic output and supports LLM overrides for task-specific params.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
+from .pattern_catalog import ENRICHED_CATALOG_TEXT, ENTERPRISE_LICENSE_NOTE, NAME_TO_CATEGORY
 from .pattern_suggester import (
-    PATTERN_CATALOG,
     VALID_PATTERN_NAMES,
     get_pattern_class,
 )
-from .pattern_catalog import ENRICHED_CATALOG_TEXT, ENTERPRISE_LICENSE_NOTE, NAME_TO_CATEGORY
 
 
 class _DynamicBuildContextRegistry:
@@ -27,13 +26,13 @@ class _DynamicBuildContextRegistry:
     """
 
     def __init__(self) -> None:
-        self._cache: Dict[str, tuple] | None = None
+        self._cache: dict[str, tuple] | None = None
 
-    def _ensure(self) -> Dict[str, tuple]:
+    def _ensure(self) -> dict[str, tuple]:
         if self._cache is None:
             from ..skills.pattern_registry import (
-                get_pattern_registry,
                 get_pattern_build_params,
+                get_pattern_registry,
             )
             registry = get_pattern_registry()
             self._cache = {
@@ -74,16 +73,16 @@ PATTERN_BUILD_CONTEXT_REGISTRY: Any = _DynamicBuildContextRegistry()
 class WorkflowChainResult:
     """Result of chain orchestration: chain + chain_params + selection reasoning."""
 
-    chain: List[str]
-    chain_params: Dict[str, Dict[str, Any]]
+    chain: list[str]
+    chain_params: dict[str, dict[str, Any]]
     reasoning: str = ""
-    selection_reasoning: Dict[str, str] = field(default_factory=dict)  # pattern_name -> why chosen, how it relates
-    pattern_categories: Dict[str, str] = field(default_factory=dict)  # pattern_name -> "free"|"enterprise"
-    question_analysis: Optional[Dict[str, Any]] = None  # facets, key_concerns, decomposition
-    template_decomposition: Optional[str] = None  # raw output from question_analyzer template (when used)
-    llm_raw: Optional[str] = None
+    selection_reasoning: dict[str, str] = field(default_factory=dict)  # pattern_name -> why chosen, how it relates
+    pattern_categories: dict[str, str] = field(default_factory=dict)  # pattern_name -> "free"|"enterprise"
+    question_analysis: dict[str, Any] | None = None  # facets, key_concerns, decomposition
+    template_decomposition: str | None = None  # raw output from question_analyzer template (when used)
+    llm_raw: str | None = None
 
-    def to_chain_params_tuple_format(self) -> Dict[str, tuple]:
+    def to_chain_params_tuple_format(self) -> dict[str, tuple]:
         """Convert to (primary_key, extra_dict) format for orchestrator loop.
         Returns dict: name -> (primary_input_key, extra_kwargs_for_build_context)
         Always merges registry defaults so required fields (depth, context_section, etc.) are present.
@@ -106,11 +105,11 @@ class WorkflowChainResult:
 def build_workflow_chain(
     question: str,
     include_enterprise: bool = True,
-    max_patterns: Optional[int] = None,
+    max_patterns: int | None = None,
     use_question_analyzer: bool = True,
     provider: str = "openai",
     temperature: float = 0,
-    model: Optional[str] = None,
+    model: str | None = None,
     **llm_kwargs: Any,
 ) -> WorkflowChainResult:
     """
@@ -135,7 +134,7 @@ def build_workflow_chain(
     from ..core import Context
     from ..foundation import Directive, Guidance
 
-    template_decomposition: Optional[str] = None
+    template_decomposition: str | None = None
     if use_question_analyzer:
         try:
             analyzer = get_pattern_class("question_analyzer")
@@ -277,7 +276,7 @@ Respond with ONLY valid JSON. No markdown, no explanation outside JSON."""
     # Tag each pattern with its category and append license note for
     # enterprise patterns when the user doesn't have enterprise access —
     # mirrors the behaviour of heuristic / hybrid modes.
-    categories: Dict[str, str] = {}
+    categories: dict[str, str] = {}
     for name in chain:
         categories[name] = NAME_TO_CATEGORY.get(name, "free")
     if not include_enterprise:

@@ -5,9 +5,9 @@ Systematic conflict resolution using proven frameworks.
 Based on conflict resolution theory and mediation practices.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class ConflictResolver(Pattern):
@@ -137,34 +137,34 @@ Conflict resolution:
                 style_guide="Be neutral and constructive"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         conflict: str = "",
         parties: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             conflict=conflict,
             parties=parties,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         conflict: str = "",
         parties: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

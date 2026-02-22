@@ -14,7 +14,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class MetacognitiveMonitor(Pattern):
@@ -223,13 +223,13 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
                 style_guide="Use structured format with clear sections, specific evidence, and actionable recommendations. Be brutally honest about gaps and mistakes."
             )
         )
-    
+
     def _render_challenges_section(self, challenges):
         """Render optional challenges section."""
         if challenges:
             return f"\n**CHALLENGES ENCOUNTERED**: {challenges}\n"
         return ""
-    
+
     def build_context(self, task_description="", current_approach="", progress_so_far="", challenges="", **kwargs):
         """
         Build context for metacognitive monitoring (without executing).
@@ -246,11 +246,11 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
         """
         # Format challenges section
         challenges_section = self._render_challenges_section(challenges)
-        
+
         # Remove challenges from kwargs if present to avoid duplicate
         kwargs.pop('challenges', None)
         kwargs.pop('challenges_section', None)
-        
+
         # Build context using parent's method with template variables
         return super().build_context(
             task_description=task_description,
@@ -259,7 +259,7 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
             challenges_section=challenges_section,
             **kwargs
         )
-    
+
     def execute(self, provider="gemini", task_description="", current_approach="", progress_so_far="", challenges="", **kwargs):
         """
         Execute metacognitive monitoring.
@@ -277,11 +277,11 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
         """
         # Format challenges section
         challenges_section = self._render_challenges_section(challenges)
-        
+
         # Remove challenges from kwargs if present to avoid duplicate
         kwargs.pop('challenges', None)
         kwargs.pop('challenges_section', None)
-        
+
         # Execute using parent's method
         return super().execute(
             provider=provider,

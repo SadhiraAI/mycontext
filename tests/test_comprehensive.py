@@ -47,76 +47,68 @@ print("TEST 1: CATEGORY IMPORTS (8 categories)")
 print("=" * 80)
 
 def test_analysis_imports():
-    from mycontext.templates.free.analysis import (
-        QuestionAnalyzer, DataAnalyzer,
-    )
     from mycontext.templates.enterprise.analysis import (
-        TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector,
+        AnomalyDetector,
+        GapAnalyzer,
+        SWOTAnalyzer,
+        TrendIdentifier,
+    )
+    from mycontext.templates.free.analysis import (
+        DataAnalyzer,
+        QuestionAnalyzer,
     )
     assert QuestionAnalyzer is not None
     assert len([QuestionAnalyzer, DataAnalyzer, TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector]) == 6
 
 def test_reasoning_imports():
-    from mycontext.templates.free.reasoning import (
-        StepByStepReasoner, RootCauseAnalyzer, HypothesisGenerator,
-    )
     from mycontext.templates.enterprise.reasoning import (
-        AnalogicalReasoner, CausalReasoner,
+        AnalogicalReasoner,
+        CausalReasoner,
+    )
+    from mycontext.templates.free.reasoning import (
+        HypothesisGenerator,
+        RootCauseAnalyzer,
+        StepByStepReasoner,
     )
     assert StepByStepReasoner is not None
     assert len([StepByStepReasoner, AnalogicalReasoner, CausalReasoner, RootCauseAnalyzer, HypothesisGenerator]) == 5
 
 def test_decision_imports():
     from mycontext.templates.enterprise.decision import (
-        DecisionFramework, ComparativeAnalyzer, TradeoffAnalyzer,
-        MultiObjectiveOptimizer, CostBenefitAnalyzer
+        ComparativeAnalyzer,
+        CostBenefitAnalyzer,
+        DecisionFramework,
+        MultiObjectiveOptimizer,
+        TradeoffAnalyzer,
     )
     assert DecisionFramework is not None
     assert len([DecisionFramework, ComparativeAnalyzer, TradeoffAnalyzer, MultiObjectiveOptimizer, CostBenefitAnalyzer]) == 5
 
 def test_creative_imports():
     from mycontext.templates.free.creative import Brainstormer
-    from mycontext.templates.enterprise.creative import (
-        IdeaGenerator, InnovationFramework,
-        DesignThinker, MetaphorGenerator,
-    )
     assert Brainstormer is not None
 
 def test_communication_imports():
     from mycontext.templates.free.communication import (
-        AudienceAdapter, TechnicalTranslator,
-    )
-    from mycontext.templates.enterprise.communication import (
-        SimplificationEngine, ClarityOptimizer,
-        PersuasionFramework, NarrativeBuilder, FeedbackComposer,
+        AudienceAdapter,
     )
     assert AudienceAdapter is not None
 
 def test_planning_imports():
     from mycontext.templates.free.planning import (
-        ScenarioPlanner, StakeholderMapper,
-    )
-    from mycontext.templates.enterprise.planning import (
-        PrioritySetter, DeadlineManager, ResourceAllocator,
+        ScenarioPlanner,
     )
     assert ScenarioPlanner is not None
 
 def test_problem_solving_imports():
     from mycontext.templates.enterprise.problem_solving import (
-        ProblemDecomposer, BottleneckIdentifier, ConstraintOptimizer,
-        DependencyMapper, EfficiencyAnalyzer, TradeSpaceExplorer
+        ProblemDecomposer,
     )
     assert ProblemDecomposer is not None
 
 def test_specialized_imports():
     from mycontext.templates.free.specialized import (
-        CodeReviewer, SocraticQuestioner,
-        IntentRecognizer, RiskAssessor,
-        ConflictResolver, SynthesisBuilder,
-    )
-    from mycontext.templates.enterprise.specialized import (
-        ContentOutliner, AmbiguityResolver, RiskMitigator,
-        ImpactAssessor, ConceptExplainer,
+        CodeReviewer,
     )
     assert CodeReviewer is not None
 
@@ -135,10 +127,9 @@ print("=" * 80)
 
 def test_main_imports():
     from mycontext.templates.free import (
-        QuestionAnalyzer, DataAnalyzer, Brainstormer,
-        AudienceAdapter, ScenarioPlanner
+        DataAnalyzer,
+        QuestionAnalyzer,
     )
-    from mycontext.templates.enterprise.decision import DecisionFramework
     assert QuestionAnalyzer is not None
     assert DataAnalyzer is not None
 
@@ -149,14 +140,14 @@ print("TEST 3: PATTERN INSTANTIATION (Sample patterns)")
 print("=" * 80)
 
 def test_pattern_instantiation():
-    from mycontext.templates.free.analysis import QuestionAnalyzer
     from mycontext.templates.enterprise.decision import DecisionFramework
+    from mycontext.templates.free.analysis import QuestionAnalyzer
     from mycontext.templates.free.creative import Brainstormer
-    
+
     qa = QuestionAnalyzer()
     df = DecisionFramework()
     br = Brainstormer()
-    
+
     assert qa.name == "question_analyzer"
     assert df.name == "decision_framework"
     assert br.name == "brainstormer"
@@ -168,15 +159,15 @@ print("TEST 4: PATTERN BUILD_CONTEXT (Context creation)")
 print("=" * 80)
 
 def test_build_context():
-    from mycontext.templates.free.analysis import QuestionAnalyzer
     from mycontext import Context
-    
+    from mycontext.templates.free.analysis import QuestionAnalyzer
+
     qa = QuestionAnalyzer()
     context = qa.build_context(
         question="What is the best approach?",
         depth="comprehensive"
     )
-    
+
     assert isinstance(context, Context)
     assert context.directive is not None
     assert context.guidance is not None
@@ -203,12 +194,12 @@ def test_transformation_engine_analysis():
 
 def test_transformation_engine_transform():
     from mycontext.intelligence import TransformationEngine, transform
-    
+
     # Test via engine
     engine = TransformationEngine()
     context = engine.transform("Should we migrate to the cloud?")
     assert context is not None
-    
+
     # Test via convenience function
     context2 = transform("What are the risks?")
     assert context2 is not None
@@ -224,7 +215,7 @@ print("=" * 80)
 def test_quality_metrics():
     from mycontext import Context, Directive, Guidance
     from mycontext.intelligence import QualityMetrics
-    
+
     context = Context(
         guidance=Guidance(
             role="Expert Analyst",
@@ -232,10 +223,10 @@ def test_quality_metrics():
         ),
         directive=Directive(content="Analyze the data systematically")
     )
-    
+
     metrics = QualityMetrics()
     score = metrics.evaluate(context)
-    
+
     assert 0.0 <= score.overall <= 1.0
     assert len(score.dimensions) == 6
     assert score.metadata is not None
@@ -243,12 +234,12 @@ def test_quality_metrics():
 def test_quality_report():
     from mycontext import Context
     from mycontext.intelligence import QualityMetrics
-    
+
     context = Context(guidance="Test")
     metrics = QualityMetrics()
     score = metrics.evaluate(context)
     report = metrics.report(score)
-    
+
     assert "Quality Report" in report
     assert "Overall Score" in report
 
@@ -262,7 +253,7 @@ print("=" * 80)
 def test_basic_exports():
     from mycontext import Context, Directive
     context = Context(directive=Directive(content="Test"))
-    
+
     # Test each export format
     assert context.to_dict() is not None
     assert context.to_json() is not None
@@ -272,7 +263,7 @@ def test_basic_exports():
 def test_framework_exports():
     from mycontext import Context
     context = Context(guidance="Expert")
-    
+
     assert context.to_langchain() is not None
     assert context.to_llamaindex() is not None
     assert context.to_crewai() is not None
@@ -281,14 +272,14 @@ def test_framework_exports():
 def test_format_exports():
     from mycontext import Context
     context = Context(guidance="Test")
-    
+
     assert context.to_yaml() is not None
     assert context.to_xml() is not None
 
 def test_provider_exports():
     from mycontext import Context
     context = Context(guidance="Test")
-    
+
     assert context.to_anthropic() is not None
     assert context.to_openai() is not None
     assert context.to_google() is not None
@@ -305,12 +296,16 @@ print("=" * 80)
 def test_integration_helpers():
     from mycontext import Context
     from mycontext.integrations import (
-        LangChainHelper, LlamaIndexHelper, CrewAIHelper,
-        AutoGenHelper, DSPyHelper, SemanticKernelHelper
+        AutoGenHelper,
+        CrewAIHelper,
+        DSPyHelper,
+        LangChainHelper,
+        LlamaIndexHelper,
+        SemanticKernelHelper,
     )
-    
+
     context = Context(guidance="Test")
-    
+
     # Test helpers exist and have methods
     assert hasattr(LangChainHelper, 'to_messages')
     assert hasattr(LlamaIndexHelper, 'to_prompt')
@@ -322,9 +317,9 @@ def test_integration_helpers():
 def test_auto_integrate():
     from mycontext import Context
     from mycontext.integrations import auto_integrate
-    
+
     context = Context(guidance="Expert")
-    
+
     # Test that function exists and accepts framework names
     result = auto_integrate(context, "langchain")
     assert result is not None
@@ -337,21 +332,18 @@ print("TEST 9: CORE COMPONENTS")
 print("=" * 80)
 
 def test_core_imports():
-    from mycontext import (
-        Context, Directive, Guidance, Constraints,
-        Pattern, Blueprint
-    )
+    from mycontext import Context, Directive, Guidance
     assert Context is not None
     assert Directive is not None
     assert Guidance is not None
 
 def test_context_creation():
     from mycontext import Context, Directive, Guidance
-    
+
     # String shorthand
     context1 = Context(guidance="Expert")
     assert context1.guidance.role == "Expert"
-    
+
     # Object creation
     context2 = Context(
         guidance=Guidance(role="Analyst"),
@@ -369,37 +361,37 @@ print("=" * 80)
 
 def test_question_analyzer_execution():
     from mycontext.templates.free.analysis import QuestionAnalyzer
-    
+
     qa = QuestionAnalyzer()
     context = qa.build_context(
         question="How can I improve performance?",
         depth="standard"
     )
-    
+
     assert context.directive is not None
     assert "How can I improve performance?" in context.directive.content
 
 def test_decision_framework_execution():
     from mycontext.templates.enterprise.decision import DecisionFramework
-    
+
     df = DecisionFramework()
     context = df.build_context(
         decision="Choose cloud provider",
         options=["AWS", "Google Cloud", "Azure"]
     )
-    
+
     assert context.directive is not None
     assert "AWS" in context.directive.content
 
 def test_idea_generator_execution():
     from mycontext.templates.enterprise.creative import IdeaGenerator
-    
+
     ig = IdeaGenerator()
     context = ig.build_context(
         challenge="Increase user engagement",
         constraints=["Budget: $10K"]
     )
-    
+
     assert context.directive is not None
     assert "engagement" in context.directive.content.lower()
 
@@ -413,12 +405,12 @@ print("=" * 80)
 
 def test_pattern_registry():
     from mycontext.intelligence import TransformationEngine
-    
+
     engine = TransformationEngine()
     patterns = engine.get_available_patterns()
-    
+
     print(f"   Registered patterns: {len(patterns)}")
-    
+
     # Should have all core patterns at minimum
     assert len(patterns) >= 13
     assert "question_analyzer" in patterns
@@ -431,16 +423,16 @@ print("TEST 12: MULTIPLE PATTERNS FROM DIFFERENT CATEGORIES")
 print("=" * 80)
 
 def test_mixed_category_usage():
-    from mycontext.templates.free.analysis import DataAnalyzer
-    from mycontext.templates.enterprise.decision import ComparativeAnalyzer
-    from mycontext.templates.free.creative import Brainstormer
     from mycontext.templates.enterprise.communication import SimplificationEngine
-    
+    from mycontext.templates.enterprise.decision import ComparativeAnalyzer
+    from mycontext.templates.free.analysis import DataAnalyzer
+    from mycontext.templates.free.creative import Brainstormer
+
     da = DataAnalyzer()
     ca = ComparativeAnalyzer()
     br = Brainstormer()
     se = SimplificationEngine()
-    
+
     assert da.name == "data_analyzer"
     assert ca.name == "comparative_analyzer"
     assert br.name == "brainstormer"
@@ -454,7 +446,7 @@ print("=" * 80)
 
 def test_context_assembly():
     from mycontext import Context, Directive, Guidance
-    
+
     context = Context(
         guidance=Guidance(
             role="Expert Data Scientist",
@@ -465,7 +457,7 @@ def test_context_assembly():
             priority=5
         )
     )
-    
+
     assembled = context.assemble()
     assert len(assembled) > 0
     assert "Expert Data Scientist" in assembled
@@ -478,22 +470,23 @@ print("TEST 14: EXPORT FORMAT VALIDATION")
 print("=" * 80)
 
 def test_export_types():
-    from mycontext import Context
     import json
-    
+
+    from mycontext import Context
+
     context = Context(guidance="Test")
-    
+
     # Test JSON is valid
     json_str = context.to_json()
     parsed = json.loads(json_str)
     assert isinstance(parsed, dict)
-    
+
     # Test messages format
     messages = context.to_messages()
     assert isinstance(messages, list)
     assert len(messages) > 0
     assert messages[0]["role"] == "system"
-    
+
     # Test markdown format
     md = context.to_markdown()
     assert "# Context" in md
@@ -506,9 +499,9 @@ print("=" * 80)
 
 def test_input_type_detection():
     from mycontext.intelligence import TransformationEngine
-    
+
     engine = TransformationEngine()
-    
+
     # Test different input types
     test_cases = [
         ("How does this work?", "QUESTION"),
@@ -517,7 +510,7 @@ def test_input_type_detection():
         ("Compare X vs Y", "COMPARISON"),
         ("The system is slow", "STATEMENT"),
     ]
-    
+
     for input_text, expected_contains in test_cases:
         analysis = engine.analyze_input(input_text)
         # Just verify it analyzes without error
@@ -531,16 +524,16 @@ print("=" * 80)
 
 def test_quality_dimensions():
     from mycontext import Context, Directive, Guidance
-    from mycontext.intelligence import QualityMetrics, QualityDimension
-    
+    from mycontext.intelligence import QualityDimension, QualityMetrics
+
     context = Context(
         guidance=Guidance(role="Expert", rules=["Rule 1"]),
         directive=Directive(content="Clear directive")
     )
-    
+
     metrics = QualityMetrics()
     score = metrics.evaluate(context)
-    
+
     # Check all 6 dimensions exist
     assert QualityDimension.CLARITY in score.dimensions
     assert QualityDimension.COMPLETENESS in score.dimensions
@@ -558,7 +551,7 @@ print("=" * 80)
 def test_pattern_parameters():
     from mycontext.templates.enterprise.analysis import TrendIdentifier
     from mycontext.templates.enterprise.planning import PrioritySetter
-    
+
     ti = TrendIdentifier()
     context1 = ti.build_context(
         data_description="Monthly sales",
@@ -566,7 +559,7 @@ def test_pattern_parameters():
         timeframe="past year"
     )
     assert context1 is not None
-    
+
     ps = PrioritySetter()
     context2 = ps.build_context(
         items=["Task A", "Task B", "Task C"],
@@ -581,19 +574,19 @@ print("TEST 18: CORE FOUNDATION CLASSES")
 print("=" * 80)
 
 def test_foundation_classes():
-    from mycontext.foundation import Directive, Guidance, Constraints
-    
+    from mycontext.foundation import Constraints, Directive, Guidance
+
     directive = Directive(content="Test directive", priority=5)
     assert directive.content == "Test directive"
     assert directive.priority == 5
-    
+
     guidance = Guidance(
         role="Test Role",
         rules=["Rule 1", "Rule 2"]
     )
     assert guidance.role == "Test Role"
     assert len(guidance.rules) == 2
-    
+
     constraints = Constraints(
         must_include=["Item 1"],
         must_not_include=["Item 2"]
@@ -608,10 +601,10 @@ print("=" * 80)
 
 def test_pattern_names():
     from mycontext.intelligence import TransformationEngine
-    
+
     engine = TransformationEngine()
     patterns = engine.get_available_patterns()
-    
+
     # Check naming convention (snake_case)
     for pattern_name in patterns:
         assert "_" in pattern_name or pattern_name.islower()
@@ -625,18 +618,18 @@ print("=" * 80)
 
 def test_framework_format_compatibility():
     from mycontext import Context
-    
+
     context = Context(guidance="Expert Developer")
-    
+
     # LangChain format
     lc = context.to_langchain()
     assert "system_message" in lc
-    
+
     # CrewAI format
     crew = context.to_crewai()
     assert "role" in crew
     assert "goal" in crew
-    
+
     # AutoGen format
     auto = context.to_autogen()
     assert "system_message" in auto

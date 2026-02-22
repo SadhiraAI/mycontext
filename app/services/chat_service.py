@@ -10,10 +10,11 @@ Two modes:
 """
 
 import os
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 try:
-    from mycontext import Context, Guidance, Directive, Constraints
+    from mycontext import Constraints, Context, Directive, Guidance
     from mycontext.intelligence import QualityMetrics
 except ImportError:
     Context = None
@@ -400,8 +401,7 @@ def _llm_stream(messages: list[dict], api_key: str, provider: str, model: str) -
             messages=user_msgs,
             max_tokens=800,
         ) as stream:
-            for text in stream.text_stream:
-                yield text
+            yield from stream.text_stream
     elif provider == "google":
         combined = "\n\n".join(m["content"] for m in messages)
         from google import genai

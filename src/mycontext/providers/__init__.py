@@ -14,9 +14,9 @@ from typing import Any, Dict, Optional
 from .base import BaseProvider, ProviderResponse
 from .mock import MockProvider
 
-_PROVIDER_CACHE: Dict[str, BaseProvider] = {}
+_PROVIDER_CACHE: dict[str, BaseProvider] = {}
 
-_DEFAULT_MODELS: Dict[str, str] = {
+_DEFAULT_MODELS: dict[str, str] = {
     "openai": "gpt-4o-mini",
     "anthropic": "claude-3-5-haiku-20241022",
     "gemini": "gemini-2.0-flash",
@@ -41,7 +41,7 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-_PROVIDER_REGISTRY: Dict[str, type[BaseProvider]] = {
+_PROVIDER_REGISTRY: dict[str, type[BaseProvider]] = {
     "mock": MockProvider,
 }
 
@@ -55,7 +55,7 @@ def register_provider(name: str, provider_class: type[BaseProvider]) -> None:
 
 def get_provider(
     name: str,
-    api_key: Optional[str] = None,
+    api_key: str | None = None,
     **kwargs: Any
 ) -> BaseProvider:
     """Get a provider instance by name.

@@ -11,7 +11,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class MoralDilemmaResolver(Pattern):
@@ -104,12 +104,12 @@ class MoralDilemmaResolver(Pattern):
                 style_guide="Acknowledge complexity and moral cost of decisions"
             )
         )
-    
+
     def build_context(self, dilemma="", conflicting_principles="", context="", **kwargs):
         context_section = f"**CONTEXT**: {context}" if context else ""
         kwargs.pop('context_section', None)
         return super().build_context(dilemma=dilemma, conflicting_principles=conflicting_principles, context_section=context_section, **kwargs)
-    
+
     def execute(self, provider="gemini", dilemma="", conflicting_principles="", context="", **kwargs):
         context_section = f"**CONTEXT**: {context}" if context else ""
         kwargs.pop('context_section', None)

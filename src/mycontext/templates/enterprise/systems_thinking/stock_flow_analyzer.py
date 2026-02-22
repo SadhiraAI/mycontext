@@ -12,8 +12,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from typing import Optional
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class StockFlowAnalyzer(Pattern):

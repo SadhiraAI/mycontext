@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class RubricDesigner(Pattern):
     """
@@ -294,24 +295,24 @@ class RubricDesigner(Pattern):
                 style_guide="Clear, specific, observable descriptors. Aligned with objectives. 3-5 performance levels."
             )
         )
-    
+
     def build_context(self, assessment_task="", learning_objectives="", rubric_type="analytic", **kwargs):
         """Build context for rubric design."""
         rubric_type_section = f"**RUBRIC TYPE**: {rubric_type.capitalize()}" if rubric_type else ""
         kwargs.pop('rubric_type_section', None)
-        
+
         return super().build_context(
             assessment_task=assessment_task,
             learning_objectives=learning_objectives,
             rubric_type_section=rubric_type_section,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", assessment_task="", learning_objectives="", rubric_type="analytic", **kwargs):
         """Execute rubric design."""
         rubric_type_section = f"**RUBRIC TYPE**: {rubric_type.capitalize()}" if rubric_type else ""
         kwargs.pop('rubric_type_section', None)
-        
+
         return super().execute(
             provider=provider,
             assessment_task=assessment_task,

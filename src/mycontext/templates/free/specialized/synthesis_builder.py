@@ -5,9 +5,9 @@ Creates cohesive syntheses from diverse information sources.
 Based on synthesis methodology and information integration.
 """
 
-from typing import Optional, List
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class SynthesisBuilder(Pattern):
@@ -145,40 +145,40 @@ Synthesis process:
                 style_guide="Be integrative and insightful"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_sources_section(self, sources: Optional[List[str]]) -> str:
+
+    def _render_sources_section(self, sources: list[str] | None) -> str:
         if sources:
             return "\n".join(f"{i+1}. {source}" for i, source in enumerate(sources))
         return "1. [Define sources]"
-    
+
     def build_context(
         self,
-        sources: Optional[List[str]] = None,
+        sources: list[str] | None = None,
         goal: str = "Unified understanding",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         sources_section = self._render_sources_section(sources)
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             sources_section=sources_section,
             goal=goal,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
-        sources: Optional[List[str]] = None,
+        sources: list[str] | None = None,
         goal: str = "Unified understanding",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

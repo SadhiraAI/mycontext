@@ -13,34 +13,29 @@ Categories:
 """
 
 from .analysis import (
-    QuestionAnalyzer,
     DataAnalyzer,
+    QuestionAnalyzer,
 )
-
-from .reasoning import (
-    StepByStepReasoner,
-    RootCauseAnalyzer,
-    HypothesisGenerator,
-)
-
-from .creative import Brainstormer
-
 from .communication import (
     AudienceAdapter,
     TechnicalTranslator,
 )
-
+from .creative import Brainstormer
 from .planning import (
     ScenarioPlanner,
     StakeholderMapper,
 )
-
+from .reasoning import (
+    HypothesisGenerator,
+    RootCauseAnalyzer,
+    StepByStepReasoner,
+)
 from .specialized import (
     CodeReviewer,
-    SocraticQuestioner,
+    ConflictResolver,
     IntentRecognizer,
     RiskAssessor,
-    ConflictResolver,
+    SocraticQuestioner,
     SynthesisBuilder,
 )
 

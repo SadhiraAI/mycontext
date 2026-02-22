@@ -5,7 +5,7 @@ A Directive is a single, focused instruction that guides the LLM's behavior
 for a specific task. Think of it as a function call in traditional programming.
 """
 
-from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -31,30 +31,30 @@ class Directive(BaseModel):
         constraints: Optional list of specific constraints
         tags: Optional tags for categorization
     """
-    
+
     content: str = Field(
         ...,
         description="The instruction content",
         min_length=1
     )
-    
+
     priority: int = Field(
         default=5,
         ge=1,
         le=10,
         description="Priority level (1-10)"
     )
-    
-    constraints: Optional[List[str]] = Field(
+
+    constraints: list[str] | None = Field(
         default=None,
         description="Specific constraints for this directive"
     )
-    
-    tags: Optional[List[str]] = Field(
+
+    tags: list[str] | None = Field(
         default=None,
         description="Tags for categorization"
     )
-    
+
     def render(self) -> str:
         """
         Render the directive as a formatted string.
@@ -63,13 +63,13 @@ class Directive(BaseModel):
             Formatted directive string
         """
         parts = [self.content]
-        
+
         if self.constraints:
             constraints_text = "\n".join(f"- {c}" for c in self.constraints)
             parts.append(f"Focus on:\n{constraints_text}")
-        
+
         return "\n".join(parts)
-    
+
     def __repr__(self) -> str:
         """String representation"""
         content_preview = self.content[:50] + "..." if len(self.content) > 50 else self.content

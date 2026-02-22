@@ -8,8 +8,8 @@ License: Enterprise
 """
 
 from .cross_domain_synthesizer import CrossDomainSynthesizer
-from .pattern_recognition_engine import PatternRecognitionEngine
 from .holistic_integrator import HolisticIntegrator
+from .pattern_recognition_engine import PatternRecognitionEngine
 
 __all__ = [
     "CrossDomainSynthesizer",

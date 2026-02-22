@@ -1,8 +1,9 @@
 """
 Test configuration and fixtures
 """
-import pytest
 import os
+
+import pytest
 
 
 @pytest.fixture
@@ -49,19 +50,19 @@ def setup_env():
     # Save original values
     original_openai = os.environ.get("OPENAI_API_KEY")
     original_anthropic = os.environ.get("ANTHROPIC_API_KEY")
-    
+
     # Set test values
     os.environ["OPENAI_API_KEY"] = "test-key-123"
     os.environ["ANTHROPIC_API_KEY"] = "test-key-456"
-    
+
     yield
-    
+
     # Restore original values
     if original_openai:
         os.environ["OPENAI_API_KEY"] = original_openai
     else:
         os.environ.pop("OPENAI_API_KEY", None)
-        
+
     if original_anthropic:
         os.environ["ANTHROPIC_API_KEY"] = original_anthropic
     else:

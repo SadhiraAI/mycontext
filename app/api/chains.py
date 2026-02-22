@@ -7,13 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-logger = logging.getLogger(__name__)
-
 from app.api.keys import get_decrypted_key_for_user
 from app.auth.deps import get_current_user
 from app.db import get_db
 from app.db.models import User
 from app.services import chain_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/chains", tags=["chains"])
 

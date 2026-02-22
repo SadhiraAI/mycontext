@@ -5,10 +5,11 @@ This is where Context as Code™ comes to life.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any
+
 from pydantic import BaseModel, Field
 
-from .foundation import Directive, Guidance, Constraints
+from .foundation import Constraints, Directive, Guidance
 
 
 class Context(BaseModel):
@@ -35,41 +36,41 @@ class Context(BaseModel):
         )
         ```
     """
-    
-    guidance: Optional[Guidance] = Field(
+
+    guidance: Guidance | None = Field(
         default=None,
         description="System-level behavioral guidance"
     )
-    
-    directive: Optional[Directive] = Field(
+
+    directive: Directive | None = Field(
         default=None,
         description="Specific instruction for this interaction"
     )
-    
-    constraints: Optional[Constraints] = Field(
+
+    constraints: Constraints | None = Field(
         default=None,
         description="Hard constraints and guardrails"
     )
-    
-    knowledge: Optional[str] = Field(
+
+    knowledge: str | None = Field(
         default=None,
         description="Retrieved knowledge, documents, or memory context"
     )
-    
-    data: Dict[str, Any] = Field(
+
+    data: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional data and parameters"
     )
-    
-    metadata: Dict[str, Any] = Field(
+
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Metadata about this context (tags, version, etc.)"
     )
-    
+
     def __init__(
         self,
-        guidance: Union[str, Guidance, None] = None,
-        directive: Union[str, Directive, None] = None,
+        guidance: str | Guidance | None = None,
+        directive: str | Directive | None = None,
         **kwargs
     ):
         """
@@ -83,17 +84,17 @@ class Context(BaseModel):
         # Convert simple strings to appropriate objects
         if isinstance(guidance, str):
             guidance = Guidance(role=guidance)
-        
+
         if isinstance(directive, str):
             directive = Directive(content=directive)
-        
+
         super().__init__(guidance=guidance, directive=directive, **kwargs)
 
     @classmethod
     def from_skill(
         cls,
-        skill_or_path: Union[Path, str, Any],
-        task: Optional[str] = None,
+        skill_or_path: Path | str | Any,
+        task: str | None = None,
         include_references: bool = True,
         **params: Any,
     ) -> "Context":
@@ -133,26 +134,26 @@ class Context(BaseModel):
             Assembled context as a formatted string
         """
         parts = []
-        
+
         # Add guidance (system-level)
         if self.guidance:
             parts.append(self.guidance.render())
-        
+
         # Add constraints (boundaries)
         if self.constraints:
             parts.append(self.constraints.render())
-        
+
         # Add knowledge (retrieved information)
         if self.knowledge:
             parts.append(f"# Knowledge\n\n{self.knowledge}")
-        
+
         # Add directive (specific instruction)
         if self.directive:
             parts.append(self.directive.render())
-        
+
         # Join with double newlines for clarity
         return "\n\n".join(filter(None, parts))
-    
+
     def execute(self, provider: str = "openai", **kwargs) -> Any:
         """
         Execute this context with an LLM provider.
@@ -175,11 +176,11 @@ class Context(BaseModel):
             ```
         """
         from .providers import get_provider
-        
+
         api_key = kwargs.pop("api_key", None)
         provider_instance = get_provider(provider, api_key=api_key)
         return provider_instance.generate(self, **kwargs)
-    
+
     def to_prompt(
         self,
         refine: bool = False,
@@ -263,7 +264,7 @@ class Context(BaseModel):
         except Exception:
             return self.to_prompt(refine=False)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert context to dictionary for serialization.
         
@@ -271,8 +272,8 @@ class Context(BaseModel):
             Dictionary representation
         """
         return self.model_dump()
-    
-    def to_messages(self, user_message: Optional[str] = None) -> list:
+
+    def to_messages(self, user_message: str | None = None) -> list:
         """
         Export context as OpenAI-style message array.
         
@@ -293,18 +294,18 @@ class Context(BaseModel):
             ```
         """
         messages = []
-        
+
         # System message from assembled context
         assembled = self.assemble()
         if assembled:
             messages.append({"role": "system", "content": assembled})
-        
+
         # Optional user message
         if user_message:
             messages.append({"role": "user", "content": user_message})
-        
+
         return messages
-    
+
     def to_langchain(self):
         """
         Export context for LangChain/LangGraph integration.
@@ -329,7 +330,7 @@ class Context(BaseModel):
             "directive": self.directive.model_dump() if self.directive else None,
             "knowledge": self.knowledge,
         }
-    
+
     def to_markdown(self) -> str:
         """
         Export context as human-readable Markdown.
@@ -351,7 +352,7 @@ class Context(BaseModel):
             ```
         """
         lines = ["# Context\n"]
-        
+
         if self.guidance:
             lines.append("## Guidance\n")
             lines.append(f"**Role:** {self.guidance.role}\n")
@@ -361,11 +362,11 @@ class Context(BaseModel):
                     lines.append(f"- {rule}\n")
             if self.guidance.style:
                 lines.append(f"**Style:** {self.guidance.style}\n")
-        
+
         if self.directive:
             lines.append("\n## Directive\n")
             lines.append(f"{self.directive.content}\n")
-        
+
         if self.constraints:
             lines.append("\n## Constraints\n")
             if self.constraints.must_include:
@@ -380,18 +381,18 @@ class Context(BaseModel):
                 lines.append("**Format Rules:**\n")
                 for rule in self.constraints.format_rules:
                     lines.append(f"- {rule}\n")
-        
+
         if self.knowledge:
             lines.append("\n## Knowledge\n")
             lines.append(f"{self.knowledge}\n")
-        
+
         if self.data:
             lines.append("\n## Data\n")
             for key, value in self.data.items():
                 lines.append(f"**{key}:** {value}\n")
-        
+
         return "".join(lines)
-    
+
     def to_json(self) -> str:
         """
         Export context as JSON string.
@@ -410,9 +411,9 @@ class Context(BaseModel):
         """
         import json
         return json.dumps(self.to_dict(), indent=2)
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Context":
+    def from_dict(cls, data: dict[str, Any]) -> "Context":
         """
         Create context from dictionary.
         
@@ -423,7 +424,7 @@ class Context(BaseModel):
             Context instance
         """
         return cls(**data)
-    
+
     @classmethod
     def from_json(cls, json_str: str) -> "Context":
         """
@@ -437,8 +438,8 @@ class Context(BaseModel):
         """
         import json
         return cls.from_dict(json.loads(json_str))
-    
-    def to_llamaindex(self) -> Dict[str, Any]:
+
+    def to_llamaindex(self) -> dict[str, Any]:
         """
         Export context for LlamaIndex integration.
         
@@ -464,8 +465,8 @@ class Context(BaseModel):
             "context_str": assembled,
             "metadata": self.metadata
         }
-    
-    def to_crewai(self) -> Dict[str, Any]:
+
+    def to_crewai(self) -> dict[str, Any]:
         """
         Export context for CrewAI integration.
         
@@ -488,7 +489,7 @@ class Context(BaseModel):
         if self.constraints and self.constraints.must_include:
             parts = ", ".join(self.constraints.must_include)
             expected_output = f"Output must include: {parts}"
-        
+
         return {
             "role": self.guidance.role if self.guidance else "Assistant",
             "goal": self.directive.content if self.directive else "",
@@ -498,8 +499,8 @@ class Context(BaseModel):
             "tools": [],  # User provides tools
             "verbose": True
         }
-    
-    def to_autogen(self) -> Dict[str, Any]:
+
+    def to_autogen(self) -> dict[str, Any]:
         """
         Export context for AutoGen multi-agent integration.
         
@@ -524,7 +525,7 @@ class Context(BaseModel):
             "human_input_mode": "NEVER",
             "code_execution_config": False,
         }
-    
+
     def to_yaml(self) -> str:
         """
         Export context as YAML string.
@@ -549,11 +550,11 @@ class Context(BaseModel):
                 "pyyaml is not installed. Install with: pip install pyyaml"
             )
         return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
-    
+
     def to_xml(self) -> str:
         """Export context as XML string including all fields."""
-        from xml.etree.ElementTree import Element, SubElement, tostring
         from xml.dom import minidom
+        from xml.etree.ElementTree import Element, SubElement, tostring
 
         def _safe_text(value: object) -> str:
             """Ensure text is XML-safe (no None values)."""
@@ -610,7 +611,7 @@ class Context(BaseModel):
         except Exception:
             return tostring(root, encoding="unicode")
 
-    def to_anthropic(self) -> Dict[str, Any]:
+    def to_anthropic(self) -> dict[str, Any]:
         """
         Export context optimized for Anthropic Claude.
         
@@ -630,7 +631,7 @@ class Context(BaseModel):
             ```
         """
         messages = []
-        
+
         # Anthropic prefers structured system messages
         if self.guidance or self.directive or self.knowledge:
             system_content = self.assemble()
@@ -639,10 +640,10 @@ class Context(BaseModel):
                 "messages": messages,
                 "max_tokens": 4096
             }
-        
+
         return {"messages": messages, "max_tokens": 4096}
-    
-    def to_openai(self) -> Dict[str, Any]:
+
+    def to_openai(self) -> dict[str, Any]:
         """
         Export context optimized for OpenAI.
         
@@ -666,8 +667,8 @@ class Context(BaseModel):
             "temperature": 0.7,
             "max_tokens": 4096
         }
-    
-    def to_google(self) -> Dict[str, Any]:
+
+    def to_google(self) -> dict[str, Any]:
         """
         Export context optimized for Google Gemini.
         
@@ -690,7 +691,7 @@ class Context(BaseModel):
                 "max_output_tokens": 4096
             }
         }
-    
+
     def __repr__(self) -> str:
         """String representation"""
         parts = []

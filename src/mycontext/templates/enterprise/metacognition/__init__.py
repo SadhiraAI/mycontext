@@ -14,11 +14,11 @@ Category: Metacognition (5 patterns)
 """
 
 # Patterns implemented - ALL 5 COMPLETE
+from .cognitive_strategy_selector import CognitiveStrategySelector
+from .error_detection_framework import ErrorDetectionFramework
+from .learning_from_experience import LearningFromExperience
 from .metacognitive_monitor import MetacognitiveMonitor
 from .self_regulation_framework import SelfRegulationFramework
-from .cognitive_strategy_selector import CognitiveStrategySelector
-from .learning_from_experience import LearningFromExperience
-from .error_detection_framework import ErrorDetectionFramework
 
 __all__ = [
     "MetacognitiveMonitor",

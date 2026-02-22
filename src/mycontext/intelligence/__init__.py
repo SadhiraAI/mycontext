@@ -4,64 +4,60 @@ Intelligence Layer - Automatic cognitive pattern selection and transformation
 This layer provides intelligent, automatic context transformation capabilities.
 """
 
-from .transformation_engine import (
-    TransformationEngine,
-    InputAnalysis,
-    InputType,
-    ComplexityLevel,
-    transform
-)
-from .quality_metrics import (
-    QualityMetrics,
-    QualityScore,
-    QualityDimension
-)
-from .pattern_catalog import (
-    FULL_PATTERN_CATALOG,
-    NAME_TO_CATEGORY,
-    VALID_PATTERN_NAMES,
-    PATTERN_CATALOG,
-    CATALOG_FOR_LLM,
-    PATTERN_MAP,
-)
-from .pattern_suggester import (
-    suggest_patterns,
-    PatternSuggestion,
-    SuggestionResult,
-    get_pattern_class,
-    assess_complexity,
-    smart_execute,
-    smart_prompt,
-    smart_generic_prompt,
-    ComplexityResult,
-)
-from .prompt_composer import (
-    PromptComposer,
-    ComposedPrompt,
-    get_generic_prompt_for,
-)
 from .chain_orchestration_agent import (
-    build_workflow_chain,
-    WorkflowChainResult,
     PATTERN_BUILD_CONTEXT_REGISTRY,
-)
-from .template_integrator_agent import (
-    TemplateIntegratorAgent,
-    IntegrationResult,
-)
-from .output_evaluator import (
-    OutputEvaluator,
-    OutputQualityScore,
-    OutputDimension,
+    WorkflowChainResult,
+    build_workflow_chain,
 )
 from .context_amplification import (
-    ContextAmplificationIndex,
     CAIResult,
+    ContextAmplificationIndex,
 )
+from .output_evaluator import (
+    OutputDimension,
+    OutputEvaluator,
+    OutputQualityScore,
+)
+from .pattern_catalog import (
+    CATALOG_FOR_LLM,
+    FULL_PATTERN_CATALOG,
+    NAME_TO_CATEGORY,
+    PATTERN_CATALOG,
+    PATTERN_MAP,
+    VALID_PATTERN_NAMES,
+)
+from .pattern_suggester import (
+    ComplexityResult,
+    PatternSuggestion,
+    SuggestionResult,
+    assess_complexity,
+    get_pattern_class,
+    smart_execute,
+    smart_generic_prompt,
+    smart_prompt,
+    suggest_patterns,
+)
+from .prompt_composer import (
+    ComposedPrompt,
+    PromptComposer,
+    get_generic_prompt_for,
+)
+from .quality_metrics import QualityDimension, QualityMetrics, QualityScore
 from .template_benchmark import (
-    TemplateBenchmark,
     BenchmarkResult,
     CaseResult,
+    TemplateBenchmark,
+)
+from .template_integrator_agent import (
+    IntegrationResult,
+    TemplateIntegratorAgent,
+)
+from .transformation_engine import (
+    ComplexityLevel,
+    InputAnalysis,
+    InputType,
+    TransformationEngine,
+    transform,
 )
 
 __all__ = [

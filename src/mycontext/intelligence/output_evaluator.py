@@ -17,7 +17,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..core import Context
 
@@ -33,11 +33,11 @@ class OutputDimension(Enum):
 @dataclass
 class OutputQualityScore:
     overall: float
-    dimensions: Dict[OutputDimension, float]
-    evidence: Dict[OutputDimension, str]
-    strengths: List[str]
-    weaknesses: List[str]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    dimensions: dict[OutputDimension, float]
+    evidence: dict[OutputDimension, str]
+    strengths: list[str]
+    weaknesses: list[str]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 _DIMENSION_WEIGHTS = {
@@ -94,10 +94,10 @@ class OutputEvaluator:
         words = output.split()
         word_count = len(words)
 
-        dims: Dict[OutputDimension, float] = {}
-        evidence: Dict[OutputDimension, str] = {}
-        strengths: List[str] = []
-        weaknesses: List[str] = []
+        dims: dict[OutputDimension, float] = {}
+        evidence: dict[OutputDimension, str] = {}
+        strengths: list[str] = []
+        weaknesses: list[str] = []
 
         if_score, if_ev = self._score_instruction_following(assembled, output)
         dims[OutputDimension.INSTRUCTION_FOLLOWING] = if_score

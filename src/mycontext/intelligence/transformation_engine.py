@@ -5,9 +5,9 @@ Core intelligence layer that analyzes inputs and selects optimal cognitive patte
 This is the heart of mycontext's automatic context engineering.
 """
 
-from typing import Optional, List, Dict, Any, Union
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 from ..core import Context
 from ..structure.pattern import Pattern
@@ -40,12 +40,12 @@ class InputAnalysis:
     input_type: InputType
     complexity: ComplexityLevel
     domain: str
-    key_concepts: List[str]
+    key_concepts: list[str]
     requires_reasoning: bool
     requires_comparison: bool
     requires_verification: bool
     ambiguity_level: str  # "low", "medium", "high"
-    recommended_patterns: List[str]
+    recommended_patterns: list[str]
     confidence: float  # 0.0 to 1.0
 
 
@@ -68,7 +68,7 @@ class TransformationEngine:
     
     This is the core innovation of mycontext - automatic, intelligent transformation.
     """
-    
+
     def __init__(self, include_enterprise: bool = True):
         """
         Initialize the transformation engine.
@@ -77,25 +77,25 @@ class TransformationEngine:
             include_enterprise: If False, only free patterns are used (for non-enterprise users)
         """
         self.include_enterprise = include_enterprise
-        self._pattern_registry: Dict[str, Pattern] = {}
+        self._pattern_registry: dict[str, Pattern] = {}
         self._load_patterns()
-    
+
     def _load_patterns(self):
         """Load all available cognitive patterns. Excludes enterprise when include_enterprise=False."""
-        from ..templates.free import (
-            QuestionAnalyzer,
-            StepByStepReasoner,
-            SocraticQuestioner,
-            RiskAssessor,
-            IntentRecognizer,
-            RootCauseAnalyzer,
-        )
         from ..templates.enterprise import (
-            CausalReasoner,
             AmbiguityResolver,
             AnalogicalReasoner,
+            CausalReasoner,
         )
-        patterns: List[Pattern] = [
+        from ..templates.free import (
+            IntentRecognizer,
+            QuestionAnalyzer,
+            RiskAssessor,
+            RootCauseAnalyzer,
+            SocraticQuestioner,
+            StepByStepReasoner,
+        )
+        patterns: list[Pattern] = [
             QuestionAnalyzer(),
             StepByStepReasoner(),
             SocraticQuestioner(),
@@ -112,19 +112,19 @@ class TransformationEngine:
         if self.include_enterprise:
             from ..templates.enterprise.decision import (
                 ComparativeAnalyzer,
-                TradeoffAnalyzer,
                 DecisionFramework,
+                TradeoffAnalyzer,
             )
             from ..templates.enterprise.problem_solving import ProblemDecomposer
             patterns.extend([ComparativeAnalyzer(), TradeoffAnalyzer(), ProblemDecomposer(), DecisionFramework()])
 
         for pattern in patterns:
             self._pattern_registry[pattern.name] = pattern
-    
+
     def analyze_input(
         self,
         input: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any] | None = None
     ) -> InputAnalysis:
         """
         Analyze input to determine characteristics and optimal patterns.
@@ -137,37 +137,37 @@ class TransformationEngine:
             InputAnalysis with recommendations
         """
         metadata = metadata or {}
-        
+
         input_lower = input.lower()
-        
+
         # Detect input type
         input_type = self._detect_input_type(input_lower)
-        
+
         # Assess complexity
         complexity = self._assess_complexity(input, metadata)
-        
+
         # Detect domain
         domain = metadata.get("domain", self._infer_domain(input_lower))
-        
+
         # Extract key concepts
         key_concepts = self._extract_concepts(input)
-        
+
         # Assess requirements
         requires_reasoning = any(word in input_lower for word in [
             "why", "how", "explain", "reason", "cause", "because"
         ])
-        
+
         requires_comparison = any(word in input_lower for word in [
             "compare", "versus", "vs", "better", "best", "which", "choose"
         ])
-        
+
         requires_verification = any(word in input_lower for word in [
             "correct", "valid", "verify", "check", "confirm", "true"
         ])
-        
+
         # Assess ambiguity
         ambiguity_level = self._assess_ambiguity(input)
-        
+
         # Recommend patterns
         recommended_patterns = self._recommend_patterns(
             input_type,
@@ -182,7 +182,7 @@ class TransformationEngine:
 
         # Calculate confidence
         confidence = self._calculate_confidence(input, recommended_patterns)
-        
+
         return InputAnalysis(
             input_type=input_type,
             complexity=complexity,
@@ -195,7 +195,7 @@ class TransformationEngine:
             recommended_patterns=recommended_patterns,
             confidence=confidence
         )
-    
+
     def _detect_input_type(self, input_lower: str) -> InputType:
         """Detect the type of input."""
         if any(phrase in input_lower for phrase in [
@@ -224,14 +224,14 @@ class TransformationEngine:
             return InputType.QUESTION
         else:
             return InputType.STATEMENT
-    
-    def _assess_complexity(self, input: str, metadata: Dict[str, Any]) -> ComplexityLevel:
+
+    def _assess_complexity(self, input: str, metadata: dict[str, Any]) -> ComplexityLevel:
         """Assess input complexity."""
         # Simple heuristic
         word_count = len(input.split())
         has_multiple_questions = input.count("?") > 1
         domain_complexity = metadata.get("complexity", "moderate")
-        
+
         if word_count < 10 and not has_multiple_questions:
             return ComplexityLevel.SIMPLE
         elif word_count < 30 and not has_multiple_questions:
@@ -240,7 +240,7 @@ class TransformationEngine:
             return ComplexityLevel.COMPLEX
         else:
             return ComplexityLevel.HIGHLY_COMPLEX
-    
+
     def _infer_domain(self, input_lower: str) -> str:
         """Infer domain from input content."""
         domain_keywords = {
@@ -250,33 +250,33 @@ class TransformationEngine:
             "business": ["business", "market", "customer", "strategy", "company"],
             "scientific": ["research", "experiment", "hypothesis", "theory", "data"],
         }
-        
+
         for domain, keywords in domain_keywords.items():
             if any(kw in input_lower for kw in keywords):
                 return domain
-        
+
         return "general"
-    
-    def _extract_concepts(self, input: str) -> List[str]:
+
+    def _extract_concepts(self, input: str) -> list[str]:
         """Extract key concepts from input."""
         # Simple extraction - could be enhanced
         words = input.split()
         # Return capitalized words and important terms (simplified)
         concepts = [w for w in words if len(w) > 5 and w[0].isupper()]
         return concepts[:5]  # Top 5
-    
+
     def _assess_ambiguity(self, input: str) -> str:
         """Assess level of ambiguity in input."""
         ambiguity_indicators = ["it", "this", "that", "thing", "stuff", "something"]
         count = sum(1 for word in ambiguity_indicators if word in input.lower())
-        
+
         if count >= 3:
             return "high"
         elif count >= 1:
             return "medium"
         else:
             return "low"
-    
+
     def _recommend_patterns(
         self,
         input_type: InputType,
@@ -285,14 +285,14 @@ class TransformationEngine:
         requires_comparison: bool,
         requires_verification: bool,
         ambiguity_level: str
-    ) -> List[str]:
+    ) -> list[str]:
         """Recommend optimal patterns based on analysis."""
         patterns = []
-        
+
         # Handle ambiguity first
         if ambiguity_level == "high":
             patterns.append("ambiguity_resolver")
-        
+
         # Pattern selection based on input type
         if input_type == InputType.CAUSAL:
             patterns.append("root_cause_analyzer")
@@ -304,36 +304,36 @@ class TransformationEngine:
             patterns.append("question_analyzer")
             if requires_reasoning:
                 patterns.append("step_by_step_reasoner")
-        
+
         elif input_type == InputType.PROBLEM:
             if complexity in [ComplexityLevel.COMPLEX, ComplexityLevel.HIGHLY_COMPLEX]:
                 patterns.append("problem_decomposer")
             patterns.append("root_cause_analyzer")
             patterns.append("step_by_step_reasoner")
-        
+
         elif input_type == InputType.DECISION:
             patterns.append("decision_framework")
             patterns.append("risk_assessor")
             if requires_comparison:
                 patterns.append("comparative_analyzer")
-        
+
         elif input_type == InputType.COMPARISON:
             patterns.append("comparative_analyzer")
             patterns.append("tradeoff_analyzer")
-        
+
         elif input_type == InputType.STATEMENT:
             patterns.append("socratic_questioner")
             patterns.append("intent_recognizer")
-        
+
         elif input_type == InputType.CONCEPT:
             patterns.append("analogical_reasoner")
             patterns.append("question_analyzer")
-        
+
         if requires_reasoning and "causal_reasoner" not in patterns:
             patterns.append("causal_reasoner")
         if requires_verification:
             patterns.append("causal_reasoner")
-        
+
         seen = set()
         deduped = []
         for p in patterns:
@@ -341,8 +341,8 @@ class TransformationEngine:
                 seen.add(p)
                 deduped.append(p)
         return deduped[:3]
-    
-    def _calculate_confidence(self, input: str, patterns: List[str]) -> float:
+
+    def _calculate_confidence(self, input: str, patterns: list[str]) -> float:
         """Calculate confidence in pattern selection."""
         # Simple heuristic
         if len(patterns) == 0:
@@ -353,12 +353,12 @@ class TransformationEngine:
             return 0.8
         else:
             return 0.7
-    
+
     def transform(
         self,
         input: str,
-        metadata: Optional[Dict[str, Any]] = None,
-        patterns: Union[str, List[str], None] = "auto",
+        metadata: dict[str, Any] | None = None,
+        patterns: str | list[str] | None = "auto",
     ) -> Context:
         """
         Transform raw input into perfect context.
@@ -377,7 +377,7 @@ class TransformationEngine:
         """
         # Analyze input
         analysis = self.analyze_input(input, metadata)
-        
+
         # Select patterns
         if patterns == "auto":
             selected_patterns = analysis.recommended_patterns
@@ -385,19 +385,19 @@ class TransformationEngine:
             selected_patterns = patterns
         else:
             selected_patterns = [analysis.recommended_patterns[0]] if analysis.recommended_patterns else []
-        
+
         # Apply primary pattern
         if selected_patterns:
             primary_pattern_name = selected_patterns[0]
             pattern = self._pattern_registry.get(primary_pattern_name)
-            
+
             if pattern:
                 # Build context using the pattern
                 # Use generic parameters that work across patterns
                 context = pattern.build_context(
                     **self._prepare_pattern_inputs(input, analysis, pattern)
                 )
-                
+
                 # Add transformation metadata
                 context.data = context.data or {}
                 context.data["transformation_metadata"] = {
@@ -410,9 +410,9 @@ class TransformationEngine:
                     },
                     "confidence": analysis.confidence,
                 }
-                
+
                 return context
-        
+
         # Fallback: Create basic context
         from ..foundation import Directive, Guidance
         return Context(
@@ -425,19 +425,19 @@ class TransformationEngine:
                 rules=["Be clear and helpful"]
             )
         )
-    
+
     def _prepare_pattern_inputs(
         self,
         input: str,
         analysis: InputAnalysis,
         pattern: Pattern
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare inputs for a specific pattern."""
         # Generic mapping - each pattern has different parameter names
         # This is a simplified version
-        
+
         inputs = {}
-        
+
         # Try common parameter names
         if pattern.name in ["question_analyzer", "intent_recognizer"]:
             inputs["question"] = input
@@ -462,7 +462,7 @@ class TransformationEngine:
             inputs["situation"] = input
         else:
             inputs["input"] = input
-        
+
         # Add depth based on complexity
         if analysis.complexity == ComplexityLevel.SIMPLE:
             inputs["depth"] = "quick"
@@ -470,21 +470,21 @@ class TransformationEngine:
             inputs["depth"] = "standard"
         else:
             inputs["depth"] = "comprehensive"
-        
+
         return inputs
-    
-    def get_available_patterns(self) -> List[str]:
+
+    def get_available_patterns(self) -> list[str]:
         """Get list of all available pattern names."""
         return list(self._pattern_registry.keys())
-    
-    def get_pattern(self, name: str) -> Optional[Pattern]:
+
+    def get_pattern(self, name: str) -> Pattern | None:
         """Get a specific pattern by name."""
         return self._pattern_registry.get(name)
-    
+
     def explain_selection(
         self,
         input: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any] | None = None
     ) -> str:
         """
         Explain why certain patterns were selected.
@@ -497,7 +497,7 @@ class TransformationEngine:
             Human-readable explanation of pattern selection
         """
         analysis = self.analyze_input(input, metadata)
-        
+
         explanation = f"""Input Analysis for: "{input}"
 
 Input Type: {analysis.input_type.value}
@@ -514,17 +514,17 @@ Recommended Patterns:
 """
         for i, pattern_name in enumerate(analysis.recommended_patterns, 1):
             explanation += f"{i}. {pattern_name}\n"
-        
+
         explanation += f"\nConfidence in selection: {analysis.confidence:.1%}"
-        
+
         return explanation
 
 
 # Convenience function for quick transformation
 def transform(
     input: str,
-    metadata: Optional[Dict[str, Any]] = None,
-    patterns: Union[str, List[str], None] = "auto",
+    metadata: dict[str, Any] | None = None,
+    patterns: str | list[str] | None = "auto",
     include_enterprise: bool = True
 ) -> Context:
     """

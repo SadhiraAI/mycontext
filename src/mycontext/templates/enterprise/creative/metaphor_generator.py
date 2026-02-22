@@ -5,9 +5,9 @@ Generates effective metaphors for communication and understanding.
 Based on metaphor theory and cognitive linguistics.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class MetaphorGenerator(Pattern):
@@ -57,7 +57,7 @@ class MetaphorGenerator(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="metaphor_generator",
@@ -141,34 +141,34 @@ Metaphor generation:
                 style_guide="Be creative but accurate"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         concept: str = "",
         audience: str = "general",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             concept=concept,
             audience=audience,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         concept: str = "",
         audience: str = "general",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

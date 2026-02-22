@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class CrossDomainSynthesizer(Pattern):
     """
@@ -275,7 +276,7 @@ class CrossDomainSynthesizer(Pattern):
                 style_guide="Creative and rigorous. Deep structural mapping. Novel but grounded solutions."
             )
         )
-    
+
     def build_context(self, target_problem="", source_domains="", **kwargs):
         """Build context for cross-domain synthesis."""
         return super().build_context(
@@ -283,7 +284,7 @@ class CrossDomainSynthesizer(Pattern):
             source_domains=source_domains,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", target_problem="", source_domains="", **kwargs):
         """Execute cross-domain synthesis."""
         return super().execute(

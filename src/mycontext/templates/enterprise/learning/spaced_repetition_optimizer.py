@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class SpacedRepetitionOptimizer(Pattern):
     """
@@ -264,24 +265,24 @@ Prepare retrieval practice questions: [List 5-10 questions]""",
                 style_guide="Scientific, precise intervals. Emphasize active retrieval over re-reading."
             )
         )
-    
+
     def build_context(self, learning_material="", initial_mastery="", previous_performance="", **kwargs):
         """Build context for spaced repetition optimization."""
         performance_section = f"**PREVIOUS REVIEW PERFORMANCE**: {previous_performance}" if previous_performance else ""
         kwargs.pop('performance_section', None)
-        
+
         return super().build_context(
             learning_material=learning_material,
             initial_mastery=initial_mastery,
             performance_section=performance_section,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", learning_material="", initial_mastery="", previous_performance="", **kwargs):
         """Execute spaced repetition schedule optimization."""
         performance_section = f"**PREVIOUS REVIEW PERFORMANCE**: {previous_performance}" if previous_performance else ""
         kwargs.pop('performance_section', None)
-        
+
         return super().execute(
             provider=provider,
             learning_material=learning_material,

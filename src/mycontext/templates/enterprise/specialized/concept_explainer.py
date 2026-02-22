@@ -5,7 +5,7 @@ Based on pedagogical best practices and cognitive tools methodology.
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ConceptExplainer(Pattern):
@@ -58,7 +58,7 @@ class ConceptExplainer(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="concept_explainer",
@@ -233,13 +233,13 @@ The core insight in simple terms: [Explain the central idea without jargon]
                 style_guide="Use clear headings, examples, analogies, and visual aids. Adjust complexity to audience."
             )
         )
-    
+
     def _render_context_section(self, context):
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
 
     def build_context(self, concept="", audience="general audience", depth="comprehensive", context=None, **kwargs):
         if context is None:
@@ -283,9 +283,9 @@ The core insight in simple terms: [Explain the central idea without jargon]
         # Provide defaults for optional fields
         if context is None:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         return super().execute(
             provider=provider,
             concept=concept,

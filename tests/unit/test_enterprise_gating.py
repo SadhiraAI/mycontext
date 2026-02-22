@@ -9,26 +9,22 @@ Covers:
 """
 
 import json
-import os
 import tempfile
-import uuid
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from mycontext.intelligence.pattern_suggester import (
-    suggest_patterns,
-    get_pattern_class,
     ENTERPRISE_LICENSE_NOTE,
     FULL_PATTERN_CATALOG,
+    get_pattern_class,
+    suggest_patterns,
 )
 from mycontext.license import (
     activate_license,
     deactivate_license,
     is_enterprise_active,
-    get_license_key,
-    _LICENSE_FILE,
 )
 
 

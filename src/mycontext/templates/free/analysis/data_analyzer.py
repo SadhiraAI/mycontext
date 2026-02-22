@@ -5,9 +5,9 @@ Comprehensive data analysis with pattern detection and insights.
 Based on data science and analytical reasoning frameworks.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class DataAnalyzer(Pattern):
@@ -217,34 +217,34 @@ Systematic data analysis:
                 style_guide="Be analytical but accessible, rigorous but clear"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         data_description: str = "",
         goal: str = "Extract insights",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             data_description=data_description,
             goal=goal,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         data_description: str = "",
         goal: str = "Extract insights",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

@@ -6,8 +6,7 @@ Structured analysis of competing objectives and constraints.
 License: Enterprise
 """
 
-from typing import Optional
-from mycontext import Pattern, Guidance, Directive
+from mycontext import Guidance, Pattern
 
 
 class TradeoffAnalyzer(Pattern):
@@ -174,19 +173,19 @@ Use specific examples, quantify where possible, and be realistic about limits.""
                 "depth": str
             }
         )
-    
+
     def _render_objectives_section(self, objectives: str) -> str:
         """Render the objectives section"""
         if not objectives or objectives.strip() == "":
             return ""
         return f"\nCompeting Objectives:\n{objectives}\n"
-    
+
     def _render_context_section(self, context: str) -> str:
         """Render the context section"""
         if not context or context.strip() == "":
             return ""
         return f"\nAdditional Context:\n{context}\n"
-    
+
     def build_context(
         self,
         situation: str,
@@ -210,12 +209,12 @@ Use specific examples, quantify where possible, and be realistic about limits.""
         """
         objectives_section = self._render_objectives_section(objectives or "")
         context_section = self._render_context_section(context or "")
-        
+
         # Clean up kwargs
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
         kwargs.pop('objectives_section', None)
-        
+
         return super().build_context(
             situation=situation,
             objectives_section=objectives_section,
@@ -223,7 +222,7 @@ Use specific examples, quantify where possible, and be realistic about limits.""
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
@@ -249,22 +248,22 @@ Use specific examples, quantify where possible, and be realistic about limits.""
         """
         objectives_section = self._render_objectives_section(objectives or "")
         context_section = self._render_context_section(context or "")
-        
+
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p', 
-                               'frequency_penalty', 'presence_penalty', 'stop', 
+        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
+                               'frequency_penalty', 'presence_penalty', 'stop',
                                'user', 'api_key', 'base_url'}
-        
+
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
-        
+
         # Clean up
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
         kwargs.pop('objectives_section', None)
-        
+
         return super().execute(
             provider=provider,
             situation=situation,

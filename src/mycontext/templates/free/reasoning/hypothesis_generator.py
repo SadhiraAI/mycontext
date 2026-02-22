@@ -5,9 +5,8 @@ Creates well-formed hypotheses following scientific method.
 Based on scientific reasoning and experimental design research.
 """
 
-from typing import Optional, List
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class HypothesisGenerator(Pattern):
@@ -211,18 +210,18 @@ Systematic hypothesis generation:
                 style_guide="Be scientific but accessible, rigorous but practical"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         observation: str = "",
         domain: str = "general",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         """
@@ -238,20 +237,20 @@ Systematic hypothesis generation:
             Context object ready for export/use
         """
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             observation=observation,
             domain=domain,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         observation: str = "",
         domain: str = "general",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         """

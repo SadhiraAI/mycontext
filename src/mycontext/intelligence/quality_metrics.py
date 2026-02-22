@@ -10,9 +10,9 @@ Based on research from:
 - FLASK benchmark: fine-grained language model evaluation
 """
 
-from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 from ..core import Context
 
@@ -31,11 +31,11 @@ class QualityDimension(Enum):
 class QualityScore:
     """Quality score for a context."""
     overall: float  # 0.0 to 1.0
-    dimensions: Dict[QualityDimension, float]
-    issues: List[str]
-    strengths: List[str]
-    suggestions: List[str]
-    metadata: Dict[str, Any]
+    dimensions: dict[QualityDimension, float]
+    issues: list[str]
+    strengths: list[str]
+    suggestions: list[str]
+    metadata: dict[str, Any]
 
 
 # Minimum word thresholds for meaningful prompts
@@ -91,7 +91,7 @@ class QualityMetrics:
     def evaluate(
         self,
         context: Context,
-        reference: Optional[str] = None
+        reference: str | None = None
     ) -> QualityScore:
         if self.mode == "llm":
             return self._evaluate_llm(context)
@@ -894,7 +894,7 @@ class QualityMetrics:
 
     # ── Compare & Report ────────────────────────────────────────────────
 
-    def compare(self, context1: Context, context2: Context) -> Dict[str, Any]:
+    def compare(self, context1: Context, context2: Context) -> dict[str, Any]:
         """Compare two contexts and show improvement."""
         score1 = self.evaluate(context1)
         score2 = self.evaluate(context2)
@@ -937,11 +937,11 @@ Dimension Scores:
                 report += f"  ✗ {issue}\n"
 
         if score.suggestions:
-            report += f"\nSuggestions for Improvement:\n"
+            report += "\nSuggestions for Improvement:\n"
             for i, suggestion in enumerate(score.suggestions, 1):
                 report += f"  {i}. {suggestion}\n"
 
-        report += f"\nMetadata:\n"
+        report += "\nMetadata:\n"
         for key, value in score.metadata.items():
             report += f"  {key}: {value}\n"
 

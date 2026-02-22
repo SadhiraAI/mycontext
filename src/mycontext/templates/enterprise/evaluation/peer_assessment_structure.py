@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class PeerAssessmentStructure(Pattern):
     """
@@ -412,7 +413,7 @@ class PeerAssessmentStructure(Pattern):
                 style_guide="Structured and supportive. Train reviewers. Balance positive and critical feedback."
             )
         )
-    
+
     def build_context(self, assessment_task="", learning_objective="", **kwargs):
         """Build context for peer assessment design."""
         return super().build_context(
@@ -420,7 +421,7 @@ class PeerAssessmentStructure(Pattern):
             learning_objective=learning_objective,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", assessment_task="", learning_objective="", **kwargs):
         """Execute peer assessment structure design."""
         return super().execute(

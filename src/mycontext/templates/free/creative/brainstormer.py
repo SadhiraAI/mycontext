@@ -5,9 +5,9 @@ Facilitates productive brainstorming sessions using proven techniques.
 Based on creative facilitation and group ideation research.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class Brainstormer(Pattern):
@@ -287,28 +287,28 @@ Structured brainstorming session:
                 style_guide="Be enthusiastic, encouraging, and non-judgmental"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_constraints_section(self, constraints: Optional[list]) -> str:
+
+    def _render_constraints_section(self, constraints: list | None) -> str:
         if constraints:
             return "\n".join(f"- {c}" for c in constraints)
         return "- None specified"
-    
+
     def build_context(
         self,
         topic: str = "",
         goal: str = "Generate creative solutions",
-        context: Optional[str] = None,
-        constraints: Optional[list] = None,
+        context: str | None = None,
+        constraints: list | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
         constraints_section = self._render_constraints_section(constraints)
-        
+
         return super().build_context(
             topic=topic,
             goal=goal,
@@ -316,14 +316,14 @@ Structured brainstorming session:
             constraints_section=constraints_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         topic: str = "",
         goal: str = "Generate creative solutions",
-        context: Optional[str] = None,
-        constraints: Optional[list] = None,
+        context: str | None = None,
+        constraints: list | None = None,
         **kwargs
     ):
         return super().execute(

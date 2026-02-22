@@ -5,7 +5,7 @@ Guidance defines the role, personality, and behavioral rules for the LLM.
 It's the "how" and "who" of context engineering.
 """
 
-from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -35,28 +35,28 @@ class Guidance(BaseModel):
         style: Communication style
         expertise: Areas of expertise
     """
-    
+
     role: str = Field(
         ...,
         description="The role or persona",
         min_length=1
     )
-    
-    rules: List[str] = Field(
+
+    rules: list[str] = Field(
         default_factory=list,
         description="Behavioral rules to follow"
     )
-    
-    style: Optional[str] = Field(
+
+    style: str | None = Field(
         default=None,
         description="Communication style"
     )
-    
-    expertise: Optional[List[str]] = Field(
+
+    expertise: list[str] | None = Field(
         default=None,
         description="Areas of expertise"
     )
-    
+
     def render(self) -> str:
         """
         Render guidance as a system prompt.
@@ -65,20 +65,20 @@ class Guidance(BaseModel):
             Formatted system prompt
         """
         parts = [f"You are {self.role}."]
-        
+
         if self.expertise:
             expertise_text = ", ".join(self.expertise)
             parts.append(f"Your areas of expertise include: {expertise_text}.")
-        
+
         if self.rules:
             rules_text = "\n".join(f"{i+1}. {rule}" for i, rule in enumerate(self.rules))
             parts.append(f"\nFollow these rules:\n{rules_text}")
-        
+
         if self.style:
             parts.append(f"\nCommunication style: {self.style}")
-        
+
         return "\n".join(parts)
-    
+
     def __repr__(self) -> str:
         """String representation"""
         role_preview = self.role[:50] + "..." if len(self.role) > 50 else self.role

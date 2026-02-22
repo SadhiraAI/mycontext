@@ -9,14 +9,14 @@ Supports standard frontmatter (name, description) plus optional:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Type
+from typing import Any
 
 import yaml
 
 from ..foundation import Directive, Guidance
 
 
-def _parse_frontmatter_and_body(content: str) -> tuple[Dict[str, Any], str]:
+def _parse_frontmatter_and_body(content: str) -> tuple[dict[str, Any], str]:
     """Split SKILL.md into YAML frontmatter and Markdown body."""
     content = content.strip()
     if not content.startswith("---"):
@@ -34,7 +34,7 @@ def _parse_frontmatter_and_body(content: str) -> tuple[Dict[str, Any], str]:
     return data, body
 
 
-def _normalize_schema_type(t: Any) -> Type:
+def _normalize_schema_type(t: Any) -> type:
     """Map YAML schema type string to Python type."""
     if t is None:
         return str
@@ -69,14 +69,14 @@ class Skill:
         name: str,
         description: str,
         body: str = "",
-        path: Optional[Path] = None,
+        path: Path | None = None,
         *,
-        license: Optional[str] = None,
-        compatibility: Optional[str] = None,
-        metadata: Optional[Dict[str, str]] = None,
-        allowed_tools: Optional[str] = None,
-        input_schema: Optional[Dict[str, Any]] = None,
-        pattern: Optional[str] = None,
+        license: str | None = None,
+        compatibility: str | None = None,
+        metadata: dict[str, str] | None = None,
+        allowed_tools: str | None = None,
+        input_schema: dict[str, Any] | None = None,
+        pattern: str | None = None,
     ):
         self.name = name
         self.description = description
@@ -90,7 +90,7 @@ class Skill:
         self.pattern = pattern
 
     @classmethod
-    def load(cls, path: Path) -> "Skill":
+    def load(cls, path: Path) -> Skill:
         """
         Load a skill from a directory containing SKILL.md.
 
@@ -155,7 +155,7 @@ class Skill:
         """Short summary for browse mode (name + description)."""
         return f"# {self.name}\n\n{self.description}"
 
-    def full_instructions(self, params: Optional[Dict[str, Any]] = None) -> str:
+    def full_instructions(self, params: dict[str, Any] | None = None) -> str:
         """Full instruction text, with optional template substitution."""
         params = params or {}
         if not params or not self.body:
@@ -169,7 +169,7 @@ class Skill:
                 out = out.replace("{" + str(k) + "}", str(v))
             return out
 
-    def validate_params(self, params: Dict[str, Any]) -> None:
+    def validate_params(self, params: dict[str, Any]) -> None:
         """Validate params against input_schema. Raises ValueError if invalid."""
         if not self.input_schema:
             return
@@ -187,10 +187,10 @@ class Skill:
 
     def to_context(
         self,
-        task: Optional[str] = None,
+        task: str | None = None,
         include_references: bool = False,
         **params: Any,
-    ) -> "Context":
+    ) -> Context:
         """
         Build a mycontext Context from this skill (no pattern fusion).
 

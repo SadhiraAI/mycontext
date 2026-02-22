@@ -5,9 +5,8 @@ Based on the Socratic method of inquiry through questioning.
 Helps users examine beliefs, assumptions, and reasoning.
 """
 
-from typing import Optional
+from mycontext.foundation import Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive
 
 
 class SocraticQuestioner(Pattern):
@@ -131,13 +130,13 @@ Then synthesize the key insights these questions reveal.""",
                 "depth": str
             }
         )
-    
+
     def _render_context_section(self, context: str) -> str:
         """Render the context section for the directive template"""
         if not context or context.strip() == "":
             return ""
         return f"\nAdditional Context:\n{context}\n"
-    
+
     def build_context(
         self,
         statement: str,
@@ -159,20 +158,20 @@ Then synthesize the key insights these questions reveal.""",
         """
         if not context:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         # Remove context from kwargs to avoid passing it to parent
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
-        
+
         return super().build_context(
             statement=statement,
             context_section=context_section,
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
@@ -196,23 +195,23 @@ Then synthesize the key insights these questions reveal.""",
         """
         if not context:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p', 
-                               'frequency_penalty', 'presence_penalty', 'stop', 
+        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
+                               'frequency_penalty', 'presence_penalty', 'stop',
                                'user', 'api_key', 'base_url'}
-        
+
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
-        
+
         # Remove context-related params
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
-        
+
         return super().execute(
             provider=provider,
             statement=statement,

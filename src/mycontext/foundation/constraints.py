@@ -5,7 +5,7 @@ Constraints define hard limits and boundaries for LLM behavior.
 They are the "must not" and "must" rules that cannot be violated.
 """
 
-from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -33,33 +33,33 @@ class Constraints(BaseModel):
         max_length: Maximum output length
         language: Required output language
     """
-    
-    must_include: Optional[List[str]] = Field(
+
+    must_include: list[str] | None = Field(
         default=None,
         description="Elements that must be included"
     )
-    
-    must_not_include: Optional[List[str]] = Field(
+
+    must_not_include: list[str] | None = Field(
         default=None,
         description="Elements that must not be included"
     )
-    
-    format_rules: Optional[List[str]] = Field(
+
+    format_rules: list[str] | None = Field(
         default=None,
         description="Formatting and style rules"
     )
-    
-    max_length: Optional[int] = Field(
+
+    max_length: int | None = Field(
         default=None,
         ge=1,
         description="Maximum output length (tokens or characters)"
     )
-    
-    language: Optional[str] = Field(
+
+    language: str | None = Field(
         default=None,
         description="Required output language"
     )
-    
+
     def render(self) -> str:
         """
         Render constraints as formatted text.
@@ -68,28 +68,28 @@ class Constraints(BaseModel):
             Formatted constraints string
         """
         parts = ["CONSTRAINTS:"]
-        
+
         if self.must_include:
             must_inc = "\n".join(f"  - {item}" for item in self.must_include)
             parts.append(f"Must include:\n{must_inc}")
-        
+
         if self.must_not_include:
             must_not = "\n".join(f"  - {item}" for item in self.must_not_include)
             parts.append(f"Must NOT include:\n{must_not}")
-        
+
         if self.format_rules:
             formats = "\n".join(f"  - {rule}" for rule in self.format_rules)
             parts.append(f"Format rules:\n{formats}")
-        
+
         if self.max_length:
             parts.append(f"Maximum length: {self.max_length}")
-        
+
         if self.language:
             parts.append(f"Language: {self.language}")
-        
+
         # Join sections with double newline so Markdown renders proper paragraph breaks
         return "\n\n".join(parts)
-    
+
     def __repr__(self) -> str:
         """String representation"""
         rules_count = sum([

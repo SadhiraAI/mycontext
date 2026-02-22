@@ -9,40 +9,39 @@ Context as Code™ - Research-backed cognitive patterns for systematic context e
 __version__ = "0.3.0"
 
 # Core exports
-from .core import Context
-from .foundation import Directive, Guidance, Constraints
-from .structure import Pattern, Blueprint
-
-# Provider exports
-from .providers import (
-    get_provider,
-    register_provider,
-    list_providers,
-)
-
 # Templates module (lazy loading)
-from . import templates
-
 # Utilities module (lazy loading)
-from . import utils
-
 # Intelligence module (lazy loading)
-from . import intelligence
-from .intelligence import transform
-from .intelligence import TemplateIntegratorAgent, IntegrationResult
-from .intelligence import OutputEvaluator, OutputQualityScore, OutputDimension
-from .intelligence import ContextAmplificationIndex, CAIResult
-from .intelligence import TemplateBenchmark, BenchmarkResult
-
 # Integrations module (lazy loading)
-from . import integrations
+# Agent Skills (executable, quality-assured, pattern-anchored skills)
+from . import integrations, intelligence, skills, templates, utils
+from .core import Context
+from .foundation import Constraints, Directive, Guidance
+from .intelligence import (
+    BenchmarkResult,
+    CAIResult,
+    ContextAmplificationIndex,
+    IntegrationResult,
+    OutputDimension,
+    OutputEvaluator,
+    OutputQualityScore,
+    TemplateBenchmark,
+    TemplateIntegratorAgent,
+    transform,
+)
 
 # Licensing
 from .license import activate_license, deactivate_license, is_enterprise_active
 
-# Agent Skills (executable, quality-assured, pattern-anchored skills)
-from . import skills
+# Provider exports
+from .providers import (
+    get_provider,
+    list_providers,
+    register_provider,
+)
 from .skills import Skill, SkillRunner, SkillRunResult
+from .structure import Blueprint, Pattern
+
 __all__ = [
     # Core
     "Context",

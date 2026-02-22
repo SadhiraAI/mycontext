@@ -10,7 +10,7 @@ context.  CAI > 1.0 means the template amplified output quality.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..core import Context
 from .output_evaluator import OutputDimension, OutputEvaluator, OutputQualityScore
@@ -25,9 +25,9 @@ class CAIResult:
     raw_score: OutputQualityScore
     templated_score: OutputQualityScore
     cai_overall: float
-    cai_dimensions: Dict[OutputDimension, float]
+    cai_dimensions: dict[OutputDimension, float]
     verdict: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 def _verdict(cai: float) -> str:
@@ -63,7 +63,7 @@ class ContextAmplificationIndex:
         self,
         provider: str = "openai",
         eval_mode: str = "heuristic",
-        model: Optional[str] = None,
+        model: str | None = None,
     ):
         self.provider = provider
         self.eval_mode = eval_mode
@@ -85,7 +85,7 @@ class ContextAmplificationIndex:
         api_key = kwargs.pop("api_key", None)
         exec_model = kwargs.pop("model", self.model)
 
-        exec_kwargs: Dict[str, Any] = {}
+        exec_kwargs: dict[str, Any] = {}
         if api_key:
             exec_kwargs["api_key"] = api_key
         if exec_model:
@@ -97,7 +97,7 @@ class ContextAmplificationIndex:
         raw_ctx = Context(directive=question)
         templated_ctx = self._build_template_context(question, template_name)
 
-        eval_kw: Dict[str, Any] = {}
+        eval_kw: dict[str, Any] = {}
         if api_key:
             eval_kw["api_key"] = api_key
 
@@ -130,7 +130,7 @@ class ContextAmplificationIndex:
     def measure_chain(
         self,
         question: str,
-        chain: List[str],
+        chain: list[str],
         **kwargs: Any,
     ) -> CAIResult:
         """Compare single best template vs. integrated chain of templates."""
@@ -139,7 +139,7 @@ class ContextAmplificationIndex:
 
         api_key = kwargs.pop("api_key", None)
         exec_model = kwargs.pop("model", self.model)
-        exec_kwargs: Dict[str, Any] = {}
+        exec_kwargs: dict[str, Any] = {}
         if api_key:
             exec_kwargs["api_key"] = api_key
         if exec_model:
@@ -155,7 +155,7 @@ class ContextAmplificationIndex:
             directive=question,
         )
 
-        eval_kw: Dict[str, Any] = {}
+        eval_kw: dict[str, Any] = {}
         if api_key:
             eval_kw["api_key"] = api_key
 
@@ -219,8 +219,8 @@ class ContextAmplificationIndex:
 
     def _build_template_context(self, question, template_name):
         try:
-            from .pattern_suggester import get_pattern_class
             from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
+            from .pattern_suggester import get_pattern_class
             klass = get_pattern_class(template_name, include_enterprise=True)
             if not klass:
                 return None

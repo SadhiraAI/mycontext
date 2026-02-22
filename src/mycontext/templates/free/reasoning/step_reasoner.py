@@ -5,7 +5,7 @@ Based on "step-by-step reasoning" cognitive tool and Chain-of-Thought methodolog
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class StepByStepReasoner(Pattern):
@@ -184,13 +184,13 @@ Work through each step methodically. For each step, show:
                 style_guide="Use numbered steps, show calculations, provide clear headings"
             )
         )
-    
+
     def _render_context_section(self, context):
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         problem="",
@@ -213,12 +213,12 @@ Work through each step methodically. For each step, show:
         # Provide defaults for optional fields
         if context is None:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         # Remove context_section from kwargs if present to avoid duplicate
         kwargs.pop('context_section', None)
-        
+
         # Only pass template variables (not 'context', only 'context_section')
         return super().build_context(
             problem=problem,
@@ -226,7 +226,7 @@ Work through each step methodically. For each step, show:
             domain=domain,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider="gemini",
@@ -253,12 +253,12 @@ Work through each step methodically. For each step, show:
         # Provide defaults for optional fields
         if context is None:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         # Remove context_section from kwargs if present to avoid duplicate
         kwargs.pop('context_section', None)
-        
+
         # Only pass template variables (not 'context', only 'context_section')
         return super().execute(
             provider=provider,

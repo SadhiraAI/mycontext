@@ -4,7 +4,7 @@ from typing import Any
 
 try:
     from mycontext import Context
-    from mycontext.foundation import Guidance, Directive, Constraints
+    from mycontext.foundation import Constraints, Directive, Guidance
     from mycontext.intelligence import QualityMetrics
     from mycontext.intelligence.quality_metrics import QualityDimension, QualityScore
 except ImportError:
@@ -32,7 +32,6 @@ def _parse_assembled_to_context(text: str):
     role = None
     rules = []
     style = None
-    goal = None
     directive_lines = []
     constraints_must_include = []
     constraints_must_not = []
@@ -53,11 +52,11 @@ def _parse_assembled_to_context(text: str):
         if lower.startswith("## goal") or lower.startswith("goal:"):
             goal_text = stripped.split(":", 1)[1].strip() if ":" in stripped else ""
             if goal_text:
-                goal = goal_text
+                _ = goal_text
             section = "goal"
             continue
         if section == "goal" and stripped and not stripped.startswith("#"):
-            goal = stripped
+            _ = stripped
             section = "preamble"
             continue
 

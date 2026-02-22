@@ -7,8 +7,8 @@ This layer provides the fundamental primitives for context engineering:
 - Constraints: Boundaries and guardrails
 """
 
+from .constraints import Constraints
 from .directive import Directive
 from .guidance import Guidance
-from .constraints import Constraints
 
 __all__ = ["Directive", "Guidance", "Constraints"]

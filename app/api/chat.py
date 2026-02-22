@@ -78,7 +78,7 @@ async def chat(
         )
         return {"response": response}
     except Exception as e:
-        raise HTTPException(502, detail=f"LLM error: {e}")
+        raise HTTPException(502, detail=f"LLM error: {e}") from None
 
 
 @router.post("/refine")

@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class DifferentialDiagnoser(Pattern):
     """
@@ -335,24 +336,24 @@ class DifferentialDiagnoser(Pattern):
                 style_guide="Systematic and evidence-based. Multiple hypotheses. Test and verify. Medical-style rigor."
             )
         )
-    
+
     def build_context(self, presenting_problem="", observed_data="", domain="", **kwargs):
         """Build context for differential diagnosis."""
         domain_section = f"**DOMAIN**: {domain}" if domain else ""
         kwargs.pop('domain_section', None)
-        
+
         return super().build_context(
             presenting_problem=presenting_problem,
             observed_data=observed_data,
             domain_section=domain_section,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", presenting_problem="", observed_data="", domain="", **kwargs):
         """Execute differential diagnosis."""
         domain_section = f"**DOMAIN**: {domain}" if domain else ""
         kwargs.pop('domain_section', None)
-        
+
         return super().execute(
             provider=provider,
             presenting_problem=presenting_problem,

@@ -1,9 +1,9 @@
 """Specialized Patterns (Enterprise) - Content, ambiguity, risk mitigation, impact, concepts"""
-from .content_outliner import ContentOutliner
 from .ambiguity_resolver import AmbiguityResolver
-from .risk_mitigator import RiskMitigator
-from .impact_assessor import ImpactAssessor
 from .concept_explainer import ConceptExplainer
+from .content_outliner import ContentOutliner
+from .impact_assessor import ImpactAssessor
+from .risk_mitigator import RiskMitigator
 
 __all__ = [
     "ContentOutliner",

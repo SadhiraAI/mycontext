@@ -11,7 +11,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class EthicalFrameworkAnalyzer(Pattern):
@@ -251,7 +251,7 @@ class EthicalFrameworkAnalyzer(Pattern):
                 style_guide="Apply each framework rigorously with specific reasoning. Identify tensions between frameworks."
             )
         )
-    
+
     def build_context(
         self,
         decision="",
@@ -262,14 +262,14 @@ class EthicalFrameworkAnalyzer(Pattern):
         """Build context for ethical framework analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
         kwargs.pop('context_section', None)
-        
+
         return super().build_context(
             decision=decision,
             stakeholders=stakeholders,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider="gemini",
@@ -281,7 +281,7 @@ class EthicalFrameworkAnalyzer(Pattern):
         """Execute ethical framework analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
         kwargs.pop('context_section', None)
-        
+
         return super().execute(
             provider=provider,
             decision=decision,

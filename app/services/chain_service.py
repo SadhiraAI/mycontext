@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 try:
     from mycontext.intelligence import (
+        PATTERN_BUILD_CONTEXT_REGISTRY,
         build_workflow_chain,
         get_pattern_class,
-        PATTERN_BUILD_CONTEXT_REGISTRY,
         suggest_patterns,
     )
     from mycontext.intelligence.pattern_suggester import NAME_TO_CATEGORY

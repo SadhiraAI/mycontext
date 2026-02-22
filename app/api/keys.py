@@ -76,7 +76,7 @@ async def get_active_provider(
     result = await db.execute(
         select(UserAPIKey).where(
             UserAPIKey.user_id == user.id,
-            UserAPIKey.is_active == True,
+            UserAPIKey.is_active.is_(True),
         )
     )
     active = result.scalar_one_or_none()
@@ -265,7 +265,7 @@ async def get_active_provider_for_user(db: AsyncSession, user_id: str) -> dict:
     result = await db.execute(
         select(UserAPIKey).where(
             UserAPIKey.user_id == user_id,
-            UserAPIKey.is_active == True,
+            UserAPIKey.is_active.is_(True),
         )
     )
     active = result.scalar_one_or_none()

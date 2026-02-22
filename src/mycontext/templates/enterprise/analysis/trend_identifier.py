@@ -5,9 +5,9 @@ Systematic trend detection, analysis, and forecasting.
 Based on time series analysis and pattern recognition research.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class TrendIdentifier(Pattern):
@@ -56,7 +56,7 @@ class TrendIdentifier(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="trend_identifier",
@@ -270,22 +270,22 @@ Comprehensive trend analysis:
                 style_guide="Be analytical but not overconfident in projections"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         data_description: str = "",
         domain: str = "general",
         timeframe: str = "past year",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             data_description=data_description,
             domain=domain,
@@ -293,14 +293,14 @@ Comprehensive trend analysis:
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         data_description: str = "",
         domain: str = "general",
         timeframe: str = "past year",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

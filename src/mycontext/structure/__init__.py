@@ -7,7 +7,7 @@ This layer provides the tools to compose and structure contexts:
 - Assembly: Dynamic context construction
 """
 
-from .pattern import Pattern
 from .blueprint import Blueprint
+from .pattern import Pattern
 
 __all__ = ["Pattern", "Blueprint"]

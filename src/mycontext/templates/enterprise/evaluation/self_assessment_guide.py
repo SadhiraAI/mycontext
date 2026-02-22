@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class SelfAssessmentGuide(Pattern):
     """
@@ -421,26 +422,26 @@ class SelfAssessmentGuide(Pattern):
                 style_guide="Reflective and honest. Evidence-based. Growth-oriented. Link to improvement goals."
             )
         )
-    
+
     def build_context(self, work_to_assess="", success_criteria="", **kwargs):
         """Build context for self-assessment guide."""
         newline = '\n- '
         detailed_criteria = f"- {success_criteria.replace(',', newline)}" if success_criteria else ""
         kwargs.pop('detailed_criteria', None)
-        
+
         return super().build_context(
             work_to_assess=work_to_assess,
             success_criteria=success_criteria,
             detailed_criteria=detailed_criteria,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", work_to_assess="", success_criteria="", **kwargs):
         """Execute self-assessment guide creation."""
         newline = '\n- '
         detailed_criteria = f"- {success_criteria.replace(',', newline)}" if success_criteria else ""
         kwargs.pop('detailed_criteria', None)
-        
+
         return super().execute(
             provider=provider,
             work_to_assess=work_to_assess,

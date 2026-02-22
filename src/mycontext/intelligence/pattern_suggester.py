@@ -5,20 +5,15 @@ Maps question intent/keywords to optimal patterns (all 85 free + enterprise).
 Always suggests from full catalog; enterprise patterns show license note when include_enterprise=False.
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List, Optional, Tuple
-
+from dataclasses import asdict, dataclass, field
+from typing import Any
 
 from .pattern_catalog import (
-    ENTERPRISE_LICENSE_NOTE,
-    FULL_PATTERN_CATALOG,
-    NAME_TO_CATEGORY,
-    NAME_TO_DESCRIPTION,
-    VALID_PATTERN_NAMES,
-    PATTERN_CATALOG,
-    CATALOG_FOR_LLM,
     ENRICHED_CATALOG_TEXT,
+    ENTERPRISE_LICENSE_NOTE,
+    NAME_TO_CATEGORY,
     PATTERN_MAP,
+    VALID_PATTERN_NAMES,
 )
 
 
@@ -29,9 +24,9 @@ class PatternSuggestion:
     category: str  # "free" | "enterprise"
     reason: str
     confidence: float  # 0.0 to 1.0
-    chain_position: Optional[int] = None  # 1, 2, 3... if part of chain
+    chain_position: int | None = None  # 1, 2, 3... if part of chain
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Export as dictionary."""
         return asdict(self)
 
@@ -40,13 +35,13 @@ class PatternSuggestion:
 class SuggestionResult:
     """Result of pattern suggestion."""
     question: str
-    suggested_patterns: List[PatternSuggestion] = field(default_factory=list)
-    suggested_chain: Optional[List[str]] = None  # Ordered pattern names for chaining
+    suggested_patterns: list[PatternSuggestion] = field(default_factory=list)
+    suggested_chain: list[str] | None = None  # Ordered pattern names for chaining
     reasoning: str = ""
     source: str = "keyword"  # "keyword" | "llm" | "hybrid"
-    llm_reasoning: Optional[str] = None  # LLM's explanation (when hybrid/llm)
+    llm_reasoning: str | None = None  # LLM's explanation (when hybrid/llm)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Export as dictionary (for JSON, YAML, APIs)."""
         return {
             "question": self.question,
@@ -87,8 +82,8 @@ class SuggestionResult:
 
     def to_xml(self) -> str:
         """Export as XML string (for XML-based systems)."""
-        from xml.etree.ElementTree import Element, SubElement, tostring
         from xml.dom import minidom
+        from xml.etree.ElementTree import Element, SubElement, tostring
         root = Element("suggestion_result")
         SubElement(root, "question").text = self.question
         SubElement(root, "source").text = self.source
@@ -113,7 +108,7 @@ class SuggestionResult:
         return reparsed.toprettyxml(indent="  ")
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "SuggestionResult":
+    def from_dict(cls, data: dict[str, Any]) -> "SuggestionResult":
         """Create from dictionary (round-trip with to_dict)."""
         patterns = [
             PatternSuggestion(**p) if isinstance(p, dict) else p
@@ -144,7 +139,7 @@ def suggest_patterns(
     mode: str = "keyword",
     llm_provider: str = "openai",
     temperature: float = 0,
-    model: Optional[str] = None,
+    model: str | None = None,
     **llm_kwargs: Any,
 ) -> SuggestionResult:
     """
@@ -217,7 +212,7 @@ def _suggest_with_keywords(
 ) -> SuggestionResult:
     """Keyword-based suggestion. Always suggests from ALL patterns; adds license note for enterprise when include_enterprise=False."""
     question_lower = question.lower().strip()
-    suggestions: List[PatternSuggestion] = []
+    suggestions: list[PatternSuggestion] = []
     seen: set = set()
 
     for keywords, (pattern_name, category, reason) in PATTERN_MAP:
@@ -273,8 +268,8 @@ def _suggest_with_llm(
     question: str,
     provider: str,
     temperature: float = 0,
-    model: Optional[str] = None,
-    keyword_hints: Optional[List[str]] = None,
+    model: str | None = None,
+    keyword_hints: list[str] | None = None,
     **kwargs: Any,
 ) -> tuple:
     """Call LLM to suggest patterns. Returns (list of (name, reason) tuples, integration_note, raw_text)."""
@@ -339,7 +334,7 @@ INTEGRATION: 2-3 sentences explaining how these templates work together as a pip
 def _parse_llm_structured_response(raw: str) -> tuple:
     """Parse structured LLM response into (list of (name, reason), integration_note, raw_text)."""
     import re
-    selections: List[tuple] = []
+    selections: list[tuple] = []
     integration = ""
 
     template_pattern = re.compile(r"TEMPLATE:\s*(\S+)", re.IGNORECASE)
@@ -373,14 +368,14 @@ def _parse_llm_structured_response(raw: str) -> tuple:
 
 def _names_to_result(
     question: str,
-    names: List[str],
+    names: list[str],
     suggest_chain: bool,
     max_patterns: int,
     source: str,
-    llm_reasoning: Optional[str] = None,
+    llm_reasoning: str | None = None,
     include_enterprise: bool = True,
-    per_template_reasons: Optional[dict] = None,
-    integration_note: Optional[str] = None,
+    per_template_reasons: dict | None = None,
+    integration_note: str | None = None,
 ) -> SuggestionResult:
     """Convert list of pattern names to SuggestionResult. Adds license note when include_enterprise=False."""
     per_template_reasons = per_template_reasons or {}
@@ -416,7 +411,7 @@ def _names_to_result(
     )
 
 
-def _order_chain(pattern_names: List[str]) -> List[str]:
+def _order_chain(pattern_names: list[str]) -> list[str]:
     """Order patterns into a sensible workflow chain."""
     order_priority = {
         "temporal_sequence_analyzer": 1,
@@ -473,13 +468,13 @@ def get_pattern_class(pattern_name: str, include_enterprise: bool = True):
 class ComplexityResult:
     """Result of question complexity assessment."""
     complexity: str  # "low", "medium", "high"
-    domains: List[str]  # e.g. ["business", "technical", "ethical"]
+    domains: list[str]  # e.g. ["business", "technical", "ethical"]
     reasoning_type: str  # "diagnostic", "comparative", "strategic", etc.
     recommendation: str  # "raw", "single_template", "integrated"
     reasoning: str  # why this recommendation
-    best_template: Optional[str] = None  # for "single_template" recommendation
+    best_template: str | None = None  # for "single_template" recommendation
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "complexity": self.complexity,
             "domains": self.domains,
@@ -494,7 +489,7 @@ def assess_complexity(
     question: str,
     provider: str = "openai",
     temperature: float = 0,
-    model: Optional[str] = None,
+    model: str | None = None,
     **kwargs: Any,
 ) -> ComplexityResult:
     """Assess question complexity to decide if templates will help.
@@ -592,7 +587,7 @@ def smart_execute(
     question: str,
     provider: str = "openai",
     include_enterprise: bool = True,
-    model: Optional[str] = None,
+    model: str | None = None,
     **kwargs: Any,
 ):
     """Intelligently execute a question using the complexity router.
@@ -605,8 +600,8 @@ def smart_execute(
     """
     from ..core import Context
     from ..foundation import Directive
-    from .template_integrator_agent import TemplateIntegratorAgent
     from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
+    from .template_integrator_agent import TemplateIntegratorAgent
 
     assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
     meta = {
@@ -656,7 +651,7 @@ def smart_prompt(
     question: str,
     provider: str = "openai",
     include_enterprise: bool = True,
-    model: Optional[str] = None,
+    model: str | None = None,
     refine: bool = True,
     **kwargs: Any,
 ):
@@ -684,10 +679,8 @@ def smart_prompt(
         >>> print(cp.to_string())   # get the optimized prompt
         >>> print(cp.execute())     # or execute it directly
     """
-    from .prompt_composer import PromptComposer, ComposedPrompt
     from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
-    from ..core import Context
-    from ..foundation import Directive
+    from .prompt_composer import ComposedPrompt, PromptComposer
 
     assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
 
@@ -767,7 +760,7 @@ def smart_generic_prompt(
     question: str,
     provider: str = "openai",
     include_enterprise: bool = True,
-    model: Optional[str] = None,
+    model: str | None = None,
     **kwargs: Any,
 ):
     """One-liner: select templates via complexity router, compile generic prompts statically.
@@ -794,7 +787,7 @@ def smart_generic_prompt(
         >>> print(cp.to_string())   # zero-LLM-cost prompt
         >>> print(cp.execute())     # execute it with one LLM call
     """
-    from .prompt_composer import PromptComposer, ComposedPrompt
+    from .prompt_composer import ComposedPrompt, PromptComposer
 
     assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
 

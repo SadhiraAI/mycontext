@@ -8,14 +8,11 @@ evaluating output quality and computing CAI scores.
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from .output_evaluator import OutputEvaluator, OutputQualityScore
-from .context_amplification import ContextAmplificationIndex, CAIResult
-
+from .context_amplification import ContextAmplificationIndex
 
 BENCHMARKS_DIR = Path(__file__).parent.parent / "benchmarks"
 
@@ -26,8 +23,8 @@ class CaseResult:
     passed: bool
     output_score: float
     cai: float
-    issues: List[str] = field(default_factory=list)
-    details: Dict[str, Any] = field(default_factory=dict)
+    issues: list[str] = field(default_factory=list)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -38,8 +35,8 @@ class BenchmarkResult:
     failed: int
     avg_score: float
     avg_cai: float
-    per_case: List[CaseResult] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    per_case: list[CaseResult] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 def _load_yaml(path):
@@ -67,8 +64,8 @@ class TemplateBenchmark:
         self,
         provider: str = "openai",
         eval_mode: str = "heuristic",
-        benchmarks_dir: Optional[Path] = None,
-        model: Optional[str] = None,
+        benchmarks_dir: Path | None = None,
+        model: str | None = None,
     ):
         self.provider = provider
         self.eval_mode = eval_mode

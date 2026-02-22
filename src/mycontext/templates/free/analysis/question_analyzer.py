@@ -5,7 +5,7 @@ Based on "understand_question" cognitive tool from IBM research and Context-Engi
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class QuestionAnalyzer(Pattern):
@@ -148,13 +148,13 @@ Once you've completed this analysis, you'll be well-prepared to address the ques
                 style_guide="Use structured format with clear headings and bullet points"
             )
         )
-    
+
     def _render_context_section(self, context):
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(self, question="", context=None, depth="comprehensive", **kwargs):
         """
         Build context for question analysis (without executing).
@@ -171,12 +171,12 @@ Once you've completed this analysis, you'll be well-prepared to address the ques
         # Provide defaults for optional fields
         if context is None:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         # Remove context_section from kwargs if present to avoid duplicate
         kwargs.pop('context_section', None)
-        
+
         # Only pass template variables (not 'context', only 'context_section')
         return super().build_context(
             question=question,
@@ -184,7 +184,7 @@ Once you've completed this analysis, you'll be well-prepared to address the ques
             depth=depth,
             **kwargs
         )
-    
+
     def execute(self, provider="gemini", question="", context=None, depth="comprehensive", **kwargs):
         """
         Execute question analysis.
@@ -202,12 +202,12 @@ Once you've completed this analysis, you'll be well-prepared to address the ques
         # Provide defaults for optional fields
         if context is None:
             context = ""
-        
+
         context_section = self._render_context_section(context)
-        
+
         # Remove context_section from kwargs if present to avoid duplicate
         kwargs.pop('context_section', None)
-        
+
         # Only pass template variables (not 'context', only 'context_section')
         return super().execute(
             provider=provider,

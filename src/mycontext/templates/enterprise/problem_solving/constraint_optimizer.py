@@ -7,8 +7,8 @@ Based on constrained optimization theory and operations research.
 License: Enterprise
 """
 
-from typing import Optional, List
-from mycontext import Pattern, Guidance, Directive, Constraints
+
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ConstraintOptimizer(Pattern):
@@ -114,40 +114,40 @@ Constrained optimization:
                 style_guide="Be creative within boundaries"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_constraints_section(self, constraints: Optional[List[str]]) -> str:
+
+    def _render_constraints_section(self, constraints: list[str] | None) -> str:
         if constraints:
             return "\n".join(f"- {c}" for c in constraints)
         return "- [Define constraints]"
-    
+
     def build_context(
         self,
         objective: str = "",
-        constraints: Optional[List[str]] = None,
-        context: Optional[str] = None,
+        constraints: list[str] | None = None,
+        context: str | None = None,
         **kwargs
     ):
         constraints_section = self._render_constraints_section(constraints)
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             objective=objective,
             constraints_section=constraints_section,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         objective: str = "",
-        constraints: Optional[List[str]] = None,
-        context: Optional[str] = None,
+        constraints: list[str] | None = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

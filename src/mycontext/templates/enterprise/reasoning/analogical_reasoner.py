@@ -5,9 +5,9 @@ Leverages analogies to explain complex concepts or solve problems.
 Based on cognitive science research on analogical transfer.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class AnalogicalReasoner(Pattern):
@@ -58,7 +58,7 @@ class AnalogicalReasoner(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="analogical_reasoner",
@@ -177,18 +177,18 @@ Systematic analogical reasoning:
                 style_guide="Be creative but grounded, insightful but accurate"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         concept: str = "",
         domain: str = "general",
-        context: Optional[str] = None,
+        context: str | None = None,
         depth: str = "detailed",
         **kwargs
     ):
@@ -206,7 +206,7 @@ Systematic analogical reasoning:
             Context object ready for export/use
         """
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             concept=concept,
             domain=domain,
@@ -214,13 +214,13 @@ Systematic analogical reasoning:
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         concept: str = "",
         domain: str = "general",
-        context: Optional[str] = None,
+        context: str | None = None,
         depth: str = "detailed",
         **kwargs
     ):

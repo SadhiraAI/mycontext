@@ -94,6 +94,11 @@ exclude = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = [
+    "docs",
+    "examples",
+    "src",
+]
 
 [tool.ruff.lint]
 select = [
@@ -111,7 +116,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"__init__.py" = ["F401"]
+"tests/**" = ["B017", "F841", "E722", "E701", "B007"]
 
 [tool.mypy]
 python_version = "3.12"

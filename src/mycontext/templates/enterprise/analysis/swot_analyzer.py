@@ -5,9 +5,9 @@ Comprehensive SWOT analysis with actionable strategic insights.
 Based on strategic management and business analysis frameworks.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class SWOTAnalyzer(Pattern):
@@ -57,7 +57,7 @@ class SWOTAnalyzer(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="swot_analyzer",
@@ -217,31 +217,31 @@ Comprehensive SWOT analysis:
                 style_guide="Be balanced, honest, and strategic"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         subject: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             subject=subject,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         subject: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

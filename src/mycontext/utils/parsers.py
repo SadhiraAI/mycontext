@@ -4,21 +4,21 @@ Output Parsers - Extract structured data from LLM responses.
 Parse JSON, XML, code blocks, lists, and other formats from LLM outputs.
 """
 
-import re
 import json
+import re
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, List, Optional, Union
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class OutputParser(ABC):
     """Base class for output parsers."""
-    
+
     @abstractmethod
     def parse(self, text: str) -> Any:
         """Parse text and return structured data."""
         pass
-    
+
     @abstractmethod
     def get_format_instruction(self) -> str:
         """Get instruction to add to prompt for this format."""
@@ -27,7 +27,7 @@ class OutputParser(ABC):
 
 class JSONParser(OutputParser):
     """Parse JSON from LLM output."""
-    
+
     def __init__(self, strict: bool = True):
         """
         Initialize JSON parser.
@@ -36,8 +36,8 @@ class JSONParser(OutputParser):
             strict: If True, raise error on parse failure
         """
         self.strict = strict
-    
-    def parse(self, text: str) -> Union[Dict, List, None]:
+
+    def parse(self, text: str) -> dict | list | None:
         """
         Extract and parse JSON from text.
         
@@ -56,21 +56,21 @@ class JSONParser(OutputParser):
             except json.JSONDecodeError as e:
                 if self.strict:
                     raise ValueError(f"Invalid JSON in code block: {e}")
-        
+
         # Try finding raw JSON
         json_pattern = r'(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\])'
         matches = re.findall(json_pattern, text, re.DOTALL)
-        
+
         for match in sorted(matches, key=len, reverse=True):
             try:
                 return json.loads(match)
             except json.JSONDecodeError:
                 continue
-        
+
         if self.strict:
             raise ValueError("No valid JSON found in response")
         return None
-    
+
     def get_format_instruction(self) -> str:
         """Get JSON format instruction."""
         return """
@@ -90,7 +90,7 @@ Ensure your response is parseable JSON."""
 
 class ListParser(OutputParser):
     """Parse lists from LLM output."""
-    
+
     def __init__(self, numbered: bool = True, bullet: bool = True):
         """
         Initialize list parser.
@@ -101,8 +101,8 @@ class ListParser(OutputParser):
         """
         self.numbered = numbered
         self.bullet = bullet
-    
-    def parse(self, text: str) -> List[str]:
+
+    def parse(self, text: str) -> list[str]:
         """
         Extract list items from text.
         
@@ -113,19 +113,19 @@ class ListParser(OutputParser):
             List of extracted items
         """
         items = []
-        
+
         if self.numbered:
             # Match: 1. Item, 2. Item, etc.
             pattern = r'^\s*\d+[\.)]\s+(.+)$'
             items.extend(re.findall(pattern, text, re.MULTILINE))
-        
+
         if self.bullet:
             # Match: - Item, * Item, • Item
             pattern = r'^\s*[-*•]\s+(.+)$'
             items.extend(re.findall(pattern, text, re.MULTILINE))
-        
+
         return [item.strip() for item in items if item.strip()]
-    
+
     def get_format_instruction(self) -> str:
         """Get list format instruction."""
         if self.numbered:
@@ -148,8 +148,8 @@ Example:
 
 class CodeBlockParser(OutputParser):
     """Parse code blocks from markdown."""
-    
-    def __init__(self, language: Optional[str] = None):
+
+    def __init__(self, language: str | None = None):
         """
         Initialize code block parser.
         
@@ -157,8 +157,8 @@ class CodeBlockParser(OutputParser):
             language: Specific language to extract (None = all)
         """
         self.language = language
-    
-    def parse(self, text: str) -> Union[str, Dict[str, str]]:
+
+    def parse(self, text: str) -> str | dict[str, str]:
         """
         Extract code blocks from markdown.
         
@@ -177,14 +177,14 @@ class CodeBlockParser(OutputParser):
             # Extract all code blocks with languages
             pattern = r'```(\w+)?\s*\n(.*?)\n```'
             matches = re.findall(pattern, text, re.DOTALL)
-            
+
             result = {}
             for i, (lang, code) in enumerate(matches):
                 key = lang if lang else f"block_{i}"
                 result[key] = code.strip()
-            
+
             return result
-    
+
     def get_format_instruction(self) -> str:
         """Get code block format instruction."""
         lang = self.language or "python"
@@ -201,8 +201,8 @@ def example():
 
 class MarkdownParser(OutputParser):
     """Parse markdown structure."""
-    
-    def parse(self, text: str) -> Dict[str, Any]:
+
+    def parse(self, text: str) -> dict[str, Any]:
         """
         Parse markdown into structured format.
         
@@ -219,7 +219,7 @@ class MarkdownParser(OutputParser):
             "code_blocks": [],
             "links": [],
         }
-        
+
         # Extract headers
         header_pattern = r'^(#{1,6})\s+(.+)$'
         for match in re.finditer(header_pattern, text, re.MULTILINE):
@@ -230,24 +230,24 @@ class MarkdownParser(OutputParser):
                 "title": title,
                 "position": match.start()
             })
-        
+
         # Extract lists
         list_parser = ListParser()
         structure["lists"] = list_parser.parse(text)
-        
+
         # Extract code blocks
         code_parser = CodeBlockParser()
         structure["code_blocks"] = code_parser.parse(text)
-        
+
         # Extract links
         link_pattern = r'\[([^\]]+)\]\(([^\)]+)\)'
         structure["links"] = [
             {"text": m.group(1), "url": m.group(2)}
             for m in re.finditer(link_pattern, text)
         ]
-        
+
         return structure
-    
+
     def get_format_instruction(self) -> str:
         """Get markdown format instruction."""
         return """
@@ -261,8 +261,8 @@ class MarkdownParser(OutputParser):
 
 class XMLParser(OutputParser):
     """Parse XML from LLM output."""
-    
-    def parse(self, text: str) -> Optional[ET.Element]:
+
+    def parse(self, text: str) -> ET.Element | None:
         """
         Extract and parse XML from text.
         
@@ -280,7 +280,7 @@ class XMLParser(OutputParser):
                 return ET.fromstring(matches[0].strip())
             except ET.ParseError:
                 pass
-        
+
         # Try to find raw XML
         xml_pattern = r'<\?xml.*?\?>.*?</.*?>'
         matches = re.findall(xml_pattern, text, re.DOTALL)
@@ -289,9 +289,9 @@ class XMLParser(OutputParser):
                 return ET.fromstring(matches[0])
             except ET.ParseError:
                 pass
-        
+
         return None
-    
+
     def get_format_instruction(self) -> str:
         """Get XML format instruction."""
         return """
@@ -308,25 +308,25 @@ Example:
 
 # Convenience functions
 
-def parse_json_response(text: str, strict: bool = True) -> Union[Dict, List, None]:
+def parse_json_response(text: str, strict: bool = True) -> dict | list | None:
     """Quick JSON parsing."""
     parser = JSONParser(strict=strict)
     return parser.parse(text)
 
 
-def parse_code_blocks(text: str, language: Optional[str] = None) -> Union[str, Dict[str, str]]:
+def parse_code_blocks(text: str, language: str | None = None) -> str | dict[str, str]:
     """Quick code block extraction."""
     parser = CodeBlockParser(language=language)
     return parser.parse(text)
 
 
-def parse_list_items(text: str) -> List[str]:
+def parse_list_items(text: str) -> list[str]:
     """Quick list extraction."""
     parser = ListParser()
     return parser.parse(text)
 
 
-def parse_markdown_structure(text: str) -> Dict[str, Any]:
+def parse_markdown_structure(text: str) -> dict[str, Any]:
     """Quick markdown parsing."""
     parser = MarkdownParser()
     return parser.parse(text)

@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class FutureScenarioPlanner(Pattern):
     """
@@ -313,12 +314,12 @@ class FutureScenarioPlanner(Pattern):
                 style_guide="Strategic and imaginative. 2-4 distinct scenarios. Implications for each. Robust strategies."
             )
         )
-    
+
     def build_context(self, focal_question="", time_horizon="", current_situation="", **kwargs):
         """Build context for scenario planning."""
         context_section = ""
         kwargs.pop('context_section', None)
-        
+
         return super().build_context(
             focal_question=focal_question,
             time_horizon=time_horizon,
@@ -326,12 +327,12 @@ class FutureScenarioPlanner(Pattern):
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", focal_question="", time_horizon="", current_situation="", **kwargs):
         """Execute scenario planning."""
         context_section = ""
         kwargs.pop('context_section', None)
-        
+
         return super().execute(
             provider=provider,
             focal_question=focal_question,

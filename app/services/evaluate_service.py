@@ -1,4 +1,4 @@
-﻿"""Evaluate service: output quality, CAI measurement, benchmarks."""
+"""Evaluate service: output quality, CAI measurement, benchmarks."""
 
 from typing import Any
 
@@ -29,7 +29,7 @@ def evaluate_output(
     try:
         from mycontext import Context
         from mycontext.intelligence.output_evaluator import (
-            OutputEvaluator, OutputDimension,
+            OutputEvaluator,
         )
     except ImportError:
         return None
@@ -76,7 +76,7 @@ def measure_cai(
     """Run Context Amplification Index measurement."""
     try:
         from mycontext.intelligence.context_amplification import (
-            ContextAmplificationIndex, OutputDimension,
+            ContextAmplificationIndex,
         )
     except ImportError:
         return None

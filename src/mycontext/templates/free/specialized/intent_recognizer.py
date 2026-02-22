@@ -5,9 +5,9 @@ Helps understand what the user REALLY wants, not just what they asked.
 Based on context engineering research on goal inference.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class IntentRecognizer(Pattern):
@@ -150,17 +150,17 @@ Conduct systematic intent recognition:
                 style_guide="Be empathetic but analytical, specific but not presumptuous"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         input: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         depth: str = "comprehensive",
         **kwargs
     ):
@@ -177,19 +177,19 @@ Conduct systematic intent recognition:
             Context object ready for export/use
         """
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             input=input,
             context_section=context_section,
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         input: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         depth: str = "comprehensive",
         **kwargs
     ):

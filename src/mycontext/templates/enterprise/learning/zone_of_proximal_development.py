@@ -11,7 +11,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class ZoneOfProximalDevelopment(Pattern):
     """
@@ -260,7 +261,7 @@ Task: [Specific task in ZPD]
                 style_guide="Diagnostic and developmental. Clearly distinguish three zones. Focus on ZPD."
             )
         )
-    
+
     def build_context(self, learner_current_abilities="", learning_goal="", **kwargs):
         """Build context for ZPD analysis."""
         return super().build_context(
@@ -268,7 +269,7 @@ Task: [Specific task in ZPD]
             learning_goal=learning_goal,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", learner_current_abilities="", learning_goal="", **kwargs):
         """Execute ZPD analysis."""
         return super().execute(

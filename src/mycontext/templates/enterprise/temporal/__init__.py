@@ -7,9 +7,9 @@ Based on Klein (1989), scenario planning research, and temporal reasoning framew
 License: Enterprise
 """
 
-from .temporal_sequence_analyzer import TemporalSequenceAnalyzer
 from .future_scenario_planner import FutureScenarioPlanner
 from .historical_context_mapper import HistoricalContextMapper
+from .temporal_sequence_analyzer import TemporalSequenceAnalyzer
 
 __all__ = [
     "TemporalSequenceAnalyzer",

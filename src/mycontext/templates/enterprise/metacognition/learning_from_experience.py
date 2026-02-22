@@ -12,7 +12,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class LearningFromExperience(Pattern):
@@ -240,7 +240,7 @@ class LearningFromExperience(Pattern):
                 style_guide="Balance honest analysis with constructive future focus. Extract generalizable principles, not just specifics."
             )
         )
-    
+
     def build_context(
         self,
         experience_description="",
@@ -264,7 +264,7 @@ class LearningFromExperience(Pattern):
         """
         context_section = f"**CONTEXTUAL FACTORS**: {context}" if context else ""
         kwargs.pop('context_section', None)
-        
+
         return super().build_context(
             experience_description=experience_description,
             outcome=outcome,
@@ -272,7 +272,7 @@ class LearningFromExperience(Pattern):
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider="gemini",
@@ -298,7 +298,7 @@ class LearningFromExperience(Pattern):
         """
         context_section = f"**CONTEXTUAL FACTORS**: {context}" if context else ""
         kwargs.pop('context_section', None)
-        
+
         return super().execute(
             provider=provider,
             experience_description=experience_description,

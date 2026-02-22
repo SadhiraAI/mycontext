@@ -7,8 +7,8 @@ Based on systems thinking and problem-solving research.
 License: Enterprise
 """
 
-from typing import Optional, List
-from mycontext import Pattern, Guidance, Directive, Constraints
+
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ProblemDecomposer(Pattern):
@@ -193,24 +193,24 @@ Systematic problem decomposition:
                 style_guide="Be thorough but practical, detailed but actionable"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         """Render optional context section."""
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_constraints_section(self, constraints: Optional[List[str]]) -> str:
+
+    def _render_constraints_section(self, constraints: list[str] | None) -> str:
         """Render constraints section."""
         if constraints:
             return "\n".join(f"- {c}" for c in constraints)
         return "- None specified"
-    
+
     def build_context(
         self,
         problem: str = "",
-        context: Optional[str] = None,
-        constraints: Optional[List[str]] = None,
+        context: str | None = None,
+        constraints: list[str] | None = None,
         depth: str = "detailed",
         **kwargs
     ):
@@ -229,7 +229,7 @@ Systematic problem decomposition:
         """
         context_section = self._render_context_section(context)
         constraints_section = self._render_constraints_section(constraints)
-        
+
         return super().build_context(
             problem=problem,
             context_section=context_section,
@@ -237,13 +237,13 @@ Systematic problem decomposition:
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         problem: str = "",
-        context: Optional[str] = None,
-        constraints: Optional[List[str]] = None,
+        context: str | None = None,
+        constraints: list[str] | None = None,
         depth: str = "detailed",
         **kwargs
     ):

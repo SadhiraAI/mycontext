@@ -7,8 +7,8 @@ Based on decision science and rational choice theory.
 License: Enterprise
 """
 
-from typing import Optional, List
-from mycontext import Pattern, Guidance, Directive, Constraints
+
+from mycontext import Constraints, Guidance, Pattern
 
 
 class DecisionFramework(Pattern):
@@ -208,14 +208,14 @@ Systematic decision analysis:
                 style_guide="Be thorough but decisive, balanced but opinionated when evidence supports it"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         """Render optional context section."""
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_options_section(self, options: Optional[List[str]]) -> str:
+
+    def _render_options_section(self, options: list[str] | None) -> str:
         """Render options section."""
         if options:
             formatted = "**OPTIONS UNDER CONSIDERATION**:\n"
@@ -223,18 +223,18 @@ Systematic decision analysis:
                 formatted += f"{i}. {opt}\n"
             return formatted
         return "**OPTIONS**: To be identified during analysis\n"
-    
-    def _format_provided_options(self, options: Optional[List[str]]) -> str:
+
+    def _format_provided_options(self, options: list[str] | None) -> str:
         """Format provided options for template."""
         if options:
             return "\n".join(f"- {opt}" for opt in options)
         return "- To be identified"
-    
+
     def build_context(
         self,
         decision: str = "",
-        context: Optional[str] = None,
-        options: Optional[List[str]] = None,
+        context: str | None = None,
+        options: list[str] | None = None,
         depth: str = "comprehensive",
         **kwargs
     ):
@@ -254,7 +254,7 @@ Systematic decision analysis:
         context_section = self._render_context_section(context)
         options_section = self._render_options_section(options)
         provided_options = self._format_provided_options(options)
-        
+
         return super().build_context(
             decision=decision,
             context_section=context_section,
@@ -263,13 +263,13 @@ Systematic decision analysis:
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         decision: str = "",
-        context: Optional[str] = None,
-        options: Optional[List[str]] = None,
+        context: str | None = None,
+        options: list[str] | None = None,
         depth: str = "comprehensive",
         **kwargs
     ):

@@ -6,8 +6,7 @@ Structured comparison framework for evaluating alternatives.
 License: Enterprise
 """
 
-from typing import List, Optional
-from mycontext import Pattern, Guidance, Directive
+from mycontext import Guidance, Pattern
 
 
 class ComparativeAnalyzer(Pattern):
@@ -127,30 +126,30 @@ Be specific, evidence-based, and actionable.""",
                 "depth": str
             }
         )
-    
+
     def _format_options(self, options) -> str:
         """Format options for template"""
         if isinstance(options, str):
             # If comma-separated string, split it
             options = [opt.strip() for opt in options.split(',')]
-        
+
         formatted = "OPTIONS TO COMPARE:\n"
         for i, opt in enumerate(options, 1):
             formatted += f"{i}. {opt}\n"
         return formatted
-    
+
     def _render_context_section(self, context: str) -> str:
         """Render the context section"""
         if not context or context.strip() == "":
             return ""
         return f"CONTEXT:\n{context}\n"
-    
+
     def _render_criteria_section(self, criteria: str) -> str:
         """Render comparison criteria"""
         if not criteria or criteria.strip() == "":
             return "Use standard comparison criteria appropriate for these options."
         return f"COMPARISON CRITERIA:\n{criteria}\n"
-    
+
     def build_context(
         self,
         options,
@@ -175,13 +174,13 @@ Be specific, evidence-based, and actionable.""",
         options_formatted = self._format_options(options)
         context_section = self._render_context_section(context or "")
         criteria_section = self._render_criteria_section(criteria or "")
-        
+
         # Clean up kwargs
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
         kwargs.pop('criteria_section', None)
         kwargs.pop('options_formatted', None)
-        
+
         return super().build_context(
             options_formatted=options_formatted,
             context_section=context_section,
@@ -189,7 +188,7 @@ Be specific, evidence-based, and actionable.""",
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
@@ -216,23 +215,23 @@ Be specific, evidence-based, and actionable.""",
         options_formatted = self._format_options(options or [])
         context_section = self._render_context_section(context or "")
         criteria_section = self._render_criteria_section(criteria or "")
-        
+
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p', 
-                               'frequency_penalty', 'presence_penalty', 'stop', 
+        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
+                               'frequency_penalty', 'presence_penalty', 'stop',
                                'user', 'api_key', 'base_url'}
-        
+
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
-        
+
         # Clean up
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
         kwargs.pop('criteria_section', None)
         kwargs.pop('options_formatted', None)
-        
+
         return super().execute(
             provider=provider,
             options_formatted=options_formatted,

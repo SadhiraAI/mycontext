@@ -11,7 +11,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ConsequentialistAnalyzer(Pattern):
@@ -80,10 +80,10 @@ Net consequentialist assessment: [Positive/Negative/Uncertain]""",
             input_schema={"action": str, "scope": str},
             constraints=Constraints(must_include=["time_horizons", "second_order_effects"], style_guide="Consider long-term impacts")
         )
-    
+
     def build_context(self, action="", scope="", **kwargs):
         return super().build_context(action=action, scope=scope, **kwargs)
-    
+
     def execute(self, provider="gemini", action="", scope="", **kwargs):
         return super().execute(provider=provider, action=action, scope=scope, **kwargs)
 

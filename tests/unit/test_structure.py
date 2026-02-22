@@ -3,13 +3,14 @@ Unit tests for Structure layer (Pattern and Blueprint)
 """
 
 import pytest
-from mycontext.structure import Pattern, Blueprint
+
 from mycontext.foundation import Guidance
+from mycontext.structure import Blueprint, Pattern
 
 
 class TestPattern:
     """Tests for Pattern class"""
-    
+
     def test_create_simple_pattern(self):
         """Test creating a simple pattern"""
         pattern = Pattern(
@@ -18,7 +19,7 @@ class TestPattern:
         )
         assert pattern.name == "test_pattern"
         assert pattern.version == "1.0.0"
-    
+
     def test_pattern_with_guidance(self):
         """Test pattern with guidance"""
         guidance = Guidance(role="Expert")
@@ -27,7 +28,7 @@ class TestPattern:
             guidance=guidance
         )
         assert pattern.guidance.role == "Expert"
-    
+
     def test_pattern_with_schema(self):
         """Test pattern with input/output schema"""
         pattern = Pattern(
@@ -37,7 +38,7 @@ class TestPattern:
         )
         assert "code" in pattern.input_schema
         assert "issues" in pattern.output_schema
-    
+
     def test_pattern_build_context(self):
         """Test building context from pattern"""
         pattern = Pattern(
@@ -50,7 +51,7 @@ class TestPattern:
         assert context is not None
         assert context.guidance.role == "Assistant"
         assert "Hello" in context.directive.content
-    
+
     def test_pattern_validate_inputs(self):
         """Test input validation"""
         pattern = Pattern(
@@ -59,7 +60,7 @@ class TestPattern:
         )
         with pytest.raises(ValueError):
             pattern.build_context()  # Missing required field
-    
+
     def test_pattern_to_dict(self):
         """Test converting pattern to dict"""
         pattern = Pattern(name="test", description="Test pattern")
@@ -70,7 +71,7 @@ class TestPattern:
 
 class TestBlueprint:
     """Tests for Blueprint class"""
-    
+
     def test_create_simple_blueprint(self):
         """Test creating a simple blueprint"""
         blueprint = Blueprint(
@@ -79,7 +80,7 @@ class TestBlueprint:
         )
         assert blueprint.name == "simple_assistant"
         assert blueprint.token_budget == 4000  # default
-    
+
     def test_blueprint_with_guidance(self):
         """Test blueprint with guidance"""
         guidance = Guidance(role="Expert assistant")
@@ -88,7 +89,7 @@ class TestBlueprint:
             guidance=guidance
         )
         assert blueprint.guidance.role == "Expert assistant"
-    
+
     def test_blueprint_with_token_budget(self):
         """Test blueprint with custom token budget"""
         blueprint = Blueprint(
@@ -96,7 +97,7 @@ class TestBlueprint:
             token_budget=8000
         )
         assert blueprint.token_budget == 8000
-    
+
     def test_blueprint_build(self):
         """Test building context from blueprint"""
         blueprint = Blueprint(
@@ -109,7 +110,7 @@ class TestBlueprint:
         assert context is not None
         assert context.guidance.role == "Assistant"
         assert "Hello" in context.directive.content
-    
+
     def test_blueprint_estimate_tokens(self):
         """Test token estimation"""
         blueprint = Blueprint(
@@ -118,7 +119,7 @@ class TestBlueprint:
         )
         estimated = blueprint.estimate_tokens()
         assert estimated > 0
-    
+
     def test_blueprint_optimize(self):
         """Test blueprint optimization"""
         blueprint = Blueprint(name="test")

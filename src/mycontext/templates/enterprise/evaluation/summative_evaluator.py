@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class SummativeEvaluator(Pattern):
     """
@@ -378,7 +379,7 @@ class SummativeEvaluator(Pattern):
                 style_guide="Rigorous and comprehensive. Aligned with outcomes. Fair and valid. Clear scoring."
             )
         )
-    
+
     def build_context(self, course_title="", learning_outcomes="", **kwargs):
         """Build context for summative evaluation design."""
         # Parse learning outcomes into individual outcomes
@@ -386,11 +387,11 @@ class SummativeEvaluator(Pattern):
         outcome_1 = outcomes_list[0] if len(outcomes_list) > 0 else ""
         outcome_2 = outcomes_list[1] if len(outcomes_list) > 1 else ""
         outcome_3 = outcomes_list[2] if len(outcomes_list) > 2 else ""
-        
+
         kwargs.pop('outcome_1', None)
         kwargs.pop('outcome_2', None)
         kwargs.pop('outcome_3', None)
-        
+
         return super().build_context(
             course_title=course_title,
             learning_outcomes=learning_outcomes,
@@ -399,7 +400,7 @@ class SummativeEvaluator(Pattern):
             outcome_3=outcome_3,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", course_title="", learning_outcomes="", **kwargs):
         """Execute summative evaluation design."""
         # Parse learning outcomes
@@ -407,11 +408,11 @@ class SummativeEvaluator(Pattern):
         outcome_1 = outcomes_list[0] if len(outcomes_list) > 0 else ""
         outcome_2 = outcomes_list[1] if len(outcomes_list) > 1 else ""
         outcome_3 = outcomes_list[2] if len(outcomes_list) > 2 else ""
-        
+
         kwargs.pop('outcome_1', None)
         kwargs.pop('outcome_2', None)
         kwargs.pop('outcome_3', None)
-        
+
         return super().execute(
             provider=provider,
             course_title=course_title,

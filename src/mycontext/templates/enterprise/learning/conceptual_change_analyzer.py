@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class ConceptualChangeAnalyzer(Pattern):
     """
@@ -315,7 +316,7 @@ class ConceptualChangeAnalyzer(Pattern):
                 style_guide="Diagnostic and constructive. Create cognitive conflict, then guide change. Use Posner's framework."
             )
         )
-    
+
     def build_context(self, topic="", current_understanding="", **kwargs):
         """Build context for conceptual change analysis."""
         return super().build_context(
@@ -323,7 +324,7 @@ class ConceptualChangeAnalyzer(Pattern):
             current_understanding=current_understanding,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", topic="", current_understanding="", **kwargs):
         """Execute conceptual change analysis."""
         return super().execute(

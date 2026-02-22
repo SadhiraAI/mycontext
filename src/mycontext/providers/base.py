@@ -5,7 +5,8 @@ All LLM providers must implement this interface.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -21,18 +22,18 @@ class ProviderResponse(BaseModel):
         model: Model used
         metadata: Additional provider-specific data
     """
-    
+
     response: str = Field(..., description="Generated text")
-    
+
     tokens_used: int = Field(default=0, description="Tokens consumed")
-    
+
     cost_usd: float = Field(default=0.0, description="Estimated cost")
-    
+
     latency_ms: int = Field(default=0, description="Response time")
-    
+
     model: str = Field(default="unknown", description="Model used")
-    
-    metadata: Dict[str, Any] = Field(
+
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Provider-specific data"
     )
@@ -45,7 +46,7 @@ class BaseProvider(ABC):
     All providers (OpenAI, Anthropic, Google, etc.) must implement
     this interface to ensure consistent behavior.
     """
-    
+
     @abstractmethod
     def generate(
         self,
@@ -63,7 +64,7 @@ class BaseProvider(ABC):
             Standardized response
         """
         pass
-    
+
     @abstractmethod
     def estimate_cost(self, tokens: int) -> float:
         """
@@ -76,13 +77,13 @@ class BaseProvider(ABC):
             Estimated cost in USD
         """
         pass
-    
+
     @property
     @abstractmethod
     def name(self) -> str:
         """Provider name"""
         pass
-    
+
     @property
     @abstractmethod
     def models(self) -> list[str]:

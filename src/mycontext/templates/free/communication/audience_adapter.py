@@ -5,9 +5,9 @@ Tailors messages, tone, and content to specific audiences.
 Based on communication theory and audience analysis.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class AudienceAdapter(Pattern):
@@ -248,22 +248,22 @@ Audience adaptation:
                 style_guide="Be respectful of both audiences, not condescending"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         message: str = "",
         current_audience: str = "general",
         target_audience: str = "specific group",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             message=message,
             current_audience=current_audience,
@@ -271,14 +271,14 @@ Audience adaptation:
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         message: str = "",
         current_audience: str = "general",
         target_audience: str = "specific group",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

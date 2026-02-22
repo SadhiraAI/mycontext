@@ -10,11 +10,10 @@ from __future__ import annotations
 import inspect
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from ..core import Context
 from ..intelligence.quality_metrics import QualityMetrics, QualityScore
-
 from .improvement import log_run
 from .pattern_registry import get_pattern
 from .skill import Skill
@@ -24,11 +23,11 @@ _PRIMARY_INPUT_KEYS = frozenset({
     "options", "problem", "statement", "decision", "topic", "concept", "situation",
     "input", "observation", "phenomenon", "challenge", "action", "conflict", "risk",
     "system", "project", "process", "objective", "goal", "sources", "text", "message",
-    "complex_topic", "technical_text", "sources", "statement", "data_description",
+    "complex_topic", "technical_text", "data_description",
 })
 
 
-def _fuse_pattern_context(skill: Skill, task: Optional[str], params: Dict[str, Any]) -> Context:
+def _fuse_pattern_context(skill: Skill, task: str | None, params: dict[str, Any]) -> Context:
     """
     Build a Context by fusing skill content with the named mycontext Pattern.
 
@@ -44,7 +43,7 @@ def _fuse_pattern_context(skill: Skill, task: Optional[str], params: Dict[str, A
         skill_content = instruction + ("\n\n" + skill_content if skill_content else "")
 
     sig = inspect.signature(pattern.build_context)
-    kwargs: Dict[str, Any] = {}
+    kwargs: dict[str, Any] = {}
     for name, param in sig.parameters.items():
         if name in ("self", "kwargs"):
             continue
@@ -71,9 +70,9 @@ class SkillRunResult:
 
     context: Context
     quality_score: QualityScore
-    execution_result: Optional[Any] = None
-    skill: Optional[Skill] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    execution_result: Any | None = None
+    skill: Skill | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
     gated: bool = False  # True when execution was skipped due to quality_threshold
 
 
@@ -87,9 +86,9 @@ class SkillRunner:
 
     def __init__(
         self,
-        quality_metrics: Optional[QualityMetrics] = None,
+        quality_metrics: QualityMetrics | None = None,
         log_runs: bool = False,
-        log_path: Optional[Path] = None,
+        log_path: Path | None = None,
     ):
         self._quality = quality_metrics or QualityMetrics()
         self._log_runs = log_runs
@@ -102,7 +101,7 @@ class SkillRunner:
     def build_context(
         self,
         skill: Skill,
-        task: Optional[str] = None,
+        task: str | None = None,
         include_references: bool = True,
         **params: Any,
     ) -> Context:
@@ -138,11 +137,11 @@ class SkillRunner:
     def run(
         self,
         skill_path: Path,
-        task: Optional[str] = None,
+        task: str | None = None,
         execute: bool = False,
         provider: str = "openai",
         include_references: bool = True,
-        quality_threshold: Optional[float] = None,
+        quality_threshold: float | None = None,
         **params: Any,
     ) -> SkillRunResult:
         """

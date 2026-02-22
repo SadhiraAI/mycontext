@@ -1,6 +1,5 @@
 """Feedback API: collect user feedback (bug reports, feature requests, etc.)."""
 
-from typing import Optional
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -16,7 +15,7 @@ router = APIRouter(prefix="/api/feedback", tags=["feedback"])
 class FeedbackRequest(BaseModel):
     feedback_type: str  # "bug" | "feature" | "general"
     message: str
-    page_url: Optional[str] = None
+    page_url: str | None = None
 
 
 class FeedbackResponse(BaseModel):

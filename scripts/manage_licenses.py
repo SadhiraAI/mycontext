@@ -15,7 +15,7 @@ import secrets
 import sqlite3
 import sys
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent.parent / "mycontext.db"
@@ -45,7 +45,7 @@ def cmd_generate(args):
         cur.execute(
             "INSERT INTO license_keys (id, key, label, is_valid, created_at) "
             "VALUES (?, ?, ?, 1, ?)",
-            (key_id, key_val, label, datetime.now(timezone.utc).isoformat()),
+            (key_id, key_val, label, datetime.now(UTC).isoformat()),
         )
         keys.append(key_val)
     conn.commit()
@@ -74,7 +74,7 @@ def cmd_list(args):
     fmt = "{:<45} {:<20} {:<15} {:<38} {:<22}"
     print(fmt.format("KEY", "LABEL", "STATUS", "REDEEMED BY", "CREATED"))
     print("-" * 140)
-    for key, label, is_valid, redeemed_by, created_at, redeemed_at in rows:
+    for key, label, is_valid, redeemed_by, created_at, _redeemed_at in rows:
         status = "REVOKED" if not is_valid else ("REDEEMED" if redeemed_by else "AVAILABLE")
         label_str = (label or "")[:20]
         redeemed_str = (redeemed_by or "")[:38]

@@ -2,12 +2,11 @@
 Unit tests for chain orchestration agent.
 """
 
-import pytest
 
 from mycontext.intelligence import (
-    build_workflow_chain,
-    WorkflowChainResult,
     PATTERN_BUILD_CONTEXT_REGISTRY,
+    WorkflowChainResult,
+    build_workflow_chain,
 )
 from mycontext.intelligence.pattern_suggester import VALID_PATTERN_NAMES
 

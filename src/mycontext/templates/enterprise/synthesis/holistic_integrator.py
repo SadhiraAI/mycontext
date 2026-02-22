@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class HolisticIntegrator(Pattern):
     """
@@ -449,7 +450,7 @@ class HolisticIntegrator(Pattern):
                 style_guide="Comprehensive and balanced. Multiple perspectives. Emergent insights. Coherent synthesis."
             )
         )
-    
+
     def build_context(self, topic="", perspectives="", **kwargs):
         """Build context for holistic integration."""
         return super().build_context(
@@ -457,7 +458,7 @@ class HolisticIntegrator(Pattern):
             perspectives=perspectives,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", topic="", perspectives="", **kwargs):
         """Execute holistic integration."""
         return super().execute(

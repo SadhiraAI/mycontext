@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class ScaffoldingFramework(Pattern):
     """
@@ -247,24 +248,24 @@ Before fading support, check:
                 style_guide="Adaptive support that gradually reduces. Balance help with independence."
             )
         )
-    
+
     def build_context(self, task="", current_skill_level="", goal="", **kwargs):
         """Build context for scaffolding design."""
         goal_section = f"**GOAL**: {goal}" if goal else ""
         kwargs.pop('goal_section', None)
-        
+
         return super().build_context(
             task=task,
             current_skill_level=current_skill_level,
             goal_section=goal_section,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", task="", current_skill_level="", goal="", **kwargs):
         """Execute scaffolding framework design."""
         goal_section = f"**GOAL**: {goal}" if goal else ""
         kwargs.pop('goal_section', None)
-        
+
         return super().execute(
             provider=provider,
             task=task,

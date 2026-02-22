@@ -7,8 +7,8 @@ Based on process optimization and lean principles.
 License: Enterprise
 """
 
-from typing import Optional
-from mycontext import Pattern, Guidance, Directive, Constraints
+
+from mycontext import Constraints, Guidance, Pattern
 
 
 class EfficiencyAnalyzer(Pattern):
@@ -137,34 +137,34 @@ Efficiency analysis:
                 style_guide="Be quantitative and actionable"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         process: str = "",
         goal: str = "Maximize efficiency",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             process=process,
             goal=goal,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         process: str = "",
         goal: str = "Maximize efficiency",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

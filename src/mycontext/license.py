@@ -12,12 +12,11 @@ Usage:
 
 import json
 from pathlib import Path
-from typing import Optional
 
 _LICENSE_DIR = Path.home() / ".mycontext"
 _LICENSE_FILE = _LICENSE_DIR / "license.json"
 
-_runtime_key: Optional[str] = None
+_runtime_key: str | None = None
 
 
 def _read_stored() -> dict:
@@ -61,7 +60,7 @@ def deactivate_license() -> None:
     _write_stored({"key": None, "active": False})
 
 
-def get_license_key() -> Optional[str]:
+def get_license_key() -> str | None:
     """Return the current license key or None."""
     if _runtime_key:
         return _runtime_key

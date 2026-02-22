@@ -4,7 +4,8 @@ Integration Helpers - Seamless integration with popular AI frameworks
 Makes mycontext work effortlessly with LangChain, LlamaIndex, CrewAI, AutoGen, and more.
 """
 
-from typing import Any, Dict, Optional, List
+from typing import Any
+
 from ..core import Context
 
 
@@ -29,12 +30,12 @@ class LangChainHelper:
         >>> chat = ChatOpenAI()
         >>> response = chat(messages)
     """
-    
+
     @staticmethod
-    def to_messages(context: Context, user_message: Optional[str] = None):
+    def to_messages(context: Context, user_message: str | None = None):
         """Convert context to LangChain messages."""
         try:
-            from langchain_core.messages import SystemMessage, HumanMessage
+            from langchain_core.messages import HumanMessage, SystemMessage
         except ImportError:
             raise ImportError(
                 "langchain-core is not installed. Install with: pip install langchain-core"
@@ -50,34 +51,34 @@ class LangChainHelper:
             messages.append(HumanMessage(content=user_message))
 
         return messages
-    
+
     @staticmethod
     def to_prompt_template(context: Context):
         """Convert context to LangChain PromptTemplate."""
         try:
             from langchain_core.prompts import PromptTemplate
-            
+
             template = context.assemble()
             if context.data:
                 # Extract variables from data
                 variables = list(context.data.keys())
                 return PromptTemplate(template=template, input_variables=variables)
-            
+
             return PromptTemplate(template=template, input_variables=[])
         except ImportError:
             raise ImportError(
                 "langchain-core is not installed. Install with: pip install langchain-core"
             )
-    
+
     @staticmethod
     def to_chat_prompt(context: Context):
         """Convert context to LangChain ChatPromptTemplate."""
         try:
             from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate
-            
+
             system_template = context.assemble()
             system_message = SystemMessagePromptTemplate.from_template(system_template)
-            
+
             return ChatPromptTemplate.from_messages([system_message])
         except ImportError:
             raise ImportError(
@@ -103,18 +104,18 @@ class LlamaIndexHelper:
         >>> index = VectorStoreIndex.from_documents(docs)
         >>> query_engine = helper.create_query_engine(index, context)
     """
-    
+
     @staticmethod
     def to_prompt(context: Context) -> str:
         """Convert context to LlamaIndex prompt."""
         return context.assemble()
-    
+
     @staticmethod
     def create_query_engine(index: Any, context: Context, **kwargs):
         """Create a LlamaIndex query engine with mycontext context."""
         try:
             prompt_template = context.assemble()
-            
+
             return index.as_query_engine(
                 text_qa_template=prompt_template,
                 **kwargs
@@ -123,13 +124,13 @@ class LlamaIndexHelper:
             raise RuntimeError(
                 f"Failed to create query engine. Make sure LlamaIndex is installed: {e}"
             )
-    
+
     @staticmethod
     def create_chat_engine(index: Any, context: Context, **kwargs):
         """Create a LlamaIndex chat engine with mycontext context."""
         try:
             system_prompt = context.assemble()
-            
+
             return index.as_chat_engine(
                 system_prompt=system_prompt,
                 **kwargs
@@ -160,20 +161,20 @@ class CrewAIHelper:
         ...     tools=my_tools
         ... )
     """
-    
+
     @staticmethod
     def create_agent(
         context: Context,
         name: str = "agent",
-        tools: Optional[List] = None,
+        tools: list | None = None,
         **kwargs
     ):
         """Create a CrewAI agent with mycontext context."""
         try:
             from crewai import Agent
-            
+
             crew_config = context.to_crewai()
-            
+
             return Agent(
                 role=crew_config['role'],
                 goal=crew_config['goal'],
@@ -186,19 +187,19 @@ class CrewAIHelper:
             raise ImportError(
                 "CrewAI is not installed. Install with: pip install crewai"
             )
-    
+
     @staticmethod
     def create_task(
         context: Context,
-        description: Optional[str] = None,
-        agent: Optional[Any] = None,
-        expected_output: Optional[str] = None,
+        description: str | None = None,
+        agent: Any | None = None,
+        expected_output: str | None = None,
         **kwargs
     ):
         """Create a CrewAI task with mycontext context."""
         try:
             from crewai import Task
-            
+
             task_description = description or (
                 context.directive.content if context.directive else "Complete the task"
             )
@@ -208,7 +209,7 @@ class CrewAIHelper:
             if output is None:
                 crew_config = context.to_crewai()
                 output = crew_config.get("expected_output", "A complete, actionable response addressing the task.")
-            
+
             return Task(
                 description=task_description,
                 expected_output=output,
@@ -240,20 +241,20 @@ class AutoGenHelper:
         ...     name="coding_expert"
         ... )
     """
-    
+
     @staticmethod
     def create_assistant(
         context: Context,
         name: str = "assistant",
-        llm_config: Optional[Dict] = None,
+        llm_config: dict | None = None,
         **kwargs
     ):
         """Create an AutoGen assistant agent with mycontext context."""
         try:
             from autogen import AssistantAgent
-            
+
             autogen_config = context.to_autogen()
-            
+
             return AssistantAgent(
                 name=name,
                 system_message=autogen_config['system_message'],
@@ -264,7 +265,7 @@ class AutoGenHelper:
             raise ImportError(
                 "AutoGen is not installed. Install with: pip install pyautogen"
             )
-    
+
     @staticmethod
     def create_user_proxy(
         name: str = "user",
@@ -273,7 +274,7 @@ class AutoGenHelper:
         """Create an AutoGen user proxy agent."""
         try:
             from autogen import UserProxyAgent
-            
+
             return UserProxyAgent(
                 name=name,
                 human_input_mode="TERMINATE",
@@ -301,14 +302,14 @@ class DSPyHelper:
         >>> # Get DSPy-compatible format
         >>> prompt = helper.to_prompt(context)
     """
-    
+
     @staticmethod
     def to_prompt(context: Context) -> str:
         """Convert context to DSPy prompt."""
         return context.assemble()
-    
+
     @staticmethod
-    def to_signature(context: Context) -> Dict[str, Any]:
+    def to_signature(context: Context) -> dict[str, Any]:
         """Convert context to DSPy signature format."""
         return {
             "instructions": context.assemble(),
@@ -332,12 +333,12 @@ class SemanticKernelHelper:
         >>> # Create semantic function
         >>> func = helper.create_semantic_function(kernel, context)
     """
-    
+
     @staticmethod
     def to_prompt_template(context: Context) -> str:
         """Convert context to Semantic Kernel prompt template."""
         return context.assemble()
-    
+
     @staticmethod
     def create_semantic_function(
         kernel,
@@ -391,8 +392,8 @@ class GoogleADKHelper:
         context: Context,
         name: str = "agent",
         model: str = "gemini-2.0-flash",
-        description: Optional[str] = None,
-        tools: Optional[List] = None,
+        description: str | None = None,
+        tools: list | None = None,
         **kwargs
     ):
         """Create a Google ADK Agent with mycontext context as instruction."""
@@ -440,7 +441,7 @@ def auto_integrate(context: Context, framework: str, **kwargs) -> Any:
         >>> agent = auto_integrate(context, "crewai", name="analyst", tools=tools)
     """
     framework = framework.lower()
-    
+
     if framework == "langchain":
         return LangChainHelper.to_messages(context, **kwargs)
     elif framework == "llamaindex":

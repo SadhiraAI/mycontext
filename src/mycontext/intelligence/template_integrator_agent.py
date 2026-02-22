@@ -11,13 +11,12 @@ Research Foundation:
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 
 from ..intelligence.pattern_suggester import (
+    ENTERPRISE_LICENSE_NOTE,
     NAME_TO_CATEGORY,
     NAME_TO_DESCRIPTION,
     VALID_PATTERN_NAMES,
-    ENTERPRISE_LICENSE_NOTE,
 )
 
 
@@ -26,18 +25,18 @@ class IntegrationResult:
     """Result of template integration."""
 
     question: str
-    source_templates: List[str]
+    source_templates: list[str]
     integrated_context: str
     role: str = ""
-    rules: List[str] = field(default_factory=list)
+    rules: list[str] = field(default_factory=list)
     directive: str = ""
-    output_requirements: List[str] = field(default_factory=list)
+    output_requirements: list[str] = field(default_factory=list)
     raw_llm_response: str = ""
 
     def to_context(self):
         """Convert to a mycontext Context object for direct execution."""
         from ..core import Context
-        from ..foundation import Directive, Guidance, Constraints
+        from ..foundation import Constraints, Directive, Guidance
 
         gkw = {}
         if self.role:
@@ -304,8 +303,8 @@ class TemplateIntegratorAgent:
     def _get_template_detail(name):
         """Extract role, key rules, and directive structure from an actual template."""
         try:
-            from .pattern_suggester import get_pattern_class
             from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
+            from .pattern_suggester import get_pattern_class
             klass = get_pattern_class(name, include_enterprise=True)
             if not klass:
                 return ""

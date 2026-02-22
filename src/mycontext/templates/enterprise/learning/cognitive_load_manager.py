@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class CognitiveLoadManager(Pattern):
     """
@@ -314,7 +315,7 @@ Before presenting material, ensure:
                 style_guide="Analytical and precise. Focus on load optimization. Evidence-based principles."
             )
         )
-    
+
     def build_context(self, learning_material="", learner_background="", **kwargs):
         """Build context for cognitive load management."""
         return super().build_context(
@@ -322,7 +323,7 @@ Before presenting material, ensure:
             learner_background=learner_background,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", learning_material="", learner_background="", **kwargs):
         """Execute cognitive load analysis."""
         return super().execute(

@@ -5,7 +5,7 @@ Based on content strategy best practices and cognitive tools methodology.
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ContentOutliner(Pattern):
@@ -61,7 +61,7 @@ class ContentOutliner(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="content_outliner",
@@ -255,13 +255,13 @@ Generate a detailed, actionable content outline:
                 style_guide="Use clear hierarchy (###), specific content descriptions, word counts for sections"
             )
         )
-    
+
     def _render_context_section(self, context):
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def _calculate_section_lengths(self, target_length_str):
         """Estimate section lengths based on total."""
         # Simple parsing - extract number
@@ -274,7 +274,7 @@ Generate a detailed, actionable content outline:
             conclusion_length = int(total * 0.10)
             return str(section_length), str(conclusion_length)
         return "200", "150"
-    
+
     def execute(
         self,
         provider="gemini",
@@ -308,10 +308,10 @@ Generate a detailed, actionable content outline:
         # Provide defaults for optional fields
         if context is None:
             context = ""
-        
+
         context_section = self._render_context_section(context)
         section_length, conclusion_length = self._calculate_section_lengths(target_length)
-        
+
         return super().execute(
             provider=provider,
             topic=topic,

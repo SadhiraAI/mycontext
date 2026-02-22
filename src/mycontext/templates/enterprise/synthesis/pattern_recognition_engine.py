@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class PatternRecognitionEngine(Pattern):
     """
@@ -389,7 +390,7 @@ T3 ----[Patterns overlap]------
                 style_guide="Analytical and systematic. Multiple pattern types. Quantified strength. Actionable insights."
             )
         )
-    
+
     def build_context(self, data="", pattern_focus="", **kwargs):
         """Build context for pattern recognition."""
         return super().build_context(
@@ -397,7 +398,7 @@ T3 ----[Patterns overlap]------
             pattern_focus=pattern_focus,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", data="", pattern_focus="", **kwargs):
         """Execute pattern recognition analysis."""
         return super().execute(

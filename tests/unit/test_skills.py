@@ -2,11 +2,12 @@
 Unit tests for Agent Skills (Skill, SkillRunner, pattern fusion).
 """
 
-import pytest
 from pathlib import Path
 
+import pytest
+
 from mycontext.skills import Skill, SkillRunner, SkillRunResult
-from mycontext.skills.pattern_registry import get_pattern_registry, get_pattern
+from mycontext.skills.pattern_registry import get_pattern, get_pattern_registry
 
 
 class TestContextFromSkill:
@@ -248,10 +249,10 @@ class TestSkillFeedbackLoop:
 
     def test_suggested_edits_from_log(self, tmp_path: Path) -> None:
         """Log 2 runs with same suggestion; suggested_edits_from_log returns it when min_count=2."""
-        from mycontext.skills import log_run, suggested_edits_from_log
-        from mycontext.skills.runner import SkillRunResult
         from mycontext.core import Context
         from mycontext.intelligence.quality_metrics import QualityScore
+        from mycontext.skills import log_run, suggested_edits_from_log
+        from mycontext.skills.runner import SkillRunResult
         log_file = tmp_path / "edits_log.jsonl"
         from mycontext.skills import Skill
         (tmp_path / "SKILL.md").write_text("---\nname: EditSkill\ndescription: D\n---\n", encoding="utf-8")

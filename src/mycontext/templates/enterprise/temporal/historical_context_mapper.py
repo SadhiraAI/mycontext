@@ -11,7 +11,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class HistoricalContextMapper(Pattern):
     """
@@ -342,7 +343,7 @@ class HistoricalContextMapper(Pattern):
                 style_guide="Analytical and contextual. Multiple precedents. Note differences. Transferable lessons."
             )
         )
-    
+
     def build_context(self, current_situation="", question="", **kwargs):
         """Build context for historical analysis."""
         return super().build_context(
@@ -350,7 +351,7 @@ class HistoricalContextMapper(Pattern):
             question=question,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", current_situation="", question="", **kwargs):
         """Execute historical context mapping."""
         return super().execute(

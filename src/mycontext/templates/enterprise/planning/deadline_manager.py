@@ -5,9 +5,9 @@ Systematic deadline management and schedule optimization.
 Based on time management and project scheduling principles.
 """
 
-from typing import Optional, List
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class DeadlineManager(Pattern):
@@ -57,7 +57,7 @@ class DeadlineManager(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="deadline_manager",
@@ -133,12 +133,12 @@ Deadline management:
                 style_guide="Be realistic, not optimistic"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def _render_tasks_section(self, tasks) -> str:
         if not tasks:
             return "1. [Define tasks]"
@@ -146,30 +146,30 @@ Deadline management:
             items = [t.strip() for t in tasks.replace("\n", ",").split(",") if t.strip()]
             return "\n".join(f"{i+1}. {task}" for i, task in enumerate(items))
         return "\n".join(f"{i+1}. {task}" for i, task in enumerate(tasks))
-    
+
     def build_context(
         self,
-        tasks: Optional[List[str]] = None,
+        tasks: list[str] | None = None,
         deadline: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         tasks_section = self._render_tasks_section(tasks)
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             tasks_section=tasks_section,
             deadline=deadline,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
-        tasks: Optional[List[str]] = None,
+        tasks: list[str] | None = None,
         deadline: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

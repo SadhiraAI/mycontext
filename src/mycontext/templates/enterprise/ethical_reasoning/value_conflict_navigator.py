@@ -11,7 +11,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ValueConflictNavigator(Pattern):
@@ -81,10 +81,10 @@ Can both values be partially honored?
             input_schema={"situation": str, "competing_values": str, "value_a": str, "value_b": str},
             constraints=Constraints(must_include=["context_specific_reasoning"], style_guide="Acknowledge both values' importance")
         )
-    
+
     def build_context(self, situation="", competing_values="", value_a="", value_b="", **kwargs):
         return super().build_context(situation=situation, competing_values=competing_values, value_a=value_a, value_b=value_b, **kwargs)
-    
+
     def execute(self, provider="gemini", situation="", competing_values="", value_a="", value_b="", **kwargs):
         return super().execute(provider=provider, situation=situation, competing_values=competing_values, value_a=value_a, value_b=value_b, **kwargs)
 

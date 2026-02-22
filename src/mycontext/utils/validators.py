@@ -4,8 +4,8 @@ Validators - Validate contexts, outputs, and schemas.
 Ensure data quality and catch issues before expensive LLM calls.
 """
 
-import re
-from typing import Any, Dict, List, Optional, Type
+from typing import Any
+
 from pydantic import BaseModel, ValidationError
 
 
@@ -15,9 +15,9 @@ class ContextValidator:
     
     Catch issues before making expensive LLM calls.
     """
-    
+
     @staticmethod
-    def validate_context(context: Any) -> Dict[str, Any]:
+    def validate_context(context: Any) -> dict[str, Any]:
         """
         Validate a context object.
         
@@ -29,35 +29,35 @@ class ContextValidator:
         """
         issues = []
         warnings = []
-        
+
         # Get context text
         if hasattr(context, 'assemble'):
             text = context.assemble()
         else:
             text = str(context)
-        
+
         # Check length
         if len(text) < 10:
             issues.append("Context is too short (<10 chars)")
-        
+
         if len(text) > 100000:
             warnings.append("Context is very long (>100k chars) - may be expensive")
-        
+
         # Check for empty directives
         if hasattr(context, 'directive') and context.directive is None:
             warnings.append("No directive provided - context may be vague")
-        
+
         # Check for placeholder text
         placeholders = ['{', '{{', '[placeholder]', 'TODO', 'FIXME']
         for placeholder in placeholders:
             if placeholder in text:
                 issues.append(f"Placeholder text found: '{placeholder}'")
-        
+
         # Estimate tokens (rough)
         estimated_tokens = len(text) // 4
         if estimated_tokens > 8000:
             warnings.append(f"High token count (~{estimated_tokens}) - consider compression")
-        
+
         return {
             "valid": len(issues) == 0,
             "issues": issues,
@@ -65,9 +65,9 @@ class ContextValidator:
             "estimated_tokens": estimated_tokens,
             "text_length": len(text)
         }
-    
+
     @staticmethod
-    def validate_inputs(inputs: Dict[str, Any], required: List[str]) -> Dict[str, Any]:
+    def validate_inputs(inputs: dict[str, Any], required: list[str]) -> dict[str, Any]:
         """
         Validate template inputs.
         
@@ -79,13 +79,13 @@ class ContextValidator:
             Validation result
         """
         issues = []
-        
+
         for field in required:
             if field not in inputs:
                 issues.append(f"Missing required field: '{field}'")
             elif inputs[field] is None or inputs[field] == "":
                 issues.append(f"Field '{field}' is empty")
-        
+
         return {
             "valid": len(issues) == 0,
             "issues": issues
@@ -98,9 +98,9 @@ class OutputValidator:
     
     Ensure outputs meet quality and format requirements.
     """
-    
+
     @staticmethod
-    def validate_json(text: str, schema: Optional[Dict[str, Type]] = None) -> Dict[str, Any]:
+    def validate_json(text: str, schema: dict[str, type] | None = None) -> dict[str, Any]:
         """
         Validate JSON output.
         
@@ -112,14 +112,14 @@ class OutputValidator:
             Validation result
         """
         issues = []
-        
+
         # Try to parse JSON
         from mycontext.utils.parsers import JSONParser
-        
+
         parser = JSONParser(strict=False)
         try:
             data = parser.parse(text)
-            
+
             if data is None:
                 issues.append("No JSON found in response")
             elif schema:
@@ -133,17 +133,17 @@ class OutputValidator:
                             f"expected {expected_type.__name__}, "
                             f"got {type(data[field]).__name__}"
                         )
-        
+
         except Exception as e:
             issues.append(f"JSON parsing failed: {e}")
-        
+
         return {
             "valid": len(issues) == 0,
             "issues": issues
         }
-    
+
     @staticmethod
-    def validate_code(text: str, language: str) -> Dict[str, Any]:
+    def validate_code(text: str, language: str) -> dict[str, Any]:
         """
         Validate code output.
         
@@ -155,25 +155,25 @@ class OutputValidator:
             Validation result
         """
         issues = []
-        
+
         from mycontext.utils.parsers import CodeBlockParser
-        
+
         parser = CodeBlockParser(language=language)
         code = parser.parse(text)
-        
+
         if not code:
             issues.append(f"No {language} code block found")
         elif isinstance(code, dict):
             if language not in code:
                 issues.append(f"No {language} code block found")
-        
+
         return {
             "valid": len(issues) == 0,
             "issues": issues
         }
-    
+
     @staticmethod
-    def validate_completeness(text: str, required_sections: List[str]) -> Dict[str, Any]:
+    def validate_completeness(text: str, required_sections: list[str]) -> dict[str, Any]:
         """
         Validate that output contains required sections.
         
@@ -185,12 +185,12 @@ class OutputValidator:
             Validation result
         """
         issues = []
-        
+
         text_lower = text.lower()
         for section in required_sections:
             if section.lower() not in text_lower:
                 issues.append(f"Missing required section: '{section}'")
-        
+
         return {
             "valid": len(issues) == 0,
             "issues": issues,
@@ -200,9 +200,9 @@ class OutputValidator:
 
 class SchemaValidator:
     """Validate Pydantic schemas."""
-    
+
     @staticmethod
-    def validate_model(data: Dict[str, Any], model: Type[BaseModel]) -> Dict[str, Any]:
+    def validate_model(data: dict[str, Any], model: type[BaseModel]) -> dict[str, Any]:
         """
         Validate data against Pydantic model.
         

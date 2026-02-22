@@ -2,6 +2,7 @@
 import re
 from pathlib import Path
 
+
 def md_to_html(md_path: Path, out_path: Path) -> None:
     text = md_path.read_text(encoding="utf-8")
 
@@ -14,7 +15,7 @@ def md_to_html(md_path: Path, out_path: Path) -> None:
         block = m.group(1).strip()
         block = block.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         code_blocks.append('<pre class="pre">' + block + '</pre>')
-        return "\x00CODE{}\x00".format(len(code_blocks) - 1)
+        return f"\x00CODE{len(code_blocks) - 1}\x00"
     text = re.sub(r'```(.*?)```', save_code, text, flags=re.DOTALL)
 
     # Horizontal rules
@@ -31,7 +32,7 @@ def md_to_html(md_path: Path, out_path: Path) -> None:
 
     # Restore code blocks
     for i, code in enumerate(code_blocks):
-        text = text.replace("\x00CODE{}\x00".format(i), code)
+        text = text.replace(f"\x00CODE{i}\x00", code)
 
     # Build output: proper paragraphs and lists
     lines = text.split('\n')

@@ -11,7 +11,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class CognitiveStrategySelector(Pattern):
@@ -174,10 +174,10 @@ For each relevant strategy, evaluate fit:
                 style_guide="Provide specific, justified strategy recommendations with clear conditional knowledge"
             )
         )
-    
+
     def _get_strategy_catalog(self, task_type: str) -> str:
         """Get relevant strategy catalog for task type."""
-        
+
         catalogs = {
             "problem-solving": """
 **Problem-Solving Strategies:**
@@ -189,7 +189,7 @@ For each relevant strategy, evaluate fit:
 - **Algorithm**: Step-by-step procedure (if known)
 - **Heuristic**: Rule of thumb for common cases
             """,
-            
+
             "learning": """
 **Learning Strategies:**
 - **Elaboration**: Connect new to existing knowledge
@@ -201,7 +201,7 @@ For each relevant strategy, evaluate fit:
 - **Self-explanation**: Explain concepts in own words
 - **Concept mapping**: Visual knowledge organization
             """,
-            
+
             "reading": """
 **Reading Comprehension Strategies:**
 - **Previewing**: Survey text before reading
@@ -212,7 +212,7 @@ For each relevant strategy, evaluate fit:
 - **Visualizing**: Create mental images
 - **Monitoring**: Track comprehension continuously
             """,
-            
+
             "decision-making": """
 **Decision-Making Strategies:**
 - **Systematic comparison**: Pros/cons analysis
@@ -222,7 +222,7 @@ For each relevant strategy, evaluate fit:
 - **Intuitive judgment**: Pattern recognition (if experienced)
 - **Decision matrix**: Formal scoring
             """,
-            
+
             "writing": """
 **Writing Strategies:**
 - **Planning**: Outline before writing
@@ -233,7 +233,7 @@ For each relevant strategy, evaluate fit:
 - **Audience analysis**: Adapt to readers
             """,
         }
-        
+
         return catalogs.get(task_type, """
 **General Cognitive Strategies:**
 - **Analysis**: Break down into components
@@ -243,7 +243,7 @@ For each relevant strategy, evaluate fit:
 - **Comprehension**: Understand meaning
 - **Memorization**: Encode and retrieve
         """)
-    
+
     def build_context(
         self,
         task_type="",
@@ -268,15 +268,15 @@ For each relevant strategy, evaluate fit:
         # Format optional sections
         learner_section = f"**LEARNER CHARACTERISTICS**: {learner_characteristics}" if learner_characteristics else ""
         available_section = f"**STRATEGIES UNDER CONSIDERATION**: {available_strategies}" if available_strategies else ""
-        
+
         # Get strategy catalog for this task type
         strategy_catalog = self._get_strategy_catalog(task_type.lower())
-        
+
         # Clean kwargs
         kwargs.pop('learner_section', None)
         kwargs.pop('available_section', None)
         kwargs.pop('strategy_catalog', None)
-        
+
         return super().build_context(
             task_type=task_type,
             task_characteristics=task_characteristics,
@@ -285,7 +285,7 @@ For each relevant strategy, evaluate fit:
             strategy_catalog=strategy_catalog,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider="gemini",
@@ -312,11 +312,11 @@ For each relevant strategy, evaluate fit:
         learner_section = f"**LEARNER CHARACTERISTICS**: {learner_characteristics}" if learner_characteristics else ""
         available_section = f"**STRATEGIES UNDER CONSIDERATION**: {available_strategies}" if available_strategies else ""
         strategy_catalog = self._get_strategy_catalog(task_type.lower())
-        
+
         kwargs.pop('learner_section', None)
         kwargs.pop('available_section', None)
         kwargs.pop('strategy_catalog', None)
-        
+
         return super().execute(
             provider=provider,
             task_type=task_type,

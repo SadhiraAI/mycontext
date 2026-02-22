@@ -15,7 +15,7 @@ Two usage patterns:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..core import Context
 from ..foundation import Directive, Guidance
@@ -26,10 +26,10 @@ class ComposedPrompt:
     """Result of prompt composition — an optimized, self-contained prompt."""
 
     prompt: str
-    source_templates: List[str] = field(default_factory=list)
+    source_templates: list[str] = field(default_factory=list)
     question: str = ""
-    component_prompts: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    component_prompts: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def execute(self, provider: str = "openai", **kwargs) -> str:
         """Execute the composed prompt and return the response text."""
@@ -49,7 +49,7 @@ class ComposedPrompt:
         """Export as OpenAI-compatible message array."""
         return [{"role": "user", "content": self.prompt}]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "prompt": self.prompt,
             "source_templates": self.source_templates,
@@ -95,8 +95,9 @@ def _resolve_generic_template(
     Returns (instance, actual_name) or (None, None).
     """
     import warnings
-    from .pattern_suggester import get_pattern_class
+
     from .pattern_catalog import GENERIC_PROMPT_FALLBACK
+    from .pattern_suggester import get_pattern_class
 
     actual_name = template_name
     klass = get_pattern_class(template_name, include_enterprise=include_enterprise)
@@ -159,11 +160,11 @@ class PromptComposer:
 
     def compose(
         self,
-        prompts: List[str],
+        prompts: list[str],
         question: str,
-        source_templates: Optional[List[str]] = None,
-        provider: Optional[str] = None,
-        model: Optional[str] = None,
+        source_templates: list[str] | None = None,
+        provider: str | None = None,
+        model: str | None = None,
         **kwargs,
     ) -> ComposedPrompt:
         """Merge multiple prompt strings into one comprehensive prompt.
@@ -235,10 +236,10 @@ class PromptComposer:
     def compose_from_templates(
         self,
         question: str,
-        template_names: List[str],
+        template_names: list[str],
         refine: bool = True,
-        provider: Optional[str] = None,
-        model: Optional[str] = None,
+        provider: str | None = None,
+        model: str | None = None,
         **kwargs,
     ) -> ComposedPrompt:
         """Generate prompts from templates and compose them in one call.
@@ -253,13 +254,13 @@ class PromptComposer:
         Returns:
             ComposedPrompt with the merged prompt.
         """
-        from .pattern_suggester import get_pattern_class
         from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
+        from .pattern_suggester import get_pattern_class
 
         provider = provider or self.provider
         model = model or self.model
-        prompts: List[str] = []
-        valid_names: List[str] = []
+        prompts: list[str] = []
+        valid_names: list[str] = []
 
         for name in template_names:
             klass = get_pattern_class(name, include_enterprise=self.include_enterprise)
@@ -298,7 +299,7 @@ class PromptComposer:
     def compile_generic(
         self,
         question: str,
-        template_names: List[str],
+        template_names: list[str],
         **template_kwargs: Any,
     ) -> ComposedPrompt:
         """Compile generic prompts from multiple templates — zero LLM calls.
@@ -318,8 +319,8 @@ class PromptComposer:
         """
         from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
 
-        prompts: List[str] = []
-        valid_names: List[str] = []
+        prompts: list[str] = []
+        valid_names: list[str] = []
 
         for name in template_names:
             instance, actual_name = _resolve_generic_template(
@@ -364,7 +365,7 @@ class PromptComposer:
 
     @staticmethod
     def _static_merge(
-        prompts: List[str], question: str, template_names: List[str]
+        prompts: list[str], question: str, template_names: list[str]
     ) -> str:
         """Merge generic prompts into one prompt — no LLM, pure string ops."""
         if len(prompts) == 1:
@@ -387,7 +388,7 @@ class PromptComposer:
         )
 
     @staticmethod
-    def _fallback_merge(prompts: List[str], question: str) -> str:
+    def _fallback_merge(prompts: list[str], question: str) -> str:
         """Zero-cost fallback: concatenate prompts with section separators."""
         sections = []
         for i, p in enumerate(prompts, 1):
@@ -407,7 +408,7 @@ def get_generic_prompt_for(
     question: str,
     include_enterprise: bool = True,
     **kwargs: Any,
-) -> Optional[str]:
+) -> str | None:
     """Get a generic prompt for any template, with automatic free-template fallback.
 
     If the requested template is enterprise and the user is in free mode,

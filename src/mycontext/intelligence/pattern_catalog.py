@@ -5,14 +5,12 @@ Contains pattern metadata, keyword mappings, and derived lookup dicts.
 Extracted from pattern_suggester.py for single-responsibility.
 """
 
-from typing import List, Tuple
-
 
 ENTERPRISE_LICENSE_NOTE = " Requires enterprise license. Set include_enterprise=True to use."
 
 
 # (name, category, one-line description) for all 85 templates (all unique names)
-FULL_PATTERN_CATALOG: List[Tuple[str, str, str]] = [
+FULL_PATTERN_CATALOG: list[tuple[str, str, str]] = [
     # FREE - Analysis (2)
     ("question_analyzer", "free", "Decomposes a question into sub-questions, identifies assumptions, clarifies scope"),
     ("data_analyzer", "free", "Structured data analysis: extract patterns, trends, metrics, and actionable insights"),
@@ -272,7 +270,7 @@ for _tier in ("free", "enterprise"):
 
 
 # Keyword -> (pattern_name, category, reason_snippet) - ALL 85 templates
-PATTERN_MAP: List[Tuple[List[str], Tuple[str, str, str]]] = [
+PATTERN_MAP: list[tuple[list[str], tuple[str, str, str]]] = [
     # FREE - Analysis
     (["question", "analyze", "clarify", "what is", "unclear"], ("question_analyzer", "free", "Question analysis")),
     (["data", "trend", "metrics", "numbers", "dataset", "csv"], ("data_analyzer", "free", "Data analysis")),

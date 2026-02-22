@@ -5,9 +5,9 @@ Systematic scenario planning for strategic decision-making.
 Based on scenario planning methodologies and futures thinking.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class ScenarioPlanner(Pattern):
@@ -235,34 +235,34 @@ Comprehensive scenario planning:
                 style_guide="Be exploratory but practical, imaginative but grounded"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         topic: str = "",
         timeframe: str = "5 years",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             topic=topic,
             timeframe=timeframe,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         topic: str = "",
         timeframe: str = "5 years",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

@@ -5,9 +5,9 @@ Systematic investigation to find true root causes, not just symptoms.
 Based on systems thinking and quality management methodologies (5 Whys, Ishikawa).
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class RootCauseAnalyzer(Pattern):
@@ -217,17 +217,17 @@ Root cause investigation framework:
                 style_guide="Be thorough but focused, investigative but not speculative"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         """Render optional context section."""
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         problem: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         depth: str = "thorough",
         **kwargs
     ):
@@ -244,19 +244,19 @@ Root cause investigation framework:
             Context object ready for export/use
         """
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             problem=problem,
             context_section=context_section,
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         problem: str = "",
-        context: Optional[str] = None,
+        context: str | None = None,
         depth: str = "thorough",
         **kwargs
     ):

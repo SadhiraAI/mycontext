@@ -22,122 +22,107 @@ mycontext Enterprise Templates - Advanced cognitive patterns for professional us
 License: Enterprise
 """
 
+from .analysis import (
+    AnomalyDetector,
+    GapAnalyzer,
+    SWOTAnalyzer,
+    TrendIdentifier,
+)
+from .communication import (
+    ClarityOptimizer,
+    FeedbackComposer,
+    NarrativeBuilder,
+    PersuasionFramework,
+    SimplificationEngine,
+)
+from .creative import (
+    DesignThinker,
+    IdeaGenerator,
+    InnovationFramework,
+    MetaphorGenerator,
+)
 from .decision import (
-    DecisionFramework,
     ComparativeAnalyzer,
-    TradeoffAnalyzer,
-    MultiObjectiveOptimizer,
     CostBenefitAnalyzer,
+    DecisionFramework,
+    MultiObjectiveOptimizer,
+    TradeoffAnalyzer,
 )
-
-from .problem_solving import (
-    ProblemDecomposer,
-    BottleneckIdentifier,
-    ConstraintOptimizer,
-    DependencyMapper,
-    EfficiencyAnalyzer,
-    TradeSpaceExplorer,
+from .diagnostic import (
+    DiagnosticRootCauseAnalyzer,
+    DifferentialDiagnoser,
+    RootCauseAnalyzer,
+    SystemHealthAuditor,
 )
-
-from .metacognition import (
-    MetacognitiveMonitor,
-    SelfRegulationFramework,
-    CognitiveStrategySelector,
-    LearningFromExperience,
-    ErrorDetectionFramework,
-)
-
 from .ethical_reasoning import (
+    ConsequentialistAnalyzer,
     EthicalFrameworkAnalyzer,
     MoralDilemmaResolver,
     StakeholderEthicsAssessor,
     ValueConflictNavigator,
-    ConsequentialistAnalyzer,
 )
-
-from .systems_thinking import (
-    FeedbackLoopIdentifier,
-    LeveragePointFinder,
-    EmergenceDetector,
-    SystemArchetypeAnalyzer,
-    CausalLoopDiagrammer,
-    StockFlowAnalyzer,
+from .evaluation import (
+    FormativeAssessmentFramework,
+    PeerAssessmentStructure,
+    RubricDesigner,
+    SelfAssessmentGuide,
+    SummativeEvaluator,
 )
-
 from .learning import (
+    CognitiveLoadManager,
+    ConceptualChangeAnalyzer,
     ScaffoldingFramework,
     SpacedRepetitionOptimizer,
     ZoneOfProximalDevelopment,
-    CognitiveLoadManager,
-    ConceptualChangeAnalyzer,
 )
-
-from .evaluation import (
-    RubricDesigner,
-    FormativeAssessmentFramework,
-    SummativeEvaluator,
-    PeerAssessmentStructure,
-    SelfAssessmentGuide,
+from .metacognition import (
+    CognitiveStrategySelector,
+    ErrorDetectionFramework,
+    LearningFromExperience,
+    MetacognitiveMonitor,
+    SelfRegulationFramework,
 )
-
-from .temporal import (
-    TemporalSequenceAnalyzer,
-    FutureScenarioPlanner,
-    HistoricalContextMapper,
+from .planning import (
+    DeadlineManager,
+    PrioritySetter,
+    ResourceAllocator,
 )
-
-from .diagnostic import (
-    DiagnosticRootCauseAnalyzer,
-    RootCauseAnalyzer,
-    DifferentialDiagnoser,
-    SystemHealthAuditor,
+from .problem_solving import (
+    BottleneckIdentifier,
+    ConstraintOptimizer,
+    DependencyMapper,
+    EfficiencyAnalyzer,
+    ProblemDecomposer,
+    TradeSpaceExplorer,
 )
-
-from .synthesis import (
-    CrossDomainSynthesizer,
-    PatternRecognitionEngine,
-    HolisticIntegrator,
-)
-
-from .analysis import (
-    TrendIdentifier,
-    GapAnalyzer,
-    SWOTAnalyzer,
-    AnomalyDetector,
-)
-
 from .reasoning import (
     AnalogicalReasoner,
     CausalReasoner,
 )
-
-from .creative import (
-    IdeaGenerator,
-    InnovationFramework,
-    DesignThinker,
-    MetaphorGenerator,
-)
-
-from .communication import (
-    SimplificationEngine,
-    ClarityOptimizer,
-    PersuasionFramework,
-    NarrativeBuilder,
-    FeedbackComposer,
-)
-
-from .planning import (
-    PrioritySetter,
-    DeadlineManager,
-    ResourceAllocator,
-)
-
 from .specialized import (
-    ContentOutliner,
     AmbiguityResolver,
-    RiskMitigator,
-    ImpactAssessor,
     ConceptExplainer,
+    ContentOutliner,
+    ImpactAssessor,
+    RiskMitigator,
+)
+from .synthesis import (
+    CrossDomainSynthesizer,
+    HolisticIntegrator,
+    PatternRecognitionEngine,
+)
+from .systems_thinking import (
+    CausalLoopDiagrammer,
+    EmergenceDetector,
+    FeedbackLoopIdentifier,
+    LeveragePointFinder,
+    StockFlowAnalyzer,
+    SystemArchetypeAnalyzer,
+)
+from .temporal import (
+    FutureScenarioPlanner,
+    HistoricalContextMapper,
+    TemporalSequenceAnalyzer,
 )
 
 __all__ = [

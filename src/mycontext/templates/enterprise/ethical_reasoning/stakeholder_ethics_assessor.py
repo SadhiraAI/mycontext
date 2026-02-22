@@ -11,7 +11,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class StakeholderEthicsAssessor(Pattern):
@@ -77,10 +77,10 @@ If you didn't know which stakeholder you'd be, would you accept this decision?
             input_schema={"decision": str, "stakeholders": str},
             constraints=Constraints(must_include=["vulnerable_groups", "power_analysis"], style_guide="Focus on fairness to all groups")
         )
-    
+
     def build_context(self, decision="", stakeholders="", **kwargs):
         return super().build_context(decision=decision, stakeholders=stakeholders, **kwargs)
-    
+
     def execute(self, provider="gemini", decision="", stakeholders="", **kwargs):
         return super().execute(provider=provider, decision=decision, stakeholders=stakeholders, **kwargs)
 

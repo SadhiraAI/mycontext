@@ -1,8 +1,8 @@
 """Evaluation API: output scoring, CAI measurement, benchmarks."""
 
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.keys import get_decrypted_key_for_user
@@ -25,14 +25,14 @@ class MeasureCAIRequest(BaseModel):
     template_name: str
     provider: str = "openai"
     eval_mode: str = "fast"
-    model: Optional[str] = None
+    model: str | None = None
 
 
 class RunBenchmarkRequest(BaseModel):
     template_name: str
     provider: str = "openai"
     eval_mode: str = "fast"
-    model: Optional[str] = None
+    model: str | None = None
 
 
 @router.post("/output")
@@ -82,8 +82,8 @@ async def measure_cai(
     except Exception as e:
         msg = str(e)
         if "api_key" in msg.lower() or "api key" in msg.lower():
-            raise HTTPException(400, detail="API key may be invalid: " + msg)
-        raise HTTPException(500, detail="CAI measurement failed: " + msg)
+            raise HTTPException(400, detail="API key may be invalid: " + msg) from None
+        raise HTTPException(500, detail="CAI measurement failed: " + msg) from None
 
     if result is None:
         raise HTTPException(500, detail="CAI service not available")
@@ -113,7 +113,7 @@ async def run_benchmark(
             model=req.model,
         )
     except Exception as e:
-        raise HTTPException(500, detail="Benchmark failed: " + str(e))
+        raise HTTPException(500, detail="Benchmark failed: " + str(e)) from None
 
     if result is None:
         raise HTTPException(500, detail="Benchmark service not available")

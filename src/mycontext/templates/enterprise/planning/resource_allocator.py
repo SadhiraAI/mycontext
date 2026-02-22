@@ -5,9 +5,9 @@ Systematic resource allocation using optimization frameworks.
 Based on resource management and allocation optimization.
 """
 
-from typing import Optional, List
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class ResourceAllocator(Pattern):
@@ -57,7 +57,7 @@ class ResourceAllocator(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="resource_allocator",
@@ -125,12 +125,12 @@ Resource allocation optimization:
                 style_guide="Be objective and data-driven"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def _render_resources_section(self, resources) -> str:
         if not resources:
             return "- [Define resources]"
@@ -139,7 +139,7 @@ Resource allocation optimization:
         if isinstance(resources, dict):
             return "\n".join(f"- {k}: {v}" for k, v in resources.items())
         return str(resources)
-    
+
     def _render_needs_section(self, needs) -> str:
         if not needs:
             return "1. [Define needs]"
@@ -147,19 +147,19 @@ Resource allocation optimization:
             parts = [t.strip() for t in needs.replace("\n", ",").split(",") if t.strip()]
             return "\n".join(f"{i+1}. {need}" for i, need in enumerate(parts))
         return "\n".join(f"{i+1}. {need}" for i, need in enumerate(needs))
-    
+
     def build_context(
         self,
-        resources: Optional[dict] = None,
-        needs: Optional[List[str]] = None,
+        resources: dict | None = None,
+        needs: list[str] | None = None,
         goal: str = "Maximize ROI",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         resources_section = self._render_resources_section(resources)
         needs_section = self._render_needs_section(needs)
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             resources_section=resources_section,
             needs_section=needs_section,
@@ -167,14 +167,14 @@ Resource allocation optimization:
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
-        resources: Optional[dict] = None,
-        needs: Optional[List[str]] = None,
+        resources: dict | None = None,
+        needs: list[str] | None = None,
         goal: str = "Maximize ROI",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

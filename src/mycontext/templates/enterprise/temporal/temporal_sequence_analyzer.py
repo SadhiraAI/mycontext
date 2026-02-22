@@ -11,7 +11,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class TemporalSequenceAnalyzer(Pattern):
     """
@@ -295,24 +296,24 @@ T4 ----------------[Event E]----
                 style_guide="Chronological and precise. Clear temporal relationships. Evidence-based causality."
             )
         )
-    
+
     def build_context(self, events="", time_span="", context="", **kwargs):
         """Build context for temporal sequence analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
         kwargs.pop('context_section', None)
-        
+
         return super().build_context(
             events=events,
             time_span=time_span,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", events="", time_span="", context="", **kwargs):
         """Execute temporal sequence analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
         kwargs.pop('context_section', None)
-        
+
         return super().execute(
             provider=provider,
             events=events,

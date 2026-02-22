@@ -12,7 +12,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class ErrorDetectionFramework(Pattern):
@@ -191,10 +191,10 @@ For each error:
                 style_guide="Be specific with evidence. Distinguish error types. Explain WHY something is an error."
             )
         )
-    
+
     def _get_error_checklist(self, domain: str) -> str:
         """Get domain-specific error checklist."""
-        
+
         checklists = {
             "programming": """
 **Programming-Specific Errors:**
@@ -209,7 +209,7 @@ For each error:
 - [ ] **API misuse**: Libraries used correctly?
 - [ ] **Security**: Input validation, SQL injection, XSS?
             """,
-            
+
             "writing": """
 **Writing-Specific Errors:**
 - [ ] **Grammar**: Subject-verb agreement, tense consistency?
@@ -223,7 +223,7 @@ For each error:
 - [ ] **Redundancy**: Unnecessary repetition?
 - [ ] **Factual accuracy**: Are facts correct?
             """,
-            
+
             "math": """
 **Mathematical Errors:**
 - [ ] **Arithmetic**: Calculations correct?
@@ -237,7 +237,7 @@ For each error:
 - [ ] **Boundary conditions**: Edge cases considered?
 - [ ] **Assumptions**: Stated and valid?
             """,
-            
+
             "reasoning": """
 **Logical Reasoning Errors:**
 - [ ] **Invalid inference**: Conclusions follow from premises?
@@ -252,7 +252,7 @@ For each error:
 - [ ] **Slippery slope**: Chain of causation justified?
             """,
         }
-        
+
         return checklists.get(domain.lower(), """
 **General Error Checklist:**
 - [ ] **Factual accuracy**: Are facts correct?
@@ -262,7 +262,7 @@ For each error:
 - [ ] **Assumptions**: Are they valid?
 - [ ] **Evidence**: Claims supported?
         """)
-    
+
     def build_context(
         self,
         work_to_check="",
@@ -284,10 +284,10 @@ For each error:
         """
         error_types_section = f"**SPECIFIC ERROR TYPES TO CHECK**: {known_error_types}" if known_error_types else ""
         error_type_checklist = self._get_error_checklist(domain)
-        
+
         kwargs.pop('error_types_section', None)
         kwargs.pop('error_type_checklist', None)
-        
+
         return super().build_context(
             work_to_check=work_to_check,
             domain=domain,
@@ -295,7 +295,7 @@ For each error:
             error_type_checklist=error_type_checklist,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider="gemini",
@@ -319,10 +319,10 @@ For each error:
         """
         error_types_section = f"**SPECIFIC ERROR TYPES TO CHECK**: {known_error_types}" if known_error_types else ""
         error_type_checklist = self._get_error_checklist(domain)
-        
+
         kwargs.pop('error_types_section', None)
         kwargs.pop('error_type_checklist', None)
-        
+
         return super().execute(
             provider=provider,
             work_to_check=work_to_check,

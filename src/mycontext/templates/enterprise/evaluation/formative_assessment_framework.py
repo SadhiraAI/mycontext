@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class FormativeAssessmentFramework(Pattern):
     """
@@ -333,7 +334,7 @@ class FormativeAssessmentFramework(Pattern):
                 style_guide="Developmental and continuous. Assessment FOR learning. Specific, actionable guidance."
             )
         )
-    
+
     def build_context(self, learning_unit="", learning_goal="", **kwargs):
         """Build context for formative assessment design."""
         return super().build_context(
@@ -341,7 +342,7 @@ class FormativeAssessmentFramework(Pattern):
             learning_goal=learning_goal,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", learning_unit="", learning_goal="", **kwargs):
         """Execute formative assessment framework design."""
         return super().execute(

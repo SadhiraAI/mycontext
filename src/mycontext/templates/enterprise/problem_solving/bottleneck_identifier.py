@@ -7,8 +7,8 @@ Based on theory of constraints and systems optimization.
 License: Enterprise
 """
 
-from typing import Optional
-from mycontext import Pattern, Guidance, Directive, Constraints
+
+from mycontext import Constraints, Guidance, Pattern
 
 
 class BottleneckIdentifier(Pattern):
@@ -274,34 +274,34 @@ Bottleneck identification:
                 style_guide="Be systematic and evidence-based"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
+
     def build_context(
         self,
         system: str = "",
         goal: str = "Improve throughput",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             system=system,
             goal=goal,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         system: str = "",
         goal: str = "Improve throughput",
-        context: Optional[str] = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

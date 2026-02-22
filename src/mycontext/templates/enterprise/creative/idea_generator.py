@@ -5,9 +5,9 @@ Generates creative ideas using structured brainstorming techniques.
 Based on creative thinking research and ideation methodologies.
 """
 
-from typing import Optional
+
+from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive, Constraints
 
 
 class IdeaGenerator(Pattern):
@@ -57,7 +57,7 @@ class IdeaGenerator(Pattern):
         "Note: For deeper analysis with specialized enterprise frameworks, "
         "upgrade to mycontext Enterprise."
     )
-    
+
     def __init__(self):
         super().__init__(
             name="idea_generator",
@@ -224,40 +224,40 @@ Creative ideation process:
                 style_guide="Be wildly creative but structured, divergent then convergent"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_constraints_section(self, constraints: Optional[list]) -> str:
+
+    def _render_constraints_section(self, constraints: list | None) -> str:
         if constraints:
             return "\n".join(f"- {c}" for c in constraints)
         return "- None specified"
-    
+
     def build_context(
         self,
         challenge: str = "",
-        context: Optional[str] = None,
-        constraints: Optional[list] = None,
+        context: str | None = None,
+        constraints: list | None = None,
         **kwargs
     ):
         context_section = self._render_context_section(context)
         constraints_section = self._render_constraints_section(constraints)
-        
+
         return super().build_context(
             challenge=challenge,
             context_section=context_section,
             constraints_section=constraints_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
         challenge: str = "",
-        context: Optional[str] = None,
-        constraints: Optional[list] = None,
+        context: str | None = None,
+        constraints: list | None = None,
         **kwargs
     ):
         return super().execute(

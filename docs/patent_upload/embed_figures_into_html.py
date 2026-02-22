@@ -1,7 +1,7 @@
 """Create a single-file HTML with figures embedded as base64 so PDF can be made from anywhere."""
 import base64
-import re
 from pathlib import Path
+
 
 def main():
     base = Path(__file__).resolve().parent

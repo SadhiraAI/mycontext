@@ -1,9 +1,9 @@
 """Communication Patterns (Enterprise) - Clarity, persuasion, narratives, feedback"""
-from .simplification_engine import SimplificationEngine
 from .clarity_optimizer import ClarityOptimizer
-from .persuasion_framework import PersuasionFramework
-from .narrative_builder import NarrativeBuilder
 from .feedback_composer import FeedbackComposer
+from .narrative_builder import NarrativeBuilder
+from .persuasion_framework import PersuasionFramework
+from .simplification_engine import SimplificationEngine
 
 __all__ = [
     "SimplificationEngine",

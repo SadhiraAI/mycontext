@@ -4,9 +4,8 @@ Risk Assessor Template - Identify and evaluate risks systematically
 Comprehensive risk analysis framework for decision-making.
 """
 
-from typing import Optional
+from mycontext.foundation import Guidance
 from mycontext.structure import Pattern
-from mycontext.foundation import Guidance, Directive
 
 
 class RiskAssessor(Pattern):
@@ -179,13 +178,13 @@ Be specific, quantitative where possible, and actionable.""",
                 "depth": str
             }
         )
-    
+
     def _render_context_section(self, context: str) -> str:
         """Render the context section"""
         if not context or context.strip() == "":
             return ""
         return f"\nAdditional Context:\n{context}\n"
-    
+
     def build_context(
         self,
         decision: str,
@@ -206,18 +205,18 @@ Be specific, quantitative where possible, and actionable.""",
             Context configured for risk assessment
         """
         context_section = self._render_context_section(context or "")
-        
+
         # Clean up kwargs
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
-        
+
         return super().build_context(
             decision=decision,
             context_section=context_section,
             depth=depth,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
@@ -240,21 +239,21 @@ Be specific, quantitative where possible, and actionable.""",
             Provider response with risk assessment
         """
         context_section = self._render_context_section(context or "")
-        
+
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p', 
-                               'frequency_penalty', 'presence_penalty', 'stop', 
+        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
+                               'frequency_penalty', 'presence_penalty', 'stop',
                                'user', 'api_key', 'base_url'}
-        
+
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
-        
+
         # Clean up
         kwargs.pop('context', None)
         kwargs.pop('context_section', None)
-        
+
         return super().execute(
             provider=provider,
             decision=decision,

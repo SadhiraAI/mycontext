@@ -12,7 +12,8 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Constraints
+from mycontext import Constraints, Guidance, Pattern
+
 
 class SystemHealthAuditor(Pattern):
     """
@@ -386,7 +387,7 @@ class SystemHealthAuditor(Pattern):
                 style_guide="Systematic and thorough. Objective metrics. Prioritized by risk. Actionable recommendations."
             )
         )
-    
+
     def build_context(self, system="", audit_focus="", **kwargs):
         """Build context for system health audit."""
         return super().build_context(
@@ -394,7 +395,7 @@ class SystemHealthAuditor(Pattern):
             audit_focus=audit_focus,
             **kwargs
         )
-    
+
     def execute(self, provider="openai", system="", audit_focus="", **kwargs):
         """Execute system health audit."""
         return super().execute(

@@ -12,7 +12,7 @@ Research Foundation:
 License: Enterprise
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class SelfRegulationFramework(Pattern):
@@ -128,10 +128,10 @@ Each phase informs the next. Always plan the transition.""",
                 style_guide="Use systematic framework with clear phase-specific actions and cyclical connections"
             )
         )
-    
+
     def _get_phase_directive(self, phase: str) -> str:
         """Get phase-specific directive."""
-        
+
         if phase == "forethought":
             return """## FORETHOUGHT PHASE: Planning Before Action
 
@@ -243,12 +243,12 @@ Each phase informs the next. Always plan the transition.""",
 
         else:
             return f"**ERROR**: Unknown phase '{phase}'. Must be 'forethought', 'performance', or 'self-reflection'."
-    
+
     def build_context(
-        self, 
-        goal="", 
-        current_phase="forethought", 
-        context="", 
+        self,
+        goal="",
+        current_phase="forethought",
+        context="",
         performance_data="",
         **kwargs
     ):
@@ -269,19 +269,19 @@ Each phase informs the next. Always plan the transition.""",
         valid_phases = ["forethought", "performance", "self-reflection"]
         if current_phase not in valid_phases:
             current_phase = "forethought"  # Default
-        
+
         # Format optional sections
         context_section = f"**CONTEXT**: {context}" if context else ""
         performance_section = f"**PERFORMANCE DATA**: {performance_data}" if performance_data else ""
-        
+
         # Get phase-specific directive
         phase_specific_directive = self._get_phase_directive(current_phase)
-        
+
         # Clean kwargs
         kwargs.pop('context_section', None)
         kwargs.pop('performance_section', None)
         kwargs.pop('phase_specific_directive', None)
-        
+
         return super().build_context(
             goal=goal,
             current_phase=current_phase.upper(),
@@ -290,11 +290,11 @@ Each phase informs the next. Always plan the transition.""",
             phase_specific_directive=phase_specific_directive,
             **kwargs
         )
-    
+
     def execute(
-        self, 
-        provider="gemini", 
-        goal="", 
+        self,
+        provider="gemini",
+        goal="",
         current_phase="forethought",
         context="",
         performance_data="",
@@ -318,19 +318,19 @@ Each phase informs the next. Always plan the transition.""",
         valid_phases = ["forethought", "performance", "self-reflection"]
         if current_phase not in valid_phases:
             current_phase = "forethought"
-        
+
         # Format optional sections
         context_section = f"**CONTEXT**: {context}" if context else ""
         performance_section = f"**PERFORMANCE DATA**: {performance_data}" if performance_data else ""
-        
+
         # Get phase-specific directive
         phase_specific_directive = self._get_phase_directive(current_phase)
-        
+
         # Clean kwargs
         kwargs.pop('context_section', None)
         kwargs.pop('performance_section', None)
         kwargs.pop('phase_specific_directive', None)
-        
+
         return super().execute(
             provider=provider,
             goal=goal,

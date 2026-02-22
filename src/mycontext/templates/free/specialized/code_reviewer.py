@@ -5,7 +5,7 @@ Based on industry best practices and cognitive tools methodology.
 Free tier template - part of mycontext open source.
 """
 
-from mycontext import Pattern, Guidance, Directive, Constraints
+from mycontext import Constraints, Guidance, Pattern
 
 
 class CodeReviewer(Pattern):
@@ -62,7 +62,7 @@ class CodeReviewer(Pattern):
         "just what is wrong."
     )
 
-    
+
     def __init__(self):
         super().__init__(
             name="code_reviewer",
@@ -200,13 +200,13 @@ Acknowledge what's done well:
                 style_guide="Use markdown formatting with code blocks and severity indicators (🔴🟠🟡🟢✅)"
             )
         )
-    
+
     def _render_context_section(self, context):
         """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
-    
+
     def _render_focus_areas(self, focus_areas):
         """Format focus areas list."""
         if isinstance(focus_areas, list):
@@ -228,7 +228,7 @@ Acknowledge what's done well:
             focus_areas=focus_areas_str,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider="gemini",
@@ -256,10 +256,10 @@ Acknowledge what's done well:
             context = ""
         if focus_areas is None:
             focus_areas = ["security", "performance", "best_practices", "maintainability"]
-        
+
         context_section = self._render_context_section(context)
         focus_areas_str = self._render_focus_areas(focus_areas)
-        
+
         return super().execute(
             provider=provider,
             code=code,

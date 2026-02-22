@@ -9,7 +9,7 @@ Includes automatic retry with exponential backoff and configurable timeout.
 
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 try:
     import litellm
@@ -60,7 +60,7 @@ class LiteLLMProvider(BaseProvider):
         self,
         model: str,
         provider: str = "openai",
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         timeout: int = DEFAULT_TIMEOUT,
         max_retries: int = DEFAULT_MAX_RETRIES,
         retry_backoff: float = DEFAULT_RETRY_BACKOFF,
@@ -87,10 +87,10 @@ class LiteLLMProvider(BaseProvider):
     def generate(
         self,
         context: "Context",
-        user: Optional[str] = None,
-        model: Optional[str] = None,
+        user: str | None = None,
+        model: str | None = None,
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
+        max_tokens: int | None = None,
         **kwargs: Any,
     ) -> ProviderResponse:
         """Generate a response via LiteLLM with retry and timeout.
@@ -123,7 +123,7 @@ class LiteLLMProvider(BaseProvider):
 
         call_kwargs.update(kwargs)
 
-        last_exc: Optional[Exception] = None
+        last_exc: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             try:
                 start = time.time()
@@ -195,7 +195,7 @@ class LiteLLMProvider(BaseProvider):
         ]
         return any(signal in exc_str for signal in retryable_signals)
 
-    def estimate_cost(self, tokens: int, model: Optional[str] = None) -> float:
+    def estimate_cost(self, tokens: int, model: str | None = None) -> float:
         """Rough cost estimate using LiteLLM pricing tables."""
         model = model or self.default_model
         litellm_model = _litellm_model_name(self._provider, model)

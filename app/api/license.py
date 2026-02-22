@@ -1,6 +1,6 @@
 """License API: activate enterprise license keys."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -65,7 +65,7 @@ async def activate_license(
         )
 
     license_key.redeemed_by = user.id
-    license_key.redeemed_at = datetime.now(timezone.utc)
+    license_key.redeemed_at = datetime.now(UTC)
 
     await db.execute(
         update(User).where(User.id == user.id).values(enterprise_license=True)

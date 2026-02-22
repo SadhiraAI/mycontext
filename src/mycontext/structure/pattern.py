@@ -5,13 +5,13 @@ Patterns are like functions in traditional programming - reusable,
 composable units that encapsulate context engineering best practices.
 """
 
-from typing import Any, ClassVar, Dict, Optional, Type
-from pydantic import BaseModel, Field
-import yaml
-import json
 from pathlib import Path
+from typing import Any, ClassVar
 
-from ..foundation import Guidance, Directive, Constraints
+import yaml
+from pydantic import BaseModel, Field
+
+from ..foundation import Constraints, Directive, Guidance
 
 
 class Pattern(BaseModel):
@@ -64,59 +64,59 @@ class Pattern(BaseModel):
         tags: Pattern categorization tags
         version: Pattern version
     """
-    
+
     name: str = Field(
         ...,
         description="Pattern name/identifier",
         min_length=1
     )
-    
-    description: Optional[str] = Field(
+
+    description: str | None = Field(
         default=None,
         description="What this pattern does"
     )
-    
-    guidance: Optional[Guidance] = Field(
+
+    guidance: Guidance | None = Field(
         default=None,
         description="Default guidance for this pattern"
     )
-    
-    directive_template: Optional[str] = Field(
+
+    directive_template: str | None = Field(
         default=None,
         description="Template for directive (supports variables)"
     )
-    
-    constraints: Optional[Constraints] = Field(
+
+    constraints: Constraints | None = Field(
         default=None,
         description="Default constraints"
     )
-    
-    input_schema: Dict[str, Type] = Field(
+
+    input_schema: dict[str, type] = Field(
         default_factory=dict,
         description="Expected input structure"
     )
-    
-    output_schema: Dict[str, Type] = Field(
+
+    output_schema: dict[str, type] = Field(
         default_factory=dict,
         description="Expected output structure"
     )
-    
+
     tags: list[str] = Field(
         default_factory=list,
         description="Categorization tags"
     )
-    
+
     version: str = Field(
         default="1.0.0",
         description="Pattern version"
     )
-    
-    metadata: Dict[str, Any] = Field(
+
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata"
     )
-    
-    GENERIC_PROMPT: ClassVar[Optional[str]] = None
+
+    GENERIC_PROMPT: ClassVar[str | None] = None
 
     def generic_prompt(self, **kwargs) -> str:
         """Return a concise, pre-authored prompt that captures this template's essence.
@@ -163,16 +163,16 @@ class Pattern(BaseModel):
             ValueError: If required inputs are missing
         """
         from ..core import Context
-        
+
         # Validate inputs
         self._validate_inputs(inputs)
-        
+
         # Build directive from template
         directive = None
         if self.directive_template:
             directive_content = self.directive_template.format(**inputs)
             directive = Directive(content=directive_content)
-        
+
         # Create context
         context = Context(
             guidance=self.guidance,
@@ -180,12 +180,12 @@ class Pattern(BaseModel):
             constraints=self.constraints,
             data=inputs
         )
-        
+
         context.metadata["pattern"] = self.name
         context.metadata["pattern_version"] = self.version
-        
+
         return context
-    
+
     def execute(self, provider: str = "openai", mode: str = "full", **inputs) -> Any:
         """
         Execute this pattern directly.
@@ -200,27 +200,27 @@ class Pattern(BaseModel):
         """
         template_inputs = {}
         provider_kwargs = {}
-        
-        provider_params = {'model', 'temperature', 'max_tokens', 'top_p', 'frequency_penalty', 
+
+        provider_params = {'model', 'temperature', 'max_tokens', 'top_p', 'frequency_penalty',
                           'presence_penalty', 'stop', 'user', 'api_key', 'base_url'}
-        
+
         for key, value in inputs.items():
             if key in provider_params:
                 provider_kwargs[key] = value
             else:
                 template_inputs[key] = value
-        
+
         if mode == "generic":
             from ..core import Context
             from ..foundation import Directive
             prompt_text = self.generic_prompt(**template_inputs)
             ctx = Context(directive=Directive(content=prompt_text))
             return ctx.execute(provider=provider, **provider_kwargs)
-        
+
         context = self.build_context(**template_inputs)
         return context.execute(provider=provider, **provider_kwargs)
-    
-    def _validate_inputs(self, inputs: Dict[str, Any]) -> None:
+
+    def _validate_inputs(self, inputs: dict[str, Any]) -> None:
         """
         Validate inputs against schema.
         
@@ -234,16 +234,16 @@ class Pattern(BaseModel):
         for field_name, field_type in self.input_schema.items():
             if field_name not in inputs:
                 raise ValueError(f"Missing required input: {field_name}")
-            
+
             # Basic type checking
             if not isinstance(inputs[field_name], field_type):
                 raise ValueError(
                     f"Input '{field_name}' must be {field_type.__name__}, "
                     f"got {type(inputs[field_name]).__name__}"
                 )
-    
+
     @classmethod
-    def load(cls, name: str, library_path: Optional[Path] = None) -> "Pattern":
+    def load(cls, name: str, library_path: Path | None = None) -> "Pattern":
         """
         Load a pattern from the pattern library.
         
@@ -260,17 +260,17 @@ class Pattern(BaseModel):
         if library_path is None:
             # Use built-in pattern library
             library_path = Path(__file__).parent.parent / "patterns"
-        
+
         pattern_file = library_path / f"{name}.yaml"
-        
+
         if not pattern_file.exists():
             raise FileNotFoundError(f"Pattern '{name}' not found")
-        
-        with open(pattern_file, 'r') as f:
+
+        with open(pattern_file) as f:
             data = yaml.safe_load(f)
-        
+
         return cls(**data)
-    
+
     def save(self, path: Path) -> None:
         """
         Save pattern to file.
@@ -280,8 +280,8 @@ class Pattern(BaseModel):
         """
         with open(path, 'w') as f:
             yaml.dump(self.model_dump(), f, default_flow_style=False)
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert to dictionary.
         
@@ -289,9 +289,9 @@ class Pattern(BaseModel):
             Dictionary representation
         """
         return self.model_dump()
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Pattern":
+    def from_dict(cls, data: dict[str, Any]) -> "Pattern":
         """
         Create from dictionary.
         
@@ -302,7 +302,7 @@ class Pattern(BaseModel):
             Pattern instance
         """
         return cls(**data)
-    
+
     def __repr__(self) -> str:
         """String representation"""
         return f"Pattern(name='{self.name}', version={self.version})"

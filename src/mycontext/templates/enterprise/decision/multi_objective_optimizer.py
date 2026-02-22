@@ -7,8 +7,8 @@ Based on multi-criteria decision analysis and Pareto optimization.
 License: Enterprise
 """
 
-from typing import Optional, List
-from mycontext import Pattern, Guidance, Directive, Constraints
+
+from mycontext import Constraints, Guidance, Pattern
 
 
 class MultiObjectiveOptimizer(Pattern):
@@ -117,37 +117,37 @@ Multi-objective optimization:
                 style_guide="Be objective about compromises"
             )
         )
-    
-    def _render_context_section(self, context: Optional[str]) -> str:
+
+    def _render_context_section(self, context: str | None) -> str:
         if context:
             return f"\n**CONTEXT**: {context}\n"
         return ""
-    
-    def _render_objectives_section(self, objectives: Optional[List[str]]) -> str:
+
+    def _render_objectives_section(self, objectives: list[str] | None) -> str:
         if objectives:
             return "\n".join(f"{i+1}. {obj}" for i, obj in enumerate(objectives))
         return "1. [Define objectives]"
-    
+
     def build_context(
         self,
-        objectives: Optional[List[str]] = None,
-        context: Optional[str] = None,
+        objectives: list[str] | None = None,
+        context: str | None = None,
         **kwargs
     ):
         objectives_section = self._render_objectives_section(objectives)
         context_section = self._render_context_section(context)
-        
+
         return super().build_context(
             objectives_section=objectives_section,
             context_section=context_section,
             **kwargs
         )
-    
+
     def execute(
         self,
         provider: str = "openai",
-        objectives: Optional[List[str]] = None,
-        context: Optional[str] = None,
+        objectives: list[str] | None = None,
+        context: str | None = None,
         **kwargs
     ):
         return super().execute(

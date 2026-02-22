@@ -5,10 +5,9 @@ Unit tests for pattern suggester (keyword, llm, hybrid modes).
 import pytest
 
 from mycontext.intelligence import (
-    suggest_patterns,
-    get_pattern_class,
     SuggestionResult,
-    PatternSuggestion,
+    get_pattern_class,
+    suggest_patterns,
 )
 
 

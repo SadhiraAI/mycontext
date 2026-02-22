@@ -4,7 +4,6 @@ Mock Provider for Testing
 A simple mock provider for testing without API calls.
 """
 
-from typing import Any
 from .base import BaseProvider, ProviderResponse
 
 
@@ -14,7 +13,7 @@ class MockProvider(BaseProvider):
     
     Returns canned responses without making real API calls.
     """
-    
+
     def generate(self, context: "Context", **kwargs) -> ProviderResponse:
         """
         Generate a mock response.
@@ -28,7 +27,7 @@ class MockProvider(BaseProvider):
         """
         # Assemble the context
         assembled = context.assemble()
-        
+
         # Create a mock response
         return ProviderResponse(
             response=f"Mock response for: {assembled[:100]}...",
@@ -37,7 +36,7 @@ class MockProvider(BaseProvider):
             latency_ms=50,
             model="mock-model-v1"
         )
-    
+
     def estimate_cost(self, tokens: int) -> float:
         """
         Estimate cost (mock).
@@ -49,12 +48,12 @@ class MockProvider(BaseProvider):
             Mock cost
         """
         return tokens * 0.00001
-    
+
     @property
     def name(self) -> str:
         """Provider name"""
         return "mock"
-    
+
     @property
     def models(self) -> list[str]:
         """Available models"""

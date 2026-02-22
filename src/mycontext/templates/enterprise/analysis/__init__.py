@@ -1,9 +1,9 @@
 """Analysis Patterns (Enterprise)"""
 
-from .trend_identifier import TrendIdentifier
+from .anomaly_detector import AnomalyDetector
 from .gap_analyzer import GapAnalyzer
 from .swot_analyzer import SWOTAnalyzer
-from .anomaly_detector import AnomalyDetector
+from .trend_identifier import TrendIdentifier
 
 __all__ = [
     "TrendIdentifier",

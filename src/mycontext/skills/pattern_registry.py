@@ -9,23 +9,23 @@ Used by: pattern_suggester.get_pattern_class(), skill fusion, chain orchestratio
 from __future__ import annotations
 
 import inspect
-from typing import Dict, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..structure import Pattern
 
 
-def _build_registry() -> Dict[str, Type["Pattern"]]:
+def _build_registry() -> dict[str, type[Pattern]]:
     """Build name -> Pattern class from free and enterprise templates.
 
     Introspects both template packages to discover all Pattern subclasses,
     keyed by their ``name`` attribute (set in __init__).
     """
     from ..structure import Pattern as PatternBase
-    from ..templates import free as free_pkg
     from ..templates import enterprise as ent_pkg
+    from ..templates import free as free_pkg
 
-    registry: Dict[str, Type["Pattern"]] = {}
+    registry: dict[str, type[Pattern]] = {}
 
     for pkg in (free_pkg, ent_pkg):
         for attr_name in dir(pkg):
@@ -46,10 +46,10 @@ def _build_registry() -> Dict[str, Type["Pattern"]]:
     return registry
 
 
-_REGISTRY: Dict[str, Type["Pattern"]] | None = None
+_REGISTRY: dict[str, type[Pattern]] | None = None
 
 
-def get_pattern_registry() -> Dict[str, Type["Pattern"]]:
+def get_pattern_registry() -> dict[str, type[Pattern]]:
     """Return the pattern name -> class registry (cached)."""
     global _REGISTRY
     if _REGISTRY is None:
@@ -63,7 +63,7 @@ def reset_registry() -> None:
     _REGISTRY = None
 
 
-def get_pattern(name: str) -> "Pattern":
+def get_pattern(name: str) -> Pattern:
     """
     Resolve a pattern by name and return a new instance.
 
@@ -114,7 +114,7 @@ def get_pattern_build_params(name: str) -> tuple:
         return ("input", {})
 
     primary = params[0].name
-    defaults: Dict[str, object] = {}
+    defaults: dict[str, object] = {}
 
     for p in params[1:]:
         if p.default is inspect.Parameter.empty:

@@ -12,7 +12,7 @@ import json
 import os
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .runner import SkillRunResult
@@ -23,7 +23,7 @@ _TASK_PREVIEW_LEN = 200
 _DEFAULT_LOG_NAME = "skill_log.jsonl"
 
 
-def improvement_report(result: "SkillRunResult") -> str:
+def improvement_report(result: SkillRunResult) -> str:
     """
     Format quality score into a short text report for the skill author.
 
@@ -65,7 +65,7 @@ def improvement_report(result: "SkillRunResult") -> str:
     return "\n".join(lines).strip()
 
 
-def suggested_edits(result: "SkillRunResult") -> List[str]:
+def suggested_edits(result: SkillRunResult) -> list[str]:
     """
     Map QualityScore suggestions to concrete edit suggestions for SKILL.md.
 
@@ -73,7 +73,7 @@ def suggested_edits(result: "SkillRunResult") -> List[str]:
     Author applies manually; no file writes.
     """
     q = result.quality_score
-    edits: List[str] = []
+    edits: list[str] = []
     for s in q.suggestions:
         s = s.strip()
         if not s:
@@ -100,14 +100,14 @@ def suggested_edits(result: "SkillRunResult") -> List[str]:
 
 
 def improve_skill_with_llm(
-    result: "SkillRunResult",
-    skill_path: Optional[Path] = None,
-    current_content: Optional[str] = None,
+    result: SkillRunResult,
+    skill_path: Path | None = None,
+    current_content: str | None = None,
     provider: str = "openai",
     model: str = "gpt-4o-mini",
     temperature: float = 0.3,
     **kwargs,
-) -> Optional[str]:
+) -> str | None:
     """
     Use an LLM to improve SKILL.md based on mycontext's recommendations.
 
@@ -190,7 +190,7 @@ Task: Rewrite the SKILL.md to address the issues and suggestions above. Preserve
         return None
 
 
-def log_run(result: "SkillRunResult", log_path: Optional[Path] = None) -> None:
+def log_run(result: SkillRunResult, log_path: Path | None = None) -> None:
     """
     Append one run to the skill log (JSONL). No PII; task is truncated.
 
@@ -219,8 +219,8 @@ def log_run(result: "SkillRunResult", log_path: Optional[Path] = None) -> None:
 
 
 def skill_health_report(
-    skill_id: Optional[str] = None,
-    log_path: Optional[Path] = None,
+    skill_id: str | None = None,
+    log_path: Path | None = None,
 ) -> str:
     """
     Aggregate log entries and produce a short health report per skill.
@@ -236,7 +236,7 @@ def skill_health_report(
     if not p.exists():
         return "# Skill health report\n\nNo log found."
     by_skill: dict = defaultdict(lambda: {"scores": [], "issues": [], "suggestions": []})
-    with open(p, "r", encoding="utf-8") as f:
+    with open(p, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -277,9 +277,9 @@ def skill_health_report(
 
 def suggested_edits_from_log(
     skill_id: str,
-    log_path: Optional[Path] = None,
+    log_path: Path | None = None,
     min_count: int = 2,
-) -> List[str]:
+) -> list[str]:
     """
     Suggest edits from frequent QualityScore.suggestions for this skill in the log.
 
@@ -294,8 +294,8 @@ def suggested_edits_from_log(
     p = Path(log_path) if log_path is not None else Path.cwd() / _DEFAULT_LOG_NAME
     if not p.exists():
         return []
-    all_suggestions: List[str] = []
-    with open(p, "r", encoding="utf-8") as f:
+    all_suggestions: list[str] = []
+    with open(p, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:

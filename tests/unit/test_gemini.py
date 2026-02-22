@@ -2,8 +2,8 @@
 Tests for Gemini provider (routed through LiteLLM)
 """
 
+
 import pytest
-from unittest.mock import patch
 
 from mycontext.providers import get_provider, list_providers
 

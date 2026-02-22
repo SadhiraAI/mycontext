@@ -4,25 +4,26 @@ Batch Processing - Execute multiple templates or contexts efficiently.
 Process multiple inputs in parallel or sequence with progress tracking.
 """
 
-from typing import List, Dict, Any, Optional, Callable
-from dataclasses import dataclass
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
 class BatchResult:
     """Result from batch processing."""
-    
-    results: List[Any]
+
+    results: list[Any]
     total_cost: float
     total_tokens: int
     total_time: float
     successful: int
     failed: int
-    errors: List[Dict[str, Any]]
-    
-    def summary(self) -> Dict[str, Any]:
+    errors: list[dict[str, Any]]
+
+    def summary(self) -> dict[str, Any]:
         """Get summary statistics."""
         return {
             "total_items": len(self.results),
@@ -53,7 +54,7 @@ class BatchProcessor:
         >>> results = processor.process(questions, process_question)
         >>> print(results.summary())
     """
-    
+
     def __init__(
         self,
         max_workers: int = 5,
@@ -71,10 +72,10 @@ class BatchProcessor:
         self.max_workers = max_workers
         self.show_progress = show_progress
         self.stop_on_error = stop_on_error
-    
+
     def process(
         self,
-        items: List[Any],
+        items: list[Any],
         process_func: Callable,
         parallel: bool = True
     ) -> BatchResult:
@@ -90,36 +91,36 @@ class BatchProcessor:
             BatchResult with all results and statistics
         """
         start_time = time.time()
-        
+
         results = []
         errors = []
         total_cost = 0.0
         total_tokens = 0
         successful = 0
         failed = 0
-        
+
         if parallel:
             # Parallel processing
             with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                 futures = {executor.submit(process_func, item): i for i, item in enumerate(items)}
-                
+
                 for future in as_completed(futures):
                     idx = futures[future]
                     try:
                         result = future.result()
                         results.append((idx, result))
-                        
+
                         # Track metrics if available
                         if hasattr(result, 'cost_usd'):
                             total_cost += result.cost_usd
                         if hasattr(result, 'tokens_used'):
                             total_tokens += result.tokens_used
-                        
+
                         successful += 1
-                        
+
                         if self.show_progress:
                             print(f"✅ Processed {successful}/{len(items)}")
-                    
+
                     except Exception as e:
                         failed += 1
                         errors.append({
@@ -127,34 +128,34 @@ class BatchProcessor:
                             "item": str(items[idx])[:100],
                             "error": str(e)
                         })
-                        
+
                         if self.stop_on_error:
                             raise
-                        
+
                         if self.show_progress:
                             print(f"❌ Failed {failed}/{len(items)}: {e}")
-            
+
             # Sort by original index
             results.sort(key=lambda x: x[0])
             results = [r[1] for r in results]
-        
+
         else:
             # Sequential processing
             for i, item in enumerate(items):
                 try:
                     result = process_func(item)
                     results.append(result)
-                    
+
                     if hasattr(result, 'cost_usd'):
                         total_cost += result.cost_usd
                     if hasattr(result, 'tokens_used'):
                         total_tokens += result.tokens_used
-                    
+
                     successful += 1
-                    
+
                     if self.show_progress:
                         print(f"✅ Processed {i+1}/{len(items)}")
-                
+
                 except Exception as e:
                     failed += 1
                     errors.append({
@@ -162,15 +163,15 @@ class BatchProcessor:
                         "item": str(item)[:100],
                         "error": str(e)
                     })
-                    
+
                     if self.stop_on_error:
                         raise
-                    
+
                     if self.show_progress:
                         print(f"❌ Failed {i+1}/{len(items)}: {e}")
-        
+
         total_time = time.time() - start_time
-        
+
         return BatchResult(
             results=results,
             total_cost=total_cost,
@@ -180,11 +181,11 @@ class BatchProcessor:
             failed=failed,
             errors=errors
         )
-    
+
     def process_with_template(
         self,
         template,
-        items: List[Dict[str, Any]],
+        items: list[dict[str, Any]],
         provider: str = "gemini",
         parallel: bool = True,
         **common_kwargs
@@ -220,7 +221,7 @@ class BatchProcessor:
         def process_item(inputs):
             merged = {**common_kwargs, **inputs}
             return template.execute(provider=provider, **merged)
-        
+
         return self.process(items, process_item, parallel=parallel)
 
 
@@ -228,7 +229,7 @@ class BatchProcessor:
 
 def batch_execute(
     template,
-    items: List[Dict[str, Any]],
+    items: list[dict[str, Any]],
     provider: str = "gemini",
     max_workers: int = 5,
     parallel: bool = True

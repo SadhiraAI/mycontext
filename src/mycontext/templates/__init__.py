@@ -6,8 +6,8 @@ Enterprise templates require a license.
 """
 
 from .free import (
-    QuestionAnalyzer,
     CodeReviewer,
+    QuestionAnalyzer,
     StepByStepReasoner,
 )
 
