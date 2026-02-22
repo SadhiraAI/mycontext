@@ -3,9 +3,9 @@ Tests for Pattern class and template system
 """
 import pytest
 
-from src.mycontext.foundation import Guidance
-from src.mycontext.structure import Pattern
-from src.mycontext.templates.free import QuestionAnalyzer, StepByStepReasoner
+from mycontext.foundation import Guidance
+from mycontext.structure import Pattern
+from mycontext.templates.free import QuestionAnalyzer, StepByStepReasoner
 
 # Note: PerspectiveShifter, AssumptionChallenger, DecisionFramework
 # will be added when those templates are implemented

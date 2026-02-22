@@ -1,8 +1,8 @@
 """
 Tests for the core Context class
 """
-from src.mycontext import Context
-from src.mycontext.foundation import Constraints, Directive, Guidance
+from mycontext import Context
+from mycontext.foundation import Constraints, Directive, Guidance
 
 
 class TestContextCreation:

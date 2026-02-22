@@ -1,8 +1,8 @@
 """
 Tests for Blueprint class
 """
-from src.mycontext.foundation import Guidance
-from src.mycontext.structure import Blueprint
+from mycontext.foundation import Guidance
+from mycontext.structure import Blueprint
 
 
 class TestBlueprintCreation:

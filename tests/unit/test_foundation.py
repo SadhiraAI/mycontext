@@ -3,7 +3,7 @@ Tests for Foundation classes (Directive, Guidance, Constraints)
 """
 import pytest
 
-from src.mycontext.foundation import Constraints, Directive, Guidance
+from mycontext.foundation import Constraints, Directive, Guidance
 
 
 class TestDirective:
