@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     # Trusted hosts (production only)
     allowed_hosts: str = "sadhiraai.com,mycontext.sadhiraai.com,api.sadhiraai.com,sadhiraai-api.fly.dev,localhost,127.0.0.1"
 
+    # Email (Resend) — for email verification
+    resend_api_key: str | None = None
+    email_from: str = "mycontext AI <noreply@sadhiraai.com>"
+    frontend_url: str = "http://localhost:5173"
+
     @property
     def is_production(self) -> bool:
         return self.environment.lower() == "production"

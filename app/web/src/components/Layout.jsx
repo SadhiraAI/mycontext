@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import * as api from "../api/client";
 import GuidedTour from "./GuidedTour";
 import OnboardingWizard from "./OnboardingWizard";
 import FeedbackWidget from "./FeedbackWidget";
@@ -42,8 +43,26 @@ export default function Layout() {
     setCockpitOpen(false);
   }, [location.pathname]);
 
+  const [resending, setResending] = useState(false);
+
+  async function handleResendVerification() {
+    setResending(true);
+    try {
+      await api.resendVerification();
+    } catch { /* ignore */ }
+    finally { setResending(false); }
+  }
+
   return (
     <div className="layout">
+      {user && !user.email_verified && (
+        <div className="verify-banner">
+          <span>&#x2709;&#xFE0F; Please verify your email address. Check your inbox for a verification link.</span>
+          <button type="button" onClick={handleResendVerification} disabled={resending} className="verify-banner-btn">
+            {resending ? "Sending\u2026" : "Resend"}
+          </button>
+        </div>
+      )}
       <header className="layout-header" role="banner">
         <Link to="/" className="layout-brand" aria-label="mycontext-ai home">
           <svg className="brand-icon-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="url(#brandGrad)" strokeWidth="2.2" strokeLinecap="round"><defs><linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#5ba8a0"/><stop offset="100%" stopColor="#8b5cf6"/></linearGradient></defs><path d="M4 6c4-2 12-2 16 0"/><path d="M4 12c4-2 12-2 16 0"/><path d="M4 18c4-2 12-2 16 0"/></svg>

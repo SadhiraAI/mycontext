@@ -440,6 +440,21 @@ export async function activateLicense(key) {
   return handleResponse(res);
 }
 
+export async function verifyEmail(token) {
+  const res = await fetch(`${API_BASE}/auth/verify-email?token=${encodeURIComponent(token)}`, {
+    headers: getHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function resendVerification() {
+  const res = await fetch(`${API_BASE}/auth/resend-verification`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+  return handleResponse(res);
+}
+
 export async function submitFeedback(feedbackType, message, pageUrl = null) {
   const res = await fetch(`${API_BASE}/feedback`, {
     method: "POST",

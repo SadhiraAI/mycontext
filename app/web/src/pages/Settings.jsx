@@ -8,7 +8,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import Toast from "../components/Toast";
 import "./Settings.css";
 
-const TABS = ["API Keys", "License", "Preferences"];
+const TABS = ["API Keys", "License", "Preferences", "Legal"];
 
 export default function Settings() {
   const { user, refreshUser } = useAuth();
@@ -240,6 +240,14 @@ export default function Settings() {
               </button>
             </form>
           </div>
+
+          <div className="settings-disclaimer">
+            <span className="settings-disclaimer-icon">&#x1F512;</span>
+            <div>
+              <strong>Security &amp; Privacy</strong>
+              <p>Your API keys are encrypted at rest using AES-256 (Fernet) encryption and are never logged, displayed after saving, or shared with third parties. Keys are decrypted only at the moment of an API call to your chosen LLM provider. <strong>You are responsible for any costs</strong> incurred through your provider (e.g., OpenAI, Anthropic) when using Smart, Hybrid, or Execute features. You can remove your keys at any time. See the <button type="button" className="settings-disclaimer-link" onClick={() => { setTab("Legal"); setError(""); setSuccess(""); }}>Legal</button> tab for our full privacy notice.</p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -307,6 +315,14 @@ export default function Settings() {
               </tbody>
             </table>
           </div>
+
+          <div className="settings-disclaimer">
+            <span className="settings-disclaimer-icon">&#x1F4DC;</span>
+            <div>
+              <strong>License Terms</strong>
+              <p>Each enterprise license key is single-use and tied to one account upon activation. Keys are non-transferable and may not be shared, resold, or redistributed. Sadhira AI reserves the right to revoke keys that violate these terms. Enterprise features are provided under a limited, non-exclusive, revocable license. Attempting to reverse-engineer, circumvent, or bypass license restrictions is strictly prohibited. For questions, contact <strong>dhirajp@sadhiraai.com</strong>. See the <button type="button" className="settings-disclaimer-link" onClick={() => { setTab("Legal"); setError(""); setSuccess(""); }}>Legal</button> tab for full terms.</p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -341,6 +357,109 @@ export default function Settings() {
             >
               Start tour again
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Legal / Privacy ─────────────────────────────────── */}
+      {tab === "Legal" && (
+        <div className="settings-panel fade-in">
+          <div className="settings-section">
+            <h3>Privacy Notice</h3>
+            <p className="settings-legal-updated">Last updated: February 2026</p>
+            <div className="settings-legal-text">
+              <p>
+                <strong>mycontext AI</strong>, operated by Sadhira AI, is committed to protecting your privacy.
+                This notice explains what data we collect, how we use it, and your rights.
+              </p>
+
+              <h4>Data We Collect</h4>
+              <ul>
+                <li><strong>Account information:</strong> Email address and a securely hashed password (bcrypt). We never store or have access to your plaintext password.</li>
+                <li><strong>API keys:</strong> Your LLM provider API keys (OpenAI, Anthropic, Google, etc.) are encrypted at rest using AES-256 Fernet symmetric encryption. They are decrypted only at the moment of an API call and are never logged, displayed after initial entry, or shared with any third party.</li>
+                <li><strong>License keys:</strong> We store license key activation records to manage enterprise access and prevent misuse.</li>
+                <li><strong>Feedback:</strong> If you submit feedback, we store the message, feedback type, and page URL to improve the product.</li>
+                <li><strong>Custom templates:</strong> Templates you create are stored in our database and tied to your account.</li>
+              </ul>
+
+              <h4>Data We Do Not Collect</h4>
+              <ul>
+                <li><strong>Prompts and outputs:</strong> The cognitive templates and chain compositions you build are processed in real-time and are <strong>not stored</strong> on our servers. When using Smart/Hybrid modes, your question is sent directly to your chosen LLM provider using your own API key.</li>
+                <li><strong>Cookies:</strong> We do not use tracking cookies. Cloudflare Web Analytics is cookie-free and privacy-first.</li>
+                <li><strong>Personal profiles:</strong> We do not build behavioral profiles or track browsing activity.</li>
+              </ul>
+
+              <h4>Third-Party Services</h4>
+              <ul>
+                <li><strong>LLM providers:</strong> When you use features that call an LLM (Smart Compose, Execute, Chat), your input is sent to the provider you selected (e.g., OpenAI, Anthropic) under their terms of service and privacy policy. We act only as a conduit.</li>
+                <li><strong>Cloudflare:</strong> DNS, CDN, and privacy-first web analytics (no personal data collected).</li>
+                <li><strong>Neon (database):</strong> Managed PostgreSQL with encryption at rest and in transit.</li>
+                <li><strong>Fly.io (hosting):</strong> Backend hosting with encrypted connections.</li>
+              </ul>
+
+              <h4>Your Rights</h4>
+              <ul>
+                <li>You can <strong>delete your API keys</strong> at any time from Settings.</li>
+                <li>You can request <strong>account deletion</strong> by contacting us. We will permanently remove your account, API keys, custom templates, and all associated data.</li>
+                <li>You can request a <strong>copy of your data</strong> by contacting us.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3>Terms of Use</h3>
+            <div className="settings-legal-text">
+              <h4>Service Description</h4>
+              <p>mycontext AI provides cognitive prompt engineering tools including pattern-based context assembly, chain composition, quality scoring, and LLM execution. Output quality depends on the LLM provider, model, and prompt you use.</p>
+
+              <h4>Your Responsibilities</h4>
+              <ul>
+                <li>You are responsible for your own LLM provider API keys, their security, and any costs incurred through their use on this platform.</li>
+                <li>You must not share your account credentials or enterprise license keys with others.</li>
+                <li>You must comply with the terms of service of any LLM provider you use through this platform.</li>
+                <li>You must not use the service for any unlawful purpose or to generate harmful content.</li>
+              </ul>
+
+              <h4>Enterprise License</h4>
+              <ul>
+                <li>Enterprise cognitive patterns require a valid, purchased license key.</li>
+                <li>Each license key is single-use and bound to one account upon activation.</li>
+                <li>License keys are non-transferable and may not be shared, resold, or redistributed.</li>
+                <li>Sadhira AI reserves the right to revoke licenses that violate these terms.</li>
+                <li>Attempting to reverse-engineer, circumvent, or bypass license restrictions is prohibited.</li>
+              </ul>
+
+              <h4>Intellectual Property</h4>
+              <ul>
+                <li>mycontext AI, its cognitive patterns, templates, and SDK are the intellectual property of Sadhira AI.</li>
+                <li>Content you generate using the service belongs to you, subject to the terms of your LLM provider.</li>
+                <li>Custom templates you create belong to you.</li>
+              </ul>
+
+              <h4>Disclaimers</h4>
+              <ul>
+                <li>The service is provided <strong>&ldquo;as is&rdquo;</strong> and <strong>&ldquo;as available&rdquo;</strong> without warranties of any kind, express or implied.</li>
+                <li>We do not guarantee the accuracy, completeness, reliability, or usefulness of any LLM-generated output.</li>
+                <li>We do not guarantee uninterrupted or error-free service availability.</li>
+                <li>AI-generated outputs should not be relied upon as professional, legal, medical, or financial advice.</li>
+              </ul>
+
+              <h4>Limitation of Liability</h4>
+              <p>To the maximum extent permitted by law, Sadhira AI shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or business opportunities, arising from the use of or inability to use this service. Total liability shall not exceed the amount paid for enterprise licensing in the 12 months preceding the claim.</p>
+
+              <h4>Account Termination</h4>
+              <p>We reserve the right to suspend or terminate accounts that violate these terms, engage in abusive behavior, or attempt to compromise system security. You may delete your account at any time by contacting us.</p>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3>Contact</h3>
+            <div className="settings-legal-text">
+              <p>For privacy inquiries, data deletion requests, legal questions, or license support:</p>
+              <p><strong>Email:</strong> dhirajp@sadhiraai.com</p>
+              <p><strong>Website:</strong> <a href="https://sadhiraai.com" target="_blank" rel="noopener noreferrer">sadhiraai.com</a></p>
+              <p className="settings-legal-muted">Sadhira AI reserves the right to update these terms. Material changes will be communicated via the application.</p>
+            </div>
           </div>
         </div>
       )}

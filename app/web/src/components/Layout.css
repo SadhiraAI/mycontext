@@ -4,6 +4,42 @@
   flex-direction: column;
 }
 
+/* ── Email verification banner ───────────────────────── */
+.verify-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1a1a2e;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.verify-banner-btn {
+  background: rgba(0, 0, 0, 0.15);
+  color: #1a1a2e;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 0.2rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.verify-banner-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.verify-banner-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ── Frosted glass header ──────────────────────────────── */
 .layout-header {
   display: flex;

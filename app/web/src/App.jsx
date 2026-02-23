@@ -4,6 +4,7 @@ import Layout from "./components/Layout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import VerifyEmail from "./pages/VerifyEmail";
 import Dashboard from "./pages/Dashboard";
 import Templates from "./pages/Templates";
 import ChainBuilder from "./pages/ChainBuilder";
@@ -38,6 +39,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/" element={<HomeOrApp />}>
         <Route index element={<Dashboard />} />
         <Route path="templates" element={<Templates />} />

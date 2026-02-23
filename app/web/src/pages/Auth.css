@@ -123,3 +123,79 @@
 .auth-switch a {
   font-weight: 500;
 }
+
+/* ── Password strength rules ─────────────────────────── */
+.auth-pw-rules {
+  list-style: none;
+  padding: 0;
+  margin: -0.25rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
+}
+
+.auth-pw-rules li {
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.15s ease;
+}
+
+.auth-pw-rules li.pass {
+  color: var(--success, #22c55e);
+}
+
+.auth-pw-rules li.fail {
+  color: var(--text-muted);
+}
+
+.auth-pw-check {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* ── Verification page ───────────────────────────────── */
+.auth-verify-icon {
+  font-size: 2.5rem;
+  margin: 0.5rem 0;
+}
+
+.auth-verify-msg {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.auth-verify-link {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  background: var(--accent-gradient);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.auth-verify-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.auth-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin: 1rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
