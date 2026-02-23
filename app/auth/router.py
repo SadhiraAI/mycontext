@@ -10,7 +10,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import create_access_token, get_current_user, get_password_hash, verify_password
-from app.config import get_settings
 from app.db import get_db
 from app.db.models import User
 from app.services.email_service import send_verification_email
