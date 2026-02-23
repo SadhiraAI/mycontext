@@ -239,6 +239,229 @@ class TestContextExport:
         assert "Background information" in markdown
 
 
+class TestResearchFlow:
+    """Test the research-backed 9-section assembly"""
+
+    def test_research_flow_flag_default_false(self):
+        ctx = Context(guidance="Expert")
+        assert ctx.research_flow is False
+
+    def test_classic_assembly_unchanged(self):
+        """Existing behavior must not change when research_flow=False"""
+        ctx = Context(
+            guidance=Guidance(role="Expert"),
+            constraints=Constraints(must_include=["data"]),
+            directive=Directive(content="Analyze")
+        )
+        assembled = ctx.assemble()
+        assert "You are Expert" in assembled
+        assert "CONSTRAINTS:" in assembled
+        assert "Analyze" in assembled
+        # Should NOT have research-flow headers
+        assert "## ROLE" not in assembled
+        assert "## YOUR TASK" not in assembled
+
+    def test_research_flow_has_nine_sections(self):
+        ctx = Context(
+            guidance=Guidance(
+                role="Expert Analyst",
+                goal="Find insights",
+                rules=["Be thorough", "Use data"],
+                style="Professional",
+            ),
+            directive=Directive(content="Analyze the data"),
+            constraints=Constraints(
+                must_include=["metrics"],
+                must_not_include=["opinions"],
+                format_rules=["Use JSON"],
+                output_schema=[{"name": "result", "type": "str"}],
+            ),
+            thinking_strategy="step_by_step",
+            examples=[
+                {"input": "Sales up 20%", "output": "Positive trend"},
+            ],
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+
+        assert "## ROLE" in assembled
+        assert "## GOAL" in assembled
+        assert "## RULES" in assembled
+        assert "## STYLE" in assembled
+        assert "## REASONING APPROACH" in assembled
+        assert "## EXAMPLES" in assembled
+        assert "## OUTPUT FORMAT" in assembled
+        assert "## GUARD RAILS" in assembled
+        assert "## YOUR TASK" in assembled
+
+    def test_research_flow_ordering(self):
+        """ROLE must come first, TASK must come last"""
+        ctx = Context(
+            guidance=Guidance(role="Expert", goal="Win", rules=["Rule1"]),
+            directive=Directive(content="Do it"),
+            constraints=Constraints(must_include=["x"]),
+            thinking_strategy="verify",
+            examples=[{"input": "a", "output": "b"}],
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+
+        role_pos = assembled.find("## ROLE")
+        goal_pos = assembled.find("## GOAL")
+        rules_pos = assembled.find("## RULES")
+        reasoning_pos = assembled.find("## REASONING")
+        examples_pos = assembled.find("## EXAMPLES")
+        guard_pos = assembled.find("## GUARD RAILS")
+        task_pos = assembled.find("## YOUR TASK")
+
+        assert role_pos < goal_pos < rules_pos
+        assert rules_pos < reasoning_pos < examples_pos
+        assert examples_pos < guard_pos < task_pos
+
+    def test_research_flow_emphasis(self):
+        """Research flow should use bold/caps emphasis markers"""
+        ctx = Context(
+            guidance=Guidance(role="Expert", rules=["Be careful"]),
+            directive=Directive(content="Analyze"),
+            constraints=Constraints(must_not_include=["speculation"]),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+
+        assert "**You are Expert.**" in assembled
+        assert "**You MUST follow" in assembled
+        assert "**NEVER include" in assembled
+
+    def test_research_flow_thinking_strategy(self):
+        for strategy in ["step_by_step", "multiple_angles", "verify", "explain_simply", "creative"]:
+            ctx = Context(
+                guidance=Guidance(role="Expert"),
+                thinking_strategy=strategy,
+                research_flow=True,
+            )
+            assembled = ctx.assemble()
+            assert "## REASONING APPROACH" in assembled
+
+    def test_research_flow_examples(self):
+        ctx = Context(
+            guidance=Guidance(role="Expert"),
+            examples=[
+                {"input": "Hello", "output": "Greeting"},
+                {"input": "Bye", "output": "Farewell"},
+            ],
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "**Example 1:**" in assembled
+        assert "**Example 2:**" in assembled
+        assert "Hello" in assembled
+        assert "Farewell" in assembled
+
+    def test_research_flow_output_schema(self):
+        ctx = Context(
+            guidance=Guidance(role="Expert"),
+            constraints=Constraints(
+                output_schema=[
+                    {"name": "sentiment", "type": "str"},
+                    {"name": "confidence", "type": "float"},
+                ]
+            ),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "## OUTPUT FORMAT" in assembled
+        assert "`sentiment`" in assembled
+        assert "`confidence`" in assembled
+        assert "```json" in assembled
+
+    def test_research_flow_minimal(self):
+        """Even with minimal input, research flow should work"""
+        ctx = Context(
+            guidance=Guidance(role="Helper"),
+            directive=Directive(content="Help me"),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "## ROLE" in assembled
+        assert "## YOUR TASK" in assembled
+        assert "Help me" in assembled
+
+    def test_research_flow_with_knowledge(self):
+        ctx = Context(
+            guidance=Guidance(role="Expert"),
+            knowledge="Some retrieved documents",
+            directive=Directive(content="Summarize"),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "## KNOWLEDGE" in assembled
+        assert "Some retrieved documents" in assembled
+        task_pos = assembled.find("## YOUR TASK")
+        knowledge_pos = assembled.find("## KNOWLEDGE")
+        assert knowledge_pos < task_pos
+
+    def test_research_flow_skips_empty_sections(self):
+        ctx = Context(
+            guidance=Guidance(role="Expert"),
+            directive=Directive(content="Go"),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "## GOAL" not in assembled
+        assert "## RULES" not in assembled
+        assert "## STYLE" not in assembled
+        assert "## REASONING" not in assembled
+        assert "## EXAMPLES" not in assembled
+        assert "## OUTPUT FORMAT" not in assembled
+        assert "## GUARD RAILS" not in assembled
+
+    def test_all_exports_use_research_flow(self):
+        """All export formats should benefit from research_flow"""
+        ctx = Context(
+            guidance=Guidance(role="Expert", goal="Win"),
+            directive=Directive(content="Do it"),
+            research_flow=True,
+        )
+        messages = ctx.to_messages()
+        assert "## ROLE" in messages[0]["content"]
+
+        openai = ctx.to_openai()
+        assert "## ROLE" in openai["messages"][0]["content"]
+
+        anthropic = ctx.to_anthropic()
+        assert "## ROLE" in anthropic["system"]
+
+        langchain = ctx.to_langchain()
+        assert "## ROLE" in langchain["system_message"]
+
+    def test_new_fields_in_to_markdown(self):
+        ctx = Context(
+            guidance=Guidance(role="Expert", goal="Find bugs"),
+            constraints=Constraints(
+                output_schema=[{"name": "bug", "type": "str"}]
+            ),
+            thinking_strategy="step_by_step",
+            examples=[{"input": "code", "output": "bug report"}],
+        )
+        md = ctx.to_markdown()
+        assert "**Goal:** Find bugs" in md
+        assert "Chain of Thought" in md
+        assert "Example 1" in md
+        assert "bug (str)" in md
+
+    def test_new_fields_in_to_xml(self):
+        ctx = Context(
+            guidance=Guidance(role="Expert", goal="Win"),
+            thinking_strategy="verify",
+            examples=[{"input": "x", "output": "y"}],
+        )
+        xml = ctx.to_xml()
+        assert "<goal>Win</goal>" in xml
+        assert "<thinking_strategy>verify</thinking_strategy>" in xml
+        assert "<input>x</input>" in xml
+        assert "<output>y</output>" in xml
+
+
 class TestContextRepresentation:
     """Test Context string representation"""
 

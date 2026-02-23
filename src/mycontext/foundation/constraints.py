@@ -12,10 +12,10 @@ from pydantic import BaseModel, Field
 class Constraints(BaseModel):
     """
     Hard constraints and guardrails for LLM behavior.
-    
+
     Constraints are non-negotiable boundaries that the LLM must respect.
     They ensure safety, compliance, and adherence to requirements.
-    
+
     Example:
         ```python
         constraints = Constraints(
@@ -25,7 +25,7 @@ class Constraints(BaseModel):
             max_length=1000
         )
         ```
-    
+
     Attributes:
         must_include: Things that must be included
         must_not_include: Things that must not be included
@@ -60,10 +60,15 @@ class Constraints(BaseModel):
         description="Required output language"
     )
 
+    output_schema: list[dict] | None = Field(
+        default=None,
+        description="Structured output schema — list of {'name': str, 'type': str} field definitions"
+    )
+
     def render(self) -> str:
         """
         Render constraints as formatted text.
-        
+
         Returns:
             Formatted constraints string
         """
@@ -80,6 +85,14 @@ class Constraints(BaseModel):
         if self.format_rules:
             formats = "\n".join(f"  - {rule}" for rule in self.format_rules)
             parts.append(f"Format rules:\n{formats}")
+
+        if self.output_schema:
+            fields = [f for f in self.output_schema if f.get("name")]
+            if fields:
+                schema_lines = "\n".join(
+                    f"  - {f['name']} ({f.get('type', 'str')})" for f in fields
+                )
+                parts.append(f"Output schema:\n{schema_lines}")
 
         if self.max_length:
             parts.append(f"Maximum length: {self.max_length}")

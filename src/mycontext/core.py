@@ -2,6 +2,16 @@
 Core Context class - The heart of mycontext
 
 This is where Context as Code™ comes to life.
+
+Research-backed prompt flow (when ``research_flow=True``):
+
+  PRIMACY ZONE    → ① Role  ② Goal          (Liu et al. 2023)
+  INSTRUCTIONS    → ③ Rules  ④ Style         (OpenAI guide)
+  MIDDLE          → ⑤ Reasoning  ⑥ Examples  (Li et al. 2025)
+  LATE            → ⑦ Output Format  ⑧ Guard Rails  (CO-STAR)
+  RECENCY ZONE    → ⑨ Task (ALWAYS LAST)     (Li et al. 2023)
+
+See docs/PROMPT_FLOW_RESEARCH.md for full references.
 """
 
 from pathlib import Path
@@ -11,28 +21,74 @@ from pydantic import BaseModel, Field
 
 from .foundation import Constraints, Directive, Guidance
 
+# ── Thinking-strategy registry ────────────────────────────────────
+THINKING_STRATEGIES: dict[str, tuple[str, str]] = {
+    "step_by_step": (
+        "Chain of Thought",
+        "Think through this step by step. Break the problem down into "
+        "stages, show your reasoning at each stage, then give your final answer.",
+    ),
+    "multiple_angles": (
+        "Tree of Thought",
+        "Before answering, brainstorm at least 3 different approaches or "
+        "perspectives. Briefly evaluate the strengths and weaknesses of each, "
+        "then choose the best approach and explain why.",
+    ),
+    "verify": (
+        "Self-Reflection",
+        "After providing your answer, critically review it. Check for errors, "
+        "missing information, unsupported claims, or logical gaps. If you find "
+        "issues, revise your answer.",
+    ),
+    "explain_simply": (
+        "Simplification",
+        "Explain your reasoning in simple, everyday language that anyone can "
+        "understand. Avoid jargon and technical terms. Use analogies where helpful.",
+    ),
+    "creative": (
+        "Divergent Thinking",
+        "Explore unconventional, surprising, and creative ideas. Don't limit "
+        "yourself to the obvious answer. Challenge assumptions and consider "
+        "perspectives that others might miss.",
+    ),
+}
+
 
 class Context(BaseModel):
     """
     Core Context class that represents a complete contextual environment for LLM interaction.
-    
+
     The Context is the fundamental building block that combines:
     - Guidance (system-level behavioral rules)
     - Directives (specific instructions)
     - Knowledge (memory, documents, state)
     - Data (user inputs and parameters)
-    
+
     Example:
         ```python
         from mycontext import Context, Guidance
-        
+
         # Simple usage
         context = Context("You are a helpful assistant")
-        
-        # Advanced usage
+
+        # Research-backed flow with all the bells and whistles
         context = Context(
-            guidance=Guidance(role="Expert code reviewer", rules=["Be thorough"]),
-            directive=Directive("Review this code for security issues")
+            guidance=Guidance(
+                role="Expert code reviewer",
+                goal="Find security vulnerabilities",
+                rules=["Focus on OWASP Top 10"],
+                style="Direct and actionable",
+            ),
+            directive=Directive("Review this code: ..."),
+            constraints=Constraints(
+                must_not_include=["personal opinions"],
+                output_schema=[{"name": "severity", "type": "str"}],
+            ),
+            thinking_strategy="verify",
+            examples=[
+                {"input": "eval(user_input)", "output": "Critical: code injection"},
+            ],
+            research_flow=True,
         )
         ```
     """
@@ -67,6 +123,29 @@ class Context(BaseModel):
         description="Metadata about this context (tags, version, etc.)"
     )
 
+    # ── Research-flow extensions (all optional, backward-compatible) ──
+
+    thinking_strategy: str | None = Field(
+        default=None,
+        description=(
+            "Reasoning strategy key — one of: step_by_step, multiple_angles, "
+            "verify, explain_simply, creative"
+        ),
+    )
+
+    examples: list[dict[str, str]] | None = Field(
+        default=None,
+        description="Few-shot examples — list of {'input': str, 'output': str}",
+    )
+
+    research_flow: bool = Field(
+        default=False,
+        description=(
+            "When True, assemble() uses the research-backed 9-section ordering "
+            "with emphasis formatting.  When False (default), classic assembly."
+        ),
+    )
+
     def __init__(
         self,
         guidance: str | Guidance | None = None,
@@ -75,7 +154,7 @@ class Context(BaseModel):
     ):
         """
         Initialize a Context.
-        
+
         Args:
             guidance: System-level guidance (can be string or Guidance object)
             directive: Specific directive (can be string or Directive object)
@@ -126,45 +205,169 @@ class Context(BaseModel):
     def assemble(self) -> str:
         """
         Assemble the complete context into a formatted string.
-        
-        This is where the magic happens - combining all components
-        into a coherent context that can be sent to an LLM.
-        
+
+        When ``research_flow`` is False (default), uses classic ordering:
+            Guidance → Constraints → Knowledge → Directive
+
+        When ``research_flow`` is True, uses the research-backed 9-section
+        ordering with emphasis formatting:
+            Role → Goal → Rules → Style → Reasoning → Examples →
+            Output Format → Guard Rails → Task
+
         Returns:
             Assembled context as a formatted string
         """
+        if self.research_flow:
+            return self._assemble_research_flow()
+
         parts = []
 
-        # Add guidance (system-level)
         if self.guidance:
             parts.append(self.guidance.render())
 
-        # Add constraints (boundaries)
         if self.constraints:
             parts.append(self.constraints.render())
 
-        # Add knowledge (retrieved information)
         if self.knowledge:
             parts.append(f"# Knowledge\n\n{self.knowledge}")
 
-        # Add directive (specific instruction)
         if self.directive:
             parts.append(self.directive.render())
 
-        # Join with double newlines for clarity
         return "\n\n".join(filter(None, parts))
+
+    # ── Research-backed assembly engine ───────────────────────────
+
+    def _assemble_research_flow(self) -> str:
+        """Build prompt in the research-backed 9-section order.
+
+        Zones (Liu et al. 2023 — primacy / recency bias):
+          PRIMACY    ① Role  ② Goal         — strongest recall
+          EARLY      ③ Rules  ④ Style        — instructions first (OpenAI)
+          MIDDLE     ⑤ Reasoning  ⑥ Examples — demos stabilize (Li et al. 2025)
+          LATE       ⑦ Output Format  ⑧ Guard Rails — near the ask (CO-STAR)
+          RECENCY    ⑨ Task                  — always last (+9.7 BLEU)
+        """
+        sections: list[str] = []
+
+        # ① ROLE (primacy zone)
+        if self.guidance:
+            sections.append(f"## ROLE\n\n**You are {self.guidance.role}.**")
+
+        # ② GOAL
+        goal = getattr(self.guidance, "goal", None) if self.guidance else None
+        if goal:
+            sections.append(f"## GOAL\n\n**Objective:** {goal}")
+
+        # ③ RULES (hard → easy, Zhang et al. 2025)
+        rules = getattr(self.guidance, "rules", []) if self.guidance else []
+        if rules:
+            items = "\n".join(f"  {i+1}. {r}" for i, r in enumerate(rules))
+            sections.append(
+                f"## RULES\n\n**You MUST follow these rules at all times:**\n{items}"
+            )
+
+        # ④ STYLE
+        style = getattr(self.guidance, "style", None) if self.guidance else None
+        if style:
+            sections.append(f"## STYLE\n\n**Tone & voice:** {style}")
+
+        # ⑤ REASONING APPROACH
+        if self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
+            label, injection = THINKING_STRATEGIES[self.thinking_strategy]
+            sections.append(
+                f"## REASONING APPROACH ({label})\n\n**Important — {injection}**"
+            )
+
+        # ⑥ EXAMPLES (few-shot, middle zone)
+        if self.examples:
+            pairs = []
+            for i, ex in enumerate(self.examples, 1):
+                inp = ex.get("input", "").strip()
+                out = ex.get("output", "").strip()
+                if inp and out:
+                    pairs.append(f"**Example {i}:**\nInput: {inp}\nOutput: {out}")
+            if pairs:
+                sections.append(
+                    "## EXAMPLES\n\nLearn from these examples of expected "
+                    "input \u2192 output:\n\n" + "\n\n".join(pairs)
+                )
+
+        # Knowledge slots into the middle zone too
+        if self.knowledge:
+            sections.append(f"## KNOWLEDGE\n\n{self.knowledge}")
+
+        # ⑦ OUTPUT FORMAT
+        schema = (
+            getattr(self.constraints, "output_schema", None)
+            if self.constraints else None
+        )
+        if schema:
+            fields = [f for f in schema if f.get("name")]
+            if fields:
+                lines = [
+                    "## OUTPUT FORMAT",
+                    "",
+                    "**Return your response as a JSON object** with these required fields:",
+                    "",
+                ]
+                for f in fields:
+                    lines.append(f"- **`{f['name']}`** ({f.get('type', 'str')})")
+                lines.append("")
+                skeleton = ", ".join('"' + f["name"] + '": ...' for f in fields)
+                lines.append("```json\n{" + skeleton + "}\n```")
+                sections.append("\n".join(lines))
+
+        # ⑧ GUARD RAILS (hard constraints first — Zhang et al. 2025)
+        if self.constraints:
+            guard = self._render_guard_rails(self.constraints)
+            if guard:
+                sections.append(guard)
+
+        # ⑨ TASK (recency zone — ALWAYS LAST)
+        if self.directive:
+            sections.append(f"---\n\n## YOUR TASK\n\n{self.directive.render()}")
+
+        return "\n\n".join(s for s in sections if s)
+
+    @staticmethod
+    def _render_guard_rails(c: Constraints) -> str:
+        parts: list[str] = ["## GUARD RAILS"]
+        must_not = [i for i in (c.must_not_include or []) if i]
+        must = [i for i in (c.must_include or []) if i]
+        fmt = [i for i in (c.format_rules or []) if i]
+
+        if not must_not and not must and not fmt:
+            return ""
+
+        if must_not:
+            items = "\n".join(f"  - {i}" for i in must_not)
+            parts.append(f"\n**NEVER include the following:**\n{items}")
+        if must:
+            items = "\n".join(f"  - {i}" for i in must)
+            parts.append(f"\n**ALWAYS include the following:**\n{items}")
+        if fmt:
+            items = "\n".join(f"  - {i}" for i in fmt)
+            parts.append(f"\n**Format rules:**\n{items}")
+
+        if c.max_length:
+            parts.append(f"\n**Maximum length:** {c.max_length}")
+        if c.language:
+            parts.append(f"\n**Language:** {c.language}")
+
+        return "\n".join(parts)
 
     def execute(self, provider: str = "openai", **kwargs) -> Any:
         """
         Execute this context with an LLM provider.
-        
+
         Args:
             provider: Provider name ('openai', 'anthropic', 'google', etc.)
             **kwargs: Additional parameters for the provider
-            
+
         Returns:
             Provider response
-            
+
         Example:
             ```python
             context = Context("You are a helpful assistant")
@@ -267,7 +470,7 @@ class Context(BaseModel):
     def to_dict(self) -> dict[str, Any]:
         """
         Convert context to dictionary for serialization.
-        
+
         Returns:
             Dictionary representation
         """
@@ -276,15 +479,15 @@ class Context(BaseModel):
     def to_messages(self, user_message: str | None = None) -> list:
         """
         Export context as OpenAI-style message array.
-        
+
         Universal format compatible with OpenAI, Anthropic, and most LLM providers.
-        
+
         Args:
             user_message: Optional user message to append
-            
+
         Returns:
             List of message dictionaries [{"role": "system", "content": "..."}, ...]
-            
+
         Example:
             ```python
             context = Context(guidance="Expert analyst")
@@ -309,15 +512,15 @@ class Context(BaseModel):
     def to_langchain(self):
         """
         Export context for LangChain/LangGraph integration.
-        
+
         Returns:
             Dictionary with 'system_message' and 'context' keys
-            
+
         Example:
             ```python
             context = Context(guidance="Expert", directive="Analyze")
             lc_format = context.to_langchain()
-            
+
             # Use in LangChain
             from langchain_core.messages import SystemMessage
             system_msg = SystemMessage(content=lc_format['system_message'])
@@ -334,12 +537,12 @@ class Context(BaseModel):
     def to_markdown(self) -> str:
         """
         Export context as human-readable Markdown.
-        
+
         Useful for documentation, debugging, or human review.
-        
+
         Returns:
             Markdown-formatted string
-            
+
         Example:
             ```python
             context = Context(guidance="Expert", directive="Analyze this")
@@ -356,6 +559,8 @@ class Context(BaseModel):
         if self.guidance:
             lines.append("## Guidance\n")
             lines.append(f"**Role:** {self.guidance.role}\n")
+            if self.guidance.goal:
+                lines.append(f"**Goal:** {self.guidance.goal}\n")
             if self.guidance.rules:
                 lines.append("**Rules:**\n")
                 for rule in self.guidance.rules:
@@ -381,6 +586,23 @@ class Context(BaseModel):
                 lines.append("**Format Rules:**\n")
                 for rule in self.constraints.format_rules:
                     lines.append(f"- {rule}\n")
+            if self.constraints.output_schema:
+                lines.append("**Output Schema:**\n")
+                for f in self.constraints.output_schema:
+                    if f.get("name"):
+                        lines.append(f"- {f['name']} ({f.get('type', 'str')})\n")
+
+        if self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
+            label, _ = THINKING_STRATEGIES[self.thinking_strategy]
+            lines.append("\n## Thinking Strategy\n")
+            lines.append(f"**{label}** ({self.thinking_strategy})\n")
+
+        if self.examples:
+            lines.append("\n## Examples\n")
+            for i, ex in enumerate(self.examples, 1):
+                lines.append(f"**Example {i}:**\n")
+                lines.append(f"- Input: {ex.get('input', '')}\n")
+                lines.append(f"- Output: {ex.get('output', '')}\n")
 
         if self.knowledge:
             lines.append("\n## Knowledge\n")
@@ -396,12 +618,12 @@ class Context(BaseModel):
     def to_json(self) -> str:
         """
         Export context as JSON string.
-        
+
         Useful for API transmission, storage, or language-agnostic consumption.
-        
+
         Returns:
             JSON string representation
-            
+
         Example:
             ```python
             context = Context(guidance="Expert")
@@ -416,10 +638,10 @@ class Context(BaseModel):
     def from_dict(cls, data: dict[str, Any]) -> "Context":
         """
         Create context from dictionary.
-        
+
         Args:
             data: Dictionary representation
-            
+
         Returns:
             Context instance
         """
@@ -429,10 +651,10 @@ class Context(BaseModel):
     def from_json(cls, json_str: str) -> "Context":
         """
         Create context from JSON string.
-        
+
         Args:
             json_str: JSON string representation
-            
+
         Returns:
             Context instance
         """
@@ -442,15 +664,15 @@ class Context(BaseModel):
     def to_llamaindex(self) -> dict[str, Any]:
         """
         Export context for LlamaIndex integration.
-        
+
         Returns:
             Dictionary compatible with LlamaIndex query engines
-            
+
         Example:
             ```python
             from llama_index import VectorStoreIndex
             context = Context(guidance="Expert", directive="Analyze")
-            
+
             index = VectorStoreIndex.from_documents(docs)
             query_engine = index.as_query_engine(
                 text_qa_template=context.to_llamaindex()['template']
@@ -469,12 +691,12 @@ class Context(BaseModel):
     def to_crewai(self) -> dict[str, Any]:
         """
         Export context for CrewAI integration.
-        
+
         Returns:
             Dictionary compatible with CrewAI agents and tasks:
             - role, goal, backstory: for Agent
             - expected_output: for Task (derived from constraints.must_include)
-            
+
         Example:
             ```python
             from crewai import Agent, Task
@@ -503,15 +725,15 @@ class Context(BaseModel):
     def to_autogen(self) -> dict[str, Any]:
         """
         Export context for AutoGen multi-agent integration.
-        
+
         Returns:
             Dictionary compatible with AutoGen agents
-            
+
         Example:
             ```python
             from autogen import AssistantAgent
             context = Context(guidance="Expert", directive="Solve problem")
-            
+
             agent = AssistantAgent(
                 name="analyst",
                 system_message=context.to_autogen()['system_message']
@@ -529,13 +751,13 @@ class Context(BaseModel):
     def to_yaml(self) -> str:
         """
         Export context as YAML string.
-        
+
         Returns:
             YAML-formatted string
-            
+
         Raises:
             ImportError: If pyyaml is not installed.
-            
+
         Example:
             ```python
             context = Context(guidance="Expert")
@@ -545,10 +767,10 @@ class Context(BaseModel):
         """
         try:
             import yaml
-        except ImportError:
+        except ImportError as err:
             raise ImportError(
                 "pyyaml is not installed. Install with: pip install pyyaml"
-            )
+            ) from err
         return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
 
     def to_xml(self) -> str:
@@ -565,12 +787,24 @@ class Context(BaseModel):
         if self.guidance:
             guidance_elem = SubElement(root, "guidance")
             SubElement(guidance_elem, "role").text = _safe_text(self.guidance.role)
+            if self.guidance.goal:
+                SubElement(guidance_elem, "goal").text = _safe_text(self.guidance.goal)
             if self.guidance.rules:
                 rules_elem = SubElement(guidance_elem, "rules")
                 for rule in self.guidance.rules:
                     SubElement(rules_elem, "rule").text = _safe_text(rule)
             if self.guidance.style:
                 SubElement(guidance_elem, "style").text = _safe_text(self.guidance.style)
+
+        if self.thinking_strategy:
+            SubElement(root, "thinking_strategy").text = _safe_text(self.thinking_strategy)
+
+        if self.examples:
+            examples_elem = SubElement(root, "examples")
+            for ex in self.examples:
+                ex_elem = SubElement(examples_elem, "example")
+                SubElement(ex_elem, "input").text = _safe_text(ex.get("input", ""))
+                SubElement(ex_elem, "output").text = _safe_text(ex.get("output", ""))
 
         if self.directive:
             directive_elem = SubElement(root, "directive")
@@ -614,15 +848,15 @@ class Context(BaseModel):
     def to_anthropic(self) -> dict[str, Any]:
         """
         Export context optimized for Anthropic Claude.
-        
+
         Returns:
             Dictionary with Anthropic-specific format
-            
+
         Example:
             ```python
             from anthropic import Anthropic
             context = Context(guidance="Expert")
-            
+
             client = Anthropic()
             response = client.messages.create(
                 **context.to_anthropic(),
@@ -646,15 +880,15 @@ class Context(BaseModel):
     def to_openai(self) -> dict[str, Any]:
         """
         Export context optimized for OpenAI.
-        
+
         Returns:
             Dictionary with OpenAI-specific format
-            
+
         Example:
             ```python
             from openai import OpenAI
             context = Context(guidance="Expert")
-            
+
             client = OpenAI()
             response = client.chat.completions.create(
                 **context.to_openai(),
@@ -671,15 +905,15 @@ class Context(BaseModel):
     def to_google(self) -> dict[str, Any]:
         """
         Export context optimized for Google Gemini.
-        
+
         Returns:
             Dictionary with Google-specific format
-            
+
         Example:
             ```python
             from google import genai
             context = Context(guidance="Expert")
-            
+
             model = genai.GenerativeModel("gemini-2.0-flash-exp")
             response = model.generate_content(**context.to_google())
             ```

@@ -15,7 +15,7 @@ __version__ = "0.3.0"
 # Integrations module (lazy loading)
 # Agent Skills (executable, quality-assured, pattern-anchored skills)
 from . import integrations, intelligence, skills, templates, utils
-from .core import Context
+from .core import THINKING_STRATEGIES, Context
 from .foundation import Constraints, Directive, Guidance
 from .intelligence import (
     BenchmarkResult,
@@ -45,6 +45,7 @@ from .structure import Blueprint, Pattern
 __all__ = [
     # Core
     "Context",
+    "THINKING_STRATEGIES",
     "Directive",
     "Guidance",
     "Constraints",

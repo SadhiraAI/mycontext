@@ -193,6 +193,56 @@ class TestConstraints:
         assert "Bullet points" in rendered
 
 
+class TestGuidanceGoal:
+    """Test the new goal field on Guidance"""
+
+    def test_goal_defaults_to_none(self):
+        g = Guidance(role="Expert")
+        assert g.goal is None
+
+    def test_goal_is_stored(self):
+        g = Guidance(role="Expert", goal="Find vulnerabilities")
+        assert g.goal == "Find vulnerabilities"
+
+    def test_render_includes_goal(self):
+        g = Guidance(role="Expert", goal="Find vulnerabilities")
+        rendered = g.render()
+        assert "Goal: Find vulnerabilities" in rendered
+
+    def test_render_without_goal_unchanged(self):
+        g = Guidance(role="Expert", rules=["Be thorough"], style="direct")
+        rendered = g.render()
+        assert "You are Expert" in rendered
+        assert "Goal" not in rendered
+
+
+class TestConstraintsOutputSchema:
+    """Test the new output_schema field on Constraints"""
+
+    def test_output_schema_defaults_to_none(self):
+        c = Constraints()
+        assert c.output_schema is None
+
+    def test_output_schema_is_stored(self):
+        schema = [{"name": "sentiment", "type": "str"}, {"name": "confidence", "type": "float"}]
+        c = Constraints(output_schema=schema)
+        assert len(c.output_schema) == 2
+        assert c.output_schema[0]["name"] == "sentiment"
+
+    def test_render_includes_output_schema(self):
+        schema = [{"name": "result", "type": "str"}]
+        c = Constraints(output_schema=schema)
+        rendered = c.render()
+        assert "Output schema" in rendered
+        assert "result (str)" in rendered
+
+    def test_render_without_schema_unchanged(self):
+        c = Constraints(must_include=["data"])
+        rendered = c.render()
+        assert "Output schema" not in rendered
+        assert "data" in rendered
+
+
 class TestFoundationIntegration:
     """Test Foundation classes working together"""
 
@@ -212,3 +262,13 @@ class TestFoundationIntegration:
         assert "Expert" in combined
         assert "metrics" in combined
         assert "Analyze data" in combined
+
+    def test_combined_with_new_fields(self):
+        """Test that new fields integrate with existing ones"""
+        guidance = Guidance(role="Analyst", goal="Find trends", rules=["Be precise"])
+        constraints = Constraints(
+            must_include=["metrics"],
+            output_schema=[{"name": "trend", "type": "str"}]
+        )
+        assert "Goal: Find trends" in guidance.render()
+        assert "trend (str)" in constraints.render()

@@ -12,10 +12,10 @@ from pydantic import BaseModel, Field
 class Guidance(BaseModel):
     """
     System-level behavioral guidance that defines how the LLM should act.
-    
+
     Guidance is like the personality and expertise definition - it tells
     the LLM who it is and how it should behave across all interactions.
-    
+
     Example:
         ```python
         guidance = Guidance(
@@ -28,7 +28,7 @@ class Guidance(BaseModel):
             style="Professional but approachable"
         )
         ```
-    
+
     Attributes:
         role: The role/persona the LLM should adopt
         rules: List of behavioral rules to follow
@@ -57,14 +57,22 @@ class Guidance(BaseModel):
         description="Areas of expertise"
     )
 
+    goal: str | None = Field(
+        default=None,
+        description="What success looks like — the objective of the interaction"
+    )
+
     def render(self) -> str:
         """
         Render guidance as a system prompt.
-        
+
         Returns:
             Formatted system prompt
         """
         parts = [f"You are {self.role}."]
+
+        if self.goal:
+            parts.append(f"Goal: {self.goal}")
 
         if self.expertise:
             expertise_text = ", ".join(self.expertise)
