@@ -31,6 +31,10 @@ from .structured_output import (
     StructuredOutputMixin,
     output_format,
 )
+from .semantic_cache import SemanticCache, get_default_cache, reset_default_cache
+from .template_safety import safe_format_template
+from .tokens import count_tokens, estimate_cost_usd, fits_in_window, token_budget_remaining
+from .tracing import Span, Tracer, get_tracer
 from .validators import (
     ContextValidator,
     OutputValidator,
@@ -65,4 +69,23 @@ __all__ = [
     "ContextValidator",
     "OutputValidator",
     "SchemaValidator",
+
+    # Template Safety
+    "safe_format_template",
+
+    # Token Counting
+    "count_tokens",
+    "fits_in_window",
+    "token_budget_remaining",
+    "estimate_cost_usd",
+
+    # Semantic Cache
+    "SemanticCache",
+    "get_default_cache",
+    "reset_default_cache",
+
+    # Tracing
+    "Span",
+    "Tracer",
+    "get_tracer",
 ]

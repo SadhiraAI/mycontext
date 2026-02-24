@@ -4,6 +4,7 @@ Intelligence Layer - Automatic cognitive pattern selection and transformation
 This layer provides intelligent, automatic context transformation capabilities.
 """
 
+from .context_generator import GeneratedContext, generate_context
 from .chain_orchestration_agent import (
     PATTERN_BUILD_CONTEXT_REGISTRY,
     WorkflowChainResult,
@@ -61,6 +62,8 @@ from .transformation_engine import (
 )
 
 __all__ = [
+    "generate_context",
+    "GeneratedContext",
     "TransformationEngine",
     "InputAnalysis",
     "InputType",

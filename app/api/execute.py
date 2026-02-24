@@ -51,7 +51,7 @@ async def execute(
         from mycontext.utils import output_format
         content = content + "\n\n" + output_format(ofmt)
 
-    result = execute_service.execute_context(
+    result = await execute_service.execute_context_async(
         assembled_content=content,
         provider=body.provider,
         api_key=api_key,

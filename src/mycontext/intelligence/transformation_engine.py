@@ -5,12 +5,37 @@ Core intelligence layer that analyzes inputs and selects optimal cognitive patte
 This is the heart of mycontext's automatic context engineering.
 """
 
+import logging
+import threading
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
 from ..core import Context
 from ..structure.pattern import Pattern
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Module-level lazy singleton for the pattern registry
+# ---------------------------------------------------------------------------
+# Research basis:
+#   "Lazy initialization" (GoF Design Patterns, 1994): defer expensive
+#   work until first use.  TransformationEngine.__init__ previously called
+#   _load_patterns() synchronously, importing all template modules even when
+#   the engine was only being inspected or type-checked.  With a module-level
+#   singleton, the import cost is paid once per Python process across all
+#   instances, not once per instantiation.
+#
+#   Thread safety: a threading.Lock prevents the "double-checked locking"
+#   race condition that would cause duplicate pattern loading under concurrent
+#   instantiation.
+#
+# The registry is keyed by include_enterprise (True/False) so enterprise and
+# free-only instances each get their own lazily-built cache.
+
+_PATTERN_REGISTRY_CACHE: dict[bool, dict[str, Pattern]] = {}
+_PATTERN_REGISTRY_LOCK = threading.Lock()
 
 
 class InputType(Enum):
@@ -72,16 +97,47 @@ class TransformationEngine:
     def __init__(self, include_enterprise: bool = True):
         """
         Initialize the transformation engine.
-        
+
+        Pattern modules are loaded once per (include_enterprise) variant and
+        cached at module level — subsequent instantiations reuse the cached
+        registry without re-importing any modules.
+
         Args:
-            include_enterprise: If False, only free patterns are used (for non-enterprise users)
+            include_enterprise: If False, only free patterns are used.
         """
         self.include_enterprise = include_enterprise
-        self._pattern_registry: dict[str, Pattern] = {}
-        self._load_patterns()
+        # Delegate to the lazy-loaded module-level cache.
+        self._pattern_registry = self._get_registry(include_enterprise)
 
-    def _load_patterns(self):
-        """Load all available cognitive patterns. Excludes enterprise when include_enterprise=False."""
+    # ------------------------------------------------------------------
+    # Lazy singleton registry
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _get_registry(include_enterprise: bool) -> dict[str, "Pattern"]:
+        """Return (and lazily build) the module-level pattern registry."""
+        if include_enterprise in _PATTERN_REGISTRY_CACHE:
+            return _PATTERN_REGISTRY_CACHE[include_enterprise]
+
+        with _PATTERN_REGISTRY_LOCK:
+            # Double-checked locking: re-test inside the lock to avoid
+            # duplicate loading if two threads arrived simultaneously.
+            if include_enterprise in _PATTERN_REGISTRY_CACHE:
+                return _PATTERN_REGISTRY_CACHE[include_enterprise]
+
+            registry: dict[str, Pattern] = {}
+            TransformationEngine._load_patterns_into(registry, include_enterprise)
+            _PATTERN_REGISTRY_CACHE[include_enterprise] = registry
+            logger.debug(
+                "TransformationEngine: loaded %d patterns (enterprise=%s)",
+                len(registry),
+                include_enterprise,
+            )
+            return registry
+
+    @staticmethod
+    def _load_patterns_into(registry: dict[str, "Pattern"], include_enterprise: bool) -> None:
+        """Populate *registry* with all applicable patterns."""
         from ..templates.free import (
             IntentRecognizer,
             QuestionAnalyzer,
@@ -90,6 +146,7 @@ class TransformationEngine:
             SocraticQuestioner,
             StepByStepReasoner,
         )
+
         patterns: list[Pattern] = [
             QuestionAnalyzer(),
             StepByStepReasoner(),
@@ -98,30 +155,34 @@ class TransformationEngine:
             IntentRecognizer(),
             RootCauseAnalyzer(),
         ]
-        if self.include_enterprise:
+
+        if include_enterprise:
             try:
                 from ..templates.enterprise import (
                     AmbiguityResolver,
                     AnalogicalReasoner,
                     CausalReasoner,
                 )
-                patterns.extend([
-                    CausalReasoner(),
-                    AmbiguityResolver(),
-                    AnalogicalReasoner(),
-                ])
+                patterns.extend([CausalReasoner(), AmbiguityResolver(), AnalogicalReasoner()])
+
                 from ..templates.enterprise.decision import (
                     ComparativeAnalyzer,
                     DecisionFramework,
                     TradeoffAnalyzer,
                 )
                 from ..templates.enterprise.problem_solving import ProblemDecomposer
-                patterns.extend([ComparativeAnalyzer(), TradeoffAnalyzer(), ProblemDecomposer(), DecisionFramework()])
+
+                patterns.extend([
+                    ComparativeAnalyzer(),
+                    TradeoffAnalyzer(),
+                    ProblemDecomposer(),
+                    DecisionFramework(),
+                ])
             except ImportError:
                 pass
 
         for pattern in patterns:
-            self._pattern_registry[pattern.name] = pattern
+            registry[pattern.name] = pattern
 
     def analyze_input(
         self,
@@ -461,7 +522,7 @@ class TransformationEngine:
         elif pattern.name in ["scenario_planner"]:
             inputs["situation"] = input
         elif pattern.name in ["risk_assessor"]:
-            inputs["situation"] = input
+            inputs["decision"] = input
         else:
             inputs["input"] = input
 

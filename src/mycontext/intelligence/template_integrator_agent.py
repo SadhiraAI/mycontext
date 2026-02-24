@@ -10,6 +10,7 @@ Research Foundation:
 - Agentic Context Engineering (arxiv 2510.04618)
 """
 
+import logging
 from dataclasses import dataclass, field
 
 from ..intelligence.pattern_catalog import NAME_TO_DESCRIPTION
@@ -18,6 +19,8 @@ from ..intelligence.pattern_suggester import (
     NAME_TO_CATEGORY,
     VALID_PATTERN_NAMES,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -300,8 +303,15 @@ class TemplateIntegratorAgent:
         return "\n\n".join(lines)
 
     @staticmethod
+    @__import__("functools").lru_cache(maxsize=128)
     def _get_template_detail(name):
-        """Extract role, key rules, and directive structure from an actual template."""
+        """Extract role, key rules, and directive structure from an actual template.
+
+        Result is LRU-cached: template definitions are static and this function
+        is called on every suggest_and_integrate() call, often with the same
+        template names.  Caching eliminates repeated Pattern class instantiation
+        and build_context() calls for previously seen templates.
+        """
         try:
             from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
             from .pattern_suggester import get_pattern_class
@@ -335,13 +345,53 @@ class TemplateIntegratorAgent:
                         s.lstrip('#- *').strip()[:60] for s in sections
                     ))
             return " | ".join(parts)[:500] if parts else ""
-        except Exception:
+        except Exception as e:
+            logger.warning(
+                "_get_template_detail: could not extract detail for template '%s'. "
+                "Returning empty string. Error: %s",
+                name, e, exc_info=True,
+            )
             return ""
 
     def _call_llm(self, prompt, provider, temperature, model, **kwargs):
         from ..core import Context
         from ..foundation import Directive, Guidance
 
+        # ── Try instructor-structured path ───────────────────────────────────
+        from .schemas import IntegrationResponse, get_instructor_client
+        instructor_client = get_instructor_client(None)
+        resolved_model = model or "gpt-4o-mini"
+
+        if instructor_client is not None:
+            try:
+                system_msg = (
+                    "You are a Template Integrator Agent — expert at fusing multiple "
+                    "cognitive reasoning frameworks into one unified, powerful context. "
+                    "Merge methodologies, do not just concatenate them. "
+                    "Every element must be specific to the user question. "
+                    "Respond with a JSON object matching the IntegrationResponse schema."
+                )
+                response = instructor_client.chat.completions.create(
+                    model=resolved_model,
+                    response_model=IntegrationResponse,
+                    messages=[
+                        {"role": "system", "content": system_msg},
+                        {"role": "user", "content": prompt},
+                    ],
+                    max_retries=2,
+                )
+                # Store parsed result so _parse_result can skip regex
+                self._last_structured = response
+                return f"[structured:{id(response)}]"  # sentinel — bypasses regex
+            except Exception as exc:
+                logger.debug(
+                    "_call_llm: instructor path failed (%s), falling back. Error: %s",
+                    type(exc).__name__, exc,
+                )
+                self._last_structured = None
+
+        # ── Fallback: classic call, ask for JSON output ──────────────────────
+        self._last_structured = None
         ctx = Context(
             guidance=Guidance(
                 role=(
@@ -353,6 +403,8 @@ class TemplateIntegratorAgent:
                     "Merge methodologies, do not just concatenate them.",
                     "Every element must be specific to the user question.",
                     "The result must be directly usable as an LLM prompt.",
+                    "Respond as JSON: {\"role\":\"...\",\"rules\":[...],\"directive\":\"...\","
+                    "\"output_requirements\":[...],\"integration_rationale\":\"...\"}",
                 ],
             ),
             directive=Directive(content=prompt),
@@ -365,8 +417,33 @@ class TemplateIntegratorAgent:
         return result.response.strip()
 
     def _parse_result(self, question, names, raw):
-        import re
+        import re  # noqa: PLC0415
 
+        from .schemas import IntegrationResponse, parse_with_fallback
+
+        # ── Use pre-parsed structured result if available (instructor path) ──
+        structured: IntegrationResponse | None = getattr(self, "_last_structured", None)
+
+        if structured is None and not raw.startswith("[structured:"):
+            # Try Pydantic parse on the raw JSON first
+            try:
+                structured = parse_with_fallback(IntegrationResponse, raw)
+            except Exception:
+                structured = None
+
+        if structured is not None:
+            return IntegrationResult(
+                question=question,
+                source_templates=names,
+                integrated_context=raw,
+                role=structured.role,
+                rules=structured.rules,
+                directive=structured.directive,
+                output_requirements=structured.output_requirements,
+                raw_llm_response=raw,
+            )
+
+        # ── Final fallback: original regex parser ────────────────────────────
         role = ""
         rules = []
         directive = ""
@@ -392,9 +469,7 @@ class TemplateIntegratorAgent:
         if dir_m:
             directive = dir_m.group(1).strip()
 
-        out_m = re.search(
-            r"OUTPUT MUST INCLUDE:\s*\n((?:- .+\n?)+)", raw
-        )
+        out_m = re.search(r"OUTPUT MUST INCLUDE:\s*\n((?:- .+\n?)+)", raw)
         if out_m:
             output_reqs = [
                 line.lstrip("- ").strip()

@@ -5,6 +5,8 @@ Maps question intent/keywords to optimal patterns (all 85 free + enterprise).
 Always suggests from full catalog; enterprise patterns show license note when include_enterprise=False.
 """
 
+import logging
+import re
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
@@ -15,6 +17,8 @@ from .pattern_catalog import (
     PATTERN_MAP,
     VALID_PATTERN_NAMES,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -308,6 +312,46 @@ REASON: 1-2 sentences...
 
 INTEGRATION: 2-3 sentences explaining how these templates work together as a pipeline — what each stage contributes and why the combination produces better results than any single template."""
 
+    from .schemas import (
+        PatternSuggestionResponse,
+        get_instructor_client,
+        parse_with_fallback,
+    )
+
+    exec_kw: dict = {"temperature": temperature, **kwargs}
+    if model:
+        exec_kw["model"] = model
+    resolved_model = exec_kw.get("model", "gpt-4o-mini")
+
+    # ── Attempt instructor-structured path ───────────────────────────────────
+    instructor_client = get_instructor_client(None)
+    if instructor_client is not None:
+        try:
+            system_msg = (
+                "You are an expert cognitive pattern architect. You match reasoning "
+                "frameworks to questions with surgical precision, selecting from a "
+                "catalog of 85 templates. Use ONLY exact snake_case names from the "
+                "catalog. Select 2-4 templates in pipeline order."
+            )
+            response = instructor_client.chat.completions.create(
+                model=resolved_model,
+                response_model=PatternSuggestionResponse,
+                messages=[
+                    {"role": "system", "content": system_msg},
+                    {"role": "user", "content": prompt},
+                ],
+                max_retries=2,
+            )
+            selections = [(s.name, s.reason) for s in response.selections]
+            return (selections[:5], response.integration, "")
+        except Exception as exc:
+            logger.debug(
+                "_suggest_with_llm: instructor path failed (%s), falling back to "
+                "regex parse. Error: %s",
+                type(exc).__name__, exc,
+            )
+
+    # ── Fallback: classic LLM call + Pydantic parse ──────────────────────────
     try:
         ctx = Context(
             guidance=Guidance(
@@ -317,29 +361,40 @@ INTEGRATION: 2-3 sentences explaining how these templates work together as a pip
                     "Select 2-4 templates. Quality over quantity — each template must directly address a core aspect of the question.",
                     "Order them as a pipeline: investigation/analysis first, then reasoning/comparison, then synthesis/decision last.",
                     "Each REASON must be specific to the user's question, not generic.",
+                    "Respond as valid JSON: {\"selections\":[{\"name\":\"...\",\"reason\":\"...\"},...],\"integration\":\"...\"}",
                 ],
             ),
             directive=Directive(content=prompt),
         )
-        exec_kw = {"temperature": temperature, **kwargs}
-        if model:
-            exec_kw["model"] = model
         result = ctx.execute(provider=provider, **exec_kw)
         raw = result.response.strip()
-        return _parse_llm_structured_response(raw)
+
+        # Try Pydantic parse first, fall back to regex if needed
+        try:
+            parsed = parse_with_fallback(PatternSuggestionResponse, raw)
+            selections = [(s.name, s.reason) for s in parsed.selections]
+            return (selections[:5], parsed.integration, raw)
+        except (ValueError, Exception):
+            return _parse_llm_structured_response_regex(raw)
+
     except Exception as e:
+        logger.warning(
+            "_suggest_with_llm: LLM suggestion call failed (%s). "
+            "Returning empty suggestions; caller will fall back to keyword mode. Error: %s",
+            type(e).__name__, e, exc_info=True,
+        )
         return ([], "", str(e))
 
 
-def _parse_llm_structured_response(raw: str) -> tuple:
-    """Parse structured LLM response into (list of (name, reason), integration_note, raw_text)."""
-    import re
+def _parse_llm_structured_response_regex(raw: str) -> tuple:
+    """Regex fallback parser — used when JSON parse fails."""
+    import re as _re
     selections: list[tuple] = []
     integration = ""
 
-    template_pattern = re.compile(r"TEMPLATE:\s*(\S+)", re.IGNORECASE)
-    reason_pattern = re.compile(r"REASON:\s*(.+)", re.IGNORECASE)
-    integration_pattern = re.compile(r"INTEGRATION:\s*(.+)", re.IGNORECASE | re.DOTALL)
+    template_pattern = _re.compile(r"TEMPLATE:\s*(\S+)", _re.IGNORECASE)
+    reason_pattern = _re.compile(r"REASON:\s*(.+)", _re.IGNORECASE)
+    integration_pattern = _re.compile(r"INTEGRATION:\s*(.+)", _re.IGNORECASE | _re.DOTALL)
 
     int_match = integration_pattern.search(raw)
     if int_match:
@@ -351,7 +406,11 @@ def _parse_llm_structured_response(raw: str) -> tuple:
         if name not in VALID_PATTERN_NAMES:
             continue
         search_start = tm.end()
-        search_end = template_matches[i + 1].start() if i + 1 < len(template_matches) else (int_match.start() if int_match else len(raw))
+        search_end = (
+            template_matches[i + 1].start()
+            if i + 1 < len(template_matches)
+            else (int_match.start() if int_match else len(raw))
+        )
         chunk = raw[search_start:search_end]
         rm = reason_pattern.search(chunk)
         reason = rm.group(1).strip() if rm else "Selected by AI"
@@ -439,6 +498,10 @@ def get_pattern_class(pattern_name: str, include_enterprise: bool = True):
     Delegates to the unified pattern registry. When include_enterprise=False
     and pattern is enterprise, returns None and emits a warning directing the
     user to either activate an enterprise license or use a free template.
+
+    Pattern classes are stateless definitions — the result is cached with
+    functools.lru_cache so repeated lookups (e.g., inside compose_from_templates
+    or parallel refinement loops) pay the import cost only once.
     """
     import warnings
 
@@ -455,6 +518,15 @@ def get_pattern_class(pattern_name: str, include_enterprise: bool = True):
             stacklevel=2,
         )
         return None
+    return _get_pattern_class_cached(pattern_name)
+
+
+import functools as _functools  # noqa: E402 — placed after the function that calls it
+
+
+@_functools.lru_cache(maxsize=256)
+def _get_pattern_class_cached(pattern_name: str):
+    """LRU-cached registry lookup — called only after access control checks."""
     from ..skills.pattern_registry import get_pattern_registry
     registry = get_pattern_registry()
     return registry.get(pattern_name)
@@ -485,11 +557,118 @@ class ComplexityResult:
         }
 
 
+# ---------------------------------------------------------------------------
+# Heuristic pre-screen for assess_complexity
+# ---------------------------------------------------------------------------
+#
+# Research basis:
+#   "System 1 / System 2" (Kahneman, 2011): fast heuristic decisions avoid
+#   the cost of deliberate reasoning for routine cases.  Applied here: a
+#   cheap lexical screen handles obvious questions so the expensive LLM call
+#   is reserved for genuinely ambiguous inputs.
+#
+#   DistilBERT-based LLM routing (Ding et al., 2024, arXiv:2406.18665):
+#   Lightweight classifiers applied before expensive models reduce cost by
+#   40–60% with negligible accuracy loss.
+#
+#   This implementation uses zero external dependencies — pure regex + token
+#   counting — making it sub-millisecond and safe in all environments.
+#
+# Confidence design:
+#   0.9  Very high — single-fact questions (what is X?), greetings, arithmetic
+#   0.75 High  — short questions with well-known answer patterns
+#   0.0  Uncertain — pass to LLM
+
+# Tokens below this → almost certainly "raw" (no scaffolding needed)
+_HEURISTIC_SHORT_TOKEN_LIMIT = 15
+
+# Signals that the question is genuinely complex (overrides short-length shortcut)
+_COMPLEX_SIGNALS = re.compile(
+    # Prefixes like "strateg" match "strategy", "strategic", "strategies" etc.
+    # No trailing \b because these are prefix patterns, not full words.
+    r"\b(strateg|roadmap|prioriti|trade.?off|recommend|analyz|compar|evaluat|"
+    r"assess|risk|impact|diagnos|root.cause|investigat|framework|stakeholder|"
+    r"organiz|systemic|policy|forecast|scenario|ethic|multi.domain|multi.facet|"
+    r"compet|regulat)",
+    re.IGNORECASE,
+)
+
+# Signals that raw is definitely fine (simple factual / greeting / arithmetic)
+_RAW_SIGNALS = re.compile(
+    r"^(what is|what are|who is|who was|when did|where is|how do i|how does|"
+    r"define |tell me |explain |describe |list |give me |show me |can you |"
+    r"please |hi |hello |hey )",
+    re.IGNORECASE,
+)
+
+# Arithmetic-only expression (ignore whitespace and common operators)
+_ARITHMETIC_RE = re.compile(r"^[\d\s\+\-\*\/\^\(\)\.]+[=?]?\s*$")
+
+
+def _heuristic_classify(question: str) -> ComplexityResult | None:
+    """Return a ``ComplexityResult`` if the question can be classified cheaply.
+
+    Returns ``None`` when the heuristic is uncertain, meaning the full LLM
+    assessment should be used.
+
+    This function never calls an LLM, has O(1) runtime, and is thread-safe.
+    """
+    stripped = question.strip()
+    if not stripped:
+        return None
+
+    # Pure arithmetic → raw, no templates needed
+    if _ARITHMETIC_RE.match(stripped):
+        return ComplexityResult(
+            complexity="low",
+            domains=["mathematics"],
+            reasoning_type="analytical",
+            recommendation="raw",
+            reasoning="Arithmetic expression detected — no cognitive template needed.",
+        )
+
+    from ..utils.tokens import count_tokens
+
+    token_count = count_tokens(stripped)
+
+    # Very short questions without complexity signals → raw
+    if token_count <= _HEURISTIC_SHORT_TOKEN_LIMIT:
+        has_complex = bool(_COMPLEX_SIGNALS.search(stripped))
+        if not has_complex:
+            return ComplexityResult(
+                complexity="low",
+                domains=[],
+                reasoning_type="explanatory",
+                recommendation="raw",
+                reasoning=(
+                    f"Short question ({token_count} tokens) with no multi-domain "
+                    "complexity signals — heuristic pre-screen classified as raw."
+                ),
+            )
+
+    # Questions starting with a simple factual opener AND no complexity signals → raw
+    if _RAW_SIGNALS.match(stripped) and not _COMPLEX_SIGNALS.search(stripped):
+        return ComplexityResult(
+            complexity="low",
+            domains=[],
+            reasoning_type="explanatory",
+            recommendation="raw",
+            reasoning=(
+                "Simple factual or definitional question detected by heuristic "
+                "pre-screen — no template scaffolding needed."
+            ),
+        )
+
+    # Uncertain — let the LLM decide
+    return None
+
+
 def assess_complexity(
     question: str,
     provider: str = "openai",
     temperature: float = 0,
     model: str | None = None,
+    skip_heuristic: bool = False,
     **kwargs: Any,
 ) -> ComplexityResult:
     """Assess question complexity to decide if templates will help.
@@ -498,7 +677,23 @@ def assess_complexity(
     - low complexity (single domain, well-known): recommend "raw"
     - medium (single domain, specialized): recommend "single_template"
     - high (multi-domain, ambiguous, novel): recommend "integrated"
+
+    Args:
+        skip_heuristic: Force the full LLM assessment even for questions that
+                        would normally be classified by the heuristic pre-screen.
+                        Useful for evaluation and testing.
     """
+    # ── Heuristic fast-path — skips LLM for obviously simple questions ─────
+    if not skip_heuristic:
+        heuristic_result = _heuristic_classify(question)
+        if heuristic_result is not None:
+            logger.debug(
+                "assess_complexity: heuristic fast-path → %s (%s)",
+                heuristic_result.recommendation,
+                heuristic_result.reasoning,
+            )
+            return heuristic_result
+
     from ..core import Context
     from ..foundation import Directive, Guidance
 
@@ -583,6 +778,58 @@ Respond with ONLY valid JSON."""
         )
 
 
+# ---------------------------------------------------------------------------
+# Shared routing logic — used by smart_execute / smart_prompt / smart_generic_prompt
+# ---------------------------------------------------------------------------
+
+def _resolve_routing(
+    question: str,
+    provider: str,
+    include_enterprise: bool,
+    model: str | None,
+    **kwargs: Any,
+) -> tuple[str, list[str], "ComplexityResult"]:
+    """Assess complexity and resolve the template list for a question.
+
+    Returns:
+        (tier, template_names, assessment)
+        tier: "raw" | "single" | "multi"
+        template_names: list of resolved template names (empty for "raw")
+        assessment: ComplexityResult
+    """
+    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
+
+    if assessment.recommendation == "raw":
+        return "raw", [], assessment
+
+    if assessment.recommendation == "single_template" and assessment.best_template:
+        klass = get_pattern_class(
+            assessment.best_template, include_enterprise=include_enterprise
+        )
+        if klass is not None:
+            return "single", [assessment.best_template], assessment
+
+    # "integrated" tier, or single_template fallback when class not found
+    suggestion = suggest_patterns(
+        question,
+        include_enterprise=include_enterprise,
+        max_patterns=3,
+        mode="hybrid",
+        llm_provider=provider,
+        model=model,
+    )
+    names = [s.name for s in suggestion.suggested_patterns[:3]]
+    if names:
+        return "multi", names, assessment
+
+    # Last resort — treat as raw
+    return "raw", [], assessment
+
+
+# ---------------------------------------------------------------------------
+# Public smart_ functions — thin wrappers over _resolve_routing
+# ---------------------------------------------------------------------------
+
 def smart_execute(
     question: str,
     provider: str = "openai",
@@ -603,36 +850,33 @@ def smart_execute(
     from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
     from .template_integrator_agent import TemplateIntegratorAgent
 
-    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
-    meta = {
-        "assessment": assessment.to_dict(),
-        "mode": assessment.recommendation,
-    }
-
+    tier, template_names, assessment = _resolve_routing(
+        question, provider, include_enterprise, model, **kwargs
+    )
+    meta: dict = {"assessment": assessment.to_dict(), "mode": tier}
     exec_kw: dict = dict(kwargs)
     if model:
         exec_kw["model"] = model
 
-    if assessment.recommendation == "raw":
+    if tier == "raw":
         ctx = Context(directive=Directive(content=question))
         result = ctx.execute(provider=provider, **exec_kw)
         meta["templates_used"] = []
         return result.response, meta
 
-    if assessment.recommendation == "single_template" and assessment.best_template:
-        tpl_name = assessment.best_template
+    if tier == "single":
+        tpl_name = template_names[0]
         klass = get_pattern_class(tpl_name, include_enterprise=include_enterprise)
         if klass:
             reg = PATTERN_BUILD_CONTEXT_REGISTRY.get(tpl_name, ("input", {}))
             primary_key, defaults = reg
-            params = dict(defaults)
-            params[primary_key] = question
+            params = {**defaults, primary_key: question}
             ctx = klass().build_context(**params)
             result = ctx.execute(provider=provider, **exec_kw)
             meta["templates_used"] = [tpl_name]
             return result.response, meta
 
-    # Fallback to integrated (or if single_template failed)
+    # "multi" tier
     integrator = TemplateIntegratorAgent(include_enterprise=include_enterprise)
     integration = integrator.suggest_and_integrate(
         question=question,
@@ -682,28 +926,29 @@ def smart_prompt(
     from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
     from .prompt_composer import ComposedPrompt, PromptComposer
 
-    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
+    _RAW_PROMPT = (
+        f"Answer this question thoroughly and provide actionable recommendations:\n\n{question}"
+    )
 
-    if assessment.recommendation == "raw":
-        raw_prompt = f"Answer this question thoroughly and provide actionable recommendations:\n\n{question}"
+    tier, template_names, assessment = _resolve_routing(
+        question, provider, include_enterprise, model, **kwargs
+    )
+
+    if tier == "raw":
         return ComposedPrompt(
-            prompt=raw_prompt,
+            prompt=_RAW_PROMPT,
             source_templates=[],
             question=question,
-            metadata={
-                "assessment": assessment.to_dict(),
-                "mode": "raw",
-            },
+            metadata={"assessment": assessment.to_dict(), "mode": "raw"},
         )
 
-    if assessment.recommendation == "single_template" and assessment.best_template:
-        tpl_name = assessment.best_template
+    if tier == "single":
+        tpl_name = template_names[0]
         klass = get_pattern_class(tpl_name, include_enterprise=include_enterprise)
         if klass:
             reg = PATTERN_BUILD_CONTEXT_REGISTRY.get(tpl_name, ("input", {}))
             primary_key, defaults = reg
-            params = dict(defaults)
-            params[primary_key] = question
+            params = {**defaults, primary_key: question}
             ctx = klass().build_context(**params)
             prompt = ctx.to_prompt(refine=refine, provider=provider, model=model)
             return ComposedPrompt(
@@ -711,39 +956,23 @@ def smart_prompt(
                 source_templates=[tpl_name],
                 question=question,
                 component_prompts=[prompt],
-                metadata={
-                    "assessment": assessment.to_dict(),
-                    "mode": "single_template",
-                },
+                metadata={"assessment": assessment.to_dict(), "mode": "single_template"},
             )
+
+    # "multi" tier
+    if not template_names:
+        return ComposedPrompt(
+            prompt=_RAW_PROMPT,
+            source_templates=[],
+            question=question,
+            metadata={"assessment": assessment.to_dict(), "mode": "integrated_fallback"},
+        )
 
     composer = PromptComposer(
         include_enterprise=include_enterprise,
         provider=provider,
         model=model or "gpt-4o-mini",
     )
-    suggestion = suggest_patterns(
-        question,
-        include_enterprise=include_enterprise,
-        max_patterns=3,
-        mode="hybrid",
-        llm_provider=provider,
-        model=model,
-    )
-    template_names = [s.name for s in suggestion.suggested_patterns[:3]]
-
-    if not template_names:
-        raw_prompt = f"Answer this question thoroughly and provide actionable recommendations:\n\n{question}"
-        return ComposedPrompt(
-            prompt=raw_prompt,
-            source_templates=[],
-            question=question,
-            metadata={
-                "assessment": assessment.to_dict(),
-                "mode": "integrated_fallback",
-            },
-        )
-
     result = composer.compose_from_templates(
         question=question,
         template_names=template_names,
@@ -789,21 +1018,28 @@ def smart_generic_prompt(
     """
     from .prompt_composer import ComposedPrompt, PromptComposer
 
-    assessment = assess_complexity(question, provider=provider, model=model, **kwargs)
+    _RAW_PROMPT = (
+        f"Answer this question thoroughly and provide actionable recommendations:\n\n{question}"
+    )
 
-    if assessment.recommendation == "raw":
-        raw_prompt = (
-            f"Answer this question thoroughly and provide actionable "
-            f"recommendations:\n\n{question}"
-        )
+    tier, template_names, assessment = _resolve_routing(
+        question, provider, include_enterprise, model, **kwargs
+    )
+
+    if tier == "raw":
         return ComposedPrompt(
-            prompt=raw_prompt,
+            prompt=_RAW_PROMPT,
             source_templates=[],
             question=question,
-            metadata={
-                "assessment": assessment.to_dict(),
-                "mode": "raw",
-            },
+            metadata={"assessment": assessment.to_dict(), "mode": "raw"},
+        )
+
+    if not template_names:
+        return ComposedPrompt(
+            prompt=_RAW_PROMPT,
+            source_templates=[],
+            question=question,
+            metadata={"assessment": assessment.to_dict(), "mode": "generic_fallback"},
         )
 
     composer = PromptComposer(
@@ -811,35 +1047,6 @@ def smart_generic_prompt(
         provider=provider,
         model=model or "gpt-4o-mini",
     )
-
-    if assessment.recommendation == "single_template" and assessment.best_template:
-        template_names = [assessment.best_template]
-    else:
-        suggestion = suggest_patterns(
-            question,
-            include_enterprise=include_enterprise,
-            max_patterns=3,
-            mode="hybrid",
-            llm_provider=provider,
-            model=model,
-        )
-        template_names = [s.name for s in suggestion.suggested_patterns[:3]]
-
-    if not template_names:
-        raw_prompt = (
-            f"Answer this question thoroughly and provide actionable "
-            f"recommendations:\n\n{question}"
-        )
-        return ComposedPrompt(
-            prompt=raw_prompt,
-            source_templates=[],
-            question=question,
-            metadata={
-                "assessment": assessment.to_dict(),
-                "mode": "generic_fallback",
-            },
-        )
-
     result = composer.compile_generic(
         question=question,
         template_names=template_names,

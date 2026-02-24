@@ -179,7 +179,33 @@ print(result.suggested_chain)
 print(result.to_markdown())
 ```
 
-### 8. Auto-Transform Any Question → Perfect Context
+### 8. Context Generator — Build a Full Context from Role + Goal
+
+Provide a role and a goal. An LLM generates everything else: behavioral rules, communication style, expertise areas, reasoning strategy, few-shot examples, output schema, and guard rails. Returns a fully assembled `Context` ready to execute.
+
+```python
+from mycontext.intelligence import generate_context
+
+result = generate_context(
+    role="Senior fraud analyst at a tier-1 investment bank",
+    goal="Detect suspicious transaction patterns with a low false-positive rate",
+    task="Analyze this batch of 50 transactions for fraud signals",
+    provider="openai",
+)
+
+# Inspect what was generated
+print(result.generation_meta)  # rules, style, examples, output_schema, ...
+
+# Assemble the structured prompt
+print(result.assemble())
+
+# Or execute directly
+response = result.execute(provider="openai")
+```
+
+No manual prompt engineering. No template hunting. Describe your role and what you're optimising for — the SDK does the rest.
+
+### 9. Auto-Transform Any Question → Perfect Context
 
 One call. No pattern selection needed. The Transformation Engine analyzes your input (type, complexity, domain, key concepts) and builds the right context automatically:
 
@@ -191,7 +217,7 @@ ctx = transform("Should we migrate to microservices? Compare tradeoffs.")
 print(ctx.to_markdown())
 ```
 
-### 9. Blueprint — Multi-Component Context Architecture
+### 10. Blueprint — Multi-Component Context Architecture
 
 For production applications that need more than a single template. Blueprints orchestrate multiple components (guidance, knowledge, reasoning) with **token budget management** and strategy-based optimization (speed / quality / cost / balanced):
 
@@ -209,7 +235,7 @@ blueprint = Blueprint(
 ctx = blueprint.build(topic="Quantum computing advances in 2025")
 ```
 
-### 10. 13 Export Formats — True Vendor Neutrality
+### 11. 13 Export Formats — True Vendor Neutrality
 
 Build once, export everywhere. One context works with every LLM and framework:
 
@@ -231,7 +257,7 @@ ctx.to_dict()         # Python dict
 
 Plus dedicated integration helpers for **LangChain, LlamaIndex, CrewAI, AutoGen, DSPy, Semantic Kernel, and Google ADK**.
 
-### 11. Agent Skills with Quality Gates
+### 12. Agent Skills with Quality Gates
 
 Define reusable skills as SKILL.md files. Fuse them with cognitive patterns. Gate execution on quality — if the generated context scores below threshold, it blocks *before* wasting an API call:
 
@@ -254,7 +280,7 @@ for edit in suggested_edits(result):
 
 Skills can declare `pattern: comparative_analyzer` in frontmatter — the runner fuses the skill body with that cognitive pattern automatically.
 
-### 12. Template Benchmarking with CAI
+### 13. Template Benchmarking with CAI
 
 Automated test suites for cognitive templates. Load YAML test cases, run templates through questions, evaluate output quality, and compute CAI scores — in CI or from the CLI:
 
@@ -263,7 +289,7 @@ python -m mycontext.benchmark_cli run --template diagnostic_root_cause_analyzer
 python -m mycontext.benchmark_cli run-all --output results.json
 ```
 
-### 13. Generic Prompts — Zero-Cost Cognitive Scaffolding
+### 14. Generic Prompts — Zero-Cost Cognitive Scaffolding
 
 Every template carries a hand-crafted `GENERIC_PROMPT` (~600-1200 chars) that distills its core methodology into a self-contained prompt. No LLM call needed — just string substitution.
 
@@ -283,7 +309,7 @@ from mycontext.intelligence import get_generic_prompt_for
 prompt = get_generic_prompt_for("root_cause_analyzer", "Why did sales drop?")
 ```
 
-### 14. Prompt Compilation Pipeline — Reusable Prompt Artifacts
+### 15. Prompt Compilation Pipeline — Reusable Prompt Artifacts
 
 Instead of executing templates and getting responses, compile them into **reusable, provider-agnostic prompts** that can be executed on any LLM:
 
@@ -295,7 +321,7 @@ print(composed.to_string())    # reusable prompt artifact
 response = composed.execute()  # or execute directly
 ```
 
-### 15. Static Generic Compilation — Maximum Cost Efficiency
+### 16. Static Generic Compilation — Maximum Cost Efficiency
 
 Compile generic prompts from multiple templates with **zero LLM calls for compilation**. The only LLM call is the complexity assessment:
 
@@ -311,7 +337,7 @@ print(composed.source_templates)  # e.g. ['root_cause_analyzer']
 response = composed.execute()     # execute with 1 more call
 ```
 
-### 16. Three-Tier Execution Model
+### 17. Three-Tier Execution Model
 
 Choose your cost/quality tradeoff:
 
@@ -323,7 +349,7 @@ Choose your cost/quality tradeoff:
 
 All three tiers validated across 6 sprints of controlled experimentation (60+ experimental runs, 10 diverse questions, 5 evaluation dimensions).
 
-### 17. Complexity Router — Automatic Template Selection
+### 18. Complexity Router — Automatic Template Selection
 
 `assess_complexity()` classifies your question and decides the optimal approach *before* running anything:
 
@@ -336,9 +362,64 @@ print(meta['mode'])            # 'single_template' or 'integrated'
 print(meta['templates_used'])  # ['root_cause_analyzer']
 ```
 
-### 18. Built-In Retry & Timeout
+### 19. Built-In Retry & Timeout
 
 All LLM calls include automatic retry with exponential backoff (rate limits, timeouts, server errors) and configurable timeout — production-ready out of the box.
+
+### 20. Async Execution — True Non-Blocking LLM Calls
+
+Every context can be executed asynchronously. Run multiple independent LLM calls concurrently with `asyncio.gather()` — no threads, no blocking, no event-loop stalls:
+
+```python
+import asyncio
+from mycontext import Context
+from mycontext.foundation import Guidance, Directive
+
+async def main():
+    ctx_a = Context(guidance=Guidance(role="Risk analyst"), directive=Directive("Assess risks"))
+    ctx_b = Context(guidance=Guidance(role="Strategist"),   directive=Directive("Plan response"))
+    ctx_c = Context(guidance=Guidance(role="Communicator"), directive=Directive("Draft message"))
+
+    # All three LLM calls run concurrently — total latency = slowest single call
+    results = await asyncio.gather(
+        ctx_a.aexecute(provider="openai"),
+        ctx_b.aexecute(provider="openai"),
+        ctx_c.aexecute(provider="openai"),
+    )
+    for r in results:
+        print(r.response)
+
+asyncio.run(main())
+```
+
+Uses `litellm.acompletion` under the hood with full cache, retry, and tracing parity with the sync path.
+
+### 21. Token-Budget Context Assembly
+
+Assemble any context within a precise token budget for a specific model. Sections are included in priority order (directive → guidance → constraints → knowledge) and the last fitting section is trimmed to fit — guaranteed `≤ max_tokens` as measured by `tiktoken`:
+
+```python
+# Assemble within a strict 8k token budget for the target model
+prompt = ctx.assemble_for_model(model="gpt-4o-mini", max_tokens=8000)
+
+# Full budget for Claude's 200k window
+prompt = ctx.assemble_for_model(model="claude-3-5-sonnet", max_tokens=180000)
+
+# No budget (default) — same as ctx.assemble()
+prompt = ctx.assemble_for_model()
+```
+
+Replaces the previous character-based truncation. Prevents context overflow and stops artificially discarding sections that would fit.
+
+### 22. Validated Structured Output Parsing
+
+All intelligence-layer LLM responses are now validated through Pydantic v2 schemas before use. When the optional `instructor` package is installed, the LLM is constrained to produce valid JSON via function-calling mode with automatic retry on validation failure (~98% parse success rate vs ~70% for regex alone):
+
+```bash
+pip install instructor   # optional — enables structured LLM output
+```
+
+Falls back to Pydantic-validated JSON parsing → original regex parser without `instructor`. No behaviour change if not installed.
 
 ---
 
@@ -347,6 +428,10 @@ All LLM calls include automatic retry with exponential backoff (rate limits, tim
 | Capability | mycontext-ai | Typical prompt libraries |
 |-----------|-------------|------------------------|
 | Cognitive patterns | 85 research-backed (16 free + 69 enterprise) | 10-20 generic templates |
+| Context generator | Role + goal → full context via LLM | None |
+| Structured prompt assembly | 9-section research-backed ordering | None |
+| Thinking strategies | 5 named strategies (CoT, ToT, Self-Reflection, ...) | None |
+| Few-shot calibration | Typed examples field, auto-positioned | Manual |
 | Generic prompts (zero-cost) | 85 pre-authored, compilable | None |
 | Prompt compilation pipeline | Static + dynamic + full (3 tiers) | None |
 | Complexity router | Auto-selects optimal approach per question | None |
@@ -359,6 +444,9 @@ All LLM calls include automatic retry with exponential backoff (rate limits, tim
 | Export formats | 13 (OpenAI, Anthropic, LangChain, YAML, ...) | 1-2 |
 | Framework integrations | 7 (LangChain, CrewAI, AutoGen, DSPy, ...) | 0-1 |
 | Agent Skills + quality gate | Pattern-fused skills with threshold gating | None |
+| Async execution | `aexecute` / `agenerate` — true non-blocking via litellm.acompletion | DIY |
+| Token-budget assembly | `assemble_for_model(model, max_tokens)` — tiktoken-accurate | None |
+| Validated structured output | Pydantic v2 schemas + optional instructor integration | None |
 | Retry + timeout | Built-in exponential backoff | DIY |
 | Research citations | 150+ peer-reviewed papers | 0-5 |
 
@@ -374,15 +462,26 @@ pip install litellm
 ```
 
 ```python
-from mycontext import Context, Guidance, Directive
+from mycontext import Context, Guidance, Directive, Constraints
 
+# Manual — full control over every field
 ctx = Context(
     guidance=Guidance(
         role="Senior security reviewer",
-        rules=["Flag every injection risk", "Suggest concrete fixes"],
+        goal="Find every exploitable vulnerability and give concrete fixes",
+        rules=["Flag every injection risk", "Always include a severity rating"],
         style="concise, actionable",
     ),
     directive=Directive(content="Review this API for auth and input validation."),
+    thinking_strategy="verify",       # answer, then self-critique
+    examples=[
+        {"input": "session.permanent = True", "output": "Medium — sessions never expire"},
+    ],
+    constraints=Constraints(
+        must_include=["severity", "fix example"],
+        output_schema=[{"name": "finding", "type": "str"}, {"name": "severity", "type": "str"}],
+    ),
+    research_flow=True,               # structured 9-section prompt
 )
 
 # Export to any LLM
@@ -392,6 +491,20 @@ ctx.to_langchain()   # → LangChain messages
 
 # Or execute directly (requires litellm)
 result = ctx.execute(provider="openai")
+```
+
+**Or generate the whole thing from role + goal:**
+
+```python
+from mycontext.intelligence import generate_context
+
+result = generate_context(
+    role="Senior security reviewer",
+    goal="Find every exploitable vulnerability and give concrete fixes",
+    task="Review this authentication middleware",
+    provider="openai",
+)
+print(result.assemble())   # fully populated 9-section prompt
 ```
 
 All providers route through LiteLLM, giving you access to 100+ models. You can also register custom providers (e.g., Ollama for local models).

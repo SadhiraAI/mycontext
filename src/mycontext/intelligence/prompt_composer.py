@@ -14,11 +14,20 @@ Two usage patterns:
 
 from __future__ import annotations
 
+import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import Any
 
 from ..core import Context
 from ..foundation import Directive, Guidance
+
+logger = logging.getLogger(__name__)
+
+# Maximum number of worker threads used when parallelising template refinement.
+# Each worker makes one LLM API call (I/O-bound); 5 concurrent is safe for
+# most rate-limit tiers and avoids CPU saturation.
+_MAX_REFINE_WORKERS = 5
 
 
 @dataclass
@@ -216,6 +225,10 @@ class PromptComposer:
                 lines = merged.split("\n")
                 merged = "\n".join(lines[1:-1]).strip()
         except Exception as e:
+            logger.warning(
+                "compose: LLM merge call failed (%s). Falling back to static concatenation. Error: %s",
+                type(e).__name__, e, exc_info=True,
+            )
             merged = self._fallback_merge(prompts, question)
             return ComposedPrompt(
                 prompt=merged,
@@ -259,9 +272,9 @@ class PromptComposer:
 
         provider = provider or self.provider
         model = model or self.model
-        prompts: list[str] = []
-        valid_names: list[str] = []
 
+        # ── Resolve valid templates first (fast, no I/O) ─────────────────────
+        tasks: list[tuple[str, type, dict]] = []
         for name in template_names:
             klass = get_pattern_class(name, include_enterprise=self.include_enterprise)
             if klass is None:
@@ -270,13 +283,50 @@ class PromptComposer:
             primary_key, defaults = reg
             params = dict(defaults)
             params[primary_key] = question
+            tasks.append((name, klass, params))
+
+        def _generate_one(task: tuple) -> tuple[str, str] | None:
+            """Build context and generate prompt for a single template.
+            Returns (name, prompt) on success or None on failure.
+            """
+            name, klass, params = task
             try:
                 ctx = klass().build_context(**params)
                 prompt = ctx.to_prompt(refine=refine, provider=provider, model=model)
-                prompts.append(prompt)
+                return (name, prompt)
+            except Exception as e:
+                logger.warning(
+                    "compose_from_templates: failed to generate prompt for template '%s' "
+                    "(refine=%s). Skipping. Error: %s",
+                    name, refine, e, exc_info=True,
+                )
+                return None
+
+        # ── Execute in parallel when refine=True (each call is an LLM I/O op)
+        # For refine=False (pure string ops) the overhead of thread management
+        # isn't worth it, so we stay sequential.
+        name_to_prompt: dict[str, str] = {}
+        if refine and len(tasks) > 1:
+            workers = min(len(tasks), _MAX_REFINE_WORKERS)
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                futures = {executor.submit(_generate_one, task): task[0] for task in tasks}
+                for future in as_completed(futures):
+                    result = future.result()
+                    if result is not None:
+                        name_to_prompt[result[0]] = result[1]
+        else:
+            for task in tasks:
+                result = _generate_one(task)
+                if result is not None:
+                    name_to_prompt[result[0]] = result[1]
+
+        # Preserve original order
+        prompts: list[str] = []
+        valid_names: list[str] = []
+        for name, _, _ in tasks:
+            if name in name_to_prompt:
+                prompts.append(name_to_prompt[name])
                 valid_names.append(name)
-            except Exception:
-                continue
 
         if not prompts:
             fallback = f"Answer this question thoroughly: {question}"
@@ -339,7 +389,12 @@ class PromptComposer:
                 prompt = instance.generic_prompt(**params)
                 prompts.append(prompt)
                 valid_names.append(actual_name)
-            except Exception:
+            except Exception as e:
+                logger.warning(
+                    "compile_generic: failed to get generic prompt for template '%s'. "
+                    "Skipping. Error: %s",
+                    actual_name, e, exc_info=True,
+                )
                 continue
 
         if not prompts:
@@ -442,5 +497,10 @@ def get_generic_prompt_for(
 
     try:
         return instance.generic_prompt(**params)
-    except Exception:
+    except Exception as e:
+        logger.warning(
+            "get_generic_prompt_for: generic_prompt() failed for template '%s'. "
+            "Returning None. Error: %s",
+            template_name, e, exc_info=True,
+        )
         return None

@@ -6,7 +6,7 @@ Transform raw questions into perfect, portable contexts for any AI system.
 Context as Code™ - Research-backed cognitive patterns for systematic context engineering.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 # Core exports
 # Templates module (lazy loading)
@@ -21,12 +21,14 @@ from .intelligence import (
     BenchmarkResult,
     CAIResult,
     ContextAmplificationIndex,
+    GeneratedContext,
     IntegrationResult,
     OutputDimension,
     OutputEvaluator,
     OutputQualityScore,
     TemplateBenchmark,
     TemplateIntegratorAgent,
+    generate_context,
     transform,
 )
 
@@ -63,6 +65,8 @@ __all__ = [
     # Intelligence
     "intelligence",
     "transform",
+    "generate_context",
+    "GeneratedContext",
     # Integrations
     "integrations",
     # Licensing

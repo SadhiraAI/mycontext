@@ -167,10 +167,11 @@ class Pattern(BaseModel):
         # Validate inputs
         self._validate_inputs(inputs)
 
-        # Build directive from template
+        # Build directive from template (safe formatting — no injection risk)
         directive = None
         if self.directive_template:
-            directive_content = self.directive_template.format(**inputs)
+            from ..utils.template_safety import safe_format_template
+            directive_content = safe_format_template(self.directive_template, **inputs)
             directive = Directive(content=directive_content)
 
         # Create context

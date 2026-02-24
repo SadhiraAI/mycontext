@@ -133,9 +133,10 @@ class Blueprint(BaseModel):
             constraints=self.constraints
         )
 
-        # Build directive from template if provided
+        # Build directive from template if provided (safe formatting — no injection risk)
         if self.directive_template:
-            directive_content = self.directive_template.format(**inputs)
+            from ..utils.template_safety import safe_format_template
+            directive_content = safe_format_template(self.directive_template, **inputs)
             context.directive = Directive(content=directive_content)
 
         # Add input data
@@ -163,24 +164,25 @@ class Blueprint(BaseModel):
 
         return context
 
-    def estimate_tokens(self) -> int:
+    def estimate_tokens(self, model: str = "gpt-4o") -> int:
         """
-        Estimate total tokens for this blueprint.
-        
+        Estimate total tokens for this blueprint using accurate tiktoken counting.
+
+        Args:
+            model: Model name to use for tokenisation (determines encoding).
+                   Defaults to ``"gpt-4o"``.
+
         Returns:
-            Estimated token count
+            Token count (integer).
         """
-        # Simple estimation for now
-        # Will be enhanced with proper token counting
-        estimated = 0
+        from ..utils.tokens import count_tokens
 
+        total = 0
         if self.guidance:
-            estimated += len(self.guidance.render().split()) * 1.3  # rough token estimate
-
+            total += count_tokens(self.guidance.render(), model=model)
         if self.directive_template:
-            estimated += len(self.directive_template.split()) * 1.3
-
-        return int(estimated)
+            total += count_tokens(self.directive_template, model=model)
+        return total
 
     def optimize(self, strategy: str = "balanced") -> "Blueprint":
         """

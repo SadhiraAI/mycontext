@@ -23,7 +23,11 @@ def execute_context(
     user_message: str = "",
     **kwargs: Any,
 ) -> dict[str, Any] | None:
-    """Execute assembled context with LLM. Returns response dict or None."""
+    """Execute assembled context with LLM synchronously. Returns response dict or None.
+
+    Kept for backward compatibility and non-async call sites.
+    Prefer ``execute_context_async`` inside FastAPI async endpoints.
+    """
     if not Context or not get_provider:
         return None
 
@@ -34,6 +38,37 @@ def execute_context(
     try:
         p = get_provider(provider, **provider_kwargs)
         result = p.generate(ctx, user=user_message or None)
+        return {
+            "response": result.response,
+            "tokens_used": result.tokens_used,
+            "model": result.model,
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+async def execute_context_async(
+    assembled_content: str,
+    provider: str,
+    api_key: str | None,
+    user_message: str = "",
+    **kwargs: Any,
+) -> dict[str, Any] | None:
+    """Async version of execute_context — uses provider.agenerate() (litellm.acompletion).
+
+    Does not block the FastAPI event loop while waiting for the LLM response.
+    Prefer this inside async FastAPI route handlers.
+    """
+    if not Context or not get_provider:
+        return None
+
+    ctx = Context(directive=assembled_content)
+    provider_kwargs = {"api_key": api_key} if api_key else {}
+    provider_kwargs.update(kwargs)
+
+    try:
+        p = get_provider(provider, **provider_kwargs)
+        result = await p.agenerate(ctx, user=user_message or None)
         return {
             "response": result.response,
             "tokens_used": result.tokens_used,

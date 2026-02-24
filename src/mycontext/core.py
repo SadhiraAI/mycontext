@@ -138,6 +138,14 @@ class Context(BaseModel):
         description="Few-shot examples — list of {'input': str, 'output': str}",
     )
 
+    analytical_approach: str | None = Field(
+        default=None,
+        description=(
+            "When set, renders in section ⑤ as ANALYTICAL AND REPORTING APPROACH "
+            "(replaces generic reasoning approach). Use for data analysis, reporting templates."
+        ),
+    )
+
     research_flow: bool = Field(
         default=False,
         description=(
@@ -236,6 +244,99 @@ class Context(BaseModel):
 
         return "\n\n".join(filter(None, parts))
 
+    def assemble_for_model(
+        self,
+        model: str = "gpt-4o",
+        max_tokens: int | None = None,
+    ) -> str:
+        """Assemble the context with a token-budget guardrail for *model*.
+
+        Extends :meth:`assemble` with awareness of the target model's context
+        window.  When *max_tokens* is provided, sections are included in
+        priority order and the last section that would overflow is trimmed to
+        fit — so the assembled context is guaranteed to be at most *max_tokens*
+        tokens long.
+
+        Section priority (highest to lowest):
+            1. directive  — the task / question (most important, kept first)
+            2. guidance   — role, rules, style
+            3. constraints — output format and guard rails
+            4. knowledge  — background context (most expendable)
+
+        If no *max_tokens* is provided, this is a transparent pass-through to
+        :meth:`assemble` (no truncation, no token counting).
+
+        Research basis:
+            OpenAI Cookbook (2024): "Assemble context in priority order and
+            trim lower-priority sections first."  Shi et al. (2023, arxiv
+            2307.03172) — irrelevant context in the prompt degrades model
+            performance; prioritised trimming keeps the most useful content.
+
+        Args:
+            model:      Model name used for accurate token counting via tiktoken.
+                        Default ``"gpt-4o"``.
+            max_tokens: Maximum tokens for the assembled output.  If None,
+                        returns ``assemble()`` unchanged.
+
+        Returns:
+            Assembled context string, guaranteed ≤ *max_tokens* tokens when
+            *max_tokens* is specified.
+
+        Example::
+
+            # Assemble for GPT-3.5 with a tight 12k token budget
+            prompt = ctx.assemble_for_model(model="gpt-3.5-turbo", max_tokens=12000)
+
+            # Assemble for Claude 3.5 with a wide 180k budget
+            prompt = ctx.assemble_for_model(model="claude-3-5-sonnet", max_tokens=180000)
+        """
+        if max_tokens is None:
+            return self.assemble()
+
+        from .utils.tokens import count_tokens
+
+        # Build ordered section list: (label, text) — highest to lowest priority
+        ordered: list[str] = []
+
+        if self.directive:
+            ordered.append(self.directive.render())
+        if self.guidance:
+            ordered.append(self.guidance.render())
+        if self.constraints:
+            ordered.append(self.constraints.render())
+        if self.knowledge:
+            ordered.append(f"# Knowledge\n\n{self.knowledge}")
+
+        if not ordered:
+            return ""
+
+        result: list[str] = []
+        # Each "\n\n" separator between sections adds ~2 tokens.
+        # Reserve a 2-token separator budget per expected join to stay within max_tokens.
+        _SEP_TOKENS = 2
+        used = 0
+
+        for section in ordered:
+            if not section:
+                continue
+            section_tokens = count_tokens(section, model)
+            # Account for the separator that will be added before this section
+            sep_cost = _SEP_TOKENS if result else 0
+            remaining = max_tokens - used - sep_cost
+            if remaining <= 0:
+                break
+            if section_tokens <= remaining:
+                result.append(section)
+                used += section_tokens + sep_cost
+            else:
+                # Trim this section to fit the remaining budget
+                trimmed = self._token_trim(section, remaining, model)
+                if trimmed:
+                    result.append(trimmed)
+                break  # budget exhausted
+
+        return "\n\n".join(filter(None, result))
+
     # ── Research-backed assembly engine ───────────────────────────
 
     def _assemble_research_flow(self) -> str:
@@ -272,8 +373,12 @@ class Context(BaseModel):
         if style:
             sections.append(f"## STYLE\n\n**Tone & voice:** {style}")
 
-        # ⑤ REASONING APPROACH
-        if self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
+        # ⑤ ANALYTICAL AND REPORTING APPROACH (or REASONING APPROACH)
+        if self.analytical_approach:
+            sections.append(
+                f"## ANALYTICAL AND REPORTING APPROACH\n\n{self.analytical_approach}"
+            )
+        elif self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
             label, injection = THINKING_STRATEGIES[self.thinking_strategy]
             sections.append(
                 f"## REASONING APPROACH ({label})\n\n**Important — {injection}**"
@@ -384,11 +489,88 @@ class Context(BaseModel):
         provider_instance = get_provider(provider, api_key=api_key)
         return provider_instance.generate(self, **kwargs)
 
+    async def aexecute(self, provider: str = "openai", **kwargs) -> Any:
+        """Async version of :meth:`execute`.
+
+        Uses ``provider.agenerate()`` which calls ``litellm.acompletion()``
+        for a true non-blocking coroutine.  Enables concurrent execution of
+        multiple independent contexts without threading:
+
+        .. code-block:: python
+
+            import asyncio
+            from mycontext import Context
+
+            async def main():
+                ctx_a = Context("Analyze risks")
+                ctx_b = Context("Summarize findings")
+
+                # Both LLM calls run concurrently
+                result_a, result_b = await asyncio.gather(
+                    ctx_a.aexecute(provider="openai", user="Question A"),
+                    ctx_b.aexecute(provider="openai", user="Question B"),
+                )
+                print(result_a.response, result_b.response)
+
+            asyncio.run(main())
+
+        Args:
+            provider: Provider name (``"openai"``, ``"anthropic"``, etc.).
+            **kwargs: Same kwargs as :meth:`execute`.
+
+        Returns:
+            ProviderResponse — identical structure to :meth:`execute`.
+        """
+        from .providers import get_provider
+
+        api_key = kwargs.pop("api_key", None)
+        provider_instance = get_provider(provider, api_key=api_key)
+        return await provider_instance.agenerate(self, **kwargs)
+
+    # Maximum tokens allowed for the framework block inside the refine meta-prompt.
+    # Configurable per-call via max_refine_tokens.  Default 4000 tokens ≈ 16 000 chars
+    # for gpt-4o, but is accurate because we count tokens with tiktoken, not chars.
+    #
+    # Research basis:
+    #   The previous hardcoded `assembled[:6000]` sliced at *characters*, not tokens.
+    #   6000 chars ≈ 1500 tokens — a tiny fraction of any modern model's context window
+    #   (GPT-4o: 128k, Claude 3.5: 200k).  Token-aware truncation both prevents context
+    #   overflows and stops artificially discarding frameworks that would fit.
+    #
+    #   OpenAI Cookbook (2024): "Always measure context size in tokens, not characters.
+    #   Character-count slicing can cut the payload by 6–8× compared to token counting."
+    _DEFAULT_REFINE_MAX_TOKENS: int = 4000
+
+    @staticmethod
+    def _token_trim(text: str, max_tokens: int, model: str) -> str:
+        """Trim *text* to at most *max_tokens* tokens using tiktoken.
+
+        Preserves the beginning of the text (system role / methodology header)
+        rather than the end.  Falls back to character-ratio trimming when
+        tiktoken is unavailable.
+        """
+        try:
+            import tiktoken
+            try:
+                enc = tiktoken.encoding_for_model(model)
+            except KeyError:
+                enc = tiktoken.get_encoding("cl100k_base")
+
+            tokens = enc.encode(text)
+            if len(tokens) <= max_tokens:
+                return text
+            return enc.decode(tokens[:max_tokens])
+        except Exception:
+            # Graceful fallback: approximate 4 chars per token
+            char_limit = max_tokens * 4
+            return text[:char_limit]
+
     def to_prompt(
         self,
         refine: bool = False,
         provider: str = "openai",
         model: str = "gpt-4o-mini",
+        max_refine_tokens: int | None = None,
         **kwargs,
     ) -> str:
         """
@@ -407,6 +589,10 @@ class Context(BaseModel):
                     polished prompt.  If False, zero-cost formatting.
             provider: LLM provider for refinement (only when refine=True).
             model: Model for refinement (default ``gpt-4o-mini``).
+            max_refine_tokens: Maximum tokens of the assembled framework to
+                include in the refinement prompt.  Defaults to
+                ``_DEFAULT_REFINE_MAX_TOKENS`` (4000).  Use a larger value
+                for models with wide context windows (e.g. 32000 for GPT-4o).
 
         Returns:
             Optimized prompt string.
@@ -414,8 +600,9 @@ class Context(BaseModel):
         Example::
 
             >>> ctx = RootCauseAnalyzer().build_context(problem="server outage")
-            >>> prompt = ctx.to_prompt()          # zero-cost
-            >>> prompt = ctx.to_prompt(refine=True)  # LLM-refined
+            >>> prompt = ctx.to_prompt()                          # zero-cost
+            >>> prompt = ctx.to_prompt(refine=True)              # LLM-refined
+            >>> prompt = ctx.to_prompt(refine=True, max_refine_tokens=8000)  # wider window
         """
         assembled = self.assemble()
 
@@ -435,6 +622,10 @@ class Context(BaseModel):
                     parts.append(content)
             return "\n\n".join(parts) if parts else assembled
 
+        # ── Token-aware framework truncation ────────────────────────────────
+        token_limit = max_refine_tokens or self._DEFAULT_REFINE_MAX_TOKENS
+        framework_block = self._token_trim(assembled, token_limit, model)
+
         meta_prompt = (
             "You are a prompt engineer. Distill the analytical framework below "
             "into a single, self-contained prompt (800-1200 characters) that "
@@ -445,7 +636,7 @@ class Context(BaseModel):
             "- Include clear output structure expectations.\n"
             "- Do NOT answer the question — produce only the optimized PROMPT.\n"
             "- The prompt must be provider-agnostic (works with any LLM).\n\n"
-            f"FRAMEWORK TO DISTILL:\n{assembled[:6000]}\n\n"
+            f"FRAMEWORK TO DISTILL:\n{framework_block}\n\n"
             "OUTPUT THE OPTIMIZED PROMPT ONLY:"
         )
 

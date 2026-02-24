@@ -1,0 +1,257 @@
+/* ============================================================
+   mycontext-ai — Custom Docusaurus Theme
+   Matches the web app: muted teal + purple, glassmorphism
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+/* ── Light mode ──────────────────────────────────────────── */
+:root {
+  --ifm-color-primary: #3d8b80;
+  --ifm-color-primary-dark: #357a70;
+  --ifm-color-primary-darker: #32736a;
+  --ifm-color-primary-darkest: #295f57;
+  --ifm-color-primary-light: #459c90;
+  --ifm-color-primary-lighter: #489f93;
+  --ifm-color-primary-lightest: #56b3a6;
+
+  --ifm-background-color: #f5f9f8;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-font-color-base: #1a3a36;
+  --ifm-font-color-secondary: #607a76;
+
+  --ifm-font-family-base: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', monospace;
+  --ifm-heading-font-family: 'Instrument Serif', Georgia, serif;
+
+  --ifm-code-font-size: 92%;
+  --ifm-code-border-radius: 6px;
+  --ifm-global-radius: 10px;
+  --ifm-border-color: rgba(75, 130, 120, 0.15);
+
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.88);
+  --ifm-navbar-shadow: 0 1px 3px rgba(61, 139, 128, 0.05);
+
+  --ifm-footer-background-color: #1a3a36;
+  --ifm-footer-color: #e6edf3;
+  --ifm-footer-link-color: #8b949e;
+  --ifm-footer-link-hover-color: #5ba8a0;
+
+  --docusaurus-highlighted-code-line-bg: rgba(61, 139, 128, 0.1);
+
+  --mc-accent-secondary: #8b5cf6;
+  --mc-gradient: linear-gradient(135deg, #4a9e94 0%, #3d8b80 100%);
+  --mc-glow: rgba(61, 139, 128, 0.08);
+  --mc-card-bg: rgba(255, 255, 255, 0.88);
+  --mc-card-border: rgba(75, 130, 120, 0.15);
+  --mc-success: #4a9e78;
+  --mc-warning: #f59e0b;
+  --mc-error: #ef4444;
+}
+
+/* ── Dark mode ───────────────────────────────────────────── */
+[data-theme='dark'] {
+  --ifm-color-primary: #5ba8a0;
+  --ifm-color-primary-dark: #4a9e94;
+  --ifm-color-primary-darker: #44978d;
+  --ifm-color-primary-darkest: #387c74;
+  --ifm-color-primary-light: #6db2ab;
+  --ifm-color-primary-lighter: #74b6af;
+  --ifm-color-primary-lightest: #8ec5c0;
+
+  --ifm-background-color: #0f1117;
+  --ifm-background-surface-color: #161b22;
+  --ifm-font-color-base: #e6edf3;
+  --ifm-font-color-secondary: #8b949e;
+
+  --ifm-border-color: rgba(55, 65, 81, 0.5);
+
+  --ifm-navbar-background-color: rgba(15, 17, 23, 0.92);
+  --ifm-navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+  --ifm-footer-background-color: #0a0c10;
+
+  --docusaurus-highlighted-code-line-bg: rgba(91, 168, 160, 0.15);
+
+  --mc-gradient: linear-gradient(135deg, #5ba8a0 0%, #7a9e96 100%);
+  --mc-glow: rgba(91, 168, 160, 0.1);
+  --mc-card-bg: rgba(22, 27, 34, 0.75);
+  --mc-card-border: rgba(55, 65, 81, 0.5);
+  --mc-success: #6dbc9a;
+  --mc-warning: #d29922;
+  --mc-error: #f85149;
+}
+
+/* ── Typography ──────────────────────────────────────────── */
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.1rem; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.hero__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+/* Mermaid diagrams - constrain size, uniform rendering */
+.mermaid {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.hero__subtitle {
+  font-family: var(--ifm-font-family-base);
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+code {
+  font-family: var(--ifm-font-family-monospace);
+  border-radius: var(--ifm-code-border-radius);
+}
+
+/* ── Navbar ──────────────────────────────────────────────── */
+.navbar {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--ifm-border-color);
+}
+
+.navbar__title {
+  font-family: var(--ifm-font-family-base);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar__link:hover,
+.navbar__link--active {
+  color: var(--ifm-color-primary);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.menu__link {
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.menu__link:hover {
+  background-color: var(--mc-glow);
+}
+
+.menu__link--active {
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+/* ── Code blocks ─────────────────────────────────────────── */
+.prism-code {
+  border-radius: 10px !important;
+  border: 1px solid var(--mc-card-border);
+}
+
+div[class*='codeBlockContainer'] {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] div[class*='codeBlockContainer'] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Cards / Admonitions ─────────────────────────────────── */
+.alert {
+  border-radius: 10px;
+  border-left-width: 4px;
+}
+
+.alert--info {
+  --ifm-alert-background-color: rgba(91, 168, 160, 0.08);
+  --ifm-alert-border-color: var(--ifm-color-primary);
+}
+
+/* ── Table of Contents ───────────────────────────────────── */
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--mc-card-border);
+}
+
+.footer__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+/* ── Tabs (for pip/uv/poetry install tabs) ───────────────── */
+.tabs__item {
+  border-radius: 6px 6px 0 0;
+  transition: all 0.15s ease;
+}
+
+.tabs__item--active {
+  border-bottom-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+/* ── Announcement bar ────────────────────────────────────── */
+div[class*='announcementBar'] {
+  background: var(--mc-gradient);
+  color: #ffffff;
+  font-family: var(--ifm-font-family-base);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+div[class*='announcementBar'] a {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Scrollbar (dark mode) ───────────────────────────────── */
+[data-theme='dark'] ::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: #0f1117;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(55, 65, 81, 0.6);
+  border-radius: 4px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(91, 168, 160, 0.4);
+}
+
+/* ── Selection ───────────────────────────────────────────── */
+::selection {
+  background: rgba(91, 168, 160, 0.3);
+  color: inherit;
+}
+
+/* ── Smooth transitions ──────────────────────────────────── */
+* {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}

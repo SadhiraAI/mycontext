@@ -53,8 +53,9 @@ class ContextValidator:
             if placeholder in text:
                 issues.append(f"Placeholder text found: '{placeholder}'")
 
-        # Estimate tokens (rough)
-        estimated_tokens = len(text) // 4
+        # Accurate token count
+        from .tokens import count_tokens
+        estimated_tokens = count_tokens(text)
         if estimated_tokens > 8000:
             warnings.append(f"High token count (~{estimated_tokens}) - consider compression")
 
