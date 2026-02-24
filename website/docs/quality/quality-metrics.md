@@ -37,11 +37,11 @@ A poorly structured context produces poor responses. `QualityMetrics` lets you:
 | Dimension | Weight | What it measures |
 |-----------|--------|-----------------|
 | Completeness | 25% | Are all components present? (role, goal, directive, rules, constraints, examples) |
-| Clarity | 20% | Are instructions clear and unambiguous? Penalizes vague language |
+| Clarity | 20% | Clear, unambiguous instructions. Checks pronoun ratio, hedge density, and modal commitment |
 | Reasoning Depth | 20% | Chain-of-thought markers, structured steps, depth of analysis |
 | Actionability | 20% | Concrete, implementable recommendations with specific metrics |
 | Specificity | 15% | Concrete domain terms, detailed directives, not generic phrases |
-| Efficiency | 10% | Concise without being incomplete. Penalizes both extremes |
+| Efficiency | 10% | Concise without being incomplete. Directive length is scored separately from total length |
 
 ### Scoring Scale
 
@@ -301,15 +301,50 @@ print(score.dimensions[QualityDimension.CLARITY])       # 0.88
 
 Common issues detected automatically:
 
-| Issue | Penalty |
-|-------|---------|
-| Extremely short content (< 10 words) | Up to 60% |
-| Minimal generic prompt ("Expert Assistant, be helpful") | 45% |
-| Generic role + generic rules | 30% |
-| Very short prompt (< 30 words) | 30% |
-| Missing role, directive, or goal | 15% each |
-| Empty JSON schema | 10% |
-| Likely typos detected | 5% per typo |
+| Issue | Dimension | Penalty |
+|-------|-----------|---------|
+| Extremely short content (< 10 words) | Global | Up to 60% |
+| Minimal generic prompt ("Expert Assistant, be helpful") | Global | 45% |
+| Generic role + generic rules | Global | 30% |
+| Very short prompt (< 30 words) | Global | 30% |
+| Missing role, directive, or goal | Global | 15% each |
+| Empty JSON schema | Global | 10% |
+| Likely typos detected | Global | 5% per typo |
+| High pronoun ratio (> 10%) — ambiguous references | Clarity | 15% |
+| Moderate pronoun ratio (5–10%) | Clarity | 7% |
+| High hedge density — "try to", "if applicable", "ideally" | Clarity | 12% |
+| Weak modal commitment — more should/could than must/shall | Clarity | 8% |
+| Directive too long (> 100 words) — dilutes the core instruction | Efficiency | 10% |
+
+## Research Foundation
+
+The heuristics in `QualityMetrics` are grounded in two internal experiments and peer-reviewed NLP research.
+
+### Empirical experiments
+
+**Experiment 1 — POS Profile & Entropy (n=10 prompt pairs)**
+Tested whether linguistic features (parts of speech, perplexity, semantic density) predict output quality. Key finding: named entity count and noun-to-pronoun ratio showed directional signal on a small controlled dataset.
+
+**Experiment 2 — TruthfulQA Scale Test (n=200, gpt-4o-mini)**
+Scaled the most promising features to the TruthfulQA benchmark. Statistically significant findings that directly shaped the Clarity and Efficiency scorers:
+
+| Feature | Correlation with accuracy | p-value | Applied to |
+|---------|--------------------------|---------|------------|
+| Pronoun ratio | r = −0.187 | p = 0.008 | Clarity — tiered penalty at 5% and 10% |
+| Directive length | r = −0.176 | p = 0.013 | Efficiency — penalty for directives > 100 words |
+
+### Academic foundations
+
+| Heuristic | Source |
+|-----------|--------|
+| Pronoun ratio & ambiguity | Experiment 2 (TruthfulQA, n=200) |
+| Hedge density | Hyland (1996) — hedging in instructional discourse |
+| Modal commitment ratio | Deontic logic; Ouyang et al. (2022) InstructGPT |
+| Concreteness preference | Brysbaert et al. (2014) — concreteness ratings for 40k English words |
+| Frame Semantics completeness | Fillmore (1982) — FrameNet argument slots |
+| Sentence complexity | Gibson (1998) — dependency locality theory |
+
+---
 
 ## API Reference
 

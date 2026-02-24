@@ -12,7 +12,6 @@ Covers:
   - assess_complexity with skip_heuristic=True calls LLM
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
 
 from mycontext.intelligence.pattern_suggester import (
@@ -20,7 +19,6 @@ from mycontext.intelligence.pattern_suggester import (
     _heuristic_classify,
     assess_complexity,
 )
-
 
 # ---------------------------------------------------------------------------
 # Direct heuristic tests

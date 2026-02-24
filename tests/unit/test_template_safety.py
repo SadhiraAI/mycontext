@@ -15,10 +15,9 @@ Covers:
 
 import pytest
 
+from mycontext.foundation import Guidance
+from mycontext.structure import Blueprint, Pattern
 from mycontext.utils.template_safety import safe_format_template
-from mycontext.structure import Pattern, Blueprint
-from mycontext.foundation import Guidance, Directive
-
 
 # ---------------------------------------------------------------------------
 # Unit tests for safe_format_template

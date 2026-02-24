@@ -150,6 +150,21 @@ class OutputEvaluator:
         lower_ctx = assembled.lower()
         lower_out = output.lower()
 
+        # Refusal / deflection detection — must check before any other scoring
+        _REFUSAL_PATTERNS = [
+            r"i (can't|cannot|am unable to|don't have the ability)",
+            r"as an? (ai|language model|llm)",
+            r"(this (falls|is) )?(outside|beyond) (my )?(capabilities|scope|knowledge)",
+            r"i (don't|do not) have access to (real.?time|current|live|up.?to.?date)",
+            r"i('d| would) (recommend|suggest) (consulting|speaking with)",
+            r"i need to (clarify|note) that i (cannot|can't)",
+            r"i('m| am) not able to (provide|help|assist)",
+            r"that('s| is) (not something|outside what) i",
+        ]
+        for pat in _REFUSAL_PATTERNS:
+            if re.search(pat, lower_out):
+                return 0.05, "Refusal or deflection detected — output did not follow instructions"
+
         action_verbs = re.findall(
             r"\b(analyze|review|identify|evaluate|summarize|classify|compare|"
             r"diagnose|assess|explain|generate|create|write|extract|recommend|"
@@ -176,6 +191,21 @@ class OutputEvaluator:
         ev = f"Matched {found}/{len(action_verbs)} action verbs"
         if must_terms:
             ev += f", {must_hit}/{len(must_terms)} required terms"
+
+        # Numbered instruction coverage — check how many enumerated items are addressed
+        numbered_items = re.findall(r"(?:^|\n)\s*\d+[\.\)]\s+(.+)", assembled, re.MULTILINE)
+        if len(numbered_items) >= 2:
+            covered = sum(
+                1 for item in numbered_items
+                if any(word in lower_out for word in item.lower().split() if len(word) > 4)
+            )
+            coverage = covered / len(numbered_items)
+            ev += f" | Instruction coverage: {covered}/{len(numbered_items)} items"
+            if coverage < 0.5:
+                score = max(score - 0.15, 0.0)
+            elif coverage >= 0.8:
+                score = min(score + 0.10, 1.0)
+
         return max(0.0, min(1.0, score)), ev
 
     def _score_reasoning_depth(self, output: str) -> tuple:
@@ -194,12 +224,23 @@ class OutputEvaluator:
         headings = len(re.findall(r"\n#+\s", output))
         nested = len(re.findall(r"\n\s{2,}[-*]\s", output))
 
-        depth_signals = marker_count + numbered * 0.5 + headings * 0.3 + nested * 0.3
+        # Quantified claims — specific numbers/metrics are the strongest signal of
+        # concrete reasoning ("declined 23% YoY" vs "declined significantly")
+        quantified = len(re.findall(
+            r"\b\d+(?:\.\d+)?(?:\s*%|x|\s+(?:percent|times|fold|days?|weeks?|months?|years?|hours?))\b"
+            r"|\b(?:Q[1-4]|FY|H[12])\s*\d{4}\b"
+            r"|\$\s*\d",
+            output, re.IGNORECASE,
+        ))
+
+        depth_signals = marker_count + numbered * 0.5 + headings * 0.3 + nested * 0.3 + quantified * 0.4
         score = min(1.0, 0.15 + depth_signals * 0.07)
 
         ev = f"{marker_count} reasoning markers, {numbered} numbered steps"
         if headings:
             ev += f", {headings} section headings"
+        if quantified:
+            ev += f", {quantified} quantified claims"
         return max(0.0, min(1.0, score)), ev
 
     def _score_actionability(self, output: str) -> tuple:
@@ -231,6 +272,21 @@ class OutputEvaluator:
         ev = f"{len(found)} action phrases, {numbered_actions + bullet_actions} action items"
         if specifics:
             ev += f", {specifics} concrete metrics"
+
+        # Vague/hedge penalty — outputs that never commit to an answer score poorly
+        _OUTPUT_HEDGES = [
+            "it depends", "generally speaking", "in most cases", "this varies",
+            "it's hard to say", "without more context", "might be worth",
+            "could potentially", "there are many factors", "it is difficult to",
+            "no one-size-fits-all", "varies widely",
+        ]
+        hedge_hits = sum(1 for h in _OUTPUT_HEDGES if h in lower)
+        if hedge_hits >= 3:
+            score = max(score - 0.15, 0.0)
+            ev += f" | Heavy hedging ({hedge_hits} vague phrases)"
+        elif hedge_hits >= 1:
+            score = max(score - 0.05, 0.0)
+
         return max(0.0, min(1.0, score)), ev
 
     def _score_structure_compliance(

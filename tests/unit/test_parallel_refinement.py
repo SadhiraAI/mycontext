@@ -11,13 +11,9 @@ Key behaviors verified:
 """
 
 import time
-from threading import Lock
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from mycontext.intelligence.prompt_composer import ComposedPrompt, PromptComposer
-
 
 # ---------------------------------------------------------------------------
 # Helpers

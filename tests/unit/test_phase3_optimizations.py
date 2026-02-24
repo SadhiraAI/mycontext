@@ -31,7 +31,6 @@ import pytest
 
 from mycontext.utils.optimizers import RedundancyRemover, TokenOptimizer
 
-
 # ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------

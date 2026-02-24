@@ -31,8 +31,9 @@ Covers:
 """
 
 import json
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from mycontext.intelligence.schemas import (
     ContextSpec,
@@ -42,7 +43,6 @@ from mycontext.intelligence.schemas import (
     _extract_json_block,
     parse_with_fallback,
 )
-
 
 # ---------------------------------------------------------------------------
 # Schema unit tests

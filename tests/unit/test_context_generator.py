@@ -4,17 +4,16 @@ Unit tests for generate_context — context_generator.py
 All tests are offline (no LLM calls). The LLM call is mocked.
 """
 
+import json as _json
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from mycontext import Context, GeneratedContext, generate_context
-from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.intelligence.context_generator import (
     _parse_llm_json,
     _spec_to_context,
 )
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -174,7 +173,6 @@ class TestSpecToContext:
 
 # ── generate_context (mocked LLM) ────────────────────────────────────────────
 
-import json as _json
 
 class TestGenerateContext:
     def _mock_generate(self, spec: dict) -> MagicMock:

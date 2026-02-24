@@ -42,7 +42,6 @@ import pytest
 
 from mycontext.utils.tracing import Span, Tracer, get_tracer
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -157,7 +156,6 @@ class TestGetPatternClassCache:
 
     def test_repeated_calls_return_same_object(self):
         from mycontext.intelligence.pattern_suggester import (
-            _get_pattern_class_cached,
             get_pattern_class,
         )
         c1 = get_pattern_class("root_cause_analyzer", include_enterprise=True)
@@ -174,8 +172,8 @@ class TestGetPatternClassCache:
         assert get_pattern_class("nonexistent_xyz") is None
 
     def test_enterprise_gated_pattern_returns_none_when_blocked(self):
-        from mycontext.intelligence.pattern_suggester import get_pattern_class
         from mycontext.intelligence.pattern_catalog import NAME_TO_CATEGORY
+        from mycontext.intelligence.pattern_suggester import get_pattern_class
         ent_names = [n for n, c in NAME_TO_CATEGORY.items() if c == "enterprise"]
         if not ent_names:
             pytest.skip("No enterprise patterns registered")

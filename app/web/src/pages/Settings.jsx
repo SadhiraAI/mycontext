@@ -284,7 +284,7 @@ export default function Settings() {
                   </button>
                 </form>
                 <p className="settings-license-help">
-                  Need a license key? Contact <strong>dhirajp@sadhiraai.com</strong> or visit our website.
+                  Need a license key? <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">Contact us</a> or visit our website.
                 </p>
               </div>
             )}
@@ -320,7 +320,7 @@ export default function Settings() {
             <span className="settings-disclaimer-icon">&#x1F4DC;</span>
             <div>
               <strong>License Terms</strong>
-              <p>Each enterprise license key is single-use and tied to one account upon activation. Keys are non-transferable and may not be shared, resold, or redistributed. Sadhira AI reserves the right to revoke keys that violate these terms. Enterprise features are provided under a limited, non-exclusive, revocable license. Attempting to reverse-engineer, circumvent, or bypass license restrictions is strictly prohibited. For questions, contact <strong>dhirajp@sadhiraai.com</strong>. See the <button type="button" className="settings-disclaimer-link" onClick={() => { setTab("Legal"); setError(""); setSuccess(""); }}>Legal</button> tab for full terms.</p>
+              <p>Each enterprise license key is single-use and tied to one account upon activation. Keys are non-transferable and may not be shared, resold, or redistributed. Sadhira AI reserves the right to revoke keys that violate these terms. Enterprise features are provided under a limited, non-exclusive, revocable license. Attempting to reverse-engineer, circumvent, or bypass license restrictions is strictly prohibited. For questions, <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">contact us</a>. See the <button type="button" className="settings-disclaimer-link" onClick={() => { setTab("Legal"); setError(""); setSuccess(""); }}>Legal</button> tab for full terms.</p>
             </div>
           </div>
         </div>
@@ -392,9 +392,8 @@ export default function Settings() {
               <h4>Third-Party Services</h4>
               <ul>
                 <li><strong>LLM providers:</strong> When you use features that call an LLM (Smart Compose, Execute, Chat), your input is sent to the provider you selected (e.g., OpenAI, Anthropic) under their terms of service and privacy policy. We act only as a conduit.</li>
-                <li><strong>Cloudflare:</strong> DNS, CDN, and privacy-first web analytics (no personal data collected).</li>
-                <li><strong>Neon (database):</strong> Managed PostgreSQL with encryption at rest and in transit.</li>
-                <li><strong>Fly.io (hosting):</strong> Backend hosting with encrypted connections.</li>
+                <li><strong>Analytics:</strong> We use privacy-first, cookie-free web analytics. No personal data is collected.</li>
+                <li><strong>Infrastructure:</strong> Our backend and database infrastructure is hosted on enterprise-grade cloud providers with encryption at rest and in transit for all data.</li>
               </ul>
 
               <h4>Your Rights</h4>
@@ -456,8 +455,8 @@ export default function Settings() {
             <h3>Contact</h3>
             <div className="settings-legal-text">
               <p>For privacy inquiries, data deletion requests, legal questions, or license support:</p>
-              <p><strong>Email:</strong> dhirajp@sadhiraai.com</p>
-              <p><strong>Website:</strong> <a href="https://sadhiraai.com" target="_blank" rel="noopener noreferrer">sadhiraai.com</a></p>
+              <p><strong>Contact:</strong> <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">contact.sadhiraai.com</a></p>
+              <p><strong>Website:</strong> <a href="https://mycontext.sadhiraai.com" target="_blank" rel="noopener noreferrer">mycontext.sadhiraai.com</a></p>
               <p className="settings-legal-muted">Sadhira AI reserves the right to update these terms. Material changes will be communicated via the application.</p>
             </div>
           </div>

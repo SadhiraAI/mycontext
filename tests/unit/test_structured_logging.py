@@ -12,10 +12,7 @@ and assert that:
 import logging
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from mycontext.intelligence.prompt_composer import PromptComposer, ComposedPrompt
-
+from mycontext.intelligence.prompt_composer import ComposedPrompt, PromptComposer
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -248,11 +245,10 @@ class TestPatternSuggesterLogging:
 
     def test_suggest_with_llm_failure_logs_warning(self, caplog):
         """_suggest_with_llm(): LLM call failure must be logged as WARNING."""
-        from mycontext.intelligence import pattern_suggester
-
         # Context is imported locally inside _suggest_with_llm: from ..core import Context
         # Patch at the source: mycontext.core.Context
         import mycontext.core as core_mod
+        from mycontext.intelligence import pattern_suggester
         original_ctx = core_mod.Context
 
         class FakeContext:
@@ -286,9 +282,8 @@ class TestPatternSuggesterLogging:
 
     def test_suggest_with_llm_failure_preserves_error_string(self):
         """The error tuple must include the original exception message."""
-        from mycontext.intelligence import pattern_suggester
-
         import mycontext.core as core_mod
+        from mycontext.intelligence import pattern_suggester
         original_ctx = core_mod.Context
 
         class FakeContext:

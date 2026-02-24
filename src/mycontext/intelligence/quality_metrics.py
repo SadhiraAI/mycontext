@@ -440,12 +440,72 @@ class QualityMetrics:
             score += 0.15
             strengths.append("Output format specified")
 
-        # Ambiguous pronouns
-        pronouns = ["it", "this", "that", "these", "those"]
-        pronoun_count = sum(1 for p in pronouns if lower.count(f" {p} ") > 3)
-        if pronoun_count > 1:
-            score -= 0.10
-            issues.append("Excessive ambiguous pronouns without clear referents")
+        # Ambiguous pronoun ratio
+        # Empirically validated: pronoun ratio > 10% correlates with ~17% lower
+        # LLM accuracy (r=-0.187, p=0.008, n=200, TruthfulQA/gpt-4o-mini).
+        words = assembled.split()
+        _pronoun_set = {"it", "this", "that", "these", "those", "they", "them", "its"}
+        pronoun_ratio = (
+            sum(1 for w in words if w.lower() in _pronoun_set) / max(len(words), 1)
+        )
+        if pronoun_ratio > 0.10:
+            score -= 0.15
+            issues.append(
+                f"High pronoun ratio ({pronoun_ratio:.0%}) — ambiguous references "
+                f"reduce LLM accuracy; replace pronouns with explicit nouns"
+            )
+        elif pronoun_ratio > 0.05:
+            score -= 0.07
+            issues.append(
+                f"Moderate pronoun ratio ({pronoun_ratio:.0%}) — consider naming "
+                f"references explicitly instead of using it/this/that/they"
+            )
+        else:
+            score += 0.10
+            strengths.append("Low pronoun ratio — clear, unambiguous references")
+
+        # Hedge density — instructional hedges erode binding force
+        _hedge_phrases = {
+            "try to", "if applicable", "when possible", "as needed",
+            "generally speaking", "in most cases", "ideally", "where relevant",
+            "if necessary", "to the extent possible", "roughly", "approximately",
+            "it depends", "typically", "usually", "often", "sometimes",
+        }
+        hedge_count = sum(1 for h in _hedge_phrases if h in lower)
+        hedge_density = hedge_count / max(word_count / 10, 1)
+        if hedge_density > 0.3:
+            score -= 0.12
+            issues.append(
+                f"High hedge density ({hedge_count} hedging phrases) — use binding language "
+                f"(must/always/never) instead of try/ideally/if applicable"
+            )
+        elif hedge_density > 0.1:
+            score -= 0.05
+            issues.append(
+                f"Moderate hedging ({hedge_count} phrases) — consider replacing with explicit constraints"
+            )
+        else:
+            score += 0.05
+            strengths.append("Low hedging — instructions are binding and clear")
+
+        # Modal commitment ratio — binding vs suggestive modals
+        import re as _re
+        binding_count = len(_re.findall(r"\b(must|shall|will|always|never|required)\b", lower))
+        suggestive_count = len(_re.findall(r"\b(should|could|might|may|try|consider|ideally)\b", lower))
+        total_modals = binding_count + suggestive_count
+        if total_modals >= 3:
+            commitment_ratio = binding_count / total_modals
+            if commitment_ratio >= 0.6:
+                score += 0.08
+                strengths.append(
+                    f"Strong instruction commitment ({commitment_ratio:.0%} binding modals)"
+                )
+            elif commitment_ratio < 0.25:
+                score -= 0.08
+                issues.append(
+                    f"Weak instruction commitment — only {binding_count}/{total_modals} modals "
+                    f"are binding (must/shall/will); replace should/could/might"
+                )
 
         # Consistent terminology (no contradictions)
         if word_count > 50:
@@ -825,6 +885,20 @@ class QualityMetrics:
             issues.append(f"Very long ({word_count} words) -- consider trimming redundancy")
         else:
             score += 0.15
+
+        # Directive length — shorter directives correlate with better LLM accuracy
+        # (Experiment 2, TruthfulQA, r=-0.176 p=0.013, n=200)
+        dir_content = (context.directive.content if context.directive else "") or ""
+        dir_words = len(dir_content.split())
+        if dir_words > 100:
+            score -= 0.10
+            issues.append(
+                f"Directive is long ({dir_words} words) — shorter, tighter directives "
+                f"correlate with better LLM accuracy; move detail into rules/constraints"
+            )
+        elif 20 <= dir_words <= 60:
+            score += 0.10
+            strengths.append(f"Directive length is optimal ({dir_words} words)")
 
         # Redundancy check
         words = assembled.lower().split()

@@ -66,9 +66,9 @@ const PRODUCT_SUITE = [
     icon: "\uD83D\uDCE6",
     title: "Python SDK",
     badge: "pip install",
-    desc: "Context-as-Code for developers. Build, compose, measure, and export contexts programmatically. One context, 13 export formats — OpenAI, Anthropic, Google, LangChain, CrewAI, and more.",
-    highlights: ["pip install mycontext-ai", "13 export formats", "LangChain / CrewAI / AutoGen"],
-    link: "https://pypi.org/user/sadhira/",
+    desc: "Context-as-Code for developers. 22 unique capabilities — context generation, quality scoring, CAI proof, async execution, token-budget assembly, and validated structured output. One context, 13 export formats.",
+    highlights: ["pip install mycontext-ai", "22 unique SDK capabilities", "13 export formats · 7 framework integrations"],
+    link: "https://pypi.org/project/mycontext-ai/",
     linkText: "See the SDK on PyPI",
     accent: "#0d9488",
     external: true,
@@ -155,13 +155,13 @@ const TOOLS_PROOF = [
     status: "Built-in",
   },
   {
-    orchestrator: "Any LLM API",
-    desc: "Context.to_openai(), .to_anthropic(), .to_google(). One context, 13 export formats.",
+    orchestrator: "DSPy / Semantic Kernel / Google ADK",
+    desc: "Dedicated integration helpers for DSPy, Semantic Kernel, and Google ADK out of the box.",
     status: "Built-in",
   },
   {
-    orchestrator: "smolagents",
-    desc: "DataAnalyzer wrapped as a Tool. CodeAgent orchestrates it with pandas — no custom agent code.",
+    orchestrator: "Any LLM API",
+    desc: "Context.to_openai(), .to_anthropic(), .to_google(). One context, 13 export formats.",
     status: "Built-in",
   },
 ];
@@ -304,7 +304,6 @@ export default function Landing() {
             <p className="landing-poem-inspired">
               Inspired by <strong>Matsuo Bash&#x14D;</strong>, Japanese Zen Master
             </p>
-            <cite className="landing-poem-credit">Photo: Dhiraj Pokhrel</cite>
           </div>
           <div className="landing-hero-actions">
             <Link to="/signup" className="landing-btn primary large">Let's slink in</Link>
@@ -428,6 +427,16 @@ export default function Landing() {
               <span className="landing-diff-icon">{"\uD83C\uDF10"}</span>
               <h3>One context, every LLM</h3>
               <p>Build once, export to 13 formats. OpenAI, Anthropic, Google, LangChain, CrewAI, AutoGen — no rewriting for each provider.</p>
+            </div>
+            <div className="landing-diff-card">
+              <span className="landing-diff-icon">{"\u2728"}</span>
+              <h3>Role + goal → full context</h3>
+              <p>Describe your role and objective in plain English. The Context Generator builds rules, examples, output schema, and guard rails automatically — no manual prompt engineering.</p>
+            </div>
+            <div className="landing-diff-card">
+              <span className="landing-diff-icon">{"\uD83D\uDEE1\uFE0F"}</span>
+              <h3>Production-ready, not experimental</h3>
+              <p>Async execution, token-budget assembly, Pydantic-validated structured output, retry with backoff, and injection prevention — all built in.</p>
             </div>
           </div>
         </section>
@@ -606,8 +615,8 @@ export default function Landing() {
               <span className="landing-stat-label">Framework Integrations</span>
             </div>
             <div className="landing-stat">
-              <span className="landing-stat-num">3</span>
-              <span className="landing-stat-label">Execution Tiers</span>
+              <span className="landing-stat-num">22</span>
+              <span className="landing-stat-label">Unique SDK Capabilities</span>
             </div>
           </div>
         </section>
@@ -643,7 +652,7 @@ export default function Landing() {
             <Link to="/signup" className="landing-btn primary large">Get started free</Link>
           </div>
           <p className="landing-dev-link">
-            Developers: <a href="https://pypi.org/user/sadhira/" target="_blank" rel="noopener noreferrer">Python SDK on PyPI</a> · <a href="https://github.com/mycontext-ai/mycontext" target="_blank" rel="noopener noreferrer">GitHub</a>
+            Developers: <a href="https://pypi.org/project/mycontext-ai/" target="_blank" rel="noopener noreferrer">Python SDK on PyPI</a> · <a href="https://github.com/SadhiraAI/mycontext" target="_blank" rel="noopener noreferrer">GitHub</a>
           </p>
         </section>
       </main>
@@ -656,7 +665,7 @@ export default function Landing() {
           <span className="landing-footer-sep">&middot;</span>
           <span>(804) 418-2759</span>
           <span className="landing-footer-sep">&middot;</span>
-          <a href="mailto:dhirajp@sadhiraai.com">dhirajp@sadhiraai.com</a>
+          <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">contact.sadhiraai.com</a>
         </div>
         <div className="landing-footer-social">
           <a href="#" title="Facebook" className="landing-social-badge" aria-label="Facebook">

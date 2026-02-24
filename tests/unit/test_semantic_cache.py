@@ -15,20 +15,16 @@ Covers:
   - Module-level default cache and reset
 """
 
-import time
 import threading
+import time
 from unittest.mock import MagicMock, patch
 
-import pytest
-
+from mycontext.providers.base import ProviderResponse
 from mycontext.utils.semantic_cache import (
-    CacheStats,
     SemanticCache,
     get_default_cache,
     reset_default_cache,
 )
-from mycontext.providers.base import ProviderResponse
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -355,7 +351,6 @@ class TestLiteLLMProviderCache:
     def test_cache_miss_calls_litellm(self):
         """On a cache miss, litellm.completion() MUST be called."""
         from mycontext import Context
-        from mycontext.providers.base import ProviderResponse
 
         provider = self._make_provider()
         ctx = Context("unique guidance for miss test")

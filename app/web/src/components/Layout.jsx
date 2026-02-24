@@ -149,7 +149,7 @@ export default function Layout() {
           <span className="layout-footer-sep">&middot;</span>
           <span>(804) 418-2759</span>
           <span className="layout-footer-sep">&middot;</span>
-          <a href="mailto:dhirajp@sadhiraai.com">dhirajp@sadhiraai.com</a>
+          <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">contact.sadhiraai.com</a>
         </div>
         <div className="layout-footer-social">
           <a href="#" title="Facebook" className="layout-social-badge" aria-label="Facebook">

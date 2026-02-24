@@ -105,13 +105,17 @@ Dimensions:
 ### Instruction Following
 
 Checks whether the output actually does what the directive asked. Looks for:
+- **Refusal / deflection** — checked first. If the output matches a known refusal pattern ("I can't help with that", "As an AI language model...", "I don't have access to real-time data"), the score is hard-capped at **0.05** regardless of other signals. This closes the most common false-positive gap.
 - **Action verbs from the directive** — analyze, review, identify, evaluate, summarize, compare, diagnose, etc.
 - **Must-include terms** — items listed in `Constraints.must_include`
+- **Numbered instruction coverage** — if the directive lists 3+ numbered items, checks how many the output actually addresses. < 50% addressed → −15%; ≥ 80% addressed → +10%.
 
 ```python
 # If directive says "identify root causes and recommend solutions"
 # and must_include = ["timeline", "impact"]
+# → First: is this a refusal? If yes → 0.05
 # → Checks: "identify" in output? "recommend" in output? "timeline" in output? "impact" in output?
+# → If directive had 5 numbered items, how many are covered?
 ```
 
 ### Reasoning Depth
@@ -121,6 +125,7 @@ Counts reasoning markers that indicate multi-step, non-surface-level responses:
 - Contrast: "however", "on the other hand", "conversely", "although"
 - Elaboration: "furthermore", "moreover", "nevertheless"
 - Structure: numbered steps, section headings, nested lists
+- **Quantified claims** — specific numbers, percentages, dates, and measurements score higher than discourse markers. "Performance declined 23% YoY from Q2 2023 to Q2 2024" outscores "performance declined significantly". Patterns detected: `23%`, `3x`, `Q3 2024`, `$50`, `2 weeks`, etc. Each quantified claim contributes 0.4 depth units vs. 0.07 per discourse marker.
 
 ### Actionability
 
@@ -128,6 +133,7 @@ Measures how concrete and implementable the recommendations are:
 - **Action phrases**: "should", "recommend", "implement", "next step", "prioritize"
 - **Numbered/bulleted actions**: items containing action language
 - **Concrete metrics**: percentages, dollar figures, time frames ("30 days", "15%")
+- **Output hedge penalty**: outputs that avoid committing to answers are penalized. Detected phrases include "it depends", "generally speaking", "in most cases", "could potentially", "there are many factors". ≥ 3 such phrases → −15%; ≥ 1 → −5%. An output that hedges every recommendation is not actionable regardless of how many "should" keywords it contains.
 
 ### Structure Compliance
 
@@ -229,6 +235,34 @@ evaluator = OutputEvaluator(mode="hybrid", provider="openai")
 score = evaluator.evaluate(ctx, output)
 print(f"Mode used: {score.metadata['mode']}")  # "hybrid_fast" or "hybrid_llm"
 ```
+
+## Research Foundation
+
+The `OutputEvaluator` heuristics are grounded in empirical experiments and established argumentation quality research.
+
+### Why refusal detection matters
+
+Without explicit refusal detection, a compliant output and a refusing output ("As an AI, I can't help with that") can score identically — both get the 0.3 base score from verb matching. This was the highest-priority gap identified in our internal audit. The fix: 8 regex patterns checked before any other scoring, with a hard floor of 0.05 on match.
+
+### Why quantified claims outweigh discourse markers
+
+Habernal & Gurevych (2016) and Wachsmuth et al. (2017) consistently find that **specific numerical evidence** is the strongest signal of argument quality. "Declined 23% YoY" is fundamentally different from "declined significantly" — one is verifiable, one is hedged. Quantified claims are therefore weighted at 0.4 depth units each, vs. 0.07 for standard discourse markers like "therefore" or "however".
+
+### Why output hedges hurt actionability
+
+An output full of "it depends", "generally speaking", and "without more context" is providing meta-commentary instead of answers. This is the output-side equivalent of instructional hedging in the prompt — it erodes the value delivered to the user even when the structural signals (bullet points, "recommend" keywords) look positive.
+
+### Academic foundations
+
+| Heuristic | Source |
+|-----------|--------|
+| Quantified claims → reasoning depth | Habernal & Gurevych (2016); Wachsmuth et al. (2017) |
+| Refusal/deflection detection | IFEval — Zhou et al. (2023) |
+| Numbered instruction coverage | IFEval — Zhou et al. (2023) |
+| Actionability = specificity + ownership + time | Decision science; consulting research |
+| Cognitive scaffolding framework matching | Bloom's Taxonomy (1956); Anderson et al. (2001) |
+
+---
 
 ## OutputDimension Enum
 

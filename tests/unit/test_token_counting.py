@@ -10,17 +10,14 @@ Covers:
   - ContextValidator uses accurate counting (regression)
 """
 
-import pytest
-from unittest.mock import patch
 
 from mycontext.utils.tokens import (
+    _encoding_for_model,
     count_tokens,
+    estimate_cost_usd,
     fits_in_window,
     token_budget_remaining,
-    estimate_cost_usd,
-    _encoding_for_model,
 )
-
 
 # ---------------------------------------------------------------------------
 # Basic counting
@@ -131,6 +128,7 @@ class TestTiktokenFallback:
 
     def test_fallback_logs_warning(self, caplog):
         import logging
+
         import mycontext.utils.tokens as tokens_mod
 
         original = tokens_mod._get_encoder
@@ -212,8 +210,8 @@ class TestEstimateCostUsd:
 class TestBlueprintEstimateTokensAccurate:
 
     def test_estimate_tokens_returns_int(self):
-        from mycontext.structure import Blueprint
         from mycontext.foundation import Guidance
+        from mycontext.structure import Blueprint
 
         bp = Blueprint(
             name="test",
@@ -230,8 +228,8 @@ class TestBlueprintEstimateTokensAccurate:
         Tiktoken is more precise — for our purposes just verify both give
         a positive integer and tiktoken's result differs from pure word * 1.3.
         """
-        from mycontext.structure import Blueprint
         from mycontext.foundation import Guidance
+        from mycontext.structure import Blueprint
 
         guidance_text = "You are an expert financial analyst specializing in quantitative risk."
         bp = Blueprint(
@@ -254,8 +252,8 @@ class TestBlueprintEstimateTokensAccurate:
         assert bp.estimate_tokens() == 0
 
     def test_model_param_accepted(self):
-        from mycontext.structure import Blueprint
         from mycontext.foundation import Guidance
+        from mycontext.structure import Blueprint
 
         bp = Blueprint(name="model_test", guidance=Guidance(role="Assistant"))
         result_gpt4o = bp.estimate_tokens(model="gpt-4o")
