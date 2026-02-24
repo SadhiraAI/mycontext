@@ -1,0 +1,316 @@
+Total code cells: 23
+=== Code Cell 2 (notebook cell index 2) ===
+# ── CELL 2: Imports ────────────────────────────────────────────────────────────
+
+import math
+import warnings
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import spacy
+import torch
+from dotenv import load_dotenv
+from scipy import stats
+from transformers import GPT2LMHeadModel, GPT2TokenizerFast
+
+warnings.filterwarnings("ignore")
+load_dotenv(dotenv_path=Path("..") / ".env")  # load API keys from project root
+
+# ── Load spaCy model
+nlp = spacy.load("en_core_web_md")
+
+# ── Load GPT-2 (for surprisal / perplexity scoring)
+print("Loading GPT-2 for surprisal scoring...")
+gpt2_tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+gpt2_model     = GPT2LMHeadModel.from_pretrained("gpt2")
+gpt2_model.eval()
+
+sns.set_theme(style="whitegrid", palette="muted")
+print("Ready.")
+
+=== Code Cell 3 (notebook cell index 3) ===
+# ── CELL 3: Configuration ─────────────────────────────────────────────────────
+
+# Set to True to send prompts to an LLM and score outputs
+RUN_LLM = True
+
+# Which model to use for evaluation (litellm routing)
+LLM_MODEL = "gpt-4o-mini"     # cheap, fast; change to "claude-3-5-haiku-20241022" etc.
+
+# Temperature for LLM evaluation calls
+LLM_TEMPERATURE = 0.2
+
+print(f"RUN_LLM = {RUN_LLM}")
+print(f"LLM_MODEL = {LLM_MODEL}")
+if not RUN_LLM:
+    print("[INFO] LLM calls disabled. Will analyse prompts only. Set RUN_LLM=True to enable LLM scoring.")
+
+=== Code Cell 6 (notebook cell index 7) ===
+# ── CELL 6: Semantic Density Scorer ───────────────────────────────────────────
+#
+# Semantic Density = average pairwise cosine similarity between content-word vectors.
+# High density → words cluster tightly in embedding space → narrow, specific topic.
+# Low density  → words spread across embedding space → vague, multi-topic.
+#
+# We only use tokens that: (a) have a vector, (b) are not stop words, (c) are content POS.
+
+CONTENT_POS = {"NOUN", "VERB", "ADJ", "ADV", "PROPN"}
+
+@dataclass
+class SemanticProfile:
+    text: str
+    content_words: list[str] = field(default_factory=list)
+    semantic_density: float = 0.0   # avg pairwise cosine sim
+    centroid_spread: float  = 0.0   # std dev of distances from centroid (lower = tighter)
+
+def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
+    denom = (np.linalg.norm(a) * np.linalg.norm(b))
+    return float(np.dot(a, b) / denom) if denom > 0 else 0.0
+
+def score_semantic_density(text: str) -> SemanticProfile:
+    profile = SemanticProfile(text=text)
+    doc = nlp(text)
+
+    vecs = []
+    words = []
+    for token in doc:
+        if token.pos_ in CONTENT_POS and token.has_vector and not token.is_stop:
+            vecs.append(token.vector)
+            words.append(token.text)
+
+    profile.content_words = words
+
+    if len(vecs) < 2:
+        return profile  # not enough content words
+
+    vecs_arr = np.array(vecs)
+
+    # Average pairwise cosine similarity
+    sims = []
+    for i in range(len(vecs_arr)):
+        for j in range(i + 1, len(vecs_arr)):
+            sims.append(cosine_sim(vecs_arr[i], vecs_arr[j]))
+    profile.semantic_density = round(float(np.mean(sims)), 4)
+
+    # Centroid spread
+    centroid = vecs_arr.mean(axis=0)
+    dists = [cosine_sim(v, centroid) for v in vecs_arr]
+    profile.centroid_spread = round(float(np.std(dists)), 4)
+
+    return profile
+
+# Quick smoke test
+sem = score_semantic_density("The mitochondria produce ATP through oxidative phosphorylation.")
+print(f"Semantic density: {sem.semantic_density}  |  Centroid spread: {sem.centroid_spread}")
+print(f"Content words: {sem.content_words}")
+
+=== Code Cell 7 (notebook cell index 8) ===
+# ── CELL 7: Combined Prompt Feature Extractor ─────────────────────────────────
+
+@dataclass
+class PromptFeatures:
+    label: str
+    prompt: str
+    topic: str
+    variant: str          # "vague" | "specific"
+    # POS
+    lss: float = 0.0
+    pronoun_ratio: float = 0.0
+    content_ratio: float = 0.0
+    ne_count: int = 0
+    noun_count: int = 0
+    token_count: int = 0
+    # Surprisal
+    perplexity: float = 0.0
+    mean_surprisal: float = 0.0
+    # Semantic
+    semantic_density: float = 0.0
+    centroid_spread: float = 0.0
+    # LLM output (filled later if RUN_LLM=True)
+    llm_output: str = ""
+    output_ne_count: int = 0
+    output_token_count: int = 0
+    output_lss: float = 0.0
+
+def extract_features(label: str, prompt: str, topic: str, variant: str) -> PromptFeatures:
+    pf = PromptFeatures(label=label, prompt=prompt, topic=topic, variant=variant)
+
+    pos  = analyse_pos(prompt)
+    surp = score_surprisal(prompt)
+    sem  = score_semantic_density(prompt)
+
+    pf.lss             = pos.lss
+    pf.pronoun_ratio   = pos.pronoun_ratio
+    pf.content_ratio   = pos.content_ratio
+    pf.ne_count        = pos.ne_count
+    pf.noun_count      = pos.noun_count
+    pf.token_count     = pos.token_count
+    pf.perplexity      = surp.perplexity
+    pf.mean_surprisal  = surp.mean_surprisal
+    pf.semantic_density = sem.semantic_density
+    pf.centroid_spread  = sem.centroid_spread
+
+    return pf
+
+print("Feature extractor ready.")
+
+=== Code Cell 16 (notebook cell index 21) ===
+# ── CELL 16: LLM calls (optional) ─────────────────────────────────────────────
+
+if RUN_LLM:
+    import litellm
+    litellm.set_verbose = False
+
+    for pf in all_features:
+        print(f"  Calling LLM: {pf.label}")
+        try:
+            response = litellm.completion(
+                model=LLM_MODEL,
+                messages=[{"role": "user", "content": pf.prompt}],
+                temperature=LLM_TEMPERATURE,
+                max_tokens=400,
+            )
+            pf.llm_output = response.choices[0].message.content or ""
+
+            # Score the output
+            out_pos  = analyse_pos(pf.llm_output)
+            pf.output_lss         = out_pos.lss
+            pf.output_ne_count    = out_pos.ne_count
+            pf.output_token_count = out_pos.token_count
+
+            print(f"    Output LSS={pf.output_lss:.2f}  NE={pf.output_ne_count}  tokens={pf.output_token_count}")
+
+        except Exception as e:
+            print(f"    ERROR: {e}")
+
+    # Add output features to df
+    for pf in all_features:
+        idx = df[df["label"] == pf.label].index
+        df.loc[idx, "output_lss"]         = pf.output_lss
+        df.loc[idx, "output_ne_count"]    = pf.output_ne_count
+        df.loc[idx, "output_token_count"] = pf.output_token_count
+
+    print("\nLLM evaluation complete.")
+else:
+    print("[SKIPPED] Set RUN_LLM=True in Cell 3 to run LLM evaluation.")
+
+=== Code Cell 17 (notebook cell index 22) ===
+# ── CELL 17: Figure 6 — Prompt LSS vs Output Quality (if LLM ran) ─────────────
+
+if RUN_LLM and "output_lss" in df.columns and df["output_lss"].notna().any():
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    fig.suptitle("Prompt LSS vs LLM Output Quality Metrics", fontsize=13, fontweight="bold")
+
+    output_metrics = [
+        ("output_lss",         "Output LSS",          "How specific the answer is"),
+        ("output_ne_count",    "Output Named Entities", "Factual anchors in answer"),
+        ("output_token_count", "Output Token Count",   "Answer substantiveness"),
+    ]
+
+    for ax, (metric, ylabel, desc) in zip(axes, output_metrics, strict=False):
+        for variant, color, marker in [("vague", "#e07070", "o"), ("specific", "#5b9bd5", "s")]:
+            subset = df[df["variant"] == variant]
+            ax.scatter(subset["lss"], subset[metric],
+                       color=color, marker=marker, s=100, label=variant, alpha=0.85)
+
+        slope, intercept, r, p, _ = stats.linregress(df["lss"], df[metric])
+        x_line = np.linspace(df["lss"].min(), df["lss"].max(), 50)
+        ax.plot(x_line, slope * x_line + intercept, "--", color="gray",
+                label=f"r={r:.2f} p={p:.3f}")
+
+        ax.set_xlabel("Prompt LSS")
+        ax.set_ylabel(ylabel)
+        ax.set_title(f"{ylabel}\n({desc})", fontsize=10)
+        ax.legend(fontsize=8)
+
+    plt.tight_layout()
+    plt.savefig("prompt_vs_output_quality.png", dpi=150, bbox_inches="tight")
+    plt.show()
+else:
+    print("[SKIPPED] LLM output quality plot requires RUN_LLM=True.")
+
+=== Code Cell 19 (notebook cell index 25) ===
+# ── CELL 19: Figure 7 — PQI bar chart ─────────────────────────────────────────
+
+df_sorted = df_pqi.sort_values("pqi", ascending=True)
+bar_colors = ["#5b9bd5" if v == "specific" else "#e07070" for v in df_sorted["variant"]]
+
+fig, ax = plt.subplots(figsize=(10, 6))
+bars = ax.barh(df_sorted["label"], df_sorted["pqi"], color=bar_colors, alpha=0.85)
+ax.axvline(0, color="black", linewidth=0.8, linestyle="-")
+
+for bar, val in zip(bars, df_sorted["pqi"], strict=False):
+    ax.text(val + (0.02 if val >= 0 else -0.02), bar.get_y() + bar.get_height() / 2,
+            f"{val:.2f}", va="center", ha="left" if val >= 0 else "right", fontsize=9)
+
+from matplotlib.patches import Patch
+
+ax.legend(handles=[
+    Patch(facecolor="#5b9bd5", label="Specific"),
+    Patch(facecolor="#e07070", label="Vague"),
+], loc="lower right")
+
+ax.set_xlabel("Prompt Quality Index (PQI) — higher is better", fontsize=11)
+ax.set_title("PQI Score: All Prompts Ranked", fontsize=13, fontweight="bold")
+plt.tight_layout()
+plt.savefig("pqi_ranking.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+=== Code Cell 20 (notebook cell index 27) ===
+# ── CELL 20: Wilcoxon signed-rank test ────────────────────────────────────────
+
+from scipy.stats import wilcoxon
+
+test_features = ["lss", "pronoun_ratio", "ne_count", "perplexity", "semantic_density", "pqi"]
+vague_rows    = df_pqi[df_pqi["variant"] == "vague"].sort_values("topic").reset_index(drop=True)
+specific_rows = df_pqi[df_pqi["variant"] == "specific"].sort_values("topic").reset_index(drop=True)
+
+print(f"{'Feature':<22} {'Vague mean':>12} {'Specific mean':>14} {'Direction':>12} {'W stat':>8} {'p-value':>10}")
+print("-" * 82)
+
+results = []
+for feat in test_features:
+    v_vals = vague_rows[feat].values
+    s_vals = specific_rows[feat].values
+    diff = s_vals - v_vals
+
+    # Expected direction
+    expected_higher_for_specific = feat in {"lss", "ne_count", "semantic_density", "pqi", "content_ratio"}
+
+    if len(set(diff)) > 1:  # wilcoxon needs non-zero differences
+        try:
+            stat, p = wilcoxon(s_vals, v_vals, alternative="greater" if expected_higher_for_specific else "less")
+        except Exception:
+            stat, p = float("nan"), float("nan")
+    else:
+        stat, p = float("nan"), float("nan")
+
+    direction = "specific↑" if expected_higher_for_specific else "specific↓"
+    sig = "*" if p < 0.05 else "(ns)"
+    print(f"{feat:<22} {v_vals.mean():>12.3f} {s_vals.mean():>14.3f} {direction:>12} {stat:>8.1f} {p:>10.4f} {sig}")
+    results.append({"feature": feat, "vague_mean": v_vals.mean(), "specific_mean": s_vals.mean(),
+                    "stat": stat, "p": p, "sig": sig})
+
+print("\n* = p < 0.05  (ns) = not significant at 0.05 threshold")
+print("Note: with n=5 pairs, power is low — treat as directional evidence only.")
+
+=== Code Cell 23 (notebook cell index 31) ===
+# ── CELL 23: Try the diagnostic on YOUR OWN prompts ───────────────────────────
+# Edit the list below and re-run to get instant feedback.
+
+MY_PROMPTS = [
+    "Summarize the document and extract the key points from it.",
+    "Extract the top 5 risk factors identified in the Q3 2024 board report for Acme Corp, ranked by financial impact.",
+    "What does this function do and why does it fail sometimes?",
+    "Identify the off-by-one error in the Python binary search implementation that causes IndexError on empty lists.",
+]
+
+for p in MY_PROMPTS:
+    diagnose_prompt(p, verbose=True)
+
