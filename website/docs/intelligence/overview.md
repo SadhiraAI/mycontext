@@ -23,7 +23,7 @@ from mycontext.intelligence import (
 )
 ```
 
-## The Five Intelligence Functions
+## The Core Intelligence Functions
 
 | Function | What it does | LLM calls |
 |----------|-------------|-----------|
@@ -33,6 +33,7 @@ from mycontext.intelligence import (
 | [`smart_prompt()`](./smart-execute) | Route → compose optimized prompt | 2–4 |
 | [`smart_generic_prompt()`](./smart-execute) | Route → compile generic prompt | 1 (assess only) |
 | [`build_workflow_chain()`](./chain-orchestration) | Design + execute multi-step chain | 2+ |
+| [`generate_context()`](./prompt-compilation) | LLM generates a full Context from role + goal | 1 |
 
 ## Architecture Overview
 
@@ -169,3 +170,5 @@ from mycontext.intelligence import (
 - [Prompt Compilation →](./prompt-compilation) — PromptComposer
 - [Chain Orchestration →](./chain-orchestration) — build_workflow_chain
 - [Template Integrator →](./template-integrator) — Fuse multiple templates
+- [Async Execution →](./async-execution) — `aexecute`, concurrent patterns, FastAPI
+- [Token-Budget Assembly →](./token-budget) — `assemble_for_model`, accurate trimming

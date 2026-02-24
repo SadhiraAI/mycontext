@@ -168,6 +168,54 @@ print(f"Completeness: {score.dimensions['completeness']:.2f}")
 print(metrics.report(score))
 ```
 
+## Run Asynchronously
+
+`ctx.aexecute()` is a native async coroutine — no thread blocking, no `run_in_executor` workarounds. Drop it directly into any `async` application, FastAPI route, or agent loop:
+
+```python
+import asyncio
+from mycontext import Context, Guidance, Directive
+
+ctx = Context(
+    guidance=Guidance(role="Senior security reviewer"),
+    directive=Directive("Review this endpoint for authentication flaws."),
+)
+
+async def main():
+    result = await ctx.aexecute(provider="openai", model="gpt-4o-mini")
+    print(result.response)
+
+asyncio.run(main())
+```
+
+Run multiple contexts concurrently:
+
+```python
+async def run_three():
+    results = await asyncio.gather(
+        ctx_analysis.aexecute(provider="openai"),
+        ctx_risk.aexecute(provider="openai"),
+        ctx_summary.aexecute(provider="anthropic"),
+    )
+    return results
+```
+
+## Assemble Within a Token Budget
+
+`assemble_for_model()` builds a prompt that fits precisely within a model's context window. Sections are included in priority order and trimmed if needed — no guesswork, no silent truncation:
+
+```python
+# Assembles all sections, trimming to fit gpt-4o-mini's window
+prompt = ctx.assemble_for_model(model="gpt-4o-mini")
+
+# Hard cap at a custom budget (useful for nested agentic calls)
+prompt = ctx.assemble_for_model(model="gpt-4o", max_tokens=2000)
+
+print(f"Prompt is {len(prompt.split())} words, fits within budget")
+```
+
+Requires `tiktoken` for accurate counting (`pip install tiktoken`). Falls back to a character estimate without it.
+
 ## Three Ways to Use mycontext-ai
 
 | Approach | When to use | Example |
@@ -182,5 +230,7 @@ print(metrics.report(score))
 - **[Prompt Assembly & Thinking Strategies](../foundations/research-flow)** — the nine-section structure, each thinking strategy in depth, and how few-shot examples are placed
 - **[Cognitive Patterns](../cognitive-patterns/overview)** — browse all 85 patterns
 - **[Intelligence Layer](../intelligence/overview)** — auto-transform, pattern suggestion, multi-template fusion
+- **[Async Execution](../intelligence/async-execution)** — `aexecute`, `agenerate`, concurrent patterns
+- **[Token-Budget Assembly](../intelligence/token-budget)** — `assemble_for_model` in depth
 - **[Quality Metrics](../quality/quality-metrics)** — score and compare contexts
 - **[Integrations](../integrations/overview)** — drop into LangChain, CrewAI, AutoGen, and more

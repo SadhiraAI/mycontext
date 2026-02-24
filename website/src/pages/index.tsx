@@ -28,6 +28,7 @@ ctx.to_langchain()   # LangChain
 ctx.to_google()      # Gemini`;
 
 const intelligenceCode = `from mycontext.intelligence import smart_execute
+import asyncio
 
 # One call — auto-selects the right cognitive pattern,
 # builds the context, and executes
@@ -35,9 +36,18 @@ response, meta = smart_execute(
     "Why did API response times triple after last deploy?",
     provider="openai",
 )
-
 print(meta["templates_used"])  # ['root_cause_analyzer']
-print(response)                # Structured root cause analysis`;
+
+# Or run multiple contexts concurrently — true async fan-out
+async def parallel():
+    from mycontext import Context, Guidance, Directive
+    ctx1 = Context(guidance="Risk analyst", directive="Assess launch risk.")
+    ctx2 = Context(guidance="Data analyst", directive="Review Q3 trends.")
+    r1, r2 = await asyncio.gather(
+        ctx1.aexecute(provider="openai"),
+        ctx2.aexecute(provider="anthropic"),
+    )
+    return r1.response, r2.response`;
 
 const qualityCode = `from mycontext.intelligence import QualityMetrics, ContextAmplificationIndex
 
@@ -90,12 +100,22 @@ const features: FeatureItem[] = [
     ),
   },
   {
-    title: '3-Tier Execution',
+    title: 'Async-Native Execution',
     icon: '⚡',
     description: (
       <>
-        Choose your cost/quality tradeoff: Static Generic (zero-cost compilation),
-        Dynamic Compiled (LLM-refined), or Full Response (complete execution).
+        <code>ctx.aexecute()</code> is a native coroutine — no thread pools, no blocking.
+        Fan out multiple LLM calls in parallel with <code>asyncio.gather</code>.
+      </>
+    ),
+  },
+  {
+    title: 'Token-Budget Assembly',
+    icon: '📐',
+    description: (
+      <>
+        <code>assemble_for_model()</code> fits any context precisely within a model's
+        window using tiktoken-accurate counting. No silent overflow, no over-truncation.
       </>
     ),
   },
@@ -116,6 +136,16 @@ const features: FeatureItem[] = [
       <>
         Auto-transform questions into perfect contexts. Pattern suggestion,
         multi-template fusion, chain orchestration, and complexity routing — all automatic.
+      </>
+    ),
+  },
+  {
+    title: 'Production-Ready Reliability',
+    icon: '🔒',
+    description: (
+      <>
+        Template injection prevention, structured logging, Pydantic-validated LLM output,
+        execution tracing, retry logic, and in-process caching — built in.
       </>
     ),
   },
@@ -140,7 +170,7 @@ function HeroSection() {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <div className={styles.heroBadge}>
-              Python SDK · v0.3.0
+              Python SDK · v0.5.0
             </div>
             <Heading as="h1" className={styles.heroTitle}>
               Context engineering<br />for LLMs
@@ -276,6 +306,10 @@ function ComparisonSection() {
               <tr><td>Cognitive patterns</td><td className={styles.highlight}>85 research-backed</td><td>10–20 generic</td></tr>
               <tr><td>Zero-cost generic prompts</td><td className={styles.highlight}>85 pre-authored</td><td>None</td></tr>
               <tr><td>Prompt compilation</td><td className={styles.highlight}>3-tier pipeline</td><td>None</td></tr>
+              <tr><td>Async-native execution</td><td className={styles.highlight}>aexecute() coroutine</td><td>Sync only or manual</td></tr>
+              <tr><td>Token-budget assembly</td><td className={styles.highlight}>tiktoken-accurate</td><td>None or char-based</td></tr>
+              <tr><td>Validated structured output</td><td className={styles.highlight}>Pydantic + instructor</td><td>None</td></tr>
+              <tr><td>Prompt injection prevention</td><td className={styles.highlight}>safe_format_template</td><td>None</td></tr>
               <tr><td>Context quality scoring</td><td className={styles.highlight}>6 dimensions</td><td>None</td></tr>
               <tr><td>Output quality scoring</td><td className={styles.highlight}>5 dimensions</td><td>None</td></tr>
               <tr><td>Template effectiveness proof</td><td className={styles.highlight}>CAI metric</td><td>None</td></tr>

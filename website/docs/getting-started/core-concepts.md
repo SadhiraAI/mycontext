@@ -296,6 +296,32 @@ graph TD
     E3 --> O3[File]
 ```
 
+## Async & Token-Aware Execution
+
+Two capabilities you'll reach for in production systems:
+
+**Async execution** — `ctx.aexecute()` is a native coroutine. It never blocks, integrates directly into FastAPI and any `async` application, and enables true fan-out parallelism:
+
+```python
+results = await asyncio.gather(
+    ctx_root_cause.aexecute(provider="openai"),
+    ctx_risk.aexecute(provider="openai"),
+    ctx_summary.aexecute(provider="anthropic"),
+)
+```
+
+**Token-budget assembly** — `ctx.assemble_for_model()` builds a prompt guaranteed to fit within a model's context window. Sections are trimmed by priority if the budget is tight — the role and directive are always preserved:
+
+```python
+# Fits precisely into gpt-4o-mini's window, trimming lower-priority sections if needed
+prompt = ctx.assemble_for_model(model="gpt-4o-mini")
+
+# Reserve space for response tokens in agentic loops
+prompt = ctx.assemble_for_model(model="gpt-4o", max_tokens=4000)
+```
+
+[Full async guide →](../intelligence/async-execution) · [Token-budget guide →](../intelligence/token-budget)
+
 ---
 
 **Next:** Deep dive into each building block:
@@ -305,3 +331,4 @@ graph TD
 - [Constraints](../foundations/constraints)
 - [Prompt Assembly & Thinking Strategies](../foundations/research-flow)
 - [Patterns](../foundations/patterns)
+- [Security, Reliability & Performance](../advanced/reliability)

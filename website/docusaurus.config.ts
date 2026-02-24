@@ -89,8 +89,8 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     announcementBar: {
-      id: 'v0_3_0',
-      content: '<b>mycontext-ai v0.3.0</b> is out — 85 cognitive patterns, 3-tier execution, 13 export formats. <a href="/docs/getting-started/installation">Get started →</a>',
+      id: 'v0_5_0',
+      content: '<b>mycontext-ai v0.5.0</b> is live — async execution, token-budget assembly, Pydantic-validated output, and more. <a href="/docs/getting-started/installation">Get started →</a>',
       isCloseable: true,
     },
     navbar: {
@@ -148,7 +148,10 @@ const config: Config = {
           title: 'Guides',
           items: [
             {label: 'Intelligence Layer', to: '/docs/intelligence/overview'},
+            {label: 'Async Execution', to: '/docs/intelligence/async-execution'},
+            {label: 'Token-Budget Assembly', to: '/docs/intelligence/token-budget'},
             {label: 'Quality Metrics', to: '/docs/quality/quality-metrics'},
+            {label: 'Security & Reliability', to: '/docs/advanced/reliability'},
             {label: 'Integrations', to: '/docs/integrations/overview'},
             {label: 'Use Cases', to: '/docs/use-cases/overview'},
           ],

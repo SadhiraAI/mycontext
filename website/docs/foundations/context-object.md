@@ -172,6 +172,25 @@ result = ctx.execute(provider="openai", model="gpt-4o", temperature=0.3)
 `ctx.execute()` requires `litellm` and a valid API key. Set `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY` as environment variables.
 :::
 
+### Async Execution
+
+`aexecute()` is a native `async` coroutine — no blocking, no thread pools. Use it directly in `async` applications, FastAPI routes, and agent loops:
+
+```python
+import asyncio
+
+result = await ctx.aexecute(provider="openai", model="gpt-4o-mini")
+print(result.response)
+
+# Fan out multiple contexts concurrently
+results = await asyncio.gather(
+    ctx1.aexecute(provider="openai"),
+    ctx2.aexecute(provider="anthropic"),
+)
+```
+
+See [Async Execution →](../intelligence/async-execution) for patterns and best practices.
+
 ## Prompt Export
 
 Convert a context into a reusable prompt string without executing it:
@@ -185,6 +204,22 @@ prompt = ctx.to_prompt(refine=True, provider="openai", model="gpt-4o-mini")
 ```
 
 The refined prompt is self-contained and provider-agnostic — it can be executed on any LLM.
+
+### Token-Budget Assembly
+
+`assemble_for_model()` builds a prompt guaranteed to fit within a model's context window. Sections are prioritised and trimmed using `tiktoken` — accurate to the token, not a character estimate:
+
+```python
+# Fit into gpt-4o-mini's default window
+prompt = ctx.assemble_for_model(model="gpt-4o-mini")
+
+# Cap at a custom budget (e.g., leaving room for response tokens)
+prompt = ctx.assemble_for_model(model="gpt-4o", max_tokens=2000)
+```
+
+Without `tiktoken`, the SDK falls back to a safe character-based estimate. Install via `pip install tiktoken` or `pip install "mycontext-ai[tokens]"`.
+
+See [Token-Budget Assembly →](../intelligence/token-budget) for full details.
 
 ## Export Formats
 
@@ -325,8 +360,10 @@ print(repr(ctx))
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `assemble()` | `str` | Combine all fields into the text sent to the LLM. Uses classic or research-backed ordering depending on `research_flow` |
-| `execute(provider, **kwargs)` | `ProviderResponse` | Execute against an LLM |
+| `assemble()` | `str` | Combine all fields into the text sent to the LLM |
+| `assemble_for_model(model, max_tokens?)` | `str` | Token-budget-aware assembly — trims to fit within the model's window |
+| `execute(provider, **kwargs)` | `ProviderResponse` | Execute against an LLM (synchronous) |
+| `aexecute(provider, **kwargs)` | `Coroutine[ProviderResponse]` | Execute asynchronously — native `async`/`await` |
 | `to_prompt(refine, provider, model)` | `str` | Export as a reusable prompt string (zero-cost or LLM-refined) |
 | `to_messages(user_message)` | `list[dict]` | Universal message list |
 | `to_openai()` | `dict` | OpenAI Chat API format |

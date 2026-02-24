@@ -151,6 +151,28 @@ poetry add "mycontext-ai[all]"
 LiteLLM handles routing to all providers. The extras install the provider's own SDK for cases where you need direct API access.
 :::
 
+## Optional: Structured Output Parsing
+
+Install `instructor` to enable JSON-mode LLM output with automatic retry on validation failure in the intelligence layer:
+
+```bash
+pip install instructor
+```
+
+When installed, all intelligence-layer LLM calls (`suggest_patterns`, `generate_context`, `TemplateIntegratorAgent`) use structured function-calling mode (~98% parse success). Without it, the SDK falls back to its Pydantic + regex parser transparently — no code changes needed.
+
+## Optional: Accurate Token Counting
+
+For `assemble_for_model()` token-budget assembly and token-aware context trimming, install `tiktoken`:
+
+```bash
+pip install "mycontext-ai[tokens]"
+# or directly:
+pip install tiktoken
+```
+
+Without `tiktoken`, the SDK falls back to character-based estimation. Install `[all]` to get everything at once.
+
 ## Orchestration Extras
 
 If you're integrating with agent frameworks:
@@ -182,7 +204,7 @@ python -c "import mycontext; print(f'mycontext-ai v{mycontext.__version__} insta
 Expected output:
 
 ```
-mycontext-ai v0.3.0 installed successfully
+mycontext-ai v0.5.0 installed successfully
 ```
 
 ## Configure Your API Key
@@ -246,9 +268,12 @@ You only need an API key when **executing** contexts against an LLM (`ctx.execut
 |-----------|-------------|
 | **Core SDK** | `Context`, `Guidance`, `Directive`, `Constraints` classes |
 | **16 Free Patterns** | RootCauseAnalyzer, CodeReviewer, StepByStepReasoner, and 13 more |
-| **Intelligence Layer** | `transform()`, `suggest_patterns()`, `smart_execute()`, `smart_prompt()` |
+| **Intelligence Layer** | `transform()`, `suggest_patterns()`, `smart_execute()`, `generate_context()` |
+| **Async Execution** | `ctx.aexecute()` — non-blocking LLM calls via `litellm.acompletion` |
+| **Token-Budget Assembly** | `ctx.assemble_for_model(model, max_tokens)` — tiktoken-accurate trimming |
+| **Validated Output Parsing** | Pydantic + `instructor` structured parsing with automatic retry |
 | **Quality Metrics** | 6-dimension context scoring + 5-dimension output evaluation |
-| **CAI** | Context Amplification Index — proves templates work |
+| **CAI** | Context Amplification Index — proves templates produce better output |
 | **13 Export Formats** | OpenAI, Anthropic, Gemini, LangChain, YAML, JSON, XML, and more |
 | **7 Integrations** | LangChain, LlamaIndex, CrewAI, AutoGen, DSPy, Semantic Kernel, Google ADK |
 

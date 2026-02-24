@@ -67,6 +67,8 @@ const sidebars: SidebarsConfig = {
         'intelligence/three-tier-execution',
         'intelligence/template-integrator',
         'intelligence/chain-orchestration',
+        'intelligence/async-execution',
+        'intelligence/token-budget',
       ],
     },
     {
@@ -107,6 +109,7 @@ const sidebars: SidebarsConfig = {
         'advanced/blueprints',
         'advanced/agent-skills',
         'advanced/structured-output',
+        'advanced/reliability',
         'advanced/enterprise-license',
       ],
     },

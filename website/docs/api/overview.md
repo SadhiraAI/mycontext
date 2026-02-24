@@ -54,7 +54,9 @@ Strings passed to `guidance` or `directive` are automatically promoted to `Guida
 
 | Method | Signature | Returns | Description |
 |--------|-----------|---------|-------------|
-| `execute` | `execute(provider, **kwargs)` | `ProviderResponse` | Run with an LLM |
+| `execute` | `execute(provider, **kwargs)` | `ProviderResponse` | Run with an LLM (synchronous) |
+| `aexecute` | `aexecute(provider, **kwargs)` | `Coroutine[ProviderResponse]` | Run asynchronously — native `async`/`await` |
+| `assemble_for_model` | `assemble_for_model(model, max_tokens?)` | `str` | Token-budget assembly — tiktoken-accurate, trims to fit |
 | `to_prompt` | `to_prompt(refine=False, provider="openai", model="gpt-4o-mini")` | `str` | Zero-cost restructuring (`refine=False`) or LLM-distilled prompt (`refine=True`) |
 
 `ProviderResponse.response` — the LLM output text.
@@ -512,6 +514,74 @@ from mycontext.utils.parsers import (
 
 ---
 
+## Token Utilities — `mycontext.utils.tokens`
+
+```python
+from mycontext.utils.tokens import (
+    count_tokens,           # count_tokens(text, model) → int
+    fits_in_window,         # fits_in_window(text, model) → bool
+    token_budget_remaining, # token_budget_remaining(text, model) → int
+    estimate_cost_usd,      # estimate_cost_usd(input_tokens, output_tokens, model) → float
+)
+```
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `count_tokens` | `(text, model)` | `int` | Exact token count via tiktoken, falls back to char estimate |
+| `fits_in_window` | `(text, model)` | `bool` | `True` if text fits in model's context window |
+| `token_budget_remaining` | `(text, model)` | `int` | Tokens remaining after `text` for the model's window |
+| `estimate_cost_usd` | `(input_tokens, output_tokens, model)` | `float` | USD cost estimate for a call |
+
+---
+
+## Tracing — `mycontext.utils.tracing`
+
+```python
+from mycontext.utils.tracing import get_tracer, Span, Tracer
+
+tracer = get_tracer()  # Module-level singleton
+
+# Read spans after execution
+result = ctx.execute(provider="openai")
+spans = tracer.get_spans()
+span = spans[-1]
+
+span.name          # "litellm_generate"
+span.metadata      # {"model": "gpt-4o-mini", "tokens": 312, "cost_usd": 0.00012, "latency_ms": 1842}
+span.duration_ms   # float
+span.error         # str | None
+```
+
+---
+
+## Semantic Cache — `mycontext.utils`
+
+```python
+from mycontext.utils import get_default_cache, reset_default_cache
+
+cache = get_default_cache()
+cache.size()   # int — current entries
+cache.clear()  # wipe all entries
+
+# Per-call cache bypass
+result = ctx.execute(provider="openai", use_cache=False)
+```
+
+---
+
+## Security — `mycontext.utils.template_safety`
+
+```python
+from mycontext.utils.template_safety import safe_format_template
+
+# Safe substitution — rejects attribute/item access patterns
+prompt = safe_format_template("Analyze {topic} for {audience}.", topic="revenue", audience="CFO")
+
+# Raises ValueError for unsafe patterns like {obj.attr} or {obj[key]}
+```
+
+---
+
 ## Enterprise License — `mycontext`
 
 ```python
@@ -574,7 +644,19 @@ from mycontext.structure import Blueprint
 from mycontext.skills import SkillRunner
 from mycontext.skills.skill import Skill
 
-# Utilities
+# Token utilities
+from mycontext.utils.tokens import count_tokens, fits_in_window, estimate_cost_usd
+
+# Tracing
+from mycontext.utils.tracing import get_tracer
+
+# Cache
+from mycontext.utils import get_default_cache
+
+# Security
+from mycontext.utils.template_safety import safe_format_template
+
+# Structured output
 from mycontext.utils.structured_output import extract_json, PydanticOutput
 from mycontext.utils.parsers import JSONParser, ListParser
 
