@@ -45,9 +45,9 @@ const PRODUCT_SUITE = [
   {
     icon: "\uD83E\uDDE0",
     title: "Cognitive Studio",
-    badge: "85 Patterns",
+    badge: "87 Patterns",
     desc: "Research-backed cognitive frameworks — not generic prompt snippets. Root cause analysis, decision frameworks, systems thinking, and 80 more. Grounded in peer-reviewed science.",
-    highlights: ["85 reasoning frameworks", "7 categories + enterprise", "Fill params \u2192 export to any LLM"],
+    highlights: ["87 reasoning frameworks", "7 categories + enterprise", "Fill params \u2192 export to any LLM"],
     link: "/signup",
     linkText: "Browse all patterns",
     accent: "#0d9488",
@@ -65,11 +65,11 @@ const PRODUCT_SUITE = [
   {
     icon: "\uD83D\uDCE6",
     title: "Python SDK",
-    badge: "pip install",
+    badge: "v0.6.0",
     desc: "Context-as-Code for developers. 22 unique capabilities — context generation, quality scoring, CAI proof, async execution, token-budget assembly, and validated structured output. One context, 13 export formats.",
     highlights: ["pip install mycontext-ai", "22 unique SDK capabilities", "13 export formats · 7 framework integrations"],
-    link: "https://pypi.org/project/mycontext-ai/",
-    linkText: "See the SDK on PyPI",
+    link: "https://mycontext-docs.pages.dev/",
+    linkText: "SDK Documentation",
     accent: "#0d9488",
     external: true,
   },
@@ -90,7 +90,7 @@ const RESEARCH_PROOF = [
     stat: "66.7%",
     claim: "improvement with cognitive scaffolding",
     source: "Cognitive Foundations for Reasoning (arxiv 2511.16660)",
-    detail: "LLMs under-utilize cognitive elements correlated with success. Scaffolding with structured reasoning frameworks — exactly what our 85 patterns do — improved performance by up to 66.7% on complex tasks.",
+    detail: "LLMs under-utilize cognitive elements correlated with success. Scaffolding with structured reasoning frameworks — exactly what our 87 patterns do — improved performance by up to 66.7% on complex tasks.",
   },
   {
     stat: "25–65%",
@@ -285,7 +285,7 @@ export default function Landing() {
             Engineer contexts.
           </h1>
           <p className="landing-tagline">
-            Research-backed prompt flows. 85 cognitive reasoning frameworks. AI-driven copilot.
+            Research-backed prompt flows. 87 cognitive reasoning frameworks. AI-driven copilot.
             Multi-pattern composition. Quality metrics. One SDK — 13 export formats.
           </p>
           <blockquote className="landing-epigraph">
@@ -307,7 +307,7 @@ export default function Landing() {
           </div>
           <div className="landing-hero-actions">
             <Link to="/signup" className="landing-btn primary large">Let's slink in</Link>
-            <Link to="/signup" className="landing-btn secondary large">See all 85 patterns</Link>
+            <Link to="/signup" className="landing-btn secondary large">See all 87 patterns</Link>
           </div>
 
           <div className="landing-demo">
@@ -516,7 +516,7 @@ export default function Landing() {
 
         {/* ── Template Showcase ────────────────────────── */}
         <section className="landing-section">
-          <h2 className="landing-section-title">85 research-backed cognitive patterns</h2>
+          <h2 className="landing-section-title">87 research-backed cognitive patterns</h2>
           <p className="landing-section-sub">
             Not generic prompt snippets. Reasoning frameworks grounded in cognitive science,
             decision theory, and systems thinking — each backed by peer-reviewed research.
@@ -525,7 +525,7 @@ export default function Landing() {
             {CATEGORIES.map((c) => (
               <span key={c} className="landing-category-chip">{c}</span>
             ))}
-            <span className="landing-category-chip enterprise">+69 Enterprise</span>
+            <span className="landing-category-chip enterprise">+71 Enterprise</span>
           </div>
           <div className="landing-templates-grid">
             {FEATURED_TEMPLATES.map((t) => (
@@ -544,7 +544,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="landing-templates-cta">
-            <Link to="/signup" className="landing-btn secondary">Browse all 85 patterns →</Link>
+            <Link to="/signup" className="landing-btn secondary">Browse all 87 patterns →</Link>
           </div>
         </section>
 
@@ -595,7 +595,7 @@ export default function Landing() {
         <section className="landing-section landing-stats-section">
           <div className="landing-stats">
             <div className="landing-stat">
-              <span className="landing-stat-num">85</span>
+              <span className="landing-stat-num">87</span>
               <span className="landing-stat-label">Cognitive Patterns</span>
             </div>
             <div className="landing-stat">
@@ -626,7 +626,7 @@ export default function Landing() {
           <div className="landing-enterprise-content">
             <h2>Enterprise Edition</h2>
             <p className="landing-enterprise-lead">
-              69 advanced patterns for teams that need deeper analysis — decision optimization,
+              71 advanced patterns for teams that need deeper analysis — decision optimization,
               systems thinking, ethical reasoning, metacognition, and more.
             </p>
             <div className="landing-enterprise-cats">
@@ -652,7 +652,7 @@ export default function Landing() {
             <Link to="/signup" className="landing-btn primary large">Get started free</Link>
           </div>
           <p className="landing-dev-link">
-            Developers: <a href="https://pypi.org/project/mycontext-ai/" target="_blank" rel="noopener noreferrer">Python SDK on PyPI</a> · <a href="https://github.com/SadhiraAI/mycontext" target="_blank" rel="noopener noreferrer">GitHub</a>
+            Developers: <a href="https://mycontext-docs.pages.dev/" target="_blank" rel="noopener noreferrer">SDK Docs</a> · <a href="https://pypi.org/project/mycontext-ai/" target="_blank" rel="noopener noreferrer">PyPI</a> · <a href="https://github.com/SadhiraAI/mycontext" target="_blank" rel="noopener noreferrer">GitHub</a>
           </p>
         </section>
       </main>

@@ -94,6 +94,10 @@ export default function Layout() {
           </Link>
         </nav>
         <div className="layout-user">
+          <a href="https://mycontext-docs.pages.dev/" target="_blank" rel="noopener noreferrer" className="layout-docs-link" title="SDK Documentation">
+            <span className="layout-docs-icon">{"\uD83D\uDCD6"}</span>
+            <span className="layout-docs-text">Docs</span>
+          </a>
           <Link to="/academy" className={`layout-academy-link${isActive("/academy") ? " active" : ""}`} title="Sadhira Academy">
             <span className="layout-academy-icon">{"\uD83C\uDF93"}</span>
             <span className="layout-academy-text">Academy</span>
