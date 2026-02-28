@@ -12,6 +12,7 @@ import CustomTemplates from "./pages/CustomTemplates";
 import Account from "./pages/Account";
 import Settings from "./pages/Settings";
 import Academy from "./pages/Academy";
+import Tutorial from "./pages/Tutorial";
 import Changelog from "./pages/Changelog";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="chains" element={<ChainBuilder />} />
         <Route path="custom" element={<ErrorBoundary><CustomTemplates /></ErrorBoundary>} />
         <Route path="academy" element={<Academy />} />
+        <Route path="academy/tutorial" element={<Tutorial />} />
         <Route path="account" element={<Account />} />
         <Route path="settings" element={<Settings />} />
         <Route path="help" element={<Navigate to="/academy" replace />} />

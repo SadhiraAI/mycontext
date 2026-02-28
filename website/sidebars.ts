@@ -1,5 +1,7 @@
 import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const sidebars: SidebarsConfig = {
   docsSidebar: [
     {
@@ -10,6 +12,7 @@ const sidebars: SidebarsConfig = {
         'getting-started/installation',
         'getting-started/quickstart',
         'getting-started/core-concepts',
+        'tutorial/context-studio-tutorial',
       ],
     },
     {
@@ -216,6 +219,17 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
+    ...(isProduction ? [] : [{
+      type: 'category' as const,
+      label: 'Research',
+      items: [
+        'research/overview',
+        'research/reasoner-model-comparison',
+        'research/data-analyzer-parameterization',
+        'research/rag-answerer-grounding',
+        'research/memory-compressor-scaling',
+      ],
+    }]),
     {
       type: 'category',
       label: 'API Reference',

@@ -116,7 +116,7 @@ def generate_roadmap(company_info: dict, save_path: str | None = None) -> str:
 roadmap = generate_roadmap(
     company_info={
         "company": "mycontext-ai (SadhiraAI)",
-        "current_position": "v0.3.0, 85 cognitive patterns, growing developer community, pre-revenue",
+        "current_position": "v0.6.0, 87 cognitive patterns, growing developer community, pre-revenue",
         "ambition": "Become the standard context engineering SDK for enterprise AI teams",
         "resources": "$1.2M seed, team of 6, 18-month runway",
         "constraints": "Small team, no dedicated sales, competing with well-funded LangChain ecosystem",

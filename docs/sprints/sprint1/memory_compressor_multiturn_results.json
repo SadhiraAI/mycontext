@@ -1,0 +1,70 @@
+{
+  "experiment": "Multi-Turn Agent Memory: MemoryCompressor vs LangGraph Strategies",
+  "date": "2026-02-28T09:15:58.681830",
+  "provider": "openai",
+  "turns": 22,
+  "probes": 10,
+  "full_history_tokens": 2633,
+  "strategies": {
+    "A_full_history": {
+      "label": "A. Full History",
+      "recall_accuracy": 1.0,
+      "probes_passed": 10,
+      "probes_total": 10,
+      "memory_tokens": 2640,
+      "compression_ratio": 1.0026585643752375,
+      "recall_by_category": {
+        "early": 1.0,
+        "mid": 1.0,
+        "pivot": 1.0,
+        "cross": 1.0
+      },
+      "avg_latency": 2.0598350286483766
+    },
+    "B_sliding_window": {
+      "label": "B. Sliding Window",
+      "recall_accuracy": 0.7,
+      "probes_passed": 7,
+      "probes_total": 10,
+      "memory_tokens": 1199,
+      "compression_ratio": 0.45537409798708695,
+      "recall_by_category": {
+        "early": 0.6666666666666666,
+        "mid": 0.3333333333333333,
+        "pivot": 1.0,
+        "cross": 1.0
+      },
+      "avg_latency": 1.2331316947937012
+    },
+    "C_summary_recent": {
+      "label": "C. Summary+Recent",
+      "recall_accuracy": 1.0,
+      "probes_passed": 10,
+      "probes_total": 10,
+      "memory_tokens": 1990,
+      "compression_ratio": 0.75579187238891,
+      "recall_by_category": {
+        "early": 1.0,
+        "mid": 1.0,
+        "pivot": 1.0,
+        "cross": 1.0
+      },
+      "avg_latency": 1.5392419576644898
+    },
+    "D_mc_recent": {
+      "label": "D. MemoryCompress",
+      "recall_accuracy": 0.9,
+      "probes_passed": 9,
+      "probes_total": 10,
+      "memory_tokens": 1351,
+      "compression_ratio": 0.5131029244208127,
+      "recall_by_category": {
+        "early": 1.0,
+        "mid": 0.6666666666666666,
+        "pivot": 1.0,
+        "cross": 1.0
+      },
+      "avg_latency": 1.3727553844451905
+    }
+  }
+}

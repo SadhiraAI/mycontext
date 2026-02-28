@@ -1,0 +1,174 @@
+.tutorial-page {
+  max-width: 720px;
+  padding-bottom: 3rem;
+}
+
+.tutorial-header {
+  margin-bottom: 2rem;
+}
+
+.tutorial-back {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+  transition: color var(--transition-fast);
+}
+
+.tutorial-back:hover {
+  color: var(--accent);
+}
+
+.tutorial-header h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.tutorial-intro {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tutorial-section {
+  margin-bottom: 2.5rem;
+}
+
+.tutorial-section h2 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tutorial-section h3 {
+  font-size: 1.05rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.tutorial-section p,
+.tutorial-section ul,
+.tutorial-section ol {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.tutorial-section ul,
+.tutorial-section ol {
+  padding-left: 1.5rem;
+}
+
+.tutorial-section li {
+  margin-bottom: 0.35rem;
+}
+
+.tutorial-section code {
+  font-size: 0.88em;
+  padding: 0.15rem 0.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.tutorial-section a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.tutorial-section a:hover {
+  text-decoration: underline;
+}
+
+.tutorial-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 0.75rem 0;
+}
+
+.tutorial-table th,
+.tutorial-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.tutorial-table th {
+  background: var(--bg-card);
+  font-weight: 600;
+}
+
+.tutorial-table td:first-child {
+  font-family: ui-monospace, monospace;
+}
+
+.tutorial-note {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+.tutorial-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin: 0.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.tutorial-steps {
+  list-style: none;
+  padding-left: 0;
+}
+
+.tutorial-steps li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tutorial-steps li:last-child {
+  border-bottom: none;
+}
+
+.tutorial-footer {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tutorial-cta {
+  display: inline-block;
+  padding: 0.6rem 1.25rem;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.tutorial-cta:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.tutorial-link {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.tutorial-link:hover {
+  color: var(--accent);
+}

@@ -223,7 +223,7 @@ Every pattern provides:
 - **`execute(provider, **inputs)`** — build + execute in one call
 - **`generic_prompt(**inputs)`** — a zero-cost prompt that distills the methodology into ~600-1200 chars
 
-There are **85 patterns** (16 free + 69 enterprise) across analysis, reasoning, creative thinking, communication, planning, decision-making, systems thinking, metacognition, and more.
+There are **87 patterns** (16 free + 71 enterprise) across analysis, reasoning, creative thinking, communication, planning, decision-making, systems thinking, metacognition, and more.
 
 [Browse all patterns →](../cognitive-patterns/overview)
 

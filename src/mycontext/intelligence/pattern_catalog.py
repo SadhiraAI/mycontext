@@ -56,6 +56,7 @@ FULL_PATTERN_CATALOG: list[tuple[str, str, str]] = [
     ("conflict_resolver", "free", "Mediates conflicts by identifying interests, finding common ground"),
     ("concept_explainer", "enterprise", "Explains complex concepts using layered depth: simple → technical → expert"),
     ("synthesis_builder", "free", "Synthesizes multiple sources into a coherent, integrated summary"),
+    ("rag_answerer", "free", "Grounded answer generation from retrieved context with citation and abstention"),
     # ENTERPRISE - Decision (5)
     ("decision_framework", "enterprise", "Structured decision-making with weighted criteria, options evaluation, and recommendations"),
     ("comparative_analyzer", "enterprise", "Side-by-side comparison across multiple dimensions with explicit scoring"),
@@ -169,6 +170,7 @@ ENRICHED_CATALOG: dict = {
     "conflict_resolver": {"theme": "Communication & Clarity", "when_to_use": "Use when the question involves mediating disagreements or finding common ground.", "use_cases": ["Team disputes", "Customer complaints", "Contract negotiations"]},
     "concept_explainer": {"theme": "Learning & Development", "when_to_use": "Use when a complex concept needs clear, layered explanation for different skill levels.", "use_cases": ["Technical documentation", "Training materials", "Onboarding guides"]},
     "synthesis_builder": {"theme": "Data & Analytics", "when_to_use": "Use when multiple information sources need to be combined into a coherent summary.", "use_cases": ["Literature reviews", "Market research synthesis", "Board reports"]},
+    "rag_answerer": {"theme": "Data & Analytics", "when_to_use": "Use when answering questions from retrieved documents (RAG pipelines).", "use_cases": ["Q&A over docs", "Knowledge base chatbots", "Document summarization", "Evidence-based synthesis"]},
     # Decision
     "decision_framework": {"theme": "Strategic Thinking", "when_to_use": "Use when the question requires choosing between options with weighted criteria evaluation.", "use_cases": ["Technology selection", "Vendor evaluation", "Architecture decisions"]},
     "comparative_analyzer": {"theme": "Strategic Thinking", "when_to_use": "Use when the question asks to compare multiple options side-by-side across dimensions.", "use_cases": ["Product comparison", "Framework selection", "Vendor evaluation"]},

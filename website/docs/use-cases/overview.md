@@ -27,7 +27,7 @@ Every use case picks the integration style that fits the problem — raw `Contex
 
 ## Patterns Coverage
 
-These use cases collectively cover all 85 cognitive patterns — 16 free and 69 enterprise. Enterprise patterns require [activating a license key](/docs/advanced/enterprise-license).
+These use cases collectively cover all 87 cognitive patterns — 16 free and 71 enterprise. Enterprise patterns require [activating a license key](/docs/advanced/enterprise-license).
 
 ```python
 import mycontext

@@ -1,0 +1,90 @@
+{
+  "experiment": "Stress Test: MemoryCompressor at Scale (42 turns, 15 probes)",
+  "date": "2026-02-28T10:28:55.317492",
+  "provider": "openai",
+  "turns": 48,
+  "probes": 15,
+  "full_history_tokens": 5864,
+  "strategies": {
+    "A_full_history": {
+      "label": "A. Full History",
+      "recall_accuracy": 1.0,
+      "probes_passed": 15,
+      "probes_total": 15,
+      "memory_tokens": 5871,
+      "compression_ratio": 1.001193724420191,
+      "recall_by_category": {
+        "early": 1.0,
+        "mid": 1.0,
+        "pivot": 1.0,
+        "cross": 1.0
+      },
+      "avg_latency": 3.6404425938924154,
+      "efficiency_per_1k_tokens": 0.170328734457503
+    },
+    "B_sliding_window": {
+      "label": "B. Sliding Window",
+      "recall_accuracy": 0.26666666666666666,
+      "probes_passed": 4,
+      "probes_total": 15,
+      "memory_tokens": 1178,
+      "compression_ratio": 0.2008867667121419,
+      "recall_by_category": {
+        "early": 0.0,
+        "mid": 0.0,
+        "pivot": 0.25,
+        "cross": 0.75
+      },
+      "avg_latency": 0.9542216936747233,
+      "efficiency_per_1k_tokens": 0.2263723825693265
+    },
+    "C_summary_recent": {
+      "label": "C. Summary+Recent",
+      "recall_accuracy": 0.3333333333333333,
+      "probes_passed": 5,
+      "probes_total": 15,
+      "memory_tokens": 1048,
+      "compression_ratio": 0.17871759890859482,
+      "recall_by_category": {
+        "early": 0.25,
+        "mid": 0.0,
+        "pivot": 0.25,
+        "cross": 0.75
+      },
+      "avg_latency": 0.8823307037353516,
+      "efficiency_per_1k_tokens": 0.3180661577608142
+    },
+    "D_mc_recent": {
+      "label": "D. MC Original",
+      "recall_accuracy": 0.6666666666666666,
+      "probes_passed": 10,
+      "probes_total": 15,
+      "memory_tokens": 2664,
+      "compression_ratio": 0.4542974079126876,
+      "recall_by_category": {
+        "early": 0.75,
+        "mid": 0.6666666666666666,
+        "pivot": 0.5,
+        "cross": 0.75
+      },
+      "avg_latency": 1.2635319550832114,
+      "efficiency_per_1k_tokens": 0.2502502502502503
+    },
+    "E_mc_phased": {
+      "label": "E. MC Phased",
+      "recall_accuracy": 0.6666666666666666,
+      "probes_passed": 10,
+      "probes_total": 15,
+      "memory_tokens": 3358,
+      "compression_ratio": 0.5726466575716235,
+      "recall_by_category": {
+        "early": 0.5,
+        "mid": 1.0,
+        "pivot": 0.5,
+        "cross": 0.75
+      },
+      "avg_latency": 1.3412751356760662,
+      "efficiency_per_1k_tokens": 0.1985308715505261
+    }
+  }
+}

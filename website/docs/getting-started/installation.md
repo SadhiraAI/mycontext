@@ -204,7 +204,7 @@ python -c "import mycontext; print(f'mycontext-ai v{mycontext.__version__} insta
 Expected output:
 
 ```
-mycontext-ai v0.5.0 installed successfully
+mycontext-ai v0.6.0 installed successfully
 ```
 
 ## Configure Your API Key

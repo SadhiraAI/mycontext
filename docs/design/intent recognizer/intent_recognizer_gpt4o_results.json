@@ -1,0 +1,162 @@
+[
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 4459,
+    "tokens": 2159,
+    "cost": 0.0126125,
+    "elapsed": 10.83970856666565,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "cancel_sub",
+    "domain": "Customer Support",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 7,
+      "assumption_detection": 5,
+      "actionability": 6,
+      "precision": 6,
+      "avg_score": 6.0
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 4975,
+    "tokens": 2250,
+    "cost": 0.013492500000000001,
+    "elapsed": 12.065893650054932,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "dark_mode",
+    "domain": "Product/Engineering",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 7,
+      "assumption_detection": 5,
+      "actionability": 5,
+      "precision": 6,
+      "avg_score": 5.8
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 5678,
+    "tokens": 2370,
+    "cost": 0.014737500000000002,
+    "elapsed": 19.702635526657104,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "enterprise_plan",
+    "domain": "Sales",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 7,
+      "assumption_detection": 6,
+      "actionability": 5,
+      "precision": 6,
+      "avg_score": 6.0
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 5795,
+    "tokens": 2403,
+    "cost": 0.015045000000000003,
+    "elapsed": 14.122536659240723,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "best_language",
+    "domain": "Career",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 8,
+      "assumption_detection": 7,
+      "actionability": 5,
+      "precision": 7,
+      "avg_score": 6.6
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 4541,
+    "tokens": 2107,
+    "cost": 0.01213,
+    "elapsed": 10.88755464553833,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "make_faster",
+    "domain": "Engineering",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 7,
+      "assumption_detection": 7,
+      "actionability": 5,
+      "precision": 6,
+      "avg_score": 6.2
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 5091,
+    "tokens": 2239,
+    "cost": 0.013435,
+    "elapsed": 12.91088056564331,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "when_done",
+    "domain": "Stakeholder Management",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 8,
+      "assumption_detection": 7,
+      "actionability": 5,
+      "precision": 6,
+      "avg_score": 6.4
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 5759,
+    "tokens": 2389,
+    "cost": 0.014912500000000002,
+    "elapsed": 13.585211038589478,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "resignation",
+    "domain": "HR",
+    "scores": {
+      "intent_accuracy": 6,
+      "depth": 7,
+      "assumption_detection": 8,
+      "actionability": 5,
+      "precision": 6,
+      "avg_score": 6.4
+    }
+  },
+  {
+    "approach": "enhanced",
+    "depth": "comprehensive",
+    "output_chars": 5399,
+    "tokens": 2360,
+    "cost": 0.014555000000000002,
+    "elapsed": 14.948684215545654,
+    "sections_count": 14,
+    "model": "gpt-4o",
+    "case_id": "prod_access",
+    "domain": "Internal Tools",
+    "scores": {
+      "intent_accuracy": 5,
+      "depth": 6,
+      "assumption_detection": 7,
+      "actionability": 4,
+      "precision": 6,
+      "avg_score": 5.6
+    }
+  }
+]

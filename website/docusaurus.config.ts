@@ -2,16 +2,19 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const config: Config = {
   title: 'mycontext-ai',
   tagline: 'Context engineering for LLMs. Build once, run anywhere, measure everything.',
   favicon: 'img/favicon.ico',
 
-  url: 'https://docs.mycontext.sadhiraai.com',
-  baseUrl: '/',
+  url: 'https://sadhiraai.github.io',
+  baseUrl: '/mycontext/',
 
   organizationName: 'SadhiraAI',
   projectName: 'mycontext',
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
 
@@ -37,6 +40,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/SadhiraAI/mycontext/tree/main/website/',
           showLastUpdateTime: true,
+          exclude: isProduction ? ['**/research/**'] : [],
         },
         blog: {
           showReadingTime: true,
@@ -77,6 +81,17 @@ const config: Config = {
     ],
   ],
 
+  headTags: [
+    {
+      tagName: 'script',
+      attributes: {
+        defer: 'true',
+        src: 'https://static.cloudflareinsights.com/beacon.min.js',
+        'data-cf-beacon': '{"token": "REPLACE_WITH_CF_ANALYTICS_TOKEN"}',
+      },
+    },
+  ],
+
   themeConfig: {
     image: 'img/mycontext-social-card.png',
     mermaid: {
@@ -89,8 +104,8 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     announcementBar: {
-      id: 'v0_5_0',
-      content: '<b>mycontext-ai v0.5.0</b> is live — async execution, token-budget assembly, Pydantic-validated output, and more. <a href="/docs/getting-started/installation">Get started →</a>',
+      id: 'v0_6_0',
+      content: '<b>mycontext-ai v0.6.0</b> is live — RagAnswerer, MemoryCompressor, research-validated templates, and more. <a href="/docs/getting-started/installation">Get started →</a>',
       isCloseable: true,
     },
     navbar: {

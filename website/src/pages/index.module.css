@@ -49,6 +49,14 @@
   max-width: 520px;
 }
 
+.heroTeaser {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--ifm-color-primary);
+  margin: 0;
+  opacity: 0.85;
+}
+
 .heroActions {
   display: flex;
   align-items: center;
@@ -254,6 +262,20 @@
 
 .showcaseCode {
   min-width: 0;
+}
+
+/* ── Web App Image ──────────────────────────────────────── */
+.webAppImage {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--mc-card-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.webAppImage:hover {
+  box-shadow: 0 12px 48px rgba(91, 168, 160, 0.2);
+  transform: translateY(-4px);
 }
 
 /* ── Comparison Table ────────────────────────────────────── */

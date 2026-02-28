@@ -44,6 +44,28 @@ def _litellm_model_name(provider: str, model: str) -> str:
     return model
 
 
+def _reasoning_tokens_exhausted(response) -> bool:
+    """Return True if a reasoning model used its entire token budget for thinking.
+
+    Reasoning models (o1, o3, gpt-5.x, etc.) split ``completion_tokens``
+    into reasoning (hidden) and text (visible).  When ``max_tokens`` is set
+    too low, the model may spend its entire budget reasoning and produce
+    empty visible content.  This helper detects that situation so the caller
+    can retry without the cap.
+    """
+    try:
+        choice = response.choices[0]
+        if (choice.message.content or "").strip():
+            return False
+        details = getattr(response.usage, "completion_tokens_details", None)
+        if details is None:
+            return False
+        reasoning = getattr(details, "reasoning_tokens", 0) or 0
+        return reasoning > 0 and response.usage.completion_tokens > 0
+    except Exception:
+        return False
+
+
 class LiteLLMProvider(BaseProvider):
     """Unified LLM provider powered by LiteLLM.
 
@@ -110,18 +132,22 @@ class LiteLLMProvider(BaseProvider):
         """
         from ..utils.semantic_cache import get_default_cache
 
+        _DEFAULT_USER_TURN = "Please respond to the instructions above."
+
         model = model or self.default_model
         litellm_model = _litellm_model_name(self._provider, model)
 
-        messages: list[dict[str, str]] = []
         system_prompt = context.assemble()
+        effective_user = user if user else (_DEFAULT_USER_TURN if system_prompt else None)
+
+        messages: list[dict[str, str]] = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-        if user:
-            messages.append({"role": "user", "content": user})
+        if effective_user:
+            messages.append({"role": "user", "content": effective_user})
 
         # ── Cache lookup (before building full call_kwargs) ───────────────────
-        cache_prompt_key = system_prompt + (f"\n[user]{user}" if user else "")
+        cache_prompt_key = system_prompt + (f"\n[user]{effective_user}" if effective_user else "")
         if use_cache:
             cache = get_default_cache()
             cached = cache.get(prompt=cache_prompt_key, model=model)
@@ -157,6 +183,23 @@ class LiteLLMProvider(BaseProvider):
                     start = time.time()
                     response = litellm.completion(**call_kwargs)
                     latency_ms = int((time.time() - start) * 1000)
+
+                    if (
+                        _reasoning_tokens_exhausted(response)
+                        and "max_tokens" in call_kwargs
+                    ):
+                        logger.info(
+                            "Reasoning model %s exhausted max_tokens=%s on "
+                            "thinking — retrying without cap.",
+                            model,
+                            call_kwargs["max_tokens"],
+                        )
+                        retry_kwargs = {
+                            k: v for k, v in call_kwargs.items() if k != "max_tokens"
+                        }
+                        start = time.time()
+                        response = litellm.completion(**retry_kwargs)
+                        latency_ms = int((time.time() - start) * 1000)
 
                     content = response.choices[0].message.content or ""
                     usage = response.usage
@@ -245,17 +288,21 @@ class LiteLLMProvider(BaseProvider):
         from ..utils.semantic_cache import get_default_cache
         from ..utils.tracing import get_tracer
 
+        _DEFAULT_USER_TURN = "Please respond to the instructions above."
+
         model = model or self.default_model
         litellm_model = _litellm_model_name(self._provider, model)
 
-        messages: list[dict[str, str]] = []
         system_prompt = context.assemble()
+        effective_user = user if user else (_DEFAULT_USER_TURN if system_prompt else None)
+
+        messages: list[dict[str, str]] = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-        if user:
-            messages.append({"role": "user", "content": user})
+        if effective_user:
+            messages.append({"role": "user", "content": effective_user})
 
-        cache_prompt_key = system_prompt + (f"\n[user]{user}" if user else "")
+        cache_prompt_key = system_prompt + (f"\n[user]{effective_user}" if effective_user else "")
         if use_cache:
             cache = get_default_cache()
             cached = cache.get(prompt=cache_prompt_key, model=model)
@@ -288,6 +335,23 @@ class LiteLLMProvider(BaseProvider):
                     start = _time.time()
                     response = await litellm.acompletion(**call_kwargs)
                     latency_ms = int((_time.time() - start) * 1000)
+
+                    if (
+                        _reasoning_tokens_exhausted(response)
+                        and "max_tokens" in call_kwargs
+                    ):
+                        logger.info(
+                            "Reasoning model %s exhausted max_tokens=%s on "
+                            "thinking — retrying without cap.",
+                            model,
+                            call_kwargs["max_tokens"],
+                        )
+                        retry_kwargs = {
+                            k: v for k, v in call_kwargs.items() if k != "max_tokens"
+                        }
+                        start = _time.time()
+                        response = await litellm.acompletion(**retry_kwargs)
+                        latency_ms = int((_time.time() - start) * 1000)
 
                     content = response.choices[0].message.content or ""
                     usage = response.usage

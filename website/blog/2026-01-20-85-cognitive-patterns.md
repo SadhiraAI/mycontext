@@ -61,17 +61,17 @@ These cover the tasks that come up most often in software development, research,
 
 ## The enterprise tier goes deeper
 
-The 69 enterprise patterns cover domains where the reasoning methodology matters even more: strategic decision-making, systems thinking, ethical analysis, organizational learning, metacognition, and complex diagnostics.
+The 71 enterprise patterns cover domains where the reasoning methodology matters even more: strategic decision-making, systems thinking, ethical analysis, organizational learning, metacognition, complex diagnostics, and specialized intelligence (RagAnswerer, MemoryCompressor).
 
 Patterns like `DecisionFramework`, `TradeoffAnalyzer`, `FeedbackLoopIdentifier`, `EthicalFrameworkAnalyzer`, and `MetacognitiveMonitor` are designed for situations where you're not just looking for an answer — you're trying to think rigorously about a genuinely hard problem.
 
 I'm particularly proud of the systems thinking category. When you're debugging a complex system (technical or organizational), linear cause-and-effect thinking is usually inadequate. The `FeedbackLoopIdentifier` and `SystemArchetypeAnalyzer` patterns encode non-linear reasoning that most ad-hoc prompts completely miss.
 
-## Why 85 specifically?
+## Why 87 (and counting)?
 
-Honestly, because that's how many we could build to a standard we were happy with. Each pattern is based on documented frameworks — root cause analysis methods from aviation safety, decision theory, the Socratic method, various epistemological frameworks. The count isn't a marketing number; it's just where we are.
+That's how many we could build to a standard we were happy with. Each pattern is based on documented frameworks — root cause analysis methods from aviation safety, decision theory, the Socratic method, various epistemological frameworks. The count isn't a marketing number; it's just where we are.
 
-We'll add more. If there's a specific analytical framework you use regularly that isn't represented here, I'd genuinely want to hear about it.
+Since this post was first published, we've added specialized intelligence patterns like RagAnswerer (grounded RAG with citation and abstention) and MemoryCompressor (structured state extraction for agent memory) — both research-validated. We'll keep adding more. If there's a specific analytical framework you use regularly that isn't represented here, I'd genuinely want to hear about it.
 
 ## What building on patterns changes
 
@@ -87,6 +87,6 @@ That shift from "tweak the prompt and hope" to "identify the problem and fix it"
 
 If you want to explore the patterns: [Cognitive Patterns](/docs/cognitive-patterns/overview). All 16 free patterns have individual documentation pages with examples.
 
-And if you're curious about the enterprise patterns: [Enterprise Overview](/docs/cognitive-patterns/enterprise-overview).
+And if you're curious about the enterprise patterns (now 71): [Enterprise Overview](/docs/cognitive-patterns/enterprise-overview).
 
 — Dhiraj

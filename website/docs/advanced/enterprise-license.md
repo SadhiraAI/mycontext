@@ -1,12 +1,12 @@
 ---
 sidebar_position: 4
 title: Enterprise License
-description: Activate an enterprise license key to unlock all 69 enterprise cognitive patterns. One-line activation, persistent storage, and graceful free-tier fallback.
+description: Activate an enterprise license key to unlock all 71 enterprise cognitive patterns. One-line activation, persistent storage, and graceful free-tier fallback.
 ---
 
 # Enterprise License
 
-mycontext-ai has 16 free patterns included in every install, plus 69 enterprise patterns that require a license. Activation is a single function call — the key is stored locally and persists across sessions.
+mycontext-ai has 16 free patterns included in every install, plus 71 enterprise patterns that require a license. Activation is a single function call — the key is stored locally and persists across sessions.
 
 ## Activation
 
@@ -17,7 +17,7 @@ mycontext.activate_license("MC-ENT-YOUR-KEY-HERE")
 print(mycontext.is_enterprise_active())  # True
 ```
 
-That's it. All 69 enterprise patterns are now available for the rest of the session — and in every future session on this machine (stored at `~/.mycontext/license.json`).
+That's it. All 71 enterprise patterns are now available for the rest of the session — and in every future session on this machine (stored at `~/.mycontext/license.json`).
 
 ## `activate_license(key)`
 
@@ -175,11 +175,11 @@ env:
 | Feature | Free | Enterprise |
 |---------|------|------------|
 | Core Context API | All | All |
-| Cognitive Patterns | 16 free patterns | 16 + 69 = 85 patterns |
+| Cognitive Patterns | 16 free patterns | 16 + 71 = 87 patterns |
 | Intelligence Layer | Full | Full |
 | Quality Metrics | Full | Full |
 | Integrations | Full | Full |
-| Generic Prompts | Free patterns | All 85 patterns |
+| Generic Prompts | Free patterns | All 87 patterns |
 | `suggest_patterns()` | Shows all (license note for enterprise) | All, no notes |
 | `smart_execute()` | Routes to free patterns | Routes to all 85 |
 

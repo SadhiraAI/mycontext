@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sadhiraai.github.io/mycontext/sitemap.xml

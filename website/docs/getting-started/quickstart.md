@@ -228,7 +228,7 @@ Requires `tiktoken` for accurate counting (`pip install tiktoken`). Falls back t
 
 - **[Core Concepts](./core-concepts)** — understand Context, Guidance, Directive, Constraints, and the research flow
 - **[Prompt Assembly & Thinking Strategies](../foundations/research-flow)** — the nine-section structure, each thinking strategy in depth, and how few-shot examples are placed
-- **[Cognitive Patterns](../cognitive-patterns/overview)** — browse all 85 patterns
+- **[Cognitive Patterns](../cognitive-patterns/overview)** — browse all 87 patterns
 - **[Intelligence Layer](../intelligence/overview)** — auto-transform, pattern suggestion, multi-template fusion
 - **[Async Execution](../intelligence/async-execution)** — `aexecute`, `agenerate`, concurrent patterns
 - **[Token-Budget Assembly](../intelligence/token-budget)** — `assemble_for_model` in depth

@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 title: Cognitive Patterns Overview
-description: 85 research-backed cognitive patterns for systematic reasoning — 16 free, 69 enterprise. Browse by category, understand the methodology, and pick the right pattern for your task.
+description: 87 research-backed cognitive patterns for systematic reasoning — 16 free, 71 enterprise. Browse by category, understand the methodology, and pick the right pattern for your task.
 ---
 
 # Cognitive Patterns
@@ -30,7 +30,7 @@ ctx = RootCauseAnalyzer().build_context(
 result = ctx.execute(provider="openai")
 ```
 
-## All 85 Patterns at a Glance
+## All 87 Patterns at a Glance
 
 ### Free Patterns (16) — Included in Every Install
 
@@ -53,12 +53,13 @@ result = ctx.execute(provider="openai")
 | [ConflictResolver](./free/conflict-resolver) | Specialized | Mediate disputes, find win-win resolutions | `conflict`, `parties` |
 | [IntentRecognizer](./free/intent-recognizer) | Specialized | Uncover true intent behind a request | `input`, `depth` |
 
-### Enterprise Patterns (69) — Requires License
+### Enterprise Patterns (71) — Requires License
 
 Advanced patterns organized by category. Each requires a valid license key. [Learn more →](./enterprise-overview)
 
 | Category | Patterns | Highlights |
 |----------|----------|------------|
+| **Specialized Intelligence** | 2 | **RagAnswerer** (+15% evidence recall, citations, abstention), **MemoryCompressor** (2x recall over summarization at scale) |
 | **Advanced Analysis** | 4 | TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector |
 | **Advanced Reasoning** | 2 | CausalReasoner, AnalogicalReasoner |
 | **Advanced Creative** | 4 | IdeaGenerator, InnovationFramework, DesignThinker, MetaphorGenerator |

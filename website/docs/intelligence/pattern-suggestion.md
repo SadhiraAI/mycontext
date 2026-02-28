@@ -55,7 +55,7 @@ suggest_patterns(
 
 ### Mode 1: `"keyword"` (instant, 0 LLM calls)
 
-Matches question keywords against a curated map of all 85 patterns. Fast, deterministic, and free.
+Matches question keywords against a curated map of all 87 patterns. Fast, deterministic, and free.
 
 ```python
 result = suggest_patterns(

@@ -19,7 +19,7 @@ const PATTERNS: Pattern[] = [
   { name: 'RootCauseAnalyzer', category: 'Reasoning', tier: 'free', description: 'Five Whys + Ishikawa systematic diagnosis', inputs: ['problem', 'depth'], docPath: '/docs/cognitive-patterns/free/root-cause-analyzer' },
   { name: 'StepByStepReasoner', category: 'Reasoning', tier: 'free', description: 'Chain-of-thought with transparent, auditable steps', inputs: ['problem', 'domain'], docPath: '/docs/cognitive-patterns/free/step-by-step-reasoner' },
   { name: 'HypothesisGenerator', category: 'Reasoning', tier: 'free', description: 'Testable hypotheses with experimental design', inputs: ['observation', 'domain'], docPath: '/docs/cognitive-patterns/free/hypothesis-generator' },
-  { name: 'DataAnalyzer', category: 'Analysis', tier: 'free', description: 'Pattern detection and actionable insight extraction', inputs: ['data_description', 'goal'], docPath: '/docs/cognitive-patterns/free/data-analyzer' },
+  { name: 'DataAnalyzer', category: 'Analysis', tier: 'free', description: '5 intents × 3 investment levels — pattern detection, anomaly identification, and actionable insights', inputs: ['data_description', 'goal', 'intent', 'investment'], docPath: '/docs/cognitive-patterns/free/data-analyzer' },
   { name: 'QuestionAnalyzer', category: 'Analysis', tier: 'free', description: 'Decompose and reframe questions before answering', inputs: ['question', 'depth'], docPath: '/docs/cognitive-patterns/free/question-analyzer' },
   { name: 'Brainstormer', category: 'Creative', tier: 'free', description: 'Divergent ideation followed by convergent selection', inputs: ['topic', 'goal', 'constraints'], docPath: '/docs/cognitive-patterns/free/brainstormer' },
   { name: 'CodeReviewer', category: 'Specialized', tier: 'free', description: 'Security, performance, and maintainability review', inputs: ['code', 'language', 'focus_areas'], docPath: '/docs/cognitive-patterns/free/code-reviewer' },
@@ -33,7 +33,10 @@ const PATTERNS: Pattern[] = [
   { name: 'ConflictResolver', category: 'Specialized', tier: 'free', description: 'Mediate disputes and find win-win resolutions', inputs: ['conflict', 'parties'], docPath: '/docs/cognitive-patterns/free/conflict-resolver' },
   { name: 'IntentRecognizer', category: 'Specialized', tier: 'free', description: 'Uncover the true intent behind any request', inputs: ['input', 'depth'], docPath: '/docs/cognitive-patterns/free/intent-recognizer' },
 
-  // ── ENTERPRISE (69) ──────────────────────────────────────────────────────
+  // ── ENTERPRISE (71) ──────────────────────────────────────────────────────
+  // Specialized Intelligence (2)
+  { name: 'RagAnswerer', category: 'Specialized Intelligence', tier: 'enterprise', description: 'Grounded RAG with citation, abstention, and +15% evidence recall (CRAG/Self-RAG/Chain-of-Note)', inputs: ['question', 'context', 'mode'] },
+  { name: 'MemoryCompressor', category: 'Specialized Intelligence', tier: 'enterprise', description: 'Structured state extraction — 2x recall over summarization at scale for agent memory', inputs: ['content', 'intent', 'existing_memory', 'goal'] },
   // Advanced Analysis (4)
   { name: 'TrendIdentifier', category: 'Analysis', tier: 'enterprise', description: 'Detect directional market movements from fragmented signals', inputs: ['data_description', 'context_section'] },
   { name: 'GapAnalyzer', category: 'Analysis', tier: 'enterprise', description: 'Find underserved needs and market white spaces', inputs: ['situation', 'context_section'] },
@@ -182,12 +185,12 @@ export default function PatternsPage(): JSX.Element {
   return (
     <Layout
       title="Pattern Browser"
-      description="Browse and filter all 85 cognitive patterns — 16 free, 69 enterprise. Search by name, category, or input.">
+      description="Browse and filter all 87 cognitive patterns — 16 free, 71 enterprise. Search by name, category, or input.">
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <h1 className={styles.heroTitle}>Pattern Browser</h1>
           <p className={styles.heroSubtitle}>
-            85 cognitive patterns — 16 free, 69 enterprise. Each one encodes a proven analytical methodology so you bring the problem, not the framework.
+            87 cognitive patterns — 16 free, 71 enterprise. Each one encodes a proven analytical methodology so you bring the problem, not the framework.
           </p>
           <input
             className={styles.searchInput}

@@ -1,10 +1,10 @@
 ---
 sidebar_position: 2
 title: Enterprise Patterns
-description: 69 advanced cognitive patterns for specialized reasoning tasks. Requires a valid license key. Covers decision science, systems thinking, metacognition, ethics, and more.
+description: 71 advanced cognitive patterns for specialized reasoning tasks. Requires a valid license key. Covers specialized intelligence, decision science, systems thinking, metacognition, ethics, and more.
 ---
 
-# Enterprise Patterns (69)
+# Enterprise Patterns (71)
 
 Enterprise patterns extend the free tier with advanced reasoning capabilities across specialized domains. They follow the same API as free patterns — `build_context()`, `execute()`, `generic_prompt()` — and integrate seamlessly with the intelligence layer.
 
@@ -37,7 +37,37 @@ result = DecisionFramework().execute(
 )
 ```
 
-## All 69 Enterprise Patterns
+## All 71 Enterprise Patterns
+
+### Specialized Intelligence (2 patterns)
+
+Research-validated templates for RAG generation and memory compression — the two most critical challenges in production AI systems.
+
+| Pattern | What it does | Key inputs | Research |
+|---------|-------------|-----------|----------|
+| **RagAnswerer** | Grounded RAG generation with citation, abstention, and evidence extraction. Applies CRAG, Self-RAG, and Chain-of-Note principles. **+15% evidence recall** over plain RAG prompts. | `question`, `context`, `mode` | Validated |
+| **MemoryCompressor** | Structured state extraction from conversations — entities, decisions, constraints, key numbers. **2x recall** over progressive summarization at scale. Plugs into any framework's memory middleware. | `content`, `intent`, `existing_memory`, `goal` | Validated |
+
+```python
+from mycontext.templates.enterprise.specialized import RagAnswerer, MemoryCompressor
+
+# RAG with grounding and citation
+rag = RagAnswerer()
+result = rag.execute(
+    provider="openai",
+    question="What caused the outage?",
+    context=retrieved_chunks,
+    mode="answer",
+)
+
+# Memory compression for agent sessions
+mc = MemoryCompressor()
+result = mc.execute(
+    provider="openai",
+    content=conversation_history,
+    intent="session",  # or "progressive" for updates
+)
+```
 
 ### Advanced Analysis (4 patterns)
 
@@ -266,8 +296,8 @@ scenarios = ScenarioPlanner().execute(
 ## License and Pricing
 
 Enterprise patterns are available in the following tiers:
-- **Professional**: All 69 patterns, single workspace
-- **Team**: All 69 patterns, up to 10 seats
+- **Professional**: All 71 patterns, single workspace
+- **Team**: All 71 patterns, up to 10 seats
 - **Enterprise**: All patterns, unlimited seats, custom SLAs
 
 [View pricing →](https://sadhiraai.com/pricing)

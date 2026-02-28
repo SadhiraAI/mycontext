@@ -10,7 +10,7 @@ Patterns and Blueprints are the composition layer. **Patterns** are reusable con
 
 ## Pattern
 
-A `Pattern` is a reusable, parameterized context template. All 85 cognitive templates (RootCauseAnalyzer, CodeReviewer, etc.) extend `Pattern`. You can also build custom patterns.
+A `Pattern` is a reusable, parameterized context template. All 87 cognitive templates (RootCauseAnalyzer, CodeReviewer, etc.) extend `Pattern`. You can also build custom patterns.
 
 ### Import
 
@@ -35,7 +35,7 @@ ctx = rca.build_context(
 result = ctx.execute(provider="openai")
 ```
 
-Each pattern's `build_context()` has typed, documented inputs specific to its methodology. See [Cognitive Patterns](../cognitive-patterns/overview) for all 85 patterns.
+Each pattern's `build_context()` has typed, documented inputs specific to its methodology. See [Cognitive Patterns](../cognitive-patterns/overview) for all 87 patterns.
 
 ### Building a Custom Pattern
 

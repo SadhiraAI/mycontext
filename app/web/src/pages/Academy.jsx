@@ -7,31 +7,38 @@ const TRACKS = [
     icon: "\u{1F680}",
     title: "Getting Started",
     desc: "From zero to structured context in 5 minutes. Install the SDK, build your first context, and send it to an LLM.",
+    to: "/academy/tutorial",
+    badge: "Available",
   },
   {
     icon: "\u{1F4DA}",
     title: "Pattern Deep Dives",
     desc: "Walkthroughs for each cognitive pattern \u2014 when to use it, what parameters matter, and real-world examples.",
+    badge: "Coming Soon",
   },
   {
     icon: "\u{1F517}",
     title: "Chain Composition",
     desc: "Learn to compose multi-pattern chains that deliver temporal + diagnostic + scenario + synthesis analysis.",
+    badge: "Coming Soon",
   },
   {
     icon: "\u{1F4CA}",
     title: "Quality & CAI",
     desc: "Use Quality Metrics to score contexts before sending. Use CAI to prove templates produce better LLM output.",
+    badge: "Coming Soon",
   },
   {
     icon: "\u{1F9E9}",
     title: "Framework Integrations",
     desc: "Plug mycontext into LangChain, CrewAI, AutoGen, smolagents, and more. Patterns as tools, contexts as agents.",
+    badge: "Coming Soon",
   },
   {
     icon: "\u{1F4D3}",
     title: "Example Notebooks",
     desc: "Jupyter notebooks covering data analysis, code review, strategic planning, and end-to-end agent workflows.",
+    badge: "Coming Soon",
   },
 ];
 
@@ -69,6 +76,19 @@ export default function Academy() {
         </div>
       </div>
 
+      {/* Featured Tutorial */}
+      <section className="academy-section academy-featured">
+        <h2>Featured Tutorial</h2>
+        <Link to="/academy/tutorial" className="academy-featured-card">
+          <span className="academy-featured-badge">Step-by-step</span>
+          <h3>Context Studio Tutorial</h3>
+          <p>
+            A complete walkthrough of the Context Studio web app — landing page, signup, login, Launchpad, 9-step wizard, Cognitive Studio, Chain Composer, and Settings. Includes screenshots and GIFs.
+          </p>
+          <span className="academy-featured-cta">Read the tutorial →</span>
+        </Link>
+      </section>
+
       {/* Learning Tracks */}
       <section className="academy-section">
         <h2>Learning Tracks</h2>
@@ -76,14 +96,20 @@ export default function Academy() {
           Each track takes you from concept to working code. Start with Getting Started, then explore any track that fits your use case.
         </p>
         <div className="academy-grid">
-          {TRACKS.map((t) => (
-            <div key={t.title} className="academy-card">
-              <span className="academy-badge soon">Coming Soon</span>
-              <span className="academy-card-icon">{t.icon}</span>
-              <h3>{t.title}</h3>
-              <p>{t.desc}</p>
-            </div>
-          ))}
+          {TRACKS.map((t) => {
+            const CardTag = t.to ? Link : "div";
+            const cardProps = t.to
+              ? { to: t.to, className: "academy-card academy-card-link" }
+              : { className: "academy-card" };
+            return (
+              <CardTag key={t.title} {...cardProps}>
+                <span className={`academy-badge ${t.badge === "Available" ? "available" : "soon"}`}>{t.badge || "Coming Soon"}</span>
+                <span className="academy-card-icon">{t.icon}</span>
+                <h3>{t.title}</h3>
+                <p>{t.desc}</p>
+              </CardTag>
+            );
+          })}
         </div>
       </section>
 
@@ -125,6 +151,11 @@ export default function Academy() {
       <section className="academy-section">
         <h2>Quick Links</h2>
         <div className="academy-grid">
+          <Link to="/academy/tutorial" className="academy-card">
+            <span className="academy-card-icon">{"\u{1F4DD}"}</span>
+            <h3>Context Studio Tutorial</h3>
+            <p>Step-by-step guide with screenshots</p>
+          </Link>
           <a href="https://pypi.org/project/mycontext-ai/" target="_blank" rel="noopener noreferrer" className="academy-card">
             <span className="academy-card-icon">{"\u{1F4E6}"}</span>
             <h3>Python SDK on PyPI</h3>
@@ -149,8 +180,9 @@ export default function Academy() {
       </section>
 
       <div className="academy-cta">
-        <h3>Tutorials and examples are on the way</h3>
-        <p>We are building step-by-step guides and Jupyter notebooks. Check back soon or explore the Cognitive Studio in the meantime.</p>
+        <h3>Start with the Context Studio Tutorial</h3>
+        <p>New to the app? Follow our step-by-step guide to build your first context. More tutorials and Jupyter notebooks coming soon.</p>
+        <Link to="/academy/tutorial" className="academy-cta-btn">Open tutorial</Link>
       </div>
     </div>
   );
