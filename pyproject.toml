@@ -99,6 +99,7 @@ extend-exclude = [
     "examples",
     "src",
     "research",
+    "website",
 ]
 
 [tool.ruff.lint]
