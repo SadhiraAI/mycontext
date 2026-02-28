@@ -36,6 +36,12 @@ jobs:
       - name: Install Wrangler
         run: npm install -g wrangler@3
 
+      - name: Ensure Pages project exists
+        run: wrangler pages project create mycontext-docs --production-branch=main || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy to Cloudflare Pages
         run: wrangler pages deploy ./website/build --project-name=mycontext-docs --branch=main
         env:
