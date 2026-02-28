@@ -330,7 +330,7 @@ Verify the relevant workflow(s) complete without errors in the Actions tab befor
 
 - [ ] Verify `https://pypi.org/project/mycontext-ai/` shows the new version
 - [ ] Verify the GitHub release page is live with the correct changelog
-- [ ] Verify the Docusaurus docs site at `https://docs.mycontext.sadhiraai.com` reflects the new content (allow ~5 minutes for Cloudflare Pages CDN)
+- [ ] Verify the Docusaurus docs site at `https://mycontext-docs.pages.dev` (or `https://docs.mycontext.sadhiraai.com` if custom domain configured) reflects the new content (allow ~5 minutes for Cloudflare Pages CDN)
 - [ ] Update the web UI at `mycontext.sadhiraai.com` if the "Docs" link or any displayed version number needs updating
 
 ---
