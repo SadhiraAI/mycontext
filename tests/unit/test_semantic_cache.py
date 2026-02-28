@@ -336,11 +336,14 @@ class TestLiteLLMProviderCache:
         provider = self._make_provider()
         ctx = Context("test guidance")
 
-        # Pre-populate cache
+        # Build cache key the same way the provider does internally
+        _DEFAULT_USER_TURN = "Please respond to the instructions above."
+        assembled = ctx.assemble()
+        cache_key = assembled + f"\n[user]{_DEFAULT_USER_TURN}"
+
         fake_resp = _fake_response("cached answer")
         cache = get_default_cache()
-        assembled = ctx.assemble()
-        cache.set(prompt=assembled, model="gpt-4o-mini", response=fake_resp)
+        cache.set(prompt=cache_key, model="gpt-4o-mini", response=fake_resp)
 
         with patch("litellm.completion") as mock_litellm:
             result = provider.generate(ctx, model="gpt-4o-mini", use_cache=True)
@@ -425,9 +428,13 @@ class TestLiteLLMProviderCache:
         provider = self._make_provider()
         ctx = Context("latency test guidance")
 
+        _DEFAULT_USER_TURN = "Please respond to the instructions above."
+        assembled = ctx.assemble()
+        cache_key = assembled + f"\n[user]{_DEFAULT_USER_TURN}"
+
         fake_resp = _fake_response("fast")
         cache = get_default_cache()
-        cache.set(prompt=ctx.assemble(), model="gpt-4o-mini", response=fake_resp)
+        cache.set(prompt=cache_key, model="gpt-4o-mini", response=fake_resp)
 
         start = time.monotonic()
         for _ in range(100):
