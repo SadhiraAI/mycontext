@@ -3,8 +3,22 @@ name: Backend CI/CD
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'app/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - 'Dockerfile'
+      - 'fly.toml'
   pull_request:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'app/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
 
 jobs:
   test:

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sadhiraai.github.io/mycontext/sitemap.xml
+Sitemap: https://docs.mycontext.sadhiraai.com/sitemap.xml

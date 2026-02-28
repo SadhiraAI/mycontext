@@ -9,8 +9,8 @@ const config: Config = {
   tagline: 'Context engineering for LLMs. Build once, run anywhere, measure everything.',
   favicon: 'img/favicon.ico',
 
-  url: 'https://sadhiraai.github.io',
-  baseUrl: '/mycontext/',
+  url: 'https://docs.mycontext.sadhiraai.com',
+  baseUrl: '/',
 
   organizationName: 'SadhiraAI',
   projectName: 'mycontext',

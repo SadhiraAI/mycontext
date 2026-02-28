@@ -158,7 +158,9 @@ The README is the PyPI landing page. Check:
 
 ## 6. Documentation Site
 
-The Docusaurus site at `website/` must build cleanly before the release goes out.
+The Docusaurus site at `website/` is deployed to **GitHub Pages** at `https://sadhiraai.github.io/mycontext/`.
+
+### 6.1 Build check
 
 ```bash
 cd website
@@ -167,12 +169,37 @@ npm run build
 
 Zero errors, zero broken links in the build output. Warnings about untracked files (git) are acceptable.
 
-Check that:
+### 6.2 CI/CD architecture
+
+There are **two independent workflows** in `.github/workflows/`, each scoped by path:
+
+| Workflow | File | Triggers On | Deploys To |
+|----------|------|-------------|------------|
+| **Docs** | `docs.yml` | `website/**` changes | Cloudflare Pages |
+| **Backend** | `backend.yml` | `src/**`, `app/**`, `tests/**`, `pyproject.toml`, `Dockerfile`, `fly.toml` | Fly.io |
+
+This means:
+- Website-only changes do **not** trigger backend tests or a Fly.io deploy.
+- Backend-only changes do **not** trigger a docs rebuild.
+- Changes that touch both paths trigger both workflows.
+
+### 6.3 Production exclusions
+
+Research pages and experiment notebooks are **excluded from production builds** through three mechanisms:
+
+1. **Docs plugin** (`docusaurus.config.ts`): `exclude: isProduction ? ['**/research/**'] : []`
+2. **Sidebar** (`sidebars.ts`): Research category conditionally removed when `NODE_ENV=production`
+3. **Notebooks** (`prebuild.js`): `static/notebooks/` moved to `.notebooks-tmp/` before build, restored by `postbuild.js` after
+
+The `docs.yml` workflow sets `NODE_ENV=production` explicitly so all three mechanisms activate.
+
+### 6.4 Content checklist
 
 - Any new page is added to `sidebars.ts`.
 - Any new API surface is reflected in `docs/api/overview.md`.
 - Any new foundation field is documented in the relevant `docs/foundations/*.md` page.
 - Page titles in frontmatter (`title:`) match the sidebar entry.
+- No non-research pages link to `/docs/research/` or `/notebooks/` (these break in production).
 
 ---
 
@@ -291,7 +318,11 @@ Go to: `https://github.com/SadhiraAI/mycontext/releases/new`
 
 ### 9.3 Confirm CI passes
 
-The `docs.yml` GitHub Actions workflow deploys the documentation site on push to `main`. Verify it completes without errors in the Actions tab before announcing the release.
+Two GitHub Actions workflows may run on push to `main`:
+- **Deploy Docs** (`docs.yml`) — only if `website/**` files changed. Deploys to GitHub Pages.
+- **Backend CI/CD** (`backend.yml`) — only if `src/**`, `app/**`, `tests/**`, or config files changed. Deploys to Fly.io.
+
+Verify the relevant workflow(s) complete without errors in the Actions tab before announcing the release.
 
 ---
 
@@ -317,6 +348,7 @@ The `docs.yml` GitHub Actions workflow deploys the documentation site on push to
 [ ] README updated (new capabilities, table, quick start)
 [ ] cd website && npm run build — docs build clean
 [ ] New pages added to sidebars.ts
+[ ] No non-research pages link to /docs/research/ or /notebooks/
 [ ] python -m build             — wheel + sdist built
 [ ] Wheel inspected — no enterprise/ files
 [ ] twine upload testpypi       — test upload successful
@@ -325,9 +357,9 @@ The `docs.yml` GitHub Actions workflow deploys the documentation site on push to
 [ ] Smoke test from PyPI        — all checks pass
 [ ] git tag vX.Y.Z && git push  — tagged and pushed
 [ ] GitHub Release page created with changelog
-[ ] CI (docs.yml) passes
+[ ] CI passes (docs.yml for website, backend.yml for code)
 [ ] PyPI page verified
-[ ] Docs site verified
+[ ] Docs site verified at docs.mycontext.sadhiraai.com
 ```
 
 ---
@@ -343,3 +375,7 @@ The `docs.yml` GitHub Actions workflow deploys the documentation site on push to
 | Test PyPI install missing a module | New file not in `src/mycontext/` package tree | Verify the file is under `src/mycontext/` and the package is re-built |
 | `generate_context` not importable | Not added to `intelligence/__init__.py` or `mycontext/__init__.py` | Add to both `__all__` lists and import lines |
 | LLM auth error in tests | Mock patch target is wrong | Patch the name as bound in the module (`mycontext.intelligence.context_generator.get_provider`), not where it's defined |
+| Website push triggers backend deploy | `backend.yml` missing `paths` filter | Add `paths` filter to both `push` and `pull_request` triggers |
+| Research pages visible in production | `NODE_ENV` not set in CI build step | Ensure `docs.yml` sets `env: NODE_ENV: production` on the build step |
+| Notebooks accessible in production | `prebuild.js` didn't run with `NODE_ENV=production` | Same fix — set `NODE_ENV` in CI, or check `prebuild.js` logic |
+| Broken links in prod build | Non-research page links to `/docs/research/*` | Remove or conditionalize the link — research pages are excluded in production |
