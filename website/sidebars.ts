@@ -12,7 +12,6 @@ const sidebars: SidebarsConfig = {
         'getting-started/installation',
         'getting-started/quickstart',
         'getting-started/core-concepts',
-        'tutorial/context-studio-tutorial',
       ],
     },
     {

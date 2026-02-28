@@ -7,8 +7,7 @@ const TRACKS = [
     icon: "\u{1F680}",
     title: "Getting Started",
     desc: "From zero to structured context in 5 minutes. Install the SDK, build your first context, and send it to an LLM.",
-    to: "/academy/tutorial",
-    badge: "Available",
+    badge: "Coming Soon",
   },
   {
     icon: "\u{1F4DA}",
@@ -54,9 +53,9 @@ const CONCEPTS = [
 
 const FAQ = [
   { q: "How do I get started?", a: "Go to Templates, pick a pattern, fill in the parameters, and click Build. That\u2019s it \u2014 your structured context is ready to download." },
-  { q: "What\u2019s the difference between Templates and Custom?", a: "Templates are pre-built, research-backed patterns (85 total). Custom lets you create your own templates from scratch using a step-by-step wizard." },
+  { q: "What\u2019s the difference between Templates and Custom?", a: "Templates are pre-built, research-backed patterns (87 total). Custom lets you create your own templates from scratch using a step-by-step wizard." },
   { q: "How does quality scoring work?", a: "Fast mode uses heuristics (no API key needed). Accurate mode uses an LLM to semantically evaluate your context across 6 dimensions. Add an API key in Account settings." },
-  { q: "What is Enterprise?", a: "Enterprise adds 69 advanced patterns for decision-making, systems thinking, ethical reasoning, metacognition, and more. Enter a license key in your Account." },
+  { q: "What is Enterprise?", a: "Enterprise adds 71 advanced patterns for decision-making, systems thinking, ethical reasoning, metacognition, and more. Enter a license key in your Account." },
   { q: "Can I export to my LLM framework?", a: "Yes. We support OpenAI, Anthropic, Google, LangChain, LlamaIndex, CrewAI, AutoGen, DSPy, Semantic Kernel, and raw formats (JSON, YAML, Markdown)." },
   { q: "Is there a Python SDK?", a: "Yes. Install with: pip install mycontext-ai. See the PyPI page for documentation." },
 ];
@@ -164,7 +163,7 @@ export default function Academy() {
           <Link to="/templates" className="academy-card">
             <span className="academy-card-icon">{"\u{1F9E0}"}</span>
             <h3>Cognitive Studio</h3>
-            <p>Browse all 85 cognitive patterns</p>
+            <p>Browse all 87 cognitive patterns</p>
           </Link>
           <Link to="/chains" className="academy-card">
             <span className="academy-card-icon">{"\u26D3\uFE0F"}</span>
