@@ -331,6 +331,49 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* ── Free Guide Download ────────────────────── */}
+        <section className="landing-section landing-guide-section">
+          <div className="landing-guide-card">
+            <div className="landing-guide-content">
+              <span className="landing-guide-badge">Free PDF Guide</span>
+              <h2 className="landing-guide-title">The Only Cursor Guide You'll Ever Need</h2>
+              <p className="landing-guide-desc">
+                Every Cursor capability in one document — rules, skills, subagents, MCP servers,
+                hooks, plugins, browser automation, and best practices. From zero to a fully
+                autonomous development environment.
+              </p>
+              <ul className="landing-guide-highlights">
+                <li>All 8 configuration systems explained with real examples</li>
+                <li>20+ free MCP servers categorized by use case</li>
+                <li>Step-by-step "How It All Works Together" walkthrough</li>
+                <li>Beginner-friendly — works for any codebase, any language</li>
+              </ul>
+              <div className="landing-guide-meta">
+                <span>By Dhiraj Pokhrel</span>
+                <span className="landing-guide-sep">·</span>
+                <span>1,200+ lines</span>
+                <span className="landing-guide-sep">·</span>
+                <span>PDF</span>
+              </div>
+            </div>
+            <div className="landing-guide-action">
+              <a
+                href="/cursor_guide.pdf"
+                download="The_Only_Cursor_Guide_Youll_Ever_Need.pdf"
+                className="landing-btn primary large landing-guide-download"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download Free PDF
+              </a>
+              <span className="landing-guide-note">No signup required</span>
+            </div>
+          </div>
+        </section>
+
         {/* ── Problem ──────────────────────────────────── */}
         <section className="landing-section">
           <h2 className="landing-section-title">The problem with prompt engineering</h2>
