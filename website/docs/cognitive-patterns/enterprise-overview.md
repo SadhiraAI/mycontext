@@ -39,23 +39,32 @@ result = DecisionFramework().execute(
 
 ## All 71 Enterprise Patterns
 
-### Specialized Intelligence (2 patterns)
+### Specialized Intelligence (3 patterns)
 
-Research-validated templates for RAG generation and memory compression — the two most critical challenges in production AI systems.
+Research-validated templates for RAG pipelines and memory — the most critical challenges in production AI systems.
 
 | Pattern | What it does | Key inputs | Research |
 |---------|-------------|-----------|----------|
+| **QueryPlanner** | Pre-retrieval query analysis: classify, decompose, rewrite (HyDE + step-back), and plan retrieval strategy. Use *before* `RagAnswerer` for best results. | `query`, `task_type`, `domain` | Validated |
 | **RagAnswerer** | Grounded RAG generation with citation, abstention, and evidence extraction. Applies CRAG, Self-RAG, and Chain-of-Note principles. **+15% evidence recall** over plain RAG prompts. | `question`, `context`, `mode` | Validated |
 | **MemoryCompressor** | Structured state extraction from conversations — entities, decisions, constraints, key numbers. **2x recall** over progressive summarization at scale. Plugs into any framework's memory middleware. | `content`, `intent`, `existing_memory`, `goal` | Validated |
 
 ```python
-from mycontext.templates.enterprise.specialized import RagAnswerer, MemoryCompressor
+from mycontext.templates.enterprise.specialized import QueryPlanner, RagAnswerer, MemoryCompressor
 
-# RAG with grounding and citation
+# Full RAG pipeline: plan query → retrieve → answer
+planner = QueryPlanner()
+plan = planner.execute(
+    provider="openai",
+    query="What are the main risks of our Q3 expansion plan?",
+    task_type="multi-hop",
+)
+
+# Use the plan to guide retrieval, then answer with grounding
 rag = RagAnswerer()
 result = rag.execute(
     provider="openai",
-    question="What caused the outage?",
+    question=plan.response,
     context=retrieved_chunks,
     mode="answer",
 )

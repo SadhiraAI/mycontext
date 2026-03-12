@@ -59,7 +59,7 @@ Advanced patterns organized by category. Each requires a valid license key. [Lea
 
 | Category | Patterns | Highlights |
 |----------|----------|------------|
-| **Specialized Intelligence** | 2 | **RagAnswerer** (+15% evidence recall, citations, abstention), **MemoryCompressor** (2x recall over summarization at scale) |
+| **Specialized Intelligence** | 3 | **QueryPlanner** (pre-retrieval decomposition, HyDE, step-back), **RagAnswerer** (+15% evidence recall, citations, abstention), **MemoryCompressor** (2x recall over summarization at scale) |
 | **Advanced Analysis** | 4 | TrendIdentifier, GapAnalyzer, SWOTAnalyzer, AnomalyDetector |
 | **Advanced Reasoning** | 2 | CausalReasoner, AnalogicalReasoner |
 | **Advanced Creative** | 4 | IdeaGenerator, InnovationFramework, DesignThinker, MetaphorGenerator |

@@ -86,7 +86,7 @@ const config: Config = {
       attributes: {
         defer: 'true',
         src: 'https://static.cloudflareinsights.com/beacon.min.js',
-        'data-cf-beacon': '{"token": "REPLACE_WITH_CF_ANALYTICS_TOKEN"}',
+        'data-cf-beacon': '{"token": "9907e76623d747808e8ec4fdd9523f06"}',
       },
     },
   ],
@@ -103,8 +103,8 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     announcementBar: {
-      id: 'v0_6_0',
-      content: '<b>mycontext-ai v0.6.0</b> is live — RagAnswerer, MemoryCompressor, research-validated templates, and more. <a href="/docs/getting-started/installation">Get started →</a>',
+      id: 'v0_7_0',
+      content: '<b>mycontext-ai v0.7.0</b> is live — output_format on all 87 templates, QueryPlanner for RAG, reworked CodeReviewer, and more. <a href="/docs/getting-started/installation">Get started →</a>',
       isCloseable: true,
     },
     navbar: {

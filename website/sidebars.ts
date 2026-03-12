@@ -110,6 +110,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'advanced/blueprints',
         'advanced/agent-skills',
+        'advanced/output-format',
         'advanced/structured-output',
         'advanced/reliability',
         'advanced/enterprise-license',

@@ -1,23 +1,27 @@
 ---
 sidebar_position: 7
 title: CodeReviewer
-description: Comprehensive code review across security, performance, and maintainability. Severity-ranked findings with fix examples, security scores, and quality ratings.
+description: Risk-aware code review using the ORIENT→ANALYZE→ASSESS→RECOMMEND cognitive flow. Focuses on 7 dimensions linters can't catch — deliberately excludes style to eliminate bikeshedding.
 ---
 
 # CodeReviewer
 
 **Category:** Specialized | **Module:** `mycontext.templates.free.specialized`
 
-Performs systematic, severity-ranked code reviews. Catches security vulnerabilities (SQL injection, XSS, etc.), performance bottlenecks (N+1 queries, inefficient algorithms), and best practice violations — with specific line references, explanations of why each issue matters, and working fix examples.
+Performs risk-aware code reviews using the **ORIENT→ANALYZE→ASSESS→RECOMMEND** cognitive flow from the Code Review as Decision-Making (CRDM) model. Focuses exclusively on the 7 dimensions that linters cannot catch — correctness, security, performance, design, resilience, testing, and maintainability — and deliberately excludes style/formatting to eliminate the bikeshedding that accounts for 85% of low-value review comments.
+
+:::info Research Basis
+Based on the CRDM model (2026), Bacchelli & Bird (2013) — *Modern Code Review* (Microsoft Research), Google eng-practices, and Fagan (1976) formal inspection methodology.
+:::
 
 ## When to Use
 
 - Pull request review
 - Security audit
+- Pre-production deployment check
+- Failure-mode and risk assessment
 - Onboarding code quality check
 - Legacy code assessment
-- Before production deployment
-- Multi-language project review
 
 ## Quick Start
 
@@ -33,88 +37,136 @@ def fetch_user(user_id):
 """
 
 result = reviewer.execute(
-    provider="gemini",
+    provider="openai",
     code=code,
     language="Python",
-    focus_areas=["security", "best_practices"],
+    focus_areas=["security", "correctness"],
 )
 print(result.response)
 ```
 
+## The CRDM Cognitive Flow
+
+The review follows four sequential phases that mirror how senior engineers actually review code:
+
+```
+ORIENT       → Understand architecture, intent, and blast radius
+    ↓
+ANALYZE      → Examine each dimension systematically (no style)
+    ↓
+ASSESS       → Severity-rank findings (Critical / High / Medium / Low)
+    ↓
+RECOMMEND    → Concrete fixes with working code examples
+```
+
+This prevents the most common failure mode in code review: jumping straight to line-level comments without first understanding what the code is supposed to do.
+
+## Review Dimensions
+
+The 7 dimensions CodeReviewer evaluates — all things linters cannot catch:
+
+| Dimension | What gets reviewed |
+|-----------|-------------------|
+| **Correctness** | Logic errors, off-by-one, race conditions, type mismatches |
+| **Security** | Injection vectors, auth gaps, data exposure, crypto misuse |
+| **Performance** | N+1 queries, algorithmic complexity, memory leaks, blocking I/O |
+| **Design** | SOLID violations, coupling, cohesion, interface clarity |
+| **Resilience** | Error handling, retry logic, timeout coverage, degraded-mode behavior |
+| **Testing** | Coverage gaps, missing edge cases, test brittleness |
+| **Maintainability** | Complexity, documentation, testability, modularity |
+
+Style, formatting, and naming conventions are **explicitly excluded** — those are for linters and formatters, not reviewers.
+
 ## Methods
 
-### `build_context(code, language="Python", context=None, focus_areas=None)`
-
-**Parameters:**
+### `build_context(code, language, context, focus_areas, output_format)`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `code` | `str` | `""` | The code to review |
 | `language` | `str` | `"Python"` | Programming language |
-| `context` | `str \| None` | `None` | Purpose, architecture context, constraints |
-| `focus_areas` | `list[str] \| None` | All areas | Review focus areas |
+| `context` | `str \| None` | `None` | Architecture, purpose, constraints |
+| `focus_areas` | `list[str] \| None` | All 7 | Which dimensions to prioritize |
+| `output_format` | `str` | `"structured"` | Output presentation format |
 
-**Default `focus_areas`**: `["security", "performance", "best_practices", "maintainability"]`
-
-### `execute(provider, code, language="Python", context=None, focus_areas=None, **kwargs)`
+### `execute(provider, code, language, context, focus_areas, output_format, **kwargs)`
 
 ```python
 result = reviewer.execute(
-    provider="gemini",
+    provider="openai",
     code=your_code,
     language="Python",
     context="Payment processing module, PCI-DSS compliance required",
-    focus_areas=["security"],
+    focus_areas=["security", "resilience"],
 )
 ```
 
+## Output Format Control
+
+Use `output_format` to change how findings are presented without changing what gets analyzed:
+
+```python
+# Default: structured sections with severity headers
+result = reviewer.execute(provider="openai", code=code, language="Python")
+
+# Action items only — for creating tickets
+result = reviewer.execute(
+    provider="openai", code=code, language="Python",
+    output_format="actionable",
+)
+
+# Slide-ready findings for a sprint review
+result = reviewer.execute(
+    provider="openai", code=code, language="Python",
+    output_format="slides",
+)
+
+# Raw JSON for CI pipeline integration
+result = reviewer.execute(
+    provider="openai", code=code, language="Python",
+    output_format="json",
+)
+```
+
+**Available formats:** `structured` (default) · `narrative` · `brief` · `actionable` · `slides` · `email` · `qa` · `checklist` · `json` · `table`
+
 ## Severity Framework
 
-Every finding is categorized by severity with actionable fixes:
+Every finding is severity-ranked with a working fix:
 
-### 🔴 Critical — Must Fix
-Security vulnerabilities, critical bugs, data exposure risks, injection vectors. For each: exact location, risk explanation, corrected code snippet.
+### 🔴 Critical — Must Fix Before Merge
+Security vulnerabilities, critical bugs, data exposure. Each finding includes: exact location, risk explanation, corrected code.
 
 ```
-### Security Vulnerabilities
-- **Issue**: SQL Injection on line 2
-- **Location**: `fetch_user()` function, f-string interpolation
+### Security: SQL Injection
+- **Location**: `fetch_user()`, line 2 — f-string interpolation
 - **Risk**: Attacker can execute arbitrary SQL: `user_id=1; DROP TABLE users`
 - **Fix**:
-  \`\`\`python
-  # Bad
+  ```python
+  # Before
   query = f"SELECT * FROM users WHERE id = {user_id}"
-  
-  # Good
+
+  # After
   query = "SELECT * FROM users WHERE id = ?"
   return db.execute(query, (user_id,))
-  \`\`\`
+  ```
 ```
 
 ### 🟠 High — Should Fix
-Performance bottlenecks, missing error handling, significant best practice violations.
+Performance bottlenecks, missing error handling, design violations with production risk.
 
 ### 🟡 Medium — Consider Fixing
-Code quality, readability, maintainability improvements.
+Code quality, resilience gaps, testability improvements.
 
 ### 🟢 Low — Nice to Have
-Style inconsistencies, minor optimizations.
+Minor improvements that won't cause production issues.
 
-### ✅ Strengths — Good Practices
-Acknowledges what's done well — keeps feedback constructive.
-
-## Focus Areas
-
-| Focus Area | What gets reviewed |
-|-----------|-------------------|
-| `"security"` | Injections, auth issues, data exposure, crypto misuse |
-| `"performance"` | N+1 queries, inefficient algorithms, memory leaks |
-| `"best_practices"` | SOLID principles, error handling, naming conventions |
-| `"maintainability"` | Complexity, documentation, testability, modularity |
+### ✅ Strengths
+What the code does well — keeps feedback constructive and balanced.
 
 ## Examples
 
-### Security-Focused Review
+### Security + Correctness Audit
 
 ```python
 code = """
@@ -133,23 +185,39 @@ result = reviewer.execute(
     provider="openai",
     code=code,
     language="Python",
-    focus_areas=["security"],
+    focus_areas=["security", "correctness"],
 )
+# Catches: path traversal, arbitrary code execution via pickle,
+# and command injection via os.system
 ```
 
-### Full Review with Context
+### Full Review with Architecture Context
 
 ```python
 result = reviewer.execute(
-    provider="gemini",
+    provider="openai",
     code=api_handler_code,
     language="Python",
-    context="FastAPI endpoint handling user authentication and payment processing",
-    focus_areas=["security", "performance", "best_practices"],
+    context="FastAPI endpoint handling user auth and payment processing. PCI-DSS in scope.",
+    focus_areas=["security", "resilience", "performance"],
 )
 ```
 
-### JavaScript Review
+### Checklist Output for PR Description
+
+```python
+result = reviewer.execute(
+    provider="openai",
+    code=pr_diff,
+    language="TypeScript",
+    output_format="checklist",
+)
+# → - [ ] Fix missing null check on user.id (line 24)
+# → - [ ] Add retry logic to payment API call (line 67)
+# → - [ ] Handle 429 rate-limit response in fetchOrders()
+```
+
+### JavaScript XSS Detection
 
 ```python
 js_code = """
@@ -165,61 +233,17 @@ result = reviewer.execute(
     language="JavaScript",
     focus_areas=["security"],
 )
-# Will catch XSS vulnerability
-```
-
-### Multi-File Context
-
-```python
-import json
-
-result = reviewer.execute(
-    provider="anthropic",
-    code=open("src/auth/login.py").read(),
-    language="Python",
-    context=f"""
-    Auth module in Django application.
-    Database: PostgreSQL.
-    External auth: OAuth2 with Google/GitHub.
-    Runs behind nginx reverse proxy.
-    """,
-)
-```
-
-## Output Format
-
-The review ends with an overall assessment:
-
-```
-## 6. OVERALL ASSESSMENT
-- **Code Quality Score**: 4/10 — Multiple critical security issues
-- **Security Score**: 2/10 — SQL injection, path traversal, command injection
-- **Maintainability Score**: 6/10 — Clear structure but needs error handling
-
-**Priority Actions**:
-1. Fix SQL injection vulnerability (line 2)
-2. Sanitize file path input (line 7)
-3. Replace os.system() with subprocess with arguments list
-
-## 7. RECOMMENDATIONS
-**Immediate Actions**:
-- Add parameterized queries for all DB operations
-- Validate and sanitize all file paths
-- Use subprocess.run(args_list) instead of os.system(string)
-
-**Testing Recommendations**:
-- Add security tests for injection attempts
-- Test with malicious file path inputs
+# Catches XSS via direct innerHTML assignment
 ```
 
 ## Generic Prompt Mode
 
 ```python
-# Zero-cost review prompt
+# Zero-cost review — no context assembly, just string substitution
 prompt = reviewer.generic_prompt(
     code="def greet(name): return f'Hello {name}'",
     language="Python",
-    focus_areas="security, best_practices",
+    focus_areas="security, correctness",
 )
 ```
 
@@ -227,6 +251,6 @@ prompt = reviewer.generic_prompt(
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `build_context(code, language, context, focus_areas)` | `Context` | Assembled context |
-| `execute(provider, code, language, context, focus_areas, **kwargs)` | `ProviderResponse` | Execute review |
+| `build_context(code, language, context, focus_areas, output_format)` | `Context` | Assembled context |
+| `execute(provider, code, language, context, focus_areas, output_format, **kwargs)` | `ProviderResponse` | Execute review |
 | `generic_prompt(code, language, context_section, focus_areas)` | `str` | Zero-cost prompt string |
