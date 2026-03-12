@@ -8,7 +8,7 @@
 [![PyPI](https://img.shields.io/pypi/v/mycontext-ai.svg)](https://pypi.org/project/mycontext-ai/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[The Problem](#the-problem) · [Core Strengths](#core-strengths) · [Quick Start](#quick-start) · [Use Cases](#use-cases) · [Patterns](#85-cognitive-patterns)
+[The Problem](#the-problem) · [Core Strengths](#core-strengths) · [Quick Start](#quick-start) · [Use Cases](#use-cases) · [Patterns](#87-cognitive-patterns)
 
 </div>
 
@@ -54,7 +54,7 @@ The engine doesn't generate answers. It generates the *best possible question* f
 
 These are capabilities that exist in mycontext-ai and, to our knowledge, do not exist in any other open-source context or prompt engineering library.
 
-### 1. 85 Research-Backed Cognitive Patterns
+### 1. 87 Research-Backed Cognitive Patterns
 
 Not generic "write a poem" templates. Each pattern implements a real cognitive framework — Five Whys, fishbone analysis, Socratic method, temporal reasoning, systems archetypes, ethical frameworks — backed by **150+ peer-reviewed papers** from cognitive science, decision theory, and systems thinking.
 
@@ -421,18 +421,42 @@ pip install instructor   # optional — enables structured LLM output
 
 Falls back to Pydantic-validated JSON parsing → original regex parser without `instructor`. No behaviour change if not installed.
 
+### 23. Output Format Control — 10 Formats, Every Template
+
+Every template's `build_context()` and `execute()` now accept an `output_format` parameter. Control *how* the LLM presents its response without changing *what* it analyses:
+
+```python
+from mycontext.templates.free.reasoning import RootCauseAnalyzer
+
+rca = RootCauseAnalyzer()
+
+# Slide-ready output for your next presentation
+ctx = rca.build_context(problem="API latency tripled after deploy", output_format="slides")
+
+# Action items only — no analysis prose
+ctx = rca.build_context(problem="API latency tripled after deploy", output_format="actionable")
+
+# Raw JSON for downstream processing (auto-sets temperature=0.0)
+ctx = rca.build_context(problem="API latency tripled after deploy", output_format="json")
+```
+
+**Human formats:** `structured` (default) · `narrative` · `brief` · `actionable` · `slides` · `email` · `qa` · `checklist`  
+**Machine formats:** `json` · `table` (auto-sets `temperature=0.0`)
+
+Works on all 87 templates — implemented once at the `Pattern` base class level.
+
 ---
 
 ## At a Glance
 
 | Capability | mycontext-ai | Typical prompt libraries |
 |-----------|-------------|------------------------|
-| Cognitive patterns | 85 research-backed (16 free + 69 enterprise) | 10-20 generic templates |
+| Cognitive patterns | 87 research-backed (16 free + 71 enterprise) | 10-20 generic templates |
 | Context generator | Role + goal → full context via LLM | None |
 | Structured prompt assembly | 9-section research-backed ordering | None |
 | Thinking strategies | 5 named strategies (CoT, ToT, Self-Reflection, ...) | None |
 | Few-shot calibration | Typed examples field, auto-positioned | Manual |
-| Generic prompts (zero-cost) | 85 pre-authored, compilable | None |
+| Generic prompts (zero-cost) | 87 pre-authored, compilable | None |
 | Prompt compilation pipeline | Static + dynamic + full (3 tiers) | None |
 | Complexity router | Auto-selects optimal approach per question | None |
 | Context quality scoring | 6 dimensions + issues + suggestions | None |
@@ -447,6 +471,7 @@ Falls back to Pydantic-validated JSON parsing → original regex parser without 
 | Async execution | `aexecute` / `agenerate` — true non-blocking via litellm.acompletion | DIY |
 | Token-budget assembly | `assemble_for_model(model, max_tokens)` — tiktoken-accurate | None |
 | Validated structured output | Pydantic v2 schemas + optional instructor integration | None |
+| Output format control | 10 formats per template: slides, email, json, table, brief, ... | None |
 | Retry + timeout | Built-in exponential backoff | DIY |
 | Research citations | 150+ peer-reviewed papers | 0-5 |
 
@@ -569,7 +594,7 @@ ctx = Context(directive=Directive(content=f"Analyze this proposal.\n\n{instructi
 
 ---
 
-## 85 Cognitive Patterns
+## 87 Cognitive Patterns
 
 ### Free Patterns (16)
 
@@ -594,7 +619,7 @@ Included in every install. Production-ready for analysis, decision-making, reaso
 | **ConflictResolver** | Mediate conflicts by identifying interests and common ground |
 | **IntentRecognizer** | Identify core intent, goals, and motivations behind a statement |
 
-### Enterprise Patterns (+69)
+### Enterprise Patterns (+71)
 
 Advanced patterns for temporal reasoning, diagnostics, systems thinking, ethical analysis, metacognition, learning science, and cross-domain synthesis. **Enterprise patterns require a valid license key.** Contact us to obtain a license.
 
@@ -613,6 +638,8 @@ response, meta = smart_execute("Analyze this...", include_enterprise=False)
 mycontext.activate_license("MC-ENT-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 response, meta = smart_execute("Analyze this...", include_enterprise=True)
 ```
+
+Includes specialized RAG patterns: **`QueryPlanner`** (pre-retrieval query decomposition, HyDE, step-back rewriting) and **`RagAnswerer`** (grounded answer generation with citation and abstention), plus **`MemoryCompressor`** for long-context agent memory.
 
 **Categories:** Metacognition · Ethical Reasoning · Systems Thinking · Learning & Knowledge Building · Evaluation & Assessment · Temporal Reasoning · Diagnostic & Troubleshooting · Synthesis & Integration · Advanced Decision · Advanced Problem Solving · Advanced Planning · Advanced Analysis · Advanced Reasoning · Advanced Creative · Advanced Communication · Advanced Specialized
 
@@ -654,7 +681,7 @@ The core insight: **the quality of an LLM's output is bounded by the quality of 
 
 ## License
 
-MIT. Free edition includes 16 patterns and the full intelligence layer. Enterprise edition (+69 advanced patterns) requires a license key.
+MIT. Free edition includes 16 patterns and the full intelligence layer. Enterprise edition (+71 advanced patterns) requires a license key.
 
 ---
 

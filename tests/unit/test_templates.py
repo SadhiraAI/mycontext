@@ -66,7 +66,7 @@ class TestQuestionAnalyzer:
         analyzer = QuestionAnalyzer()
         context = analyzer.build_context(
             question="What is AI?",
-            depth="basic"
+            depth="brief"
         )
         assert context.directive is not None
         assert "What is AI?" in context.directive.content
@@ -89,7 +89,7 @@ class TestQuestionAnalyzer:
         context = analyzer.build_context(
             question="What car should I buy?",
             context="Budget: $30,000, Family of 4",
-            depth="detailed"
+            depth="moderate"
         )
         assert context.directive is not None
         # Context section should be included
@@ -131,7 +131,7 @@ class TestPatternParameterSeparation:
 
         context = analyzer.build_context(
             question="Test question",
-            depth="basic"
+            depth="brief"
         )
 
         # Template inputs are stored in context.data (by design)
@@ -146,7 +146,7 @@ class TestPatternParameterSeparation:
         analyzer = QuestionAnalyzer()
         context = analyzer.build_context(
             question="Test",
-            depth="basic"
+            depth="brief"
         )
 
         assert context.metadata.get("pattern") == "question_analyzer"

@@ -6,6 +6,77 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.7.0] — 2026-03-11
+
+### Added
+
+- **`output_format` parameter on all templates** — Every template's `build_context()` and `execute()` now accepts an `output_format` argument that appends a format instruction to the assembled directive. 10 formats available:
+  - Human formats: `"structured"` (default, no change), `"narrative"`, `"brief"`, `"actionable"`, `"slides"`, `"email"`, `"qa"`, `"checklist"`
+  - Machine formats: `"json"`, `"table"` (auto-sets temperature to 0.0 for structured output)
+  - Implemented at the `Pattern` base class level — all 87 templates inherit it automatically.
+
+- **`mycontext.utils.format_directives`** — new public utility module exposing:
+  - `get_format_directive(output_format)` — returns the format instruction string for appending to directives
+  - `is_machine_format(output_format)` — returns `True` for `"json"` and `"table"` formats
+  - `VALID_OUTPUT_FORMATS`, `HUMAN_OUTPUT_FORMATS`, `MACHINE_OUTPUT_FORMATS` — frozensets of valid format names
+
+- **`QueryPlanner`** (enterprise) — Pre-retrieval query analysis template for RAG pipelines. Classifies, decomposes, rewrites (HyDE + step-back), and plans retrieval strategy before hitting the vector store. Complements `RagAnswerer`. Available via `mycontext.templates.enterprise.specialized.QueryPlanner`.
+
+- **`CodeReviewer`** — completely reworked with a research-backed ORIENT→ANALYZE→ASSESS→RECOMMEND cognitive flow based on the Code Review as Decision-Making (CRDM) model (2026), Bacchelli & Bird (2013), and Google eng-practices. Focuses on 7 dimensions linters cannot catch (correctness, security, performance, design, resilience, testing, maintainability). Explicitly excludes style/formatting to avoid the low-value bikeshedding that accounts for 85% of review comments.
+
+### Changed
+
+- **`MemoryCompressor`** moved from free → enterprise tier. Available via `mycontext.templates.enterprise.specialized.MemoryCompressor`. Removed from `mycontext.templates.free.specialized`.
+
+- **`RagAnswerer`** moved from free → enterprise tier. Available via `mycontext.templates.enterprise.specialized.RagAnswerer`. Removed from `mycontext.templates.free.specialized`.
+
+- **Free tier** now ships 16 patterns (unchanged count — `MemoryCompressor` and `RagAnswerer` were already deprecated from free in 0.6.0 and are now formally removed).
+
+- **Pattern catalog** (`mycontext.intelligence.pattern_catalog`) updated with enriched metadata (`when_to_use`, `use_cases`, `theme`) for all 87 patterns, and full keyword routing entries for `QueryPlanner`, `MemoryCompressor`, and `RagAnswerer`.
+
+- **`Pattern.build_context()`** base method signature updated: `output_format: str = "structured"` added as a keyword argument. Raises `ValueError` for unrecognised format values.
+
+- **`Pattern.execute()`** base method signature updated: `output_format: str = "structured"` added. Machine formats (`json`, `table`) automatically set `temperature=0.0` unless the caller overrides it.
+
+### Migration
+
+If you were importing `MemoryCompressor` or `RagAnswerer` from the free tier:
+
+```python
+# Before (0.6.x — these no longer exist in the free package)
+from mycontext.templates.free.specialized import MemoryCompressor, RagAnswerer
+
+# After (0.7.0 — enterprise tier, requires license)
+from mycontext.templates.enterprise.specialized import MemoryCompressor, RagAnswerer
+```
+
+---
+
+## [0.6.0] — 2026-02-28
+
+### Added
+
+- **`RagAnswerer`** (enterprise) — Grounded answer generation from retrieved context for RAG pipelines. Incorporates generation-side best practices from Chain-of-Note, Self-RAG, CRAG, and multi-granularity reasoning. Supports three tasks: `answer`, `summarize`, `synthesize`. Enforces citation, reduces hallucination, and preserves specific terminology.
+
+- **`MemoryCompressor`** (enterprise) — Structured state extraction from conversations and documents for long-context agent memory. Extracts entities, decisions, constraints, and quantitative data instead of prose summaries. Three intents: `session` (full compression), `progressive` (incremental update), `context` (document compression). Research basis: SimpleMem, CDIC, RECOMP, Cognitive Load Theory.
+
+- **`OutputEvaluator`** — 5-dimension LLM output quality scoring: Instruction Following, Reasoning Depth, Actionability, Structure Compliance, Cognitive Scaffolding. Available via `mycontext.intelligence.OutputEvaluator`.
+
+- **`QualityMetrics`** — 7-dimension context quality scoring: Clarity, Completeness, Specificity, Relevance, Structure, Efficiency. Available via `mycontext.intelligence.QualityMetrics`.
+
+### Changed
+
+- **`DataAnalyzer`** now supports `intent` and `investment` parameters for controlling analysis scope and depth:
+  - `intent`: `"executive"` | `"analyst"` | `"operations"` | `"summary"` | `"comprehensive"` (default) — controls which sections are produced.
+  - `investment`: `"quick"` | `"standard"` (default) | `"thorough"` — controls depth and token budget.
+  - Backward compatible: omitting both parameters gives the original full report behavior.
+
+- Pattern count updated from 85 to 87 (16 free + 71 enterprise).
+
+- **`SemanticCache`** test suite fixed — cache key now correctly includes the default user turn, matching the provider's internal key format.
+
+---
+
 ## [0.5.0] — 2026-02-24
 
 ### Added

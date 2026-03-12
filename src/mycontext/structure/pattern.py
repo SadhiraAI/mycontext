@@ -149,20 +149,31 @@ class Pattern(BaseModel):
         filled = re.sub(r"\n{3,}", "\n\n", filled).strip()
         return filled
 
-    def build_context(self, **inputs) -> "Context":
+    def build_context(self, output_format: str = "structured", **inputs) -> "Context":
         """
         Build a Context from this pattern with the given inputs.
         
         Args:
+            output_format: Controls presentation style of the LLM response.
+                Human formats: "structured" (default), "narrative", "brief",
+                "actionable", "slides", "email", "qa", "checklist".
+                Machine formats: "json", "table".
             **inputs: Input values matching input_schema
             
         Returns:
             Context instance ready to execute
             
         Raises:
-            ValueError: If required inputs are missing
+            ValueError: If required inputs are missing or output_format is invalid
         """
         from ..core import Context
+        from ..utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
+
+        if output_format not in VALID_OUTPUT_FORMATS:
+            raise ValueError(
+                f"Invalid output_format {output_format!r}. "
+                f"Choose from: {sorted(VALID_OUTPUT_FORMATS)}"
+            )
 
         # Validate inputs
         self._validate_inputs(inputs)
@@ -172,6 +183,9 @@ class Pattern(BaseModel):
         if self.directive_template:
             from ..utils.template_safety import safe_format_template
             directive_content = safe_format_template(self.directive_template, **inputs)
+            fmt = get_format_directive(output_format)
+            if fmt:
+                directive_content += fmt
             directive = Directive(content=directive_content)
 
         # Create context
@@ -184,21 +198,28 @@ class Pattern(BaseModel):
 
         context.metadata["pattern"] = self.name
         context.metadata["pattern_version"] = self.version
+        context.metadata["output_format"] = output_format
 
         return context
 
-    def execute(self, provider: str = "openai", mode: str = "full", **inputs) -> Any:
+    def execute(self, provider: str = "openai", mode: str = "full", output_format: str = "structured", **inputs) -> Any:
         """
         Execute this pattern directly.
         
         Args:
             provider: LLM provider to use
             mode: "full" for the rich template, "generic" for the concise prompt
+            output_format: Controls presentation style of the LLM response.
+                Human formats: "structured" (default), "narrative", "brief",
+                "actionable", "slides", "email", "qa", "checklist".
+                Machine formats: "json", "table".
             **inputs: Input values (template inputs + provider kwargs like 'model')
             
         Returns:
             Execution result
         """
+        from ..utils.format_directives import is_machine_format
+
         template_inputs = {}
         provider_kwargs = {}
 
@@ -211,14 +232,22 @@ class Pattern(BaseModel):
             else:
                 template_inputs[key] = value
 
+        # Machine formats work best at low temperature
+        if is_machine_format(output_format) and "temperature" not in provider_kwargs:
+            provider_kwargs["temperature"] = 0.0
+
         if mode == "generic":
             from ..core import Context
-            from ..foundation import Directive
+            from ..utils.format_directives import get_format_directive
             prompt_text = self.generic_prompt(**template_inputs)
+            fmt = get_format_directive(output_format)
+            if fmt:
+                prompt_text += fmt
             ctx = Context(directive=Directive(content=prompt_text))
+            ctx.metadata["output_format"] = output_format
             return ctx.execute(provider=provider, **provider_kwargs)
 
-        context = self.build_context(**template_inputs)
+        context = self.build_context(output_format=output_format, **template_inputs)
         return context.execute(provider=provider, **provider_kwargs)
 
     def _validate_inputs(self, inputs: dict[str, Any]) -> None:

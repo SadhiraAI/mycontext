@@ -1,5 +1,5 @@
 """
-Pattern Catalog - Single source of truth for all 85 cognitive patterns.
+Pattern Catalog - Single source of truth for all 87 cognitive patterns.
 
 Contains pattern metadata, keyword mappings, and derived lookup dicts.
 Extracted from pattern_suggester.py for single-responsibility.
@@ -9,7 +9,7 @@ Extracted from pattern_suggester.py for single-responsibility.
 ENTERPRISE_LICENSE_NOTE = " Requires enterprise license. Set include_enterprise=True to use."
 
 
-# (name, category, one-line description) for all 85 templates (all unique names)
+# (name, category, one-line description) for all 87 templates (all unique names)
 FULL_PATTERN_CATALOG: list[tuple[str, str, str]] = [
     # FREE - Analysis (2)
     ("question_analyzer", "free", "Decomposes a question into sub-questions, identifies assumptions, clarifies scope"),
@@ -45,7 +45,7 @@ FULL_PATTERN_CATALOG: list[tuple[str, str, str]] = [
     ("priority_setter", "enterprise", "Ranks priorities using weighted criteria and urgency/importance matrix"),
     ("deadline_manager", "enterprise", "Creates timeline with milestones, dependencies, and buffer management"),
     # FREE - Specialized (6)
-    ("code_reviewer", "free", "Systematic code review: security, performance, maintainability, best practices"),
+    ("code_reviewer", "free", "Risk-aware code review: orient-then-analyze cognitive flow across 7 dimensions (correctness, security, performance, design, resilience, testing, maintainability)"),
     ("content_outliner", "enterprise", "Creates structured content outlines with hierarchy and flow"),
     ("socratic_questioner", "free", "Asks probing questions to uncover hidden assumptions and deepen understanding"),
     ("intent_recognizer", "free", "Identifies the core intent, goals, and motivations behind a query"),
@@ -56,8 +56,9 @@ FULL_PATTERN_CATALOG: list[tuple[str, str, str]] = [
     ("conflict_resolver", "free", "Mediates conflicts by identifying interests, finding common ground"),
     ("concept_explainer", "enterprise", "Explains complex concepts using layered depth: simple → technical → expert"),
     ("synthesis_builder", "free", "Synthesizes multiple sources into a coherent, integrated summary"),
-    ("rag_answerer", "free", "Grounded answer generation from retrieved context with citation and abstention"),
-    ("memory_compressor", "free", "Compress conversations and documents into structured state for long-context memory"),
+    ("rag_answerer", "enterprise", "Grounded answer generation from retrieved context with citation and abstention"),
+    ("query_planner", "enterprise", "Pre-retrieval query analysis: classify, decompose, rewrite (HyDE + step-back), and plan retrieval strategy for RAG pipelines"),
+    ("memory_compressor", "enterprise", "Compress conversations and documents into structured state for long-context memory"),
     # ENTERPRISE - Decision (5)
     ("decision_framework", "enterprise", "Structured decision-making with weighted criteria, options evaluation, and recommendations"),
     ("comparative_analyzer", "enterprise", "Side-by-side comparison across multiple dimensions with explicit scoring"),
@@ -122,7 +123,7 @@ VALID_PATTERN_NAMES = set(NAME_TO_CATEGORY.keys())
 PATTERN_CATALOG = "\n".join(f"{n} [{c}]: {d}" for n, c, d in FULL_PATTERN_CATALOG)
 
 # ---------------------------------------------------------------------------
-# ENRICHED_CATALOG — when_to_use, use_cases, theme for all 85 templates.
+# ENRICHED_CATALOG — when_to_use, use_cases, theme for all 87 templates.
 # Bridges rich metadata from template_service.py into the SDK intelligence layer.
 # ---------------------------------------------------------------------------
 ENRICHED_CATALOG: dict = {
@@ -160,7 +161,7 @@ ENRICHED_CATALOG: dict = {
     "priority_setter": {"theme": "Project Management", "when_to_use": "Use when the question requires ranking items by importance, urgency, or impact.", "use_cases": ["Sprint backlog", "Feature prioritization", "Strategic initiatives"]},
     "deadline_manager": {"theme": "Project Management", "when_to_use": "Use when the question involves managing timelines, milestones, and dependencies.", "use_cases": ["Project timelines", "Release planning", "Event coordination"]},
     # Specialized
-    "code_reviewer": {"theme": "Evaluation & Quality", "when_to_use": "Use when the question involves reviewing code for quality, security, or best practices.", "use_cases": ["Pull request reviews", "Security audits", "Tech debt assessment"]},
+    "code_reviewer": {"theme": "Evaluation & Quality", "when_to_use": "Use when the question involves reviewing code for correctness, security, resilience, or design — uses a risk-weighted cognitive flow that skips style (linters handle that).", "use_cases": ["Pull request reviews", "Security audits", "Failure-mode analysis", "Pre-merge risk assessment"]},
     "content_outliner": {"theme": "Communication & Clarity", "when_to_use": "Use when the question needs a structured content outline or hierarchy.", "use_cases": ["Blog posts", "Whitepapers", "Course curriculum"]},
     "socratic_questioner": {"theme": "Self-Improvement", "when_to_use": "Use when the question benefits from probing deeper to uncover hidden assumptions.", "use_cases": ["Coaching sessions", "Requirements elicitation", "Critical thinking"]},
     "intent_recognizer": {"theme": "Data & Analytics", "when_to_use": "Use when the question involves understanding the underlying intent or motivation in text.", "use_cases": ["Customer support triage", "Chatbot design", "Survey analysis"]},
@@ -172,6 +173,7 @@ ENRICHED_CATALOG: dict = {
     "concept_explainer": {"theme": "Learning & Development", "when_to_use": "Use when a complex concept needs clear, layered explanation for different skill levels.", "use_cases": ["Technical documentation", "Training materials", "Onboarding guides"]},
     "synthesis_builder": {"theme": "Data & Analytics", "when_to_use": "Use when multiple information sources need to be combined into a coherent summary.", "use_cases": ["Literature reviews", "Market research synthesis", "Board reports"]},
     "rag_answerer": {"theme": "Data & Analytics", "when_to_use": "Use when answering questions from retrieved documents (RAG pipelines).", "use_cases": ["Q&A over docs", "Knowledge base chatbots", "Document summarization", "Evidence-based synthesis"]},
+    "query_planner": {"theme": "Data & Analytics", "when_to_use": "Use before retrieval to analyze, decompose, and rewrite queries for better RAG results. Complements rag_answerer.", "use_cases": ["Multi-hop question decomposition", "Query rewriting for better retrieval", "HyDE document generation", "RAG query routing"]},
     "memory_compressor": {"theme": "Data & Analytics", "when_to_use": "Use when compressing long conversations or documents into structured memory state.", "use_cases": ["Multi-turn agent memory", "Context window management", "Progressive summarization", "Long-context retention"]},
     # Decision
     "decision_framework": {"theme": "Strategic Thinking", "when_to_use": "Use when the question requires choosing between options with weighted criteria evaluation.", "use_cases": ["Technology selection", "Vendor evaluation", "Architecture decisions"]},
@@ -273,7 +275,7 @@ for _tier in ("free", "enterprise"):
         CATALOG_FOR_LLM += f"  {_n}: {_d}\n"
 
 
-# Keyword -> (pattern_name, category, reason_snippet) - ALL 85 templates
+# Keyword -> (pattern_name, category, reason_snippet) - ALL 87 templates
 PATTERN_MAP: list[tuple[list[str], tuple[str, str, str]]] = [
     # FREE - Analysis
     (["question", "analyze", "clarify", "what is", "unclear"], ("question_analyzer", "free", "Question analysis")),
@@ -319,6 +321,9 @@ PATTERN_MAP: list[tuple[list[str], tuple[str, str, str]]] = [
     (["conflict", "conflicts", "disagree", "dispute"], ("conflict_resolver", "free", "Conflict resolution")),
     (["concept", "concepts", "explain", "define"], ("concept_explainer", "enterprise", "Concept explanation")),
     (["synthesis", "synthesize", "combine"], ("synthesis_builder", "free", "Synthesis building")),
+    (["rag", "retrieval", "retrieved", "grounded", "knowledge base", "document qa", "citation"], ("rag_answerer", "enterprise", "RAG answer generation")),
+    (["query plan", "decompose query", "sub-query", "hyde", "pre-retrieval", "query rewrite", "query routing", "multi-hop"], ("query_planner", "enterprise", "Query planning for RAG")),
+    (["memory", "compress", "compression", "summarize conversation", "agent memory", "context window"], ("memory_compressor", "enterprise", "Memory compression")),
     # ENTERPRISE - Decision
     (["should we", "should i", "decide", "decision", "choose between"], ("decision_framework", "enterprise", "Decision framework")),
     (["compare", "versus", "vs", "better", "difference between"], ("comparative_analyzer", "enterprise", "Comparison analysis")),

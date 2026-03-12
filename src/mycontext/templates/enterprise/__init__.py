@@ -1,13 +1,13 @@
 """
 mycontext Enterprise Templates - Advanced cognitive patterns for professional use.
 
-**69 Enterprise Patterns** across 16 categories:
+**71 Enterprise Patterns** across 16 categories:
 - Analysis (4): Trend, gap, SWOT, anomaly
 - Reasoning (2): Analogical, causal
 - Creative (4): Ideation, innovation, design thinking, metaphors
 - Communication (5): Simplification, clarity, persuasion, narrative, feedback
 - Planning (3): Priority, deadline, resource allocation
-- Specialized (5): Content, ambiguity, risk mitigation, impact, concepts
+- Specialized (8): Content, ambiguity, risk mitigation, impact, concepts, RAG answerer, query planner, memory compressor
 - Decision (5): Decision framework, comparative, tradeoff, multi-objective, cost-benefit
 - Problem Solving (6): Decomposition, bottleneck, constraint, dependency, efficiency, trade space
 - Metacognition (5): Self-monitoring, self-regulation, learning
@@ -104,6 +104,9 @@ from .specialized import (
     ConceptExplainer,
     ContentOutliner,
     ImpactAssessor,
+    MemoryCompressor,
+    QueryPlanner,
+    RagAnswerer,
     RiskMitigator,
 )
 from .synthesis import (
@@ -196,4 +199,7 @@ __all__ = [
     "RiskMitigator",
     "ImpactAssessor",
     "ConceptExplainer",
+    "MemoryCompressor",
+    "QueryPlanner",
+    "RagAnswerer",
 ]

@@ -6,8 +6,9 @@ Based on synthesis methodology and information integration.
 """
 
 
-from mycontext.foundation import Constraints, Guidance
+from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
+from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
 
 
 class SynthesisBuilder(Pattern):
@@ -161,17 +162,39 @@ Synthesis process:
         sources: list[str] | None = None,
         goal: str = "Unified understanding",
         context: str | None = None,
-        **kwargs
+        output_format: str = "structured",
+        **kwargs,
     ):
+        """
+        Build context for synthesis.
+
+        Args:
+            sources: List of sources to synthesise
+            goal: What the synthesis should achieve
+            context: Optional additional context
+            output_format: How to present results — ``"structured"`` (default)
+                | ``"narrative"`` (synthesis as a single essay — the most natural
+                format for this template) | ``"brief"`` | ``"table"``
+                (evidence matrix only) | ``"json"``
+        """
+        if output_format not in VALID_OUTPUT_FORMATS:
+            raise ValueError(
+                f"Invalid output_format {output_format!r}. "
+                f"Choose from: {sorted(VALID_OUTPUT_FORMATS)}"
+            )
         sources_section = self._render_sources_section(sources)
         context_section = self._render_context_section(context)
-
-        return super().build_context(
+        ctx = super().build_context(
             sources_section=sources_section,
             goal=goal,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
+        fmt = get_format_directive(output_format)
+        if fmt and ctx.directive:
+            ctx.directive = Directive(content=ctx.directive.content + fmt)
+            ctx.metadata["output_format"] = output_format
+        return ctx
 
     def execute(
         self,
@@ -179,12 +202,30 @@ Synthesis process:
         sources: list[str] | None = None,
         goal: str = "Unified understanding",
         context: str | None = None,
-        **kwargs
+        output_format: str = "structured",
+        **kwargs,
     ):
-        return super().execute(
-            provider=provider,
+        """
+        Execute synthesis building.
+
+        Args:
+            provider: LLM provider to use
+            sources: List of sources to synthesise
+            goal: What the synthesis should achieve
+            context: Optional additional context
+            output_format: How to present results — ``"structured"`` (default)
+                | ``"narrative"`` | ``"brief"`` | ``"table"`` | ``"json"``
+        """
+        provider_params = {
+            "model", "temperature", "max_tokens", "top_p",
+            "frequency_penalty", "presence_penalty", "stop",
+            "user", "api_key", "base_url",
+        }
+        provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
+        ctx = self.build_context(
             sources=sources,
             goal=goal,
             context=context,
-            **kwargs
+            output_format=output_format,
         )
+        return ctx.execute(provider=provider, **provider_kwargs)

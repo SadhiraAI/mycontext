@@ -1,7 +1,7 @@
 [project]
 name = "mycontext-ai"
-version = "0.5.0"
-description = "Context engineering for LLMs — 85 cognitive patterns, prompt compilation, 3-tier execution, 13 export formats"
+version = "0.7.0"
+description = "Context engineering for LLMs — 87 cognitive patterns, prompt compilation, 3-tier execution, 13 export formats"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -23,6 +23,7 @@ dependencies = [
     "pydantic>=2.11.0",
     "pyyaml>=6.0.2",
     "litellm>=1.55.0",  # Required for ctx.execute() — routes to OpenAI, Anthropic, Gemini, 100+ providers
+    "pandas>=3.0.1",
 ]
 
 [project.optional-dependencies]
@@ -68,8 +69,8 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/SadhiraAI/mycontext"
-Documentation = "https://github.com/SadhiraAI/mycontext#readme"
+Homepage = "https://mycontext-docs.pages.dev/"
+Documentation = "https://mycontext-docs.pages.dev/"
 Repository = "https://github.com/SadhiraAI/mycontext"
 Changelog = "https://github.com/SadhiraAI/mycontext/blob/main/CHANGELOG.md"
 Issues = "https://github.com/SadhiraAI/mycontext/issues"

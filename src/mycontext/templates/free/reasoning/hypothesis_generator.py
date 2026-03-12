@@ -1,56 +1,207 @@
 """
-Hypothesis Generator - Generate testable hypotheses systematically
+Hypothesis Generator - Generate testable hypotheses systematically.
 
-Creates well-formed hypotheses following scientific method.
+Creates well-formed hypotheses following the scientific method.
 Based on scientific reasoning and experimental design research.
+
+rigor parameter drives a genuinely different directive per level:
+  exploratory — 3 sections: observation + hypothesis + next steps
+  standard    — 6 sections: + background + predictions + success criteria
+  scientific  — all 10 sections (default, full experimental design)
 """
 
-from mycontext.foundation import Constraints, Guidance
+from __future__ import annotations
+
+from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
 
+VALID_RIGOR_LEVELS: frozenset[str] = frozenset({"exploratory", "standard", "scientific"})
+
+
+def _build_directive(rigor: str) -> str:
+    """Assemble the directive at runtime — scaffold never stored as a module-level constant."""
+
+    def _next_steps(n: int) -> str:
+        return (
+            f"{n}. **NEXT STEPS**\n"
+            "   - Immediate: [First action \u2014 data collection, lit review, pilot]\n"
+            "   - Short-term: [Early validation test \u2014 cheapest way to get signal]\n"
+            "   - Long-term: [Comprehensive study if initial results are promising]\n"
+            "   - Resources needed: [Data, tools, expertise, time, budget]"
+        )
+
+    sections_map = {
+        "observation": (
+            "1. **OBSERVATION ANALYSIS**\n"
+            "   - Core observation: [What exactly was observed?]\n"
+            "   - Pattern: [What relationship or pattern was noticed?]\n"
+            "   - Context: [Under what conditions?]\n"
+            "   - Significance: [Why is this interesting or worth investigating?]"
+        ),
+        "background": (
+            "2. **BACKGROUND KNOWLEDGE**\n"
+            "   - Known theory: [What existing theory applies?]\n"
+            "   - Prior evidence: [What is already established?]\n"
+            "   - Mechanisms: [What could explain this?]\n"
+            "   - Gaps: [What remains unknown?]"
+        ),
+        "hypotheses": (
+            "3. **HYPOTHESIS FORMULATION**\n\n"
+            '   **Primary Hypothesis (H1)**: [Clear cause-effect: "If X, then Y because Z"]\n'
+            "   - Independent variable: [What is manipulated] | Dependent variable: [What is measured]\n"
+            "   - Mechanism: [Why would this happen?]\n\n"
+            "   **Null Hypothesis (H0)**: [No effect \u2014 the default assumption to reject]\n\n"
+            "   **Alternative Hypotheses**:\n"
+            "   - H2: [An alternative explanation]\n"
+            "   - H3: [Another possibility \u2014 different mechanism, same outcome]"
+        ),
+        "predictions": (
+            "4. **TESTABLE PREDICTIONS**\n"
+            "   If the primary hypothesis is true:\n"
+            "   - Prediction 1: [Specific, observable, measurable outcome]\n"
+            "   - Prediction 2: [Another testable outcome]\n\n"
+            "   If the hypothesis is false:\n"
+            "   - What we would observe instead: [The null result]"
+        ),
+        "variables": (
+            "5. **VARIABLES & CONTROLS**\n\n"
+            "   Independent Variables: [Variable] \u2014 [How to manipulate]\n"
+            "   Dependent Variables: [Variable] \u2014 [How to measure]\n"
+            "   Control Variables: [Variable] \u2014 [What to hold constant]\n"
+            "   Confounding Variables: [Variable] \u2014 [Mitigation]"
+        ),
+        "experimental_design": (
+            "6. **EXPERIMENTAL DESIGN**\n\n"
+            "   Method: [Design type] | Sample size: [Minimum] | Duration: [Time required]\n"
+            "   Treatment group: [What they receive] | Control group: [Comparison baseline]\n"
+            "   Primary outcome: [Key metric] | Secondary outcomes: [Additional metrics]"
+        ),
+        "success_criteria": (
+            "7. **SUCCESS CRITERIA**\n\n"
+            "   Evidence that supports the hypothesis:\n"
+            "   - Statistical: [Significance threshold, effect size, confidence interval]\n"
+            "   - Practical: [Minimum meaningful difference \u2014 not just statistical]\n\n"
+            "   Reject the hypothesis if:\n"
+            "   - [Specific statistical conditions] | [Practical conditions]"
+        ),
+        "limitations": (
+            "8. **LIMITATIONS & ASSUMPTIONS**\n\n"
+            "   Assumptions: [What must be true for the experiment to be valid]\n"
+            "   Limitations: [What this experiment cannot tell us]\n"
+            "   Boundary conditions: [When or where this hypothesis may not apply]"
+        ),
+        "rival_hypotheses": (
+            "9. **RIVAL HYPOTHESES**\n"
+            "   Rival Hypothesis A: [Alternative explanation] \u2014 Why plausible: [Evidence] "
+            "\u2014 How to distinguish: [Finding that tells them apart]\n"
+            "   Rival Hypothesis B: [Another alternative] \u2014 How to rule out: [Test]"
+        ),
+    }
+
+    configs = {
+        "exploratory": {
+            "keys": ["observation", "hypotheses"],
+            "next_steps_n": 3,
+            "instruction": (
+                "Generate a clear, testable hypothesis from this observation. "
+                "Keep it lean \u2014 state what you think is happening, why, and "
+                "the most direct way to test it."
+            ),
+            "total": 3,
+        },
+        "standard": {
+            "keys": ["observation", "background", "hypotheses", "predictions", "success_criteria"],
+            "next_steps_n": 6,
+            "instruction": (
+                "Apply standard scientific hypothesis generation. "
+                "Ground the hypothesis in background knowledge, define testable "
+                "predictions, set clear success criteria, and outline next steps."
+            ),
+            "total": 6,
+        },
+        "scientific": {
+            "keys": [
+                "observation", "background", "hypotheses", "predictions",
+                "variables", "experimental_design", "success_criteria",
+                "limitations", "rival_hypotheses",
+            ],
+            "next_steps_n": 10,
+            "instruction": (
+                "Apply the full scientific method. Generate a rigorously specified "
+                "hypothesis with null and alternative hypotheses, detailed variable "
+                "definitions, an experimental design, success criteria, rival "
+                "hypotheses to rule out, and a prioritised next-steps plan."
+            ),
+            "total": 10,
+        },
+    }
+    cfg = configs.get(rigor, configs["scientific"])
+    sections_list = [sections_map[k] for k in cfg["keys"]] + [_next_steps(cfg["next_steps_n"])]
+    sections_text = "\n\n".join(sections_list)
+
+    return (
+        f"Generate testable hypotheses from this observation:\n\n"
+        f"**OBSERVATION**: {{observation}}\n\n"
+        f"{{context_section}}\n\n"
+        f"**DOMAIN**: {{domain}}\n\n"
+        f"**RIGOR LEVEL**: {rigor} ({cfg['total']} sections)\n\n"
+        f"{cfg['instruction']}\n\n"
+        f"All hypotheses must be testable and falsifiable.\n\n"
+        f"{sections_text}\n\n"
+        f"**OUTPUT FORMAT**: Scientific, rigorous hypothesis with clear testing plan."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Template class
+# ---------------------------------------------------------------------------
 
 class HypothesisGenerator(Pattern):
     """
-    Generate testable hypotheses systematically.
-    
-    Creates:
-    - Well-formed hypotheses
-    - Null and alternative hypotheses
-    - Testable predictions
-    - Experimental designs
-    
-    Based on: Scientific method and hypothesis formation research
-    
-    Example:
+    Generate testable hypotheses systematically from observations.
+
+    The **rigor** parameter controls how comprehensive the output is:
+
+    - ``exploratory`` (3 sections): Observation → Hypothesis → Next steps.
+      Fast — good for product managers, analysts, and business teams who need
+      a well-formed hypothesis to guide a quick experiment.
+    - ``standard`` (6 sections): + Background + Predictions + Success criteria.
+      Good for most research and data science contexts.
+    - ``scientific`` (10 sections, default): Full scientific method including
+      variable definitions, experimental design, rival hypotheses, and
+      limitations.  Good for academic research and rigorous experimentation.
+
+    Based on: Scientific method and hypothesis formation research.
+
+    Examples:
         >>> generator = HypothesisGenerator()
-        >>> context = generator.build_context(
-        ...     observation="Sales increase when we send email reminders",
-        ...     domain="e-commerce"
+        >>> # Quick product hypothesis
+        >>> result = generator.execute(
+        ...     provider="openai",
+        ...     observation="Users who complete onboarding in under 5 minutes retain at 2x the rate",
+        ...     domain="SaaS product analytics",
+        ...     rigor="exploratory",
         ... )
-    
+        >>> # Full scientific hypothesis
+        >>> result = generator.execute(
+        ...     provider="openai",
+        ...     observation="Plants in the east-facing room grew 30% taller than west-facing ones",
+        ...     domain="botany",
+        ...     rigor="scientific",
+        ... )
+
     Free Template - Part of mycontext open source edition.
     """
 
     GENERIC_PROMPT = (
-        "You are a scientific researcher and hypothesis specialist. Generate testable "
-        "hypotheses from the following observation:\n\n"
+        "Generate testable hypotheses from the following observation:\n\n"
         "Observation: {observation}\n"
         "Domain: {domain}\n"
         "{context_section}\n\n"
-        "Apply rigorous scientific methodology: "
-        "(1) Analyze the observation — what exactly has been observed, in what context, "
-        "and with what frequency? "
-        "(2) Identify relevant background knowledge and prior findings. "
-        "(3) Generate hypotheses: formulate a primary hypothesis (H1), a null "
-        "hypothesis (H0), and 2-3 alternative hypotheses — each must state a clear "
-        "cause-effect relationship. "
-        "(4) For each hypothesis, define testable predictions, identify independent "
-        "and dependent variables plus potential confounds, and outline an experimental "
-        "design to test it. "
-        "(5) Define success criteria — what evidence would support or refute each? "
-        "(6) Acknowledge limitations and assumptions. "
-        "(7) Consider rival hypotheses and explain why they are less likely. "
-        "(8) Recommend concrete next steps for investigation.\n\n"
+        "Analyse what was observed and in what context, identify relevant background "
+        "knowledge, formulate a primary hypothesis (H1), a null hypothesis (H0), and "
+        "alternative hypotheses, define testable predictions with variables and controls, "
+        "set success criteria, acknowledge limitations, and recommend next steps.\n\n"
         "All hypotheses must be testable and falsifiable."
     )
 
@@ -65,154 +216,27 @@ class HypothesisGenerator(Pattern):
                     "State clear cause-effect relationships",
                     "Include null and alternative hypotheses",
                     "Provide measurable predictions",
-                    "Consider confounding variables"
+                    "Consider confounding variables",
                 ],
-                style="rigorous, scientific, precise"
+                style="rigorous, scientific, precise",
             ),
-            directive_template="""Generate testable hypotheses:
-
-**OBSERVATION**: {observation}
-
-{context_section}
-
-**DOMAIN**: {domain}
-
-Systematic hypothesis generation:
-
-1. **OBSERVATION ANALYSIS**
-   - Core observation: [What did we observe?]
-   - Pattern: [What pattern or relationship?]
-   - Context: [Under what conditions?]
-   - Significance: [Why is this interesting?]
-
-2. **BACKGROUND KNOWLEDGE**
-   - Known theory: [What existing theory applies?]
-   - Prior evidence: [What's already known?]
-   - Mechanisms: [What could explain this?]
-   - Gaps: [What's unknown?]
-
-3. **HYPOTHESIS FORMULATION**
-   
-   **Primary Hypothesis (H1)**:
-   - Statement: [Clear cause-effect statement]
-   - Independent variable: [What we manipulate]
-   - Dependent variable: [What we measure]
-   - Relationship: [Expected relationship]
-   - Mechanism: [Why would this happen?]
-   
-   **Null Hypothesis (H0)**:
-   - Statement: [No effect statement]
-   - Basis: [Default assumption]
-   
-   **Alternative Hypotheses** (if applicable):
-   - H2: [Alternative explanation]
-   - H3: [Another possibility]
-
-4. **TESTABLE PREDICTIONS**
-   If primary hypothesis is true:
-   - Prediction 1: [Specific testable outcome]
-   - Prediction 2: [Another testable outcome]
-   - Prediction 3: [Additional prediction]
-   
-   If hypothesis is false:
-   - What we'd observe instead: [Null result]
-
-5. **VARIABLES & CONTROLS**
-   
-   Independent Variables:
-   - [Variable 1]: [How to manipulate]
-   - [Variable 2]: [Alternative manipulation]
-   
-   Dependent Variables:
-   - [Variable 1]: [How to measure]
-   - [Variable 2]: [Additional measures]
-   
-   Control Variables:
-   - [Variable 1]: [What to hold constant]
-   - [Variable 2]: [Another control]
-   
-   Confounding Variables:
-   - [Variable 1]: [Potential confounder]
-   - [Mitigation]: [How to address]
-
-6. **EXPERIMENTAL DESIGN**
-   
-   Method:
-   - Design type: [Experimental, observational, etc.]
-   - Sample size: [Estimated needed]
-   - Duration: [Time required]
-   - Procedure: [High-level steps]
-   
-   Conditions:
-   - Treatment group: [What they receive]
-   - Control group: [Comparison group]
-   - Randomization: [How to assign]
-   
-   Measurements:
-   - Primary outcome: [Key metric]
-   - Secondary outcomes: [Additional metrics]
-   - Timing: [When to measure]
-
-7. **SUCCESS CRITERIA**
-   
-   Support for hypothesis:
-   - Statistical: [p < 0.05, effect size, etc.]
-   - Practical: [Meaningful difference]
-   - Consistency: [Across conditions]
-   
-   Reject hypothesis if:
-   - [Specific conditions]
-   - [Statistical criteria]
-
-8. **LIMITATIONS & ASSUMPTIONS**
-   
-   Assumptions:
-   - [Assumption 1]
-   - [Assumption 2]
-   
-   Limitations:
-   - [Limitation 1]
-   - [Limitation 2]
-   
-   Boundary conditions:
-   - [When hypothesis may not apply]
-
-9. **RIVAL HYPOTHESES**
-   Consider alternative explanations:
-   
-   Rival Hypothesis A:
-   - Statement: [Alternative explanation]
-   - How to test against: [Distinguish from H1]
-   
-   Rival Hypothesis B:
-   - Statement: [Another alternative]
-   - How to test against: [How to rule out]
-
-10. **NEXT STEPS**
-    - Immediate: [First action]
-    - Short-term: [Early tests]
-    - Long-term: [Comprehensive study]
-    - Resources needed: [What's required]
-
-**OUTPUT FORMAT**: Scientific, rigorous hypothesis with clear testing plan.""",
+            directive_template=_build_directive("scientific"),
             input_schema={
                 "observation": str,
                 "context_section": str,
-                "domain": str
+                "domain": str,
             },
             constraints=Constraints(
                 must_include=[
                     "testable_hypothesis",
                     "null_hypothesis",
                     "predictions",
-                    "experimental_design"
                 ],
-                style_guide="Be scientific but accessible, rigorous but practical"
-            )
+                style_guide="Be scientific but accessible, rigorous but practical",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
-        """Render optional context section."""
         if context:
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
@@ -222,28 +246,46 @@ Systematic hypothesis generation:
         observation: str = "",
         domain: str = "general",
         context: str | None = None,
-        **kwargs
+        rigor: str = "scientific",
+        **kwargs,
     ):
         """
         Build context for hypothesis generation.
-        
+
         Args:
             observation: The observation to explain
-            domain: Domain context
+            domain: Domain context (e.g. "e-commerce", "biology", "engineering")
             context: Optional additional context
+            rigor: Depth of scientific rigour — ``"exploratory"`` (3 sections)
+                | ``"standard"`` (6 sections) | ``"scientific"`` (10, default)
             **kwargs: Additional options
-        
-        Returns:
-            Context object ready for export/use
         """
-        context_section = self._render_context_section(context)
+        if rigor not in VALID_RIGOR_LEVELS:
+            raise ValueError(
+                f"Invalid rigor {rigor!r}. Choose from: {sorted(VALID_RIGOR_LEVELS)}"
+            )
+        from mycontext.core import Context
+        from mycontext.utils.template_safety import safe_format_template
 
-        return super().build_context(
+        context_section = self._render_context_section(context)
+        directive_text = _build_directive(rigor)
+        directive_content = safe_format_template(
+            directive_text,
             observation=observation,
             domain=domain,
             context_section=context_section,
-            **kwargs
         )
+
+        ctx = Context(
+            guidance=self.guidance,
+            directive=Directive(content=directive_content),
+            constraints=self.constraints,
+            data={"observation": observation, "domain": domain, "context_section": context_section},
+        )
+        ctx.metadata["pattern"] = self.name
+        ctx.metadata["pattern_version"] = self.version
+        ctx.metadata["rigor"] = rigor
+        return ctx
 
     def execute(
         self,
@@ -251,25 +293,28 @@ Systematic hypothesis generation:
         observation: str = "",
         domain: str = "general",
         context: str | None = None,
-        **kwargs
+        rigor: str = "scientific",
+        **kwargs,
     ):
         """
         Execute hypothesis generation.
-        
+
         Args:
             provider: LLM provider to use
             observation: The observation to explain
             domain: Domain context
             context: Optional additional context
-            **kwargs: Provider parameters
-        
-        Returns:
-            ProviderResponse with hypotheses
+            rigor: ``"exploratory"`` | ``"standard"`` | ``"scientific"`` (default)
+            **kwargs: Provider parameters (model, temperature, max_tokens, etc.)
         """
-        return super().execute(
-            provider=provider,
-            observation=observation,
-            domain=domain,
-            context=context,
-            **kwargs
+        provider_params = {
+            "model", "temperature", "max_tokens", "top_p",
+            "frequency_penalty", "presence_penalty", "stop",
+            "user", "api_key", "base_url",
+        }
+        provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
+        ctx = self.build_context(
+            observation=observation, domain=domain,
+            context=context, rigor=rigor,
         )
+        return ctx.execute(provider=provider, **provider_kwargs)

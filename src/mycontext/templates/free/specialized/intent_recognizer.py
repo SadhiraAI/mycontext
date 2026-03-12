@@ -10,169 +10,164 @@ applied: quick (4), standard (8), or comprehensive (12).
 
 from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
-
-
-_SECTION_SURFACE = """
-1. **SURFACE ANALYSIS**
-   - Explicit question/request: [What was literally asked?]
-   - Key terms and phrases: [Important words/concepts]
-   - Question type: [Information, advice, decision, validation, etc.]"""
-
-_SECTION_GOALS = """
-2. **GOAL INFERENCE**
-   - Immediate goal: [What do they want right now?]
-   - Underlying goal: [What's the real objective?]
-   - Long-term goal: [Where are they trying to get?]
-   - Success criteria: [How will they know they succeeded?]"""
-
-_SECTION_MOTIVATION = """
-3. **MOTIVATION ANALYSIS**
-   - Primary motivation: [What's driving this?]
-   - Pain points: [What problem are they solving?]
-   - Constraints: [What limitations exist?]
-   - Urgency: [How time-sensitive is this?]"""
-
-_SECTION_CONTEXT = """
-4. **CONTEXT INTERPRETATION**
-   - Situation: [What's their current state?]
-   - Background: [Relevant history or experience?]
-   - Stakeholders: [Who else is involved?]
-   - Environment: [External factors?]"""
-
-_SECTION_ASSUMPTIONS = """
-5. **IMPLICIT ASSUMPTIONS**
-   - Unstated beliefs: [What are they assuming?]
-   - Bias indicators: [Any cognitive biases?]
-   - Knowledge gaps: [What don't they know they don't know?]
-   - Misconceptions: [Potential misunderstandings?]"""
-
-_SECTION_NEEDS = """
-6. **NEED CLASSIFICATION**
-   - Information need: [What do they need to know?]
-   - Decision need: [What do they need to decide?]
-   - Action need: [What do they need to do?]
-   - Validation need: [Do they need confirmation?]"""
-
-_SECTION_REFORMULATED = """
-{n}. **REFORMULATED INTENT**
-   **Original Input**: {{input}}
-
-   **True Intent**: [State the actual underlying intent]
-
-   **Real Question**: [Reformulate as what they really want to know]
-
-   **Optimal Response Type**: [What kind of answer would best serve their needs?]"""
-
-_SECTION_RECOMMENDATION = """
-{n}. **RECOMMENDATION**
-   To address this intent effectively:
-   - Approach: [How to best respond]
-   - Key elements: [What to include]
-   - Avoid: [What not to do]
-   - Success indicators: [How to measure if you helped]"""
-
-_SECTION_SPEECH_ACTS = """
-7. **SPEECH ACT ANALYSIS**
-   - Locutionary act: [What was literally said — the propositional content]
-   - Illocutionary act: [What was intended — request, complaint, threat, plea, etc.]
-   - Perlocutionary act: [What effect do they want on the listener — persuade, alarm, reassure?]
-   - Illocutionary force mismatch: [Is the surface speech act different from the intended one?]"""
-
-_SECTION_IMPLICATURE = """
-8. **CONVERSATIONAL IMPLICATURE** (Gricean Analysis)
-   - Quantity: [Are they saying too much or too little? What does the over/under-sharing signal?]
-   - Quality: [Any hedging, exaggeration, or qualifiers that signal uncertainty?]
-   - Relation: [What seems irrelevant but was mentioned? Why include that detail?]
-   - Manner: [Is the phrasing unusually indirect, formal, or vague? What does the style signal?]
-   - What is NOT being said: [Conspicuous omissions — topics they are avoiding]"""
-
-_SECTION_INDIRECTNESS = """
-9. **INDIRECTNESS & POWER DYNAMICS**
-   - Directness level: [Scale 1-5, where 1 is highly indirect]
-   - Face-saving moves: [Are they protecting their own face or the listener's?]
-   - Power asymmetry: [Who has authority? How does it shape the request?]
-   - Politeness strategy: [Bald-on-record, positive, negative, or off-record?]
-   - Escalation signals: [Is this a first ask, a repeat, or a final warning?]"""
-
-_SECTION_FRAMES = """
-10. **FRAME & ABSENCE ANALYSIS**
-   - Activated frames: [What conceptual domains does this request invoke?]
-   - Alternative frames: [How would this look reframed from a different perspective?]
-   - Conspicuous absences: [What would you expect to see mentioned but isn't?]
-   - Temporal signals: [Time-of-day, day-of-week, deadline proximity — what do they reveal?]
-   - Metaphor analysis: [Any metaphors or analogies that reveal how they conceptualize the problem?]"""
-
-_DEPTH_CONFIGS = {
-    "quick": {
-        "sections": [
-            _SECTION_SURFACE,
-            _SECTION_GOALS,
-        ],
-        "reformulated_n": 3,
-        "recommendation_n": 4,
-        "instruction": "Provide a focused, efficient analysis. Prioritize the true intent and actionable recommendation.",
-    },
-    "standard": {
-        "sections": [
-            _SECTION_SURFACE,
-            _SECTION_GOALS,
-            _SECTION_MOTIVATION,
-            _SECTION_CONTEXT,
-            _SECTION_ASSUMPTIONS,
-            _SECTION_NEEDS,
-        ],
-        "reformulated_n": 7,
-        "recommendation_n": 8,
-        "instruction": "Provide thorough analysis across all standard dimensions.",
-    },
-    "comprehensive": {
-        "sections": [
-            _SECTION_SURFACE,
-            _SECTION_GOALS,
-            _SECTION_MOTIVATION,
-            _SECTION_CONTEXT,
-            _SECTION_ASSUMPTIONS,
-            _SECTION_NEEDS,
-            _SECTION_SPEECH_ACTS,
-            _SECTION_IMPLICATURE,
-            _SECTION_INDIRECTNESS,
-            _SECTION_FRAMES,
-        ],
-        "reformulated_n": 11,
-        "recommendation_n": 12,
-        "instruction": (
-            "Conduct the deepest possible analysis. Apply linguistic and pragmatic "
-            "frameworks (Speech Act Theory, Gricean implicature, Politeness Theory, "
-            "Frame Semantics) to uncover layers that surface-level analysis misses."
-        ),
-    },
-}
+from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
 
 
 def _build_directive(depth: str) -> str:
-    """Assemble the directive template for the given depth level."""
-    cfg = _DEPTH_CONFIGS.get(depth, _DEPTH_CONFIGS["comprehensive"])
-    sections = "\n".join(cfg["sections"])
-    reformulated = _SECTION_REFORMULATED.format(n=cfg["reformulated_n"])
-    recommendation = _SECTION_RECOMMENDATION.format(n=cfg["recommendation_n"])
+    """Assemble the directive at runtime — scaffold never stored as a module-level constant."""
+    section_texts = {
+        "surface": (
+            "\n1. **SURFACE ANALYSIS**\n"
+            "   - Explicit question/request: [What was literally asked?]\n"
+            "   - Key terms and phrases: [Important words/concepts]\n"
+            "   - Question type: [Information, advice, decision, validation, etc.]"
+        ),
+        "goals": (
+            "\n2. **GOAL INFERENCE**\n"
+            "   - Immediate goal: [What do they want right now?]\n"
+            "   - Underlying goal: [What's the real objective?]\n"
+            "   - Long-term goal: [Where are they trying to get?]\n"
+            "   - Success criteria: [How will they know they succeeded?]"
+        ),
+        "motivation": (
+            "\n3. **MOTIVATION ANALYSIS**\n"
+            "   - Primary motivation: [What's driving this?]\n"
+            "   - Pain points: [What problem are they solving?]\n"
+            "   - Constraints: [What limitations exist?]\n"
+            "   - Urgency: [How time-sensitive is this?]"
+        ),
+        "context": (
+            "\n4. **CONTEXT INTERPRETATION**\n"
+            "   - Situation: [What's their current state?]\n"
+            "   - Background: [Relevant history or experience?]\n"
+            "   - Stakeholders: [Who else is involved?]\n"
+            "   - Environment: [External factors?]"
+        ),
+        "assumptions": (
+            "\n5. **IMPLICIT ASSUMPTIONS**\n"
+            "   - Unstated beliefs: [What are they assuming?]\n"
+            "   - Bias indicators: [Any cognitive biases?]\n"
+            "   - Knowledge gaps: [What don't they know they don't know?]\n"
+            "   - Misconceptions: [Potential misunderstandings?]"
+        ),
+        "needs": (
+            "\n6. **NEED CLASSIFICATION**\n"
+            "   - Information need: [What do they need to know?]\n"
+            "   - Decision need: [What do they need to decide?]\n"
+            "   - Action need: [What do they need to do?]\n"
+            "   - Validation need: [Do they need confirmation?]"
+        ),
+        "affective": (
+            "\n7. **AFFECTIVE STATE ANALYSIS**\n"
+            "   - Emotional valence: [Positive / Neutral / Negative]\n"
+            "   - Dominant emotion: [Frustrated / Anxious / Curious / Hopeful / Urgent / Other]\n"
+            "   - Confidence level: [How certain does the person seem?]\n"
+            "   - Stress indicators: [Language markers of pressure or urgency]\n"
+            "   - Response tone needed: [What emotional register is appropriate?]"
+        ),
+        "speech_acts": (
+            "\n8. **SPEECH ACT ANALYSIS**\n"
+            "   - Locutionary act: [What was literally said]\n"
+            "   - Illocutionary act: [What was intended \u2014 request, complaint, plea, etc.]\n"
+            "   - Perlocutionary act: [What effect do they want \u2014 persuade, alarm, reassure?]\n"
+            "   - Illocutionary force mismatch: [Is surface speech act different from intended?]"
+        ),
+        "implicature": (
+            "\n9. **CONVERSATIONAL IMPLICATURE** (Gricean Analysis)\n"
+            "   - Quantity: [Over/under-sharing signal?]\n"
+            "   - Quality: [Hedging, exaggeration, or qualifiers indicating uncertainty?]\n"
+            "   - Relation: [What seems irrelevant but was mentioned?]\n"
+            "   - Manner: [Unusually indirect, formal, or vague?]\n"
+            "   - What is NOT being said: [Conspicuous omissions]"
+        ),
+        "indirectness": (
+            "\n10. **INDIRECTNESS & POWER DYNAMICS**\n"
+            "   - Directness level: [Scale 1-5, where 1 is highly indirect]\n"
+            "   - Face-saving moves: [Protecting own or listener's face?]\n"
+            "   - Power asymmetry: [Who has authority? How does it shape the request?]\n"
+            "   - Politeness strategy: [Bald-on-record, positive, negative, or off-record?]\n"
+            "   - Escalation signals: [First ask, repeat, or final warning?]"
+        ),
+        "frames": (
+            "\n11. **FRAME & ABSENCE ANALYSIS**\n"
+            "   - Activated frames: [What conceptual domains does this invoke?]\n"
+            "   - Alternative frames: [How would this look from a different perspective?]\n"
+            "   - Conspicuous absences: [What would you expect to see mentioned but isn't?]\n"
+            "   - Temporal signals: [Deadline proximity, urgency indicators]\n"
+            "   - Metaphor analysis: [Metaphors revealing how they conceptualise the problem]"
+        ),
+    }
+
+    def _reformulated(n: int) -> str:
+        return (
+            f"\n{n}. **REFORMULATED INTENT**\n"
+            "   **Original Input**: {{input}}\n\n"
+            "   **True Intent**: [State the actual underlying intent]\n\n"
+            "   **Real Question**: [Reformulate as what they really want to know]\n\n"
+            "   **Optimal Response Type**: [What kind of answer would best serve their needs?]"
+        )
+
+    def _recommendation(n: int) -> str:
+        return (
+            f"\n{n}. **RECOMMENDATION**\n"
+            "   To address this intent effectively:\n"
+            "   - Approach: [How to best respond]\n"
+            "   - Key elements: [What to include]\n"
+            "   - Avoid: [What not to do]\n"
+            "   - Success indicators: [How to measure if you helped]"
+        )
+
+    configs = {
+        "quick": {
+            "keys": ["surface", "goals"],
+            "reformulated_n": 3,
+            "recommendation_n": 4,
+            "instruction": (
+                "Provide a focused, efficient analysis. "
+                "Identify the true intent and give an actionable recommendation."
+            ),
+        },
+        "standard": {
+            "keys": ["surface", "goals", "motivation", "context", "assumptions", "needs", "affective"],
+            "reformulated_n": 8,
+            "recommendation_n": 9,
+            "instruction": (
+                "Provide thorough analysis across all standard dimensions, including an "
+                "affective state analysis to identify the emotional context and what response "
+                "tone is appropriate."
+            ),
+        },
+        "comprehensive": {
+            "keys": [
+                "surface", "goals", "motivation", "context", "assumptions", "needs",
+                "affective", "speech_acts", "implicature", "indirectness", "frames",
+            ],
+            "reformulated_n": 12,
+            "recommendation_n": 13,
+            "instruction": (
+                "Conduct the deepest possible analysis. Apply affective state analysis to "
+                "identify the emotional context, then apply linguistic and pragmatic frameworks "
+                "(Speech Act Theory, Gricean implicature, Politeness Theory, Frame Semantics) "
+                "to uncover layers that surface-level analysis misses."
+            ),
+        },
+    }
+    cfg = configs.get(depth, configs["comprehensive"])
     total = cfg["recommendation_n"]
+    sections_text = "".join(section_texts[k] for k in cfg["keys"])
+    sections_text += _reformulated(cfg["reformulated_n"])
+    sections_text += _recommendation(cfg["recommendation_n"])
 
-    return f"""Analyze the true intent behind this input:
-
-**INPUT**: {{input}}
-
-{{context_section}}
-
-**ANALYSIS DEPTH**: {depth} ({total} sections)
-
-{cfg['instruction']}
-
-Conduct systematic intent recognition:
-{sections}
-{reformulated}
-{recommendation}
-
-**OUTPUT FORMAT**: Clear, structured analysis with specific insights."""
+    return (
+        f"Analyze the true intent behind this input:\n\n"
+        f"**INPUT**: {{input}}\n\n"
+        f"{{context_section}}\n\n"
+        f"**ANALYSIS DEPTH**: {depth} ({total} sections)\n\n"
+        f"{cfg['instruction']}\n\n"
+        f"Conduct systematic intent recognition:\n"
+        f"{sections_text}\n\n"
+        f"**OUTPUT FORMAT**: Clear, structured analysis with specific insights."
+    )
 
 
 class IntentRecognizer(Pattern):
@@ -187,8 +182,8 @@ class IntentRecognizer(Pattern):
 
     The **depth** parameter controls analytical rigour:
     - ``quick`` (4 sections): Surface, Goals, Reformulated Intent, Recommendation
-    - ``standard`` (8 sections): + Motivation, Context, Assumptions, Needs
-    - ``comprehensive`` (12 sections): + Speech Acts, Implicature, Indirectness, Frames
+    - ``standard`` (9 sections): + Motivation, Context, Assumptions, Needs, Affective State
+    - ``comprehensive`` (13 sections): + Speech Acts, Implicature, Indirectness, Frames
 
     Grounded in Speech Act Theory (Austin/Searle), Gricean pragmatics,
     Politeness Theory (Brown & Levinson), and Frame Semantics (Fillmore).
@@ -205,28 +200,14 @@ class IntentRecognizer(Pattern):
     """
 
     GENERIC_PROMPT = (
-        "You are an intent analyst grounded in pragmatic linguistics. "
         "Analyze the following input to uncover the true intent behind it:\n\n"
         "Input: {input}\n"
         "{context_section}\n"
         "Depth: {depth}\n\n"
-        "Apply multi-layer intent analysis:\n"
-        "(1) Surface Analysis — what is explicitly stated, key terms, literal request type.\n"
-        "(2) Goal Inference — immediate, underlying, and long-term goals; success criteria.\n"
-        "(3) Motivation Analysis — what drives this request; pain points, constraints, urgency.\n"
-        "(4) Context Interpretation — situation, background, stakeholders, environment.\n"
-        "(5) Implicit Assumptions — unstated beliefs, biases, knowledge gaps.\n"
-        "(6) Need Classification — information, decision, action, or validation need.\n"
-        "(7) Speech Act Analysis — locutionary vs illocutionary vs perlocutionary act; "
-        "is the surface speech act different from the intended one?\n"
-        "(8) Conversational Implicature — Gricean maxim violations (quantity, quality, "
-        "relation, manner); what is conspicuously NOT being said?\n"
-        "(9) Indirectness & Power — directness level, face-saving, power asymmetry, "
-        "escalation signals.\n"
-        "(10) Frame & Absence Analysis — conceptual frames activated, alternative frames, "
-        "conspicuous absences, temporal signals.\n"
-        "(11) Reformulated Intent — true intent, real question, optimal response type.\n"
-        "(12) Recommendation — best approach, key elements, what to avoid.\n\n"
+        "Apply multi-layer intent analysis to identify surface meaning, underlying goals, "
+        "motivations, implicit assumptions, and emotional context. Use linguistic and "
+        "pragmatic frameworks to uncover what is really being asked versus what is stated. "
+        "Reformulate the true intent and recommend the most effective response approach.\n\n"
         "Look beyond the surface. The stated question is rarely the full picture."
     )
 
@@ -258,9 +239,13 @@ class IntentRecognizer(Pattern):
                 must_include=[
                     "underlying_goal",
                     "true_intent",
-                    "reformulated_question"
+                    "reformulated_question",
                 ],
-                style_guide="Be empathetic but analytical, specific but not presumptuous"
+                style_guide=(
+                    "Be empathetic but analytical, specific but not presumptuous. "
+                    "When identifying emotional state, be clinical and descriptive — "
+                    "not judgmental."
+                ),
             )
         )
 
@@ -275,6 +260,7 @@ class IntentRecognizer(Pattern):
         input: str = "",
         context: str | None = None,
         depth: str = "comprehensive",
+        output_format: str = "structured",
         **kwargs
     ):
         """
@@ -287,6 +273,9 @@ class IntentRecognizer(Pattern):
             input: The question/request to analyze
             context: Optional additional context
             depth: Analysis depth ("quick", "standard", "comprehensive")
+            output_format: How to present results — ``"structured"`` (default)
+                | ``"narrative"`` | ``"brief"`` | ``"actionable"``
+                | ``"json"`` | ``"table"``
             **kwargs: Additional options
 
         Returns:
@@ -295,11 +284,18 @@ class IntentRecognizer(Pattern):
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
+        if output_format not in VALID_OUTPUT_FORMATS:
+            raise ValueError(
+                f"Invalid output_format {output_format!r}. "
+                f"Choose from: {sorted(VALID_OUTPUT_FORMATS)}"
+            )
+
         context_section = self._render_context_section(context)
         directive_text = _build_directive(depth)
         directive_content = safe_format_template(
             directive_text, input=input, context_section=context_section, depth=depth
         )
+        directive_content += get_format_directive(output_format)
 
         ctx = Context(
             guidance=self.guidance,
@@ -309,6 +305,7 @@ class IntentRecognizer(Pattern):
         )
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
+        ctx.metadata["output_format"] = output_format
         return ctx
 
     def execute(
@@ -317,6 +314,7 @@ class IntentRecognizer(Pattern):
         input: str = "",
         context: str | None = None,
         depth: str = "comprehensive",
+        output_format: str = "structured",
         **kwargs
     ):
         """
@@ -327,15 +325,24 @@ class IntentRecognizer(Pattern):
             input: The question/request to analyze
             context: Optional additional context
             depth: Analysis depth ("quick", "standard", "comprehensive")
+            output_format: How to present results — ``"structured"`` (default)
+                | ``"narrative"`` | ``"brief"`` | ``"actionable"``
+                | ``"json"`` | ``"table"``
             **kwargs: Provider parameters
 
         Returns:
             ProviderResponse with the analysis
         """
-        return super().execute(
-            provider=provider,
+        ctx = self.build_context(
             input=input,
             context=context,
             depth=depth,
-            **kwargs
+            output_format=output_format,
         )
+        provider_params = {
+            "model", "temperature", "max_tokens", "top_p",
+            "frequency_penalty", "presence_penalty", "stop",
+            "user", "api_key", "base_url",
+        }
+        provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
+        return ctx.execute(provider=provider, **provider_kwargs)

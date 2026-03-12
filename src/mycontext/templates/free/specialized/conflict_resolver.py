@@ -6,8 +6,9 @@ Based on conflict resolution theory and mediation practices.
 """
 
 
-from mycontext.foundation import Constraints, Guidance
+from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
+from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
 
 
 class ConflictResolver(Pattern):
@@ -34,25 +35,14 @@ class ConflictResolver(Pattern):
     """
 
     GENERIC_PROMPT = (
-        "You are an expert mediator and conflict resolution specialist. Analyze "
-        "and resolve the following conflict:\n\n"
+        "Analyze and resolve the following conflict:\n\n"
         "Conflict: {conflict}\n"
         "Parties involved: {parties}\n"
         "{context_section}\n\n"
-        "Apply structured mediation methodology: "
-        "(1) Analyze the conflict — classify its type (interpersonal, structural, "
-        "value-based, interest-based), assess severity, duration, and key triggers. "
-        "(2) Map each party's perspective — their stated position, underlying "
-        "interests, core concerns, and what they fear losing. "
-        "(3) Identify common ground — shared goals, values, constraints, and mutual "
-        "dependencies. "
-        "(4) Diagnose root causes — what underlying issues are driving the "
-        "surface-level disagreement? "
-        "(5) Generate resolution options: (a) Compromise — each side gives something; "
-        "(b) Collaboration — expand the pie; (c) Creative — reframe the problem "
-        "entirely. For each option, outline pros, cons, and feasibility. "
-        "(6) Recommend the best resolution with a clear rationale, implementation "
-        "steps, and follow-up plan.\n\n"
+        "Classify the conflict type, map each party's position and underlying interests, "
+        "identify common ground and root causes, generate resolution options (compromise, "
+        "collaboration, creative reframe), and recommend the best resolution with "
+        "implementation steps and a follow-up plan.\n\n"
         "Stay neutral. Understand all perspectives before proposing solutions."
     )
 
@@ -148,16 +138,36 @@ Conflict resolution:
         conflict: str = "",
         parties: str = "",
         context: str | None = None,
-        **kwargs
+        output_format: str = "structured",
+        **kwargs,
     ):
-        context_section = self._render_context_section(context)
+        """
+        Build context for conflict resolution.
 
-        return super().build_context(
+        Args:
+            conflict: Description of the conflict
+            parties: Parties involved (string or comma-separated list)
+            context: Optional additional context
+            output_format: How to present results — ``"structured"`` (default)
+                | ``"narrative"`` | ``"brief"`` | ``"actionable"`` | ``"table"``
+        """
+        if output_format not in VALID_OUTPUT_FORMATS:
+            raise ValueError(
+                f"Invalid output_format {output_format!r}. "
+                f"Choose from: {sorted(VALID_OUTPUT_FORMATS)}"
+            )
+        context_section = self._render_context_section(context)
+        ctx = super().build_context(
             conflict=conflict,
             parties=parties,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
+        fmt = get_format_directive(output_format)
+        if fmt and ctx.directive:
+            ctx.directive = Directive(content=ctx.directive.content + fmt)
+            ctx.metadata["output_format"] = output_format
+        return ctx
 
     def execute(
         self,
@@ -165,12 +175,30 @@ Conflict resolution:
         conflict: str = "",
         parties: str = "",
         context: str | None = None,
-        **kwargs
+        output_format: str = "structured",
+        **kwargs,
     ):
-        return super().execute(
-            provider=provider,
+        """
+        Execute conflict resolution.
+
+        Args:
+            provider: LLM provider to use
+            conflict: Description of the conflict
+            parties: Parties involved
+            context: Optional additional context
+            output_format: How to present results — ``"structured"`` (default)
+                | ``"narrative"`` | ``"brief"`` | ``"actionable"`` | ``"table"``
+        """
+        provider_params = {
+            "model", "temperature", "max_tokens", "top_p",
+            "frequency_penalty", "presence_penalty", "stop",
+            "user", "api_key", "base_url",
+        }
+        provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
+        ctx = self.build_context(
             conflict=conflict,
             parties=parties,
             context=context,
-            **kwargs
+            output_format=output_format,
         )
+        return ctx.execute(provider=provider, **provider_kwargs)

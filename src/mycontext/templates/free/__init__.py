@@ -9,7 +9,7 @@ Categories:
 - creative: Brainstormer (1)
 - communication: AudienceAdapter, TechnicalTranslator (2)
 - planning: ScenarioPlanner, StakeholderMapper (2)
-- specialized: CodeReviewer, SocraticQuestioner, IntentRecognizer, RagAnswerer, RiskAssessor, ConflictResolver, SynthesisBuilder (7)
+- specialized: CodeReviewer, SocraticQuestioner, IntentRecognizer, RiskAssessor, ConflictResolver, SynthesisBuilder (6)
 """
 
 from .analysis import (
@@ -34,8 +34,6 @@ from .specialized import (
     CodeReviewer,
     ConflictResolver,
     IntentRecognizer,
-    MemoryCompressor,
-    RagAnswerer,
     RiskAssessor,
     SocraticQuestioner,
     SynthesisBuilder,
@@ -55,8 +53,6 @@ __all__ = [
     "CodeReviewer",
     "SocraticQuestioner",
     "IntentRecognizer",
-    "MemoryCompressor",
-    "RagAnswerer",
     "RiskAssessor",
     "ConflictResolver",
     "SynthesisBuilder",
