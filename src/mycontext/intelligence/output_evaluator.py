@@ -233,7 +233,22 @@ class OutputEvaluator:
             output, re.IGNORECASE,
         ))
 
-        depth_signals = marker_count + numbered * 0.5 + headings * 0.3 + nested * 0.3 + quantified * 0.4
+        # Evidence citation — explicit "Evidence:" labels in the output signal that
+        # findings are backed by data, not asserted. Counts both markdown bold
+        # ("**Evidence**:") and plain bullet forms ("- Evidence:").
+        evidence_citations = len(re.findall(
+            r"(?:^|\n)\s*[-*]?\s*\*{0,2}evidence\*{0,2}\s*:",
+            output, re.IGNORECASE | re.MULTILINE,
+        ))
+
+        depth_signals = (
+            marker_count
+            + numbered * 0.5
+            + headings * 0.3
+            + nested * 0.3
+            + quantified * 0.4
+            + evidence_citations * 0.5
+        )
         score = min(1.0, 0.15 + depth_signals * 0.07)
 
         ev = f"{marker_count} reasoning markers, {numbered} numbered steps"
@@ -241,6 +256,8 @@ class OutputEvaluator:
             ev += f", {headings} section headings"
         if quantified:
             ev += f", {quantified} quantified claims"
+        if evidence_citations:
+            ev += f", {evidence_citations} evidence citations"
         return max(0.0, min(1.0, score)), ev
 
     def _score_actionability(self, output: str) -> tuple:
@@ -273,11 +290,27 @@ class OutputEvaluator:
         if specifics:
             ev += f", {specifics} concrete metrics"
 
-        # Vague/hedge penalty — outputs that never commit to an answer score poorly
+        # Gap-honest statements are assertive analytical conclusions, not hedges.
+        # Reward outputs that explicitly flag unanswerable questions rather than
+        # speculating — this is a sign of analytical rigour, not vagueness.
+        _GAP_HONEST = [
+            "cannot be answered", "can't be answered",
+            "data is not available", "data is not provided",
+            "not available in the data", "not provided in the data",
+            "would need", "attribution data", "baseline is not",
+            "insufficient data", "data does not include",
+        ]
+        gap_hits = sum(1 for g in _GAP_HONEST if g in lower)
+        if gap_hits >= 1:
+            score = min(score + 0.05 * min(gap_hits, 2), 1.0)
+            ev += f" | Gap-honest statements: {gap_hits}"
+
+        # Vague/hedge penalty — outputs that never commit to an answer score poorly.
+        # Only penalise genuine vagueness, not gap-honest refusals (handled above).
         _OUTPUT_HEDGES = [
             "it depends", "generally speaking", "in most cases", "this varies",
-            "it's hard to say", "without more context", "might be worth",
-            "could potentially", "there are many factors", "it is difficult to",
+            "it's hard to say", "might be worth",
+            "could potentially", "there are many factors",
             "no one-size-fits-all", "varies widely",
         ]
         hedge_hits = sum(1 for h in _OUTPUT_HEDGES if h in lower)

@@ -197,12 +197,64 @@ Insights are structured for immediate action:
 - Action: Conduct exit interviews with churned SMB accounts
 ```
 
+## Data Source Convenience Methods
+
+Load data from common sources without manually building `data_description` strings.
+
+### From a pandas DataFrame
+
+```python
+import pandas as pd
+
+df = pd.read_csv("sales.csv")
+ctx = analyzer.from_dataframe(df, goal="Growth drivers", intent="executive")
+```
+
+Auto-generates `data_description` from `df.info()`, `df.describe()`, null counts, and sample rows.
+
+### From a CSV file path
+
+```python
+ctx = analyzer.from_csv_path("metrics.csv", goal="Trend analysis")
+```
+
+Reads the CSV into a DataFrame under the hood. Accepts any `pandas.read_csv()` keyword argument (`sep`, `encoding`, etc.).
+
+### From JSON (API responses, configs)
+
+```python
+import requests
+
+data = requests.get("https://api.example.com/metrics").json()
+ctx = analyzer.from_json(data, goal="Spot anomalies", intent="operations")
+```
+
+Works with both `list[dict]` (array of records) and `dict` (single object). Infers keys, types, and includes a preview.
+
+### From records (SQL results, ORMs)
+
+```python
+rows = cursor.fetchall()  # list of dicts from database
+ctx = analyzer.from_records(rows, goal="Revenue trends", intent="analyst")
+
+# Optionally filter columns
+ctx = analyzer.from_records(rows, goal="...", columns=["name", "revenue", "region"])
+```
+
+Computes basic numeric statistics (min, max, mean) automatically and formats a sample table.
+
+All convenience methods accept the same `goal`, `context`, `intent`, `investment`, and `output_format` parameters as `build_context()`.
+
 ## API Reference
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `build_context(data_description, goal, context, intent, investment)` | `Context` | Assembled context with parameterized sections |
 | `execute(provider, data_description, goal, context, intent, investment, **kwargs)` | `ProviderResponse` | Execute analysis with auto token budget |
+| `from_dataframe(df, goal, context, intent, investment)` | `Context` | Build context from pandas DataFrame |
+| `from_csv_path(path, goal, context, intent, investment)` | `Context` | Build context from CSV file |
+| `from_json(data, goal, context, intent, investment)` | `Context` | Build context from dict or list |
+| `from_records(records, goal, context, intent, investment)` | `Context` | Build context from list of row-dicts |
 | `generic_prompt(data_description, context_section, goal)` | `str` | Zero-cost prompt string |
 
 | Class Attribute | Type | Description |

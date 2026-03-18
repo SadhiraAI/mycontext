@@ -11,15 +11,26 @@ Research-backed prompt flow (when ``research_flow=True``):
   LATE            → ⑦ Output Format  ⑧ Guard Rails  (CO-STAR)
   RECENCY ZONE    → ⑨ Task (ALWAYS LAST)     (Li et al. 2023)
 
-See docs/PROMPT_FLOW_RESEARCH.md for full references.
+Provider-aware rendering (when ``provider_hint`` is set):
+  - "anthropic" → XML delimiters, positive constraint reframe, docs-first ordering
+  - "openai"    → Markdown headings, instruction mirror at end for long knowledge blocks
+  - "gemini"    → XML delimiters, trait adjectives on role, explicit verbosity anchor
+
+See docs/research/2026-03-16-provider-specific-prompt-rendering.md for full references.
 """
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from .foundation import Constraints, Directive, Guidance
+# Supported provider hint values
+ProviderHint = Literal["openai", "anthropic", "gemini", "generic"]
+
+# Threshold (chars) above which OpenAI instruction mirroring kicks in
+_OPENAI_MIRROR_THRESHOLD = 1500
+
+from .foundation import Constraints, Directive, Guidance  # noqa: E402 — intentional: placed after module-level constants
 
 # ── Thinking-strategy registry ────────────────────────────────────
 THINKING_STRATEGIES: dict[str, tuple[str, str]] = {
@@ -154,6 +165,18 @@ class Context(BaseModel):
         ),
     )
 
+    provider_hint: ProviderHint | None = Field(
+        default=None,
+        description=(
+            "Target provider for rendering optimizations. "
+            "When set, assemble() applies provider-specific overrides: "
+            "'anthropic' → XML delimiters + positive constraint reframe; "
+            "'openai' → Markdown headings + instruction mirror for long knowledge; "
+            "'gemini' → XML delimiters + trait adjectives on role + verbosity anchor. "
+            "Does not affect which provider execute() calls — set that separately."
+        ),
+    )
+
     def __init__(
         self,
         guidance: str | Guidance | None = None,
@@ -222,19 +245,24 @@ class Context(BaseModel):
             Role → Goal → Rules → Style → Reasoning → Examples →
             Output Format → Guard Rails → Task
 
+        When ``provider_hint`` is set, applies provider-specific rendering
+        overrides on top of whichever flow is active.
+
         Returns:
             Assembled context as a formatted string
         """
+        provider = self.provider_hint or "generic"
+
         if self.research_flow:
-            return self._assemble_research_flow()
+            return self._assemble_research_flow(provider=provider)
 
         parts = []
 
         if self.guidance:
-            parts.append(self.guidance.render())
+            parts.append(self.guidance.render(provider=provider))
 
         if self.constraints:
-            parts.append(self.constraints.render())
+            parts.append(self.constraints.render(provider=provider))
 
         if self.knowledge:
             parts.append(f"# Knowledge\n\n{self.knowledge}")
@@ -339,7 +367,7 @@ class Context(BaseModel):
 
     # ── Research-backed assembly engine ───────────────────────────
 
-    def _assemble_research_flow(self) -> str:
+    def _assemble_research_flow(self, provider: str = "generic") -> str:
         """Build prompt in the research-backed 9-section order.
 
         Zones (Liu et al. 2023 — primacy / recency bias):
@@ -348,41 +376,72 @@ class Context(BaseModel):
           MIDDLE     ⑤ Reasoning  ⑥ Examples — demos stabilize (Li et al. 2025)
           LATE       ⑦ Output Format  ⑧ Guard Rails — near the ask (CO-STAR)
           RECENCY    ⑨ Task                  — always last (+9.7 BLEU)
+
+        Provider overrides applied when ``provider`` is set:
+          anthropic → XML tag delimiters instead of ## headings
+          openai    → Markdown headings; instruction mirror appended after long knowledge
+          gemini    → XML tag delimiters; explicit verbosity anchor added to TASK section
         """
+        use_xml = provider in ("anthropic", "gemini")
+
+        def _h(title: str) -> str:
+            """Return section header in the appropriate delimiter style."""
+            if use_xml:
+                return f"<{title.lower().replace(' ', '_')}>"
+            return f"## {title}"
+
+        def _close(title: str) -> str:
+            if use_xml:
+                return f"</{title.lower().replace(' ', '_')}>"
+            return ""
+
+        def _wrap(title: str, body: str) -> str:
+            if use_xml:
+                tag = title.lower().replace(" ", "_")
+                return f"<{tag}>\n{body}\n</{tag}>"
+            return f"## {title}\n\n{body}"
+
         sections: list[str] = []
 
-        # ① ROLE (primacy zone)
+        # ① ROLE (primacy zone) — goal/rules/style rendered in their own sections below
         if self.guidance:
-            sections.append(f"## ROLE\n\n**You are {self.guidance.role}.**")
+            role_text = self.guidance.render(
+                provider=provider,
+                include_goal=False,
+                include_rules=False,
+                include_style=False,
+            )
+            sections.append(_wrap("ROLE", role_text))
 
         # ② GOAL
         goal = getattr(self.guidance, "goal", None) if self.guidance else None
         if goal:
-            sections.append(f"## GOAL\n\n**Objective:** {goal}")
+            goal_body = f"**Your mission:** {goal} — accomplish this fully."
+            sections.append(_wrap("GOAL", goal_body))
 
         # ③ RULES (hard → easy, Zhang et al. 2025)
         rules = getattr(self.guidance, "rules", []) if self.guidance else []
         if rules:
             items = "\n".join(f"  {i+1}. {r}" for i, r in enumerate(rules))
-            sections.append(
-                f"## RULES\n\n**You MUST follow these rules at all times:**\n{items}"
-            )
+            rules_body = f"**You MUST follow these rules at all times:**\n{items}"
+            sections.append(_wrap("RULES", rules_body))
 
         # ④ STYLE
         style = getattr(self.guidance, "style", None) if self.guidance else None
-        if style:
-            sections.append(f"## STYLE\n\n**Tone & voice:** {style}")
+        style_guide = getattr(self.constraints, "style_guide", None) if self.constraints else None
+        if style_guide:
+            sections.append(_wrap("STYLE", f"**Tone & voice:** {style_guide}"))
+        elif style and provider != "gemini":
+            # Gemini already received traits in the role block via render()
+            sections.append(_wrap("STYLE", f"**Tone & voice:** {style}"))
 
         # ⑤ ANALYTICAL AND REPORTING APPROACH (or REASONING APPROACH)
         if self.analytical_approach:
-            sections.append(
-                f"## ANALYTICAL AND REPORTING APPROACH\n\n{self.analytical_approach}"
-            )
+            sections.append(_wrap("ANALYTICAL AND REPORTING APPROACH", self.analytical_approach))
         elif self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
             label, injection = THINKING_STRATEGIES[self.thinking_strategy]
-            sections.append(
-                f"## REASONING APPROACH ({label})\n\n**Important — {injection}**"
-            )
+            body = f"**Important — {injection}**"
+            sections.append(_wrap(f"REASONING APPROACH ({label})", body))
 
         # ⑥ EXAMPLES (few-shot, middle zone)
         if self.examples:
@@ -391,76 +450,130 @@ class Context(BaseModel):
                 inp = ex.get("input", "").strip()
                 out = ex.get("output", "").strip()
                 if inp and out:
-                    pairs.append(f"**Example {i}:**\nInput: {inp}\nOutput: {out}")
+                    if use_xml:
+                        pairs.append(
+                            f"<example_{i}>\n"
+                            f"<input>{inp}</input>\n"
+                            f"<output>{out}</output>\n"
+                            f"</example_{i}>"
+                        )
+                    else:
+                        pairs.append(f"**Example {i}:**\nInput: {inp}\nOutput: {out}")
             if pairs:
-                sections.append(
-                    "## EXAMPLES\n\nLearn from these examples of expected "
-                    "input \u2192 output:\n\n" + "\n\n".join(pairs)
-                )
+                header = "Learn from these examples of expected input → output:"
+                body = header + "\n\n" + "\n\n".join(pairs)
+                sections.append(_wrap("EXAMPLES", body))
 
-        # Knowledge slots into the middle zone too
+        # Knowledge slots into the middle zone
+        # Anthropic/Gemini: knowledge before task (already the case here)
         if self.knowledge:
-            sections.append(f"## KNOWLEDGE\n\n{self.knowledge}")
+            sections.append(_wrap("KNOWLEDGE", self.knowledge))
 
         # ⑦ OUTPUT FORMAT
-        schema = (
-            getattr(self.constraints, "output_schema", None)
-            if self.constraints else None
-        )
-        if schema:
-            fields = [f for f in schema if f.get("name")]
-            if fields:
-                lines = [
-                    "## OUTPUT FORMAT",
-                    "",
-                    "**Return your response as a JSON object** with these required fields:",
-                    "",
-                ]
-                for f in fields:
-                    lines.append(f"- **`{f['name']}`** ({f.get('type', 'str')})")
-                lines.append("")
-                skeleton = ", ".join('"' + f["name"] + '": ...' for f in fields)
-                lines.append("```json\n{" + skeleton + "}\n```")
-                sections.append("\n".join(lines))
+        output_contract = getattr(self.constraints, "output_contract", None) if self.constraints else None
+        schema = getattr(self.constraints, "output_schema", None) if self.constraints else None
+
+        if output_contract or schema:
+            fmt_lines: list[str] = []
+            if output_contract:
+                fmt_lines.append(output_contract)
+            if schema:
+                fields = [f for f in schema if f.get("name")]
+                if fields:
+                    fmt_lines.append("**Return your response as a JSON object** with these required fields:\n")
+                    for f in fields:
+                        fmt_lines.append(f"- **`{f['name']}`** ({f.get('type', 'str')})")
+                    skeleton = ", ".join('"' + f["name"] + '": ...' for f in fields)
+                    fmt_lines.append(f"\n```json\n{{{skeleton}}}\n```")
+            sections.append(_wrap("OUTPUT FORMAT", "\n".join(fmt_lines)))
 
         # ⑧ GUARD RAILS (hard constraints first — Zhang et al. 2025)
         if self.constraints:
-            guard = self._render_guard_rails(self.constraints)
+            guard = self._render_guard_rails(self.constraints, provider=provider, use_xml=use_xml)
             if guard:
                 sections.append(guard)
 
         # ⑨ TASK (recency zone — ALWAYS LAST)
         if self.directive:
-            sections.append(f"---\n\n## YOUR TASK\n\n{self.directive.render()}")
+            task_body = self.directive.render()
+            if provider == "gemini":
+                # Gemini: explicit verbosity anchor at the end
+                task_body += "\n\nBe direct and efficient. Avoid unnecessary preamble."
+            task_section = _wrap("YOUR TASK", task_body)
+            if use_xml:
+                sections.append(f"---\n\n{task_section}")
+            else:
+                sections.append(f"---\n\n{task_section}")
 
-        return "\n\n".join(s for s in sections if s)
+        assembled = "\n\n".join(s for s in sections if s)
+
+        # OpenAI override: mirror instructions at end of long knowledge blocks
+        if provider == "openai" and self.knowledge and len(self.knowledge) > _OPENAI_MIRROR_THRESHOLD:
+            mirror = self._build_instruction_mirror()
+            if mirror:
+                assembled = assembled + "\n\n---\n\n" + mirror
+
+        return assembled
+
+    def _build_instruction_mirror(self) -> str:
+        """Build a compact instruction mirror for OpenAI long-context mode.
+
+        When the knowledge block is large, OpenAI recommends repeating key
+        instructions at the end of the prompt to counteract the lost-in-the-middle
+        effect (Liu et al. 2023).
+        """
+        reminders: list[str] = []
+        if self.guidance and self.guidance.goal:
+            reminders.append(f"Reminder — your mission: {self.guidance.goal}")
+        if self.guidance and self.guidance.rules:
+            top_rules = self.guidance.rules[:3]
+            rules_text = "; ".join(top_rules)
+            reminders.append(f"Key rules to apply: {rules_text}")
+        if self.directive:
+            content = self.directive.render().strip()
+            if len(content) < 300:
+                reminders.append(f"Task (repeat): {content}")
+        if not reminders:
+            return ""
+        return "## KEY REMINDERS (re-stated after long context)\n\n" + "\n\n".join(reminders)
 
     @staticmethod
-    def _render_guard_rails(c: Constraints) -> str:
-        parts: list[str] = ["## GUARD RAILS"]
+    def _render_guard_rails(
+        c: Constraints,
+        provider: str = "generic",
+        use_xml: bool = False,
+    ) -> str:
+        header = "<guard_rails>" if use_xml else "## GUARD RAILS"
+        footer = "</guard_rails>" if use_xml else ""
+
         must_not = [i for i in (c.must_not_include or []) if i]
         must = [i for i in (c.must_include or []) if i]
         fmt = [i for i in (c.format_rules or []) if i]
 
-        if not must_not and not must and not fmt:
+        has_content = must_not or must or fmt or c.max_length or c.language
+        if not has_content:
             return ""
 
+        body_parts: list[str] = []
+
         if must_not:
-            items = "\n".join(f"  - {i}" for i in must_not)
-            parts.append(f"\n**NEVER include the following:**\n{items}")
+            exclusions = Constraints._render_exclusions(must_not, provider)
+            body_parts.append(exclusions)
         if must:
             items = "\n".join(f"  - {i}" for i in must)
-            parts.append(f"\n**ALWAYS include the following:**\n{items}")
+            body_parts.append(f"**ALWAYS include the following:**\n{items}")
         if fmt:
             items = "\n".join(f"  - {i}" for i in fmt)
-            parts.append(f"\n**Format rules:**\n{items}")
-
+            body_parts.append(f"**Format rules:**\n{items}")
         if c.max_length:
-            parts.append(f"\n**Maximum length:** {c.max_length}")
+            body_parts.append(f"**Maximum length:** {c.max_length}")
         if c.language:
-            parts.append(f"\n**Language:** {c.language}")
+            body_parts.append(f"**Language:** {c.language}")
 
-        return "\n".join(parts)
+        body = "\n\n".join(body_parts)
+        if use_xml:
+            return f"{header}\n{body}\n{footer}"
+        return f"{header}\n\n{body}"
 
     def execute(self, provider: str = "openai", **kwargs) -> Any:
         """

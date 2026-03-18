@@ -4,7 +4,6 @@ Intelligence Layer - Automatic cognitive pattern selection and transformation
 This layer provides intelligent, automatic context transformation capabilities.
 """
 
-from .context_generator import GeneratedContext, generate_context
 from .chain_orchestration_agent import (
     PATTERN_BUILD_CONTEXT_REGISTRY,
     WorkflowChainResult,
@@ -13,6 +12,31 @@ from .chain_orchestration_agent import (
 from .context_amplification import (
     CAIResult,
     ContextAmplificationIndex,
+)
+from .context_generator import GeneratedContext, generate_context
+from .eval_criteria import (
+    ACTIONABILITY as EVAL_ACTIONABILITY,
+)
+from .eval_criteria import (
+    CATALOG as EVAL_CRITERIA_CATALOG,
+)
+from .eval_criteria import (
+    CAUSATION_DISCIPLINE,
+    COGNITIVE_SCAFFOLDING_USE,
+    DATA_GAP_HONESTY,
+    EVIDENCE_CITATION,
+    INSTRUCTION_ADHERENCE,
+    REASONING_SOUNDNESS,
+    STRUCTURE_COMPLIANCE,
+    GEvalCriteria,
+    get_criteria,
+    to_deepeval_metrics,
+)
+from .guidance_optimizer import (
+    GuidanceAuditResult,
+    GuidanceOptimizer,
+    OptimizedGuidance,
+    RuleAudit,
 )
 from .output_evaluator import (
     OutputDimension,
@@ -37,6 +61,12 @@ from .pattern_suggester import (
     smart_generic_prompt,
     smart_prompt,
     suggest_patterns,
+)
+from .prompt_architect import (
+    ArchitectResult,
+    ParsedSections,
+    PromptArchitect,
+    SectionDiff,
 )
 from .prompt_composer import (
     ComposedPrompt,
@@ -97,4 +127,25 @@ __all__ = [
     "PromptComposer",
     "ComposedPrompt",
     "get_generic_prompt_for",
+    "PromptArchitect",
+    "ArchitectResult",
+    "ParsedSections",
+    "SectionDiff",
+    "GuidanceOptimizer",
+    "OptimizedGuidance",
+    "GuidanceAuditResult",
+    "RuleAudit",
+    # Eval criteria
+    "GEvalCriteria",
+    "EVIDENCE_CITATION",
+    "CAUSATION_DISCIPLINE",
+    "DATA_GAP_HONESTY",
+    "INSTRUCTION_ADHERENCE",
+    "EVAL_ACTIONABILITY",
+    "REASONING_SOUNDNESS",
+    "STRUCTURE_COMPLIANCE",
+    "COGNITIVE_SCAFFOLDING_USE",
+    "EVAL_CRITERIA_CATALOG",
+    "get_criteria",
+    "to_deepeval_metrics",
 ]

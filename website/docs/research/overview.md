@@ -10,6 +10,29 @@ Empirical experiments validating the core thesis of context engineering: **struc
 
 ## Studies
 
+### [Prompt Engineering Foundation: Structure, Linguistics, and Provider Rendering](./prompt-engineering-foundation)
+
+Research behind the mycontext prompt assembly engine — the 9-section ordering model, five linguistic upgrades that improve instruction compliance, and provider-specific rendering optimizations for OpenAI, Anthropic, and Gemini.
+
+**Key findings:**
+
+- The 9-section ordering (primacy zone → instructions → middle → late → recency zone) is grounded in three independent research findings: primacy-recency bias (Liu et al. 2023), instruction-first ordering (OpenAI Cookbook), and recency-task correlation (+9.7 BLEU, Li et al. 2023)
+- Imperative goal framing ("Your mission: X — accomplish this fully") drives completion; declarative descriptions correlate with partial responses
+- Positive constraint reframing ("Omit X" vs "Must NOT include X") reduces token-priming failure — directly validated by Anthropic's own prompt engineering team
+- Persona scope bounding (`persona_scope`) prevents the Persona Effect (Shanahan et al. 2023) — roles expanding into unintended domains
+- Output contract placement in section ⑦ (recency zone) maximises format compliance
+- Provider delimiter differences matter for constraint compliance and long-context recall — not overall accuracy. A 2026 benchmark found ≤0.3% accuracy deltas between XML and Markdown on frontier models
+
+| Upgrade | Mechanism | Measured signal |
+|---------|-----------|----------------|
+| Imperative goal | Linguistic commitment → completion drive | Goal completion rate (live eval) |
+| Positive constraint reframe | Eliminates negation processing failure | Constraint violation rate |
+| Persona scope | Explicit domain boundary on role | Role drift prevention |
+| Output contract | Section ⑦ recency placement | Format compliance rate |
+| Provider hint | XML/Markdown + 4 rendering overrides | Per-provider compliance |
+
+---
+
 ### [Structured Reasoning: Model Cost vs Accuracy](./reasoner-model-comparison)
 
 Tests the `StepByStepReasoner` template across three OpenAI model tiers on math/logic problems.
@@ -72,9 +95,43 @@ Based on SimpleMem, CDIC, RECOMP, and Cognitive Load Theory research.
 
 ---
 
+### [Code Review: Cognitive Restructuring](./code-reviewer-optimization)
+
+Research-backed redesign of the `CodeReviewer` template — replacing a flat "list issues by severity" prompt with a four-phase cognitive flow (ORIENT → ANALYZE → ASSESS → RECOMMEND) based on industry findings.
+
+**Key insight:** 85% of code review comments are low-value style bikeshedding, and the #1 unmet need is code/change understanding. The restructured template adds an orientation phase before critique, uses risk-weighted severity (impact × likelihood × blast radius) instead of flat labels, and excludes style/formatting entirely — redirecting attention to the 7 dimensions linters cannot catch.
+
+| Problem | Research Finding |
+|---------|-----------------|
+| 85% bikeshedding | Only 15% of review comments find real defects (CodePulse 2025) |
+| No understanding phase | Code/change understanding is #1 unmet need (Bacchelli & Bird, Microsoft) |
+| Flat severity labels | Senior engineers prioritize by risk, not severity (Google eng-practices) |
+
+Based on CRDM (2026), Bacchelli & Bird (2013), Google eng-practices, and Fagan (1976).
+
+---
+
+### [DataAnalyzer: Research Foundation](./data-analyzer-design)
+
+The academic and industry research behind DataAnalyzer's 11-section design — mapping each section to CRISP-DM, KDD, Tukey's EDA, anomaly detection literature, evidence-based reporting, and visualization science.
+
+**Key insight:** DataAnalyzer's 11 sections are not arbitrary — each maps to a specific finding from established analytical frameworks. The causation-correlation note in Section 5 is binding (enforced by Pearson/Pearl). The confidence ratings in Section 7 implement Gneiting & Raftery's calibrated probability assessment. The hypothesis structure in Section 8 enforces Popper's falsifiability criterion.
+
+| Section | Research Source |
+|---------|----------------|
+| Data Overview + Descriptive Statistics | CRISP-DM Data Understanding phase |
+| Pattern Detection | Tukey (1977) — Revelation & Re-expression principles |
+| Anomaly Detection | Chandola, Banerjee & Kumar (2009) — ACM Computing Surveys |
+| Key Insights | Sackett et al. (1996) — Evidence-based practice; Gneiting & Raftery (2007) — calibrated confidence |
+| Hypotheses | Peirce (1878) abductive reasoning + Popper (1959) falsifiability |
+| Data Limitations | Redman (1996); Wilkinson et al. FAIR principles (2016) |
+| Visualization Suggestions | Cleveland & McGill (1984) — graphical perception hierarchy |
+
+---
+
 ## Cross-Study Conclusions
 
-All four experiments point to the same principles:
+All six studies point to the same principles:
 
 1. **Structure beats capability.** A well-structured template with a cheap model outperforms an unstructured prompt with an expensive model. The template provides the "reasoning scaffold" that makes model intelligence secondary.
 
@@ -87,6 +144,8 @@ All four experiments point to the same principles:
 5. **Generation-side RAG optimization works.** The RagAnswerer template applies CRAG, Self-RAG, and Chain-of-Note principles as concise prompt instructions — extracting 15% more evidence from the same retrieved chunks, with zero latency overhead. Most RAG improvement focuses on retrieval; this shows the generation prompt matters too.
 
 6. **Structured extraction beats progressive summarization at scale.** After 7 rewrites, progressive summaries lose entity names, dollar amounts, and decision rationale — performing no better than discarding old messages. Structured state extraction (entities, decisions, constraints, key numbers) degrades gracefully, maintaining 2x recall advantage.
+
+7. **Cognitive structure matters as much as content structure.** The CodeReviewer study shows that fixing *how* a template thinks (orient before analyze, assess risk not just severity) is as important as fixing *what* it outputs. A flat severity list encourages bikeshedding; a cognitive flow (understand → analyze → assess risk → recommend) redirects attention to high-value findings.
 
 ## Reproduce
 

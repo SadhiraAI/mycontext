@@ -21,16 +21,19 @@ This experiment tests three questions:
 
 ## Template Architecture
 
-### Two-Axis Parameterization
+### Three-Axis Parameterization
 
-`DataAnalyzer` exposes two orthogonal parameters that compose freely:
+`DataAnalyzer` exposes three orthogonal parameters that compose freely:
 
 | Parameter | Controls | Options |
 |-----------|----------|---------|
 | **`intent`** | *Which* sections are produced | `executive` · `analyst` · `operations` · `summary` · `comprehensive` |
 | **`investment`** | *How deep* each section goes | `quick` · `standard` · `thorough` |
+| **`output_format`** | *How* results are presented | `structured` · `narrative` · `brief` · `actionable` · `slides` · `email` · `qa` · `checklist` · `json` · `table` |
 
-This gives **5 × 3 = 15** distinct configurations from a single template. Every combination is valid.
+This gives **5 × 3 × 10 = 150** distinct configurations from a single template. Every combination is valid.
+
+The `output_format` parameter is inherited from the `Pattern` base class, so it works identically across all 88 templates — not just `DataAnalyzer`.
 
 ### Intent → Section Mapping
 
@@ -265,21 +268,53 @@ from mycontext.templates.free.analysis import DataAnalyzer
 
 analyzer = DataAnalyzer()
 
-# Executive briefing — 4 sections, ~900 tokens
+# Executive briefing — 4 sections, ~900 tokens, narrative prose
 ctx = analyzer.build_context(
     data_description="Monthly revenue by region...",
     goal="Key takeaways for leadership",
     intent="executive",
     investment="standard",
+    output_format="narrative",
 )
 
-# Quick ops triage — 3 sections, ~450 tokens
+# Slack update — brief bullet points under 300 words
+result = analyzer.execute(
+    provider="openai",
+    data_description="Weekly KPI dashboard metrics...",
+    goal="Summarise for team standup",
+    intent="summary",
+    investment="quick",
+    output_format="brief",
+)
+
+# Quick ops triage — checklist of remediation steps
 result = analyzer.execute(
     provider="openai",
     data_description="Server error rates over 24 hours...",
     goal="Identify anomalies and remediation steps",
     intent="operations",
     investment="quick",
+    output_format="checklist",
+)
+
+# Slide deck — executive intent formatted for presentations
+result = analyzer.execute(
+    provider="openai",
+    data_description="Q1 revenue by region and product...",
+    goal="Board presentation materials",
+    intent="executive",
+    investment="standard",
+    output_format="slides",
+)
+
+# API / pipeline — raw JSON for downstream processing
+result = analyzer.execute(
+    provider="openai",
+    data_description="Quarterly financials with 200 line items...",
+    goal="Extract key metrics for dashboard",
+    intent="analyst",
+    investment="standard",
+    output_format="json",   # temperature auto-set to 0.0
 )
 
 # Full audit report — all 11 sections, thorough depth

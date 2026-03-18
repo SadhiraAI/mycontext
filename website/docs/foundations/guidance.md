@@ -1,12 +1,12 @@
 ---
 sidebar_position: 2
 title: Guidance
-description: Complete reference for the Guidance class — defines who the AI is, its role, goal, rules, style, and expertise.
+description: Complete reference for the Guidance class — defines who the AI is, its role, goal, persona scope, rules, style, and expertise.
 ---
 
 # Guidance
 
-`Guidance` defines the **identity** of the AI — its role, objective, behavioral rules, communication style, and areas of expertise. It becomes the system-level prompt that shapes every response.
+`Guidance` defines the **identity** of the AI — its role, objective, behavioral rules, communication style, areas of expertise, and the boundaries within which the role applies. It becomes the system-level prompt that shapes every response.
 
 Think of Guidance as the job description: it tells the LLM who it is, what it is trying to achieve, how it should think, and what standards it should hold itself to.
 
@@ -22,8 +22,9 @@ from mycontext.foundation import Guidance
 
 ```python
 Guidance(
-    role: str,                        # required
+    role: str,                          # required
     goal: str | None = None,
+    persona_scope: str | None = None,
     rules: list[str] = [],
     style: str | None = None,
     expertise: list[str] | None = None,
@@ -35,22 +36,48 @@ Guidance(
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `role` | `str` | **Yes** | The persona or identity the LLM adopts |
-| `goal` | `str \| None` | No | The objective — what success looks like for this interaction |
+| `goal` | `str \| None` | No | The mission — rendered imperatively to drive completion |
+| `persona_scope` | `str \| None` | No | Bounds the role's applicability — prevents scope drift |
 | `rules` | `list[str]` | No | Behavioral rules to follow (numbered in output) |
 | `style` | `str \| None` | No | Communication tone and style |
 | `expertise` | `list[str] \| None` | No | Specific domains of knowledge |
 
+### `goal` — imperative framing
+
+`goal` renders as a mission statement, not a passive description:
+
+```
+Your mission: Identify every exploitable vulnerability — accomplish this fully.
+```
+
+This imperative framing drives completion rather than acknowledgment. The LLM is given a clear success criterion, not just a label. Declarative descriptions (`"Goal: find vulnerabilities"`) correlate with partial responses; imperative framing correlates with fuller task execution.
+
+### `persona_scope` — bounding the role
+
+`persona_scope` prevents the LLM from applying its role outside its intended domain:
+
+```python
+Guidance(
+    role="Senior application security engineer",
+    persona_scope="Limit review to application-layer code only. Do not assess infrastructure, network, or compliance.",
+)
+```
+
+Without scope bounding, LLMs expand roles — a "security engineer" will start auditing deployment configs, Kubernetes manifests, and team practices if not constrained. `persona_scope` eliminates that drift.
+
 ### `goal` vs `directive`
 
-`goal` belongs in `Guidance` — it defines what the AI is **optimising for** across the whole interaction. `Directive` contains the specific **task** to execute. Think of `goal` as the success criterion and `directive` as the concrete instruction.
+`goal` belongs in `Guidance` — it defines what the AI is **optimising for** across the whole interaction. `Directive` contains the specific **task** to execute.
 
 ```python
 Guidance(
     role="Senior data analyst",
-    goal="Identify the root cause of the revenue anomaly and give the team one clear action",
+    goal="Surface the root cause of the revenue anomaly and give the team one clear action",
 )
 # directive = Directive("Analyze Q3 revenue data: ...")
 ```
+
+`goal` = success criterion. `directive` = concrete instruction.
 
 ## Basic Usage
 
@@ -60,6 +87,7 @@ from mycontext import Guidance
 guidance = Guidance(
     role="Senior Python developer with 15 years of experience",
     goal="Produce production-ready code with clear reasoning behind every decision",
+    persona_scope="Limit advice to Python backend code — do not review frontend or infrastructure.",
     rules=[
         "Always consider edge cases and error conditions",
         "Prefer readability and maintainability over cleverness",
@@ -73,25 +101,48 @@ guidance = Guidance(
 
 ## How It Renders
 
-`guidance.render()` produces the system prompt text. Given the example above:
+`guidance.render()` produces the system prompt text. In the research flow, `role`, `goal`, `rules`, and `style` each occupy their own dedicated section for maximum clarity:
 
 ```
+## ROLE
+
 You are Senior Python developer with 15 years of experience.
-Goal: Produce production-ready code with clear reasoning behind every decision
-Your areas of expertise include: Python, async/await, API design, testing, performance.
+Scope: Limit advice to Python backend code — do not review frontend or infrastructure.
 
-Follow these rules:
-1. Always consider edge cases and error conditions
-2. Prefer readability and maintainability over cleverness
-3. Cite PEP standards where relevant
-4. Include type hints in all code examples
+## GOAL
 
-Communication style: technical but approachable — use plain English alongside code
+**Your mission:** Produce production-ready code with clear reasoning behind every decision — accomplish this fully.
+
+## RULES
+
+**You MUST follow these rules at all times:**
+  1. Always consider edge cases and error conditions
+  2. Prefer readability and maintainability over cleverness
+  3. Cite PEP standards where relevant
+  4. Include type hints in all code examples
+
+## STYLE
+
+**Tone & voice:** technical but approachable — use plain English alongside code
 ```
 
-This rendered string becomes the system message in the assembled `Context`.
+When used outside `research_flow`, `render()` produces a compact single block with all fields inline.
 
-When used with `research_flow=True`, `goal` gets its own **## GOAL** section — second position in the assembled prompt, where the LLM's attention is strongest. See [Prompt Assembly →](./research-flow).
+### Provider-aware rendering
+
+`render()` accepts an optional `provider` parameter that adjusts how the role and style are presented to match each provider's documented preferences:
+
+```python
+guidance.render(provider="gemini")
+# → "You are Senior Python developer with 15 years of experience.
+#    You are technical, approachable, precise."
+# Gemini responds better to explicit trait adjectives on the role.
+
+guidance.render(provider="anthropic")
+# → Standard role + scope — no trait injection (Claude handles style separately)
+```
+
+You do not call `render()` directly in most usage — set `provider_hint` on `Context` and `assemble()` handles it automatically. See [Provider-Aware Assembly →](./research-flow#provider-aware-assembly).
 
 ## Common Patterns
 
@@ -101,19 +152,34 @@ When used with `research_flow=True`, `goal` gets its own **## GOAL** section —
 guidance = Guidance(role="Expert data scientist")
 ```
 
-### With explicit goal
+### Mission-driven with scope bound
 
 ```python
 guidance = Guidance(
-    role="Medical content reviewer",
-    goal="Ensure content is accurate, safe, and understandable to a non-specialist audience",
+    role="Senior revenue analyst with 10 years of FP&A experience",
+    goal="Surface every statistically significant anomaly in Q4 revenue",
+    persona_scope="Limit analysis to revenue and margin data only.",
     rules=[
-        "Never provide specific medical advice",
-        "Always recommend consulting a licensed physician",
-        "Cite peer-reviewed sources when possible",
-        "Use plain language — avoid unnecessary jargon",
+        "Back every claim with a specific data point or calculation",
+        "Flag outliers above 2 standard deviations explicitly",
+        "Separate root causes from symptoms in your findings",
     ],
-    style="empathetic and informative",
+    style="precise, analytical, direct",
+)
+```
+
+### High-stakes with verification mandate
+
+```python
+guidance = Guidance(
+    role="Senior information security engineer",
+    goal="Produce a complete and accurate security assessment — no gaps or overclaiming",
+    persona_scope="Limit review to application-layer security only.",
+    rules=[
+        "Every vulnerability must be backed by a specific code location or configuration",
+        "Do not flag theoretical risks without evidence in the provided code",
+        "State confidence level (high/medium/low) for every finding",
+    ],
 )
 ```
 
@@ -158,7 +224,7 @@ ctx = Context(guidance="Expert security engineer")
 ctx = Context(guidance=Guidance(role="Expert security engineer"))
 ```
 
-Use the full `Guidance` object when you need rules, style, or expertise.
+Use the full `Guidance` object when you need `goal`, `persona_scope`, `rules`, `style`, or `expertise`.
 
 ## Combining with Context
 
@@ -168,6 +234,8 @@ from mycontext import Context, Guidance, Directive
 ctx = Context(
     guidance=Guidance(
         role="Principal site reliability engineer",
+        goal="Produce a post-incident review the team can act on immediately",
+        persona_scope="Limit scope to the services involved — do not scope-creep into org process.",
         rules=[
             "Prioritize customer impact over technical elegance",
             "Always include rollback procedures",
@@ -177,21 +245,10 @@ ctx = Context(
         expertise=["incident response", "Kubernetes", "observability", "SRE practices"],
     ),
     directive=Directive(content="Write a post-incident review for the 3-hour database outage."),
+    research_flow=True,
 )
 
 result = ctx.execute(provider="openai")
-```
-
-## Accessing Fields
-
-```python
-print(guidance.role)       # "Senior Python developer with 15 years of experience"
-print(guidance.rules)      # ["Always consider edge cases...", ...]
-print(guidance.style)      # "technical but approachable..."
-print(guidance.expertise)  # ["Python", "async/await", ...]
-
-# Render to string
-print(guidance.render())
 ```
 
 ## Best Practices
@@ -206,6 +263,23 @@ Guidance(role="an expert")
 Guidance(role="Principal machine learning engineer focused on production ML systems at scale")
 ```
 
+**Use `goal` to define completion, not just purpose.** The difference between a passive label and a completion-driving mission statement is in the phrasing — write the goal as something that can be fully accomplished, not just worked toward.
+
+```python
+# Passive — describes orientation, not a completable mission
+goal="Be helpful with security topics"
+
+# Completion-driving — the LLM knows what done looks like
+goal="Identify every exploitable vulnerability and provide a concrete remediation for each"
+```
+
+**Use `persona_scope` when the role is broad.** Any role that could plausibly be applied to many domains should have a scope boundary. Without it, LLMs expand into adjacent areas.
+
+```python
+# Without scope: "security engineer" might audit infrastructure, team practices, and deployment pipelines
+persona_scope="Limit review to application-layer code only."
+```
+
 **Rules are guarantees, not preferences.** Write rules the way you'd write acceptance criteria — concrete and verifiable.
 
 ```python
@@ -216,24 +290,19 @@ rules=["Try to be thorough"]
 rules=["Every recommendation must include a concrete implementation example"]
 ```
 
-**Style shapes tone, not substance.** Use style to control how results are delivered, not what they contain — use rules for that.
-
-```python
-style="concise, no preamble, lead with the most important finding"
-```
-
-**Keep expertise focused.** 3-6 domains is usually optimal. More expertise signals dilutes the persona.
+**Keep expertise focused.** 3-6 domains is usually optimal. More expertise signals dilute the persona.
 
 ## API Reference
 
 | Method / Field | Type | Description |
 |----------------|------|-------------|
 | `role` | `str` | Required. The persona the LLM adopts. |
-| `goal` | `str \| None` | The objective — what success looks like. Rendered after `role`. |
+| `goal` | `str \| None` | The mission — rendered imperatively: "Your mission: X — accomplish this fully." |
+| `persona_scope` | `str \| None` | Bounds the role's domain — prevents scope drift. |
 | `rules` | `list[str]` | Behavioral rules, rendered as a numbered list. |
 | `style` | `str \| None` | Communication tone and style. |
 | `expertise` | `list[str] \| None` | Domain expertise areas. |
-| `render()` | `str` | Produces the system prompt text. |
+| `render(provider="generic", include_goal=True, include_rules=True, include_style=True)` | `str` | Produces the system prompt text. `provider` adjusts presentation style. |
 
 ---
 

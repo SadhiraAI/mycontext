@@ -86,11 +86,12 @@ class DataAnalyzer(Pattern):
             guidance=Guidance(
                 role="Expert Data Analyst and Insights Specialist",
                 rules=[
-                    "Start with descriptive understanding",
-                    "Look for patterns and anomalies",
-                    "Distinguish correlation from causation",
-                    "Provide actionable insights",
-                    "Acknowledge data limitations",
+                    "Begin by stating what the data covers: time range, metrics, and any visible gaps.",
+                    "Cite the specific metric or value behind every pattern or anomaly you identify.",
+                    "Every correlation must include an explicit causation caveat.",
+                    "Every recommendation must trace directly back to a specific finding.",
+                    "When data is insufficient for a section, state what is missing "
+                    "and why it prevents a conclusion -- do not fill gaps with assumptions.",
                 ],
                 style="analytical, evidence-based, clear",
             ),
@@ -215,14 +216,16 @@ class DataAnalyzer(Pattern):
                 "   - Hypothesis 2: [Alternative explanation]"
             ),
             "data_limitations": (
-                "9. **DATA LIMITATIONS**\n"
-                "   What to be cautious about:\n"
-                "   - Limitation 1: [Data gap or issue]\n"
-                "   - Limitation 2: [Bias or constraint]\n"
-                "   - Limitation 3: [Missing information]\n"
+                "9. **DATA LIMITATIONS & GAP AUDIT**\n"
+                "   For EACH limitation, complete all three fields:\n"
                 "   \n"
-                "   Confidence caveats:\n"
-                "   - [What we can't conclude from this data]"
+                "   - Gap: [What data is absent, ambiguous, or insufficient]\n"
+                "     - Blocks: [Which conclusion this prevents -- be specific]\n"
+                "     - Would need: [What additional data would resolve this]\n"
+                "   \n"
+                "   If a section above could not be completed due to missing data, "
+                "restate it here explicitly: \"[Section X] cannot be answered -- "
+                "[specific data] is not available.\""
             ),
             "recommendations": (
                 "10. **RECOMMENDATIONS**\n"
@@ -331,11 +334,30 @@ class DataAnalyzer(Pattern):
 
         fmt_directive = get_format_directive(output_format)
 
+        few_shot = (
+            "**EXAMPLE -- how to handle missing data** (do not include this in your output):\n"
+            "\n"
+            "Scenario: Asked 'which channel drove more revenue?' but only click data "
+            "is available, not attribution data.\n"
+            "\n"
+            "\n"
+            "WRONG (speculation): 'Email drove more revenue because it had higher "
+            "click-through rates.'\n"
+            "\n"
+            "CORRECT (gap-honest): 'This question cannot be answered from the available "
+            "data. Revenue attribution data is not provided -- only click counts are available. "
+            "To answer this, we would need: revenue per channel, or conversion rates and "
+            "average order values per channel.'\n"
+            "\n"
+            "Apply this pattern any time the goal asks a question the data cannot answer.\n"
+        )
+
         return (
             f"Analyze this data:\n\n"
             f"**DATA**: {data_description}\n\n"
             f"{context_section}\n\n"
             f"**ANALYSIS GOAL**: {goal}\n\n"
+            f"{few_shot}\n"
             f"Produce ONLY these sections (in order):\n\n"
             f"{body}"
             f"{constraint_line}"

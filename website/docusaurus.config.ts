@@ -9,7 +9,7 @@ const config: Config = {
   tagline: 'Context engineering for LLMs. Build once, run anywhere, measure everything.',
   favicon: 'img/favicon.ico',
 
-  url: 'https://docs.mycontext.sadhiraai.com',
+  url: 'https://mycontext-docs.pages.dev',
   baseUrl: '/',
 
   organizationName: 'SadhiraAI',

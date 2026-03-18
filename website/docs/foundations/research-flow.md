@@ -1,18 +1,32 @@
 ---
 sidebar_position: 5
 title: Prompt Assembly & Thinking Strategies
-description: How Context assembles into a structured prompt, and a complete guide to the five thinking strategies — when to use each one and why.
+description: How Context assembles into a structured prompt, provider-aware rendering, and a complete guide to the five thinking strategies — when to use each one and why.
 ---
 
 # Prompt Assembly & Thinking Strategies
 
-When you call `ctx.assemble()`, mycontext-ai builds a structured prompt from your Context fields. Understanding how that structure is ordered — and how to inject a reasoning strategy — is what separates a good prompt from a great one.
+When you call `ctx.assemble()`, mycontext-ai builds a structured prompt from your Context fields. Understanding how that structure is ordered, how to target a specific provider, and how to inject a reasoning strategy is what separates a good prompt from a great one.
 
 ---
 
 ## How a Context Assembles
 
-A Context assembles into nine ordered sections. Each section maps directly to a field you set on the Context or its sub-objects:
+A Context assembles into nine ordered sections. Each section maps directly to a field you set on the Context or its sub-objects.
+
+The complete field-to-section mapping:
+
+| Section | Source field | Notes |
+|---------|-------------|-------|
+| ① ROLE | `Guidance.role` + `persona_scope` | Identity and domain boundary |
+| ② GOAL | `Guidance.goal` | Rendered as "Your mission: X — accomplish this fully." |
+| ③ RULES | `Guidance.rules` | Numbered list, hard → easy ordering |
+| ④ STYLE | `Constraints.style_guide` or `Guidance.style` | Tone and voice |
+| ⑤ REASONING | `thinking_strategy` or `analytical_approach` | Cognitive strategy injection |
+| ⑥ EXAMPLES | `examples` | Few-shot demonstrations |
+| ⑦ OUTPUT FORMAT | `Constraints.output_contract` + `output_schema` | Explicit response shape |
+| ⑧ GUARD RAILS | `Constraints.must_include/must_not_include/format_rules` | Hard constraints |
+| ⑨ TASK | `Directive` | Always last — highest attention at generation time |
 
 ```mermaid
 graph TD
@@ -34,6 +48,7 @@ ctx = Context(
     guidance=Guidance(
         role="Senior sentiment analysis expert",
         goal="Classify product reviews with confidence scores and actionable recommendations",
+        persona_scope="Limit analysis to the review text provided — do not infer product history or brand context.",
         rules=[
             "Always provide a confidence score between 0.0 and 1.0",
             "Consider context, sarcasm, and mixed sentiments",
@@ -54,6 +69,8 @@ ctx = Context(
         },
     ],
     constraints=Constraints(
+        output_contract="Return ONLY a JSON object matching the schema below. No prose, no markdown wrapper.",
+        style_guide="Analytical, evidence-based. Every claim must reference specific text from the review.",
         must_include=["sentiment", "confidence", "reasoning"],
         output_schema=[
             {"name": "sentiment", "type": "str"},
@@ -73,11 +90,12 @@ Assembled output:
 ```
 ## ROLE
 
-**You are Senior sentiment analysis expert.**
+You are Senior sentiment analysis expert.
+Scope: Limit analysis to the review text provided — do not infer product history or brand context.
 
 ## GOAL
 
-**Objective:** Classify product reviews with confidence scores and actionable recommendations
+**Your mission:** Classify product reviews with confidence scores and actionable recommendations — accomplish this fully.
 
 ## RULES
 
@@ -88,7 +106,7 @@ Assembled output:
 
 ## STYLE
 
-**Tone & voice:** Professional and analytical with clear reasoning
+**Tone & voice:** Analytical, evidence-based. Every claim must reference specific text from the review.
 
 ## REASONING APPROACH (Chain of Thought)
 
@@ -109,14 +127,14 @@ Output: Mixed — positive on delivery, negative on durability, confidence: 0.80
 
 ## OUTPUT FORMAT
 
+Return ONLY a JSON object matching the schema below. No prose, no markdown wrapper.
+
 **Return your response as a JSON object** with these required fields:
 
 - **`sentiment`** (str)
 - **`confidence`** (float)
 - **`reasoning`** (str)
 - **`recommendation`** (str)
-
-{"sentiment": ..., "confidence": ..., "reasoning": ..., "recommendation": ...}
 
 ## GUARD RAILS
 
@@ -131,6 +149,111 @@ Output: Mixed — positive on delivery, negative on durability, confidence: 0.80
 
 Analyze this review: 'Great build quality but battery dies by noon'
 ```
+
+---
+
+## Provider-Aware Assembly
+
+Set `provider_hint` on `Context` to adapt the assembled prompt to each provider's documented formatting preferences. The content stays identical — only the rendering layer changes.
+
+```python
+ctx = Context(
+    guidance=Guidance(role="data analyst", goal="Find revenue anomalies"),
+    constraints=Constraints(must_not_include=["speculation"]),
+    research_flow=True,
+    provider_hint="anthropic",   # or "openai", "gemini", "generic"
+)
+```
+
+`provider_hint` is independent of `execute(provider=...)` — one controls how the prompt is *assembled*, the other controls which model *receives* it.
+
+### What each hint does
+
+| Override | `openai` | `anthropic` | `gemini` |
+|----------|----------|-------------|---------|
+| **Delimiters** | `## Markdown` headings | `<xml>` tags | `<xml>` tags |
+| **Constraint phrasing** | `Must NOT include: X` | `Omit X.` (positive redirect) | `Omit X.` (positive redirect) |
+| **Role traits** | Role title only | Role title only | Appends style as trait adjectives: `"You are precise, analytical."` |
+| **Instruction mirror** | Repeats goal + top rules after long `knowledge` blocks | — | — |
+| **Verbosity anchor** | — | — | Appends `"Be direct and efficient."` to task |
+
+### Anthropic output
+
+With `provider_hint="anthropic"`, every section wraps in XML tags — Anthropic's primary documented recommendation for structured prompts:
+
+```
+<role>
+You are data analyst.
+</role>
+
+<goal>
+**Your mission:** Find revenue anomalies — accomplish this fully.
+</goal>
+
+<guard_rails>
+Exclude the following (use alternatives where needed):
+  - Omit speculation.
+</guard_rails>
+
+---
+
+<your_task>
+Analyze the Q4 dataset.
+</your_task>
+```
+
+### OpenAI output
+
+With `provider_hint="openai"`, Markdown headings are used. For long `knowledge` blocks, goal and top rules are automatically mirrored at the end of the prompt to counteract the lost-in-the-middle effect:
+
+```
+## ROLE
+
+You are data analyst.
+
+## GOAL
+
+**Your mission:** Find revenue anomalies — accomplish this fully.
+
+## GUARD RAILS
+
+Must NOT include:
+  - speculation
+
+---
+
+## YOUR TASK
+
+Analyze the Q4 dataset.
+
+---
+
+## KEY REMINDERS (re-stated after long context)
+
+Reminder — your mission: Find revenue anomalies
+```
+
+### Gemini output
+
+With `provider_hint="gemini"`, XML tags are used and style is injected as trait adjectives on the role. A verbosity anchor is appended to the task section:
+
+```
+<role>
+You are data analyst. You are precise, analytical, direct.
+</role>
+
+<your_task>
+Analyze the Q4 dataset.
+
+Be direct and efficient. Avoid unnecessary preamble.
+</your_task>
+```
+
+### Research basis
+
+Provider-specific formatting was validated against official documentation from OpenAI (GPT-4.1 Prompting Guide), Anthropic (Claude prompt engineering docs), and Google (Gemini API prompting strategies). A 2026 benchmark across 600 model calls found format deltas of ≤0.3% between XML and Markdown on frontier models — the differences matter most for **constraint compliance** and **long-context recall**, not general accuracy.
+
+See [Prompt Engineering Foundation →](../research/prompt-engineering-foundation) for the full research.
 
 ---
 
@@ -487,4 +610,4 @@ The `generation_meta` field contains the raw spec the LLM produced. Inspect it t
 
 ---
 
-**See also:** [Context Object →](./context-object) | [Guidance →](./guidance) | [Constraints →](./constraints) | [API Reference →](../api/overview)
+**See also:** [Context Object →](./context-object) | [Guidance →](./guidance) | [Constraints →](./constraints) | [API Reference →](../api/overview) | [Prompt Engineering Foundation →](../research/prompt-engineering-foundation)

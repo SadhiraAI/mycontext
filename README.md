@@ -8,7 +8,7 @@
 [![PyPI](https://img.shields.io/pypi/v/mycontext-ai.svg)](https://pypi.org/project/mycontext-ai/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[The Problem](#the-problem) · [Core Strengths](#core-strengths) · [Quick Start](#quick-start) · [Use Cases](#use-cases) · [Patterns](#87-cognitive-patterns)
+[The Problem](#the-problem) · [Core Strengths](#core-strengths) · [Quick Start](#quick-start) · [Use Cases](#use-cases) · [Patterns](#87-cognitive-patterns) · [Prompt Tools](#23-prompt-architect--apply-the-9-section-architecture-to-any-raw-prompt)
 
 </div>
 
@@ -30,20 +30,26 @@ Every team building with LLMs hits the same wall:
 mycontext-ai gives you a **structured `Context` object** that separates *what the AI should know* (guidance) from *what it should do* (directive) and *what it must not do* (constraints). You build the context once and export it to any LLM or framework.
 
 ```
-Raw question
+Raw question / raw prompt
+    ↓
+[ PromptArchitect ]  — parse, score, upgrade to 9-section architecture
     ↓
 [ Intelligence Layer ] — auto-selects the right cognitive pattern
-    ↓
+    │
+    ├─ [ GuidanceOptimizer ] — audit + rewrite weak template rules
+    │
 Three execution tiers:
-  ├─ Static Generic  — zero-cost compiled prompt (1 LLM call)
+  ├─ Static Generic   — zero-cost compiled prompt (1 LLM call)
   ├─ Dynamic Compiled — LLM-refined prompt artifact (2-3 calls)
   └─ Full Response    — complete template execution (2-3 calls)
     ↓
 Export: OpenAI │ Anthropic │ Gemini │ LangChain │ YAML │ 13 formats
     ↓
-[ Quality Metrics ] — score, compare, improve
+[ QualityMetrics + OutputEvaluator ] — score prompt & output, no LLM needed
     ↓
 [ CAI ] — prove the template made a measurable difference
+    ↓
+[ eval_criteria ] — targeted LLM-judge rubrics for experiment validation
 ```
 
 The engine doesn't generate answers. It generates the *best possible question* for the LLM you're sending it to — and it can *prove* it.
@@ -421,7 +427,68 @@ pip install instructor   # optional — enables structured LLM output
 
 Falls back to Pydantic-validated JSON parsing → original regex parser without `instructor`. No behaviour change if not installed.
 
-### 23. Output Format Control — 10 Formats, Every Template
+### 23. Prompt Architect — Apply the 9-Section Architecture to Any Raw Prompt
+
+Takes any raw prompt string and upgrades it automatically — parses which of the 9 sections exist, scores quality, rewrites weak or missing sections using an LLM, and returns a before/after diff with score deltas. Also builds complete structured prompts from a plain task description.
+
+```python
+from mycontext.intelligence import PromptArchitect
+
+arch = PromptArchitect(provider="openai", model="gpt-4o-mini")
+
+# Improve an existing weak prompt
+result = arch.improve("You are an analyst. Summarize this data.")
+print(result.summary())
+# Score: 18% → 74%  (+56%)
+# Added sections: goal, rules, style, reasoning, output_contract, guard_rails
+# Resolved 5 issues: missing_goal; missing_rules; generic_role; ...
+
+print(result.diff_report())   # section-by-section what changed and why
+
+# Build a complete 9-section prompt from scratch
+result = arch.build("Analyze customer churn and identify at-risk segments")
+print(result.improved_prompt)   # ready to use
+```
+
+Three entry points: `parse()` detects sections heuristically (no LLM). `build()` constructs from a task description (1 LLM call). `improve()` rewrites and diffs an existing prompt.
+
+### 24. Guidance Optimizer — Upgrade Template Rules Automatically
+
+Audits `Guidance` objects in SDK templates for three common weaknesses — suggestive modals (`should/try to/ideally`), vague directives (`be accurate`), and under-specified rules — and rewrites only the weak ones using an LLM. Binding rules are kept exactly as written.
+
+```python
+from mycontext.intelligence import GuidanceOptimizer
+from mycontext.foundation import Guidance
+
+guidance = Guidance(
+    role="Data analyst",
+    rules=[
+        "Try to look for patterns",           # weak: suggestive modal
+        "You should mention limitations",     # weak: suggestive modal
+        "Be accurate",                        # weak: vague directive
+        "Every claim must cite the specific data point that supports it",  # binding — kept
+    ],
+)
+
+opt = GuidanceOptimizer(provider="openai", model="gpt-4o-mini")
+
+# Audit without rewriting (no LLM call)
+audit = opt.audit(guidance)
+print(audit.summary())
+# Rules: 4 total  |  1 binding  |  3 weak  |  Strength: 28%
+
+# Rewrite weak rules only
+result = opt.optimize(guidance)
+print(result.summary())
+# Rule strength: 28% → 91%  (+63%)  |  3/4 rules rewritten
+print(result.optimized_guidance.rules)
+# ["Identify and quantify every pattern — report the metric and its value.",
+#  "Must explicitly state each data gap: what is absent and what it prevents.",
+#  "Every numeric claim must reference the exact figure from the dataset.",
+#  "Every claim must cite the specific data point that supports it."]  ← unchanged
+```
+
+### 25. Output Format Control — 10 Formats, Every Template
 
 Every template's `build_context()` and `execute()` now accept an `output_format` parameter. Control *how* the LLM presents its response without changing *what* it analyses:
 
@@ -461,6 +528,9 @@ Works on all 87 templates — implemented once at the `Pattern` base class level
 | Complexity router | Auto-selects optimal approach per question | None |
 | Context quality scoring | 6 dimensions + issues + suggestions | None |
 | Output quality scoring | 5 dimensions (separate from prompt quality) | None |
+| Prompt optimization (raw prompts) | `PromptArchitect` — parse, score, rewrite, diff | None |
+| Guidance optimization (templates) | `GuidanceOptimizer` — audit + rewrite weak rules | None |
+| Pre-built eval rubrics | `eval_criteria` — 10 research-backed GEval criteria | None |
 | Template effectiveness proof | CAI (quantitative lift measurement) | None |
 | Pattern suggestion | Keyword + LLM + hybrid modes | Manual selection |
 | Multi-template fusion | Intelligent merge (not concatenation) | None |

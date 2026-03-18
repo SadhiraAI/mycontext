@@ -71,6 +71,8 @@ const sidebars: SidebarsConfig = {
         'intelligence/chain-orchestration',
         'intelligence/async-execution',
         'intelligence/token-budget',
+        'intelligence/prompt-architect',
+        'intelligence/guidance-optimizer',
       ],
     },
     {
@@ -81,6 +83,8 @@ const sidebars: SidebarsConfig = {
         'quality/output-evaluator',
         'quality/cai',
         'quality/benchmarking',
+        'quality/prompt-optimization-workflow',
+        'quality/eval-criteria',
       ],
     },
     {

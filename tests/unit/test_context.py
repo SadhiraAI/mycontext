@@ -328,9 +328,9 @@ class TestResearchFlow:
         )
         assembled = ctx.assemble()
 
-        assert "**You are Expert.**" in assembled
+        assert "You are Expert." in assembled
         assert "**You MUST follow" in assembled
-        assert "**NEVER include" in assembled
+        assert "Must NOT include" in assembled
 
     def test_research_flow_thinking_strategy(self):
         for strategy in ["step_by_step", "multiple_angles", "verify", "explain_simply", "creative"]:

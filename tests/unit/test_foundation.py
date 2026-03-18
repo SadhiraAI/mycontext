@@ -207,7 +207,7 @@ class TestGuidanceGoal:
     def test_render_includes_goal(self):
         g = Guidance(role="Expert", goal="Find vulnerabilities")
         rendered = g.render()
-        assert "Goal: Find vulnerabilities" in rendered
+        assert "Find vulnerabilities" in rendered
 
     def test_render_without_goal_unchanged(self):
         g = Guidance(role="Expert", rules=["Be thorough"], style="direct")
@@ -270,5 +270,5 @@ class TestFoundationIntegration:
             must_include=["metrics"],
             output_schema=[{"name": "trend", "type": "str"}]
         )
-        assert "Goal: Find trends" in guidance.render()
+        assert "Find trends" in guidance.render()
         assert "trend (str)" in constraints.render()

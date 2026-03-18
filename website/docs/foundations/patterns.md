@@ -100,7 +100,7 @@ result = ctx.execute(provider="openai")
 | `version` | `str` | No | Semantic version, default `"1.0.0"` |
 | `metadata` | `dict` | No | Arbitrary metadata |
 
-### `build_context(**inputs)` → `Context`
+### `build_context(output_format, **inputs)` → `Context`
 
 Builds a fully assembled `Context` from the pattern and provided inputs.
 
@@ -108,6 +108,7 @@ Builds a fully assembled `Context` from the pattern and provided inputs.
 ctx = pattern.build_context(
     problem="Server crashes under load",
     depth="comprehensive",
+    output_format="brief",   # optional, default "structured"
 )
 # Returns a Context with guidance, directive (built from template), constraints, and data
 ```
@@ -117,24 +118,71 @@ The built `Context` automatically carries pattern metadata:
 ```python
 ctx.metadata["pattern"]         # "root_cause_analyzer"
 ctx.metadata["pattern_version"] # "1.0.0"
+ctx.metadata["output_format"]   # "brief"
 ```
 
-### `execute(provider, mode, **inputs)` → response
+#### `output_format` — Presentation Style
 
-Build and execute in a single call. Accepts all `build_context` inputs plus any provider kwargs (`model`, `temperature`, etc.):
+All 88 built-in patterns accept `output_format` in both `build_context()` and `execute()`. It appends a format instruction to the assembled directive, controlling *how* the model presents its output without changing *what* it analyses.
+
+Two groups of formats are available:
+
+**Human formats** — control presentation style for a person reading the output:
+
+| Format | Output Style | Best For |
+|--------|-------------|----------|
+| `structured` | Sections with headers and bullet points **(default)** | Standard reports, documentation |
+| `narrative` | Flowing prose paragraphs, no headers | Executive docs, written reports |
+| `brief` | Bullets only, max 2 sentences each, &lt;300 words | Slack/Teams, notifications |
+| `actionable` | Imperative verbs only (Fix, Add, Update…) | Ticket creation, ops handoff |
+| `slides` | Slide titles + 3–5 bullets per slide | PowerPoint/Google Slides prep |
+| `email` | Subject + body paragraphs + clear ask | Executive communications |
+| `qa` | Q: / A: pairs | FAQs, knowledge bases, chatbot training |
+| `checklist` | `- [ ]` items grouped by category | Runbooks, review checklists |
+
+**Machine formats** — control serialization for downstream code (auto-sets `temperature=0.0`):
+
+| Format | Output Style | Best For |
+|--------|-------------|----------|
+| `json` | Raw JSON object only | Pipelines, dashboards, downstream LLMs |
+| `table` | Markdown table(s) only | Risk registers, comparison matrices |
+
+```python
+# Slide deck prep
+ctx = RootCauseAnalyzer().build_context(
+    problem="API latency tripled",
+    output_format="slides",
+)
+
+# Runbook checklist
+ctx = RootCauseAnalyzer().build_context(
+    problem="Database disk at 90%",
+    output_format="checklist",
+)
+
+# Machine-readable pipeline
+ctx = RootCauseAnalyzer().build_context(
+    problem="Auth failures spiked",
+    output_format="json",  # temperature auto-set to 0.0
+)
+```
+
+### `execute(provider, mode, output_format, **inputs)` → response
+
+Build and execute in a single call. Accepts `output_format`, all `build_context` inputs, and any provider kwargs (`model`, `temperature`, etc.):
 
 ```python
 result = pattern.execute(
     provider="openai",
-    mode="full",          # "full" (default) or "generic"
+    mode="full",             # "full" (default) or "generic"
+    output_format="email",   # optional, default "structured"
     problem="Server crashes under load",
     depth="comprehensive",
     model="gpt-4o",
-    temperature=0.2,
 )
 ```
 
-`mode="generic"` uses the pattern's `GENERIC_PROMPT` — a zero-cost pre-authored prompt that skips context assembly.
+`mode="generic"` uses the pattern's `GENERIC_PROMPT` — a zero-cost pre-authored prompt that skips context assembly. `output_format` is applied to generic prompts too.
 
 ### Generic Prompts — Zero-Cost Execution
 

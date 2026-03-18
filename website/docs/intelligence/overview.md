@@ -20,6 +20,9 @@ from mycontext.intelligence import (
     PromptComposer,             # Merge template prompts
     QualityMetrics,             # Measure context quality
     ContextAmplificationIndex,  # CAI quality signal
+    PromptArchitect,            # Parse → score → rewrite any raw prompt
+    GuidanceOptimizer,          # Upgrade Guidance rules to binding language
+    get_criteria,               # Pre-built DeepEval GEval criteria bundles
 )
 ```
 
@@ -149,6 +152,18 @@ from mycontext.intelligence import (
 )
 ```
 
+## Prompt Quality Tools
+
+These tools live in the Intelligence Layer and focus on improving the quality of prompts and template rules — before execution, not just after.
+
+| Tool | Input | What it does | LLM call |
+|------|-------|-------------|----------|
+| [`PromptArchitect`](./prompt-architect) | Any raw prompt string | Parse sections → score → rewrite weak/missing → diff | 0 (parse) or 1 (build/improve) |
+| [`GuidanceOptimizer`](./guidance-optimizer) | A `Guidance` object | Audit rules for suggestive modals + vague directives → rewrite only weak ones | 0 (audit) or 1 (optimize) |
+| `QualityMetrics` | Any `Context` | Score on 6 dimensions: clarity, completeness, specificity, relevance, structure, efficiency | 0 |
+| `OutputEvaluator` | LLM output + `Context` | Score on 5 dimensions: instruction_following, reasoning_depth, actionability, structure_compliance, cognitive_scaffolding | 0 |
+| `get_criteria()` | Bundle name | Return pre-built DeepEval GEval rubrics | 0 |
+
 ## Choosing the Right Entry Point
 
 | Your situation | Use |
@@ -159,7 +174,10 @@ from mycontext.intelligence import (
 | I want to control which pattern runs | `pattern.execute()` directly |
 | I want a multi-step workflow | `build_workflow_chain()` |
 | I want to merge multiple templates | `TemplateIntegratorAgent` |
-| I want to measure quality | `QualityMetrics.evaluate()` |
+| I have a raw prompt and want it upgraded | `PromptArchitect.improve()` |
+| I want to audit/rewrite template rules | `GuidanceOptimizer.optimize()` |
+| I want to measure prompt quality | `QualityMetrics.evaluate()` |
+| I want to measure output quality | `OutputEvaluator.evaluate()` |
 | I want to measure amplification | `ContextAmplificationIndex.compute()` |
 
 ## Next Steps
@@ -172,3 +190,5 @@ from mycontext.intelligence import (
 - [Template Integrator →](./template-integrator) — Fuse multiple templates
 - [Async Execution →](./async-execution) — `aexecute`, concurrent patterns, FastAPI
 - [Token-Budget Assembly →](./token-budget) — `assemble_for_model`, accurate trimming
+- [PromptArchitect →](./prompt-architect) — Upgrade any raw prompt to the 9-section architecture
+- [GuidanceOptimizer →](./guidance-optimizer) — Audit and rewrite weak template rules

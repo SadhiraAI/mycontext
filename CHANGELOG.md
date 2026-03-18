@@ -6,6 +6,33 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.8.0] — 2026-03-18
+
+### Added
+
+- **`PromptArchitect`** (`mycontext.intelligence.PromptArchitect`) — Applies the 9-section prompt architecture to any raw prompt string. Three entry points:
+  - `parse(prompt)` — heuristic section detection, no LLM call
+  - `build(task)` — constructs a complete 9-section prompt from a plain task description (1 LLM call)
+  - `improve(prompt)` — parse + score + rewrite weak/missing sections + score again + section-level diff (1 LLM call)
+  - Returns `ArchitectResult` with `improved_context`, `improved_prompt`, `before_score`, `after_score`, `score_delta`, `parsed`, and `diffs`
+
+- **`GuidanceOptimizer`** (`mycontext.intelligence.GuidanceOptimizer`) — Audits and upgrades `Guidance` objects in SDK templates. Targets three weaknesses: suggestive modals (`should/try to/ideally` → `must/always/never`), vague directives (`be accurate` → specific testable criterion), and under-specified rules (< 5 words). Only weak rules are sent to the LLM — binding rules are kept exactly as written.
+  - `audit(guidance)` — heuristic weakness detection, no LLM call. Returns `GuidanceAuditResult` with per-rule `RuleAudit` records and a `rule_strength_score`
+  - `optimize(guidance)` — rewrites weak rules via LLM. Returns `OptimizedGuidance` with before/after scores and full audit trail
+
+- **`eval_criteria`** (`mycontext.intelligence.eval_criteria`) — Pre-built LLM-judge rubrics for use with DeepEval's `GEval` metric. Ten criteria organized into five bundles (`data_analysis`, `reasoning`, `instruction_following`, `code_review`, `general`):
+  - `EVIDENCE_CITATION`, `CAUSATION_DISCIPLINE`, `DATA_GAP_HONESTY`, `INSTRUCTION_ADHERENCE`, `ACTIONABILITY`, `REASONING_SOUNDNESS`, `STRUCTURE_COMPLIANCE`, `COGNITIVE_SCAFFOLDING_USE`, `CODE_REVIEW_SEVERITY_ACCURACY`, `CODE_REVIEW_ACTIONABILITY`
+  - `get_criteria(bundle)` — retrieve a pre-assembled bundle
+  - `to_deepeval_metrics(criteria)` — convert to `deepeval.metrics.GEval` objects
+
+- **`OutputEvaluator` improvements** — `_score_actionability` now rewards explicit data-gap statements before applying hedge penalties; `_score_reasoning_depth` rewards explicit `Evidence:` labels. Both changes reduce false penalization of analytically rigorous outputs.
+
+### Changed
+
+- `QualityMetrics._evaluate_clarity` — added modal commitment ratio scoring: prompts with ≥60% binding modals (`must/shall/will/always/never`) receive a positive signal; prompts with <25% are flagged. Hedge density now also factors in `try to / if applicable / as needed`.
+
+---
+
 ## [0.7.0] — 2026-03-11
 
 ### Added

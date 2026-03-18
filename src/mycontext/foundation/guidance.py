@@ -20,17 +20,21 @@ class Guidance(BaseModel):
         ```python
         guidance = Guidance(
             role="Expert security engineer with 10 years experience",
+            goal="Identify every exploitable vulnerability in the code provided.",
+            persona_scope="Limit your expertise to application-layer security only.",
             rules=[
                 "Always prioritize security over convenience",
                 "Explain technical concepts clearly",
-                "Provide code examples when relevant"
+                "Provide code examples when relevant",
             ],
-            style="Professional but approachable"
+            style="Professional but approachable",
         )
         ```
 
     Attributes:
         role: The role/persona the LLM should adopt
+        goal: The mission — rendered imperatively to drive completion
+        persona_scope: Bounds the applicability of the role (prevents scope creep)
         rules: List of behavioral rules to follow
         style: Communication style
         expertise: Areas of expertise
@@ -39,53 +43,102 @@ class Guidance(BaseModel):
     role: str = Field(
         ...,
         description="The role or persona",
-        min_length=1
+        min_length=1,
     )
 
     rules: list[str] = Field(
         default_factory=list,
-        description="Behavioral rules to follow"
+        description="Behavioral rules to follow",
     )
 
     style: str | None = Field(
         default=None,
-        description="Communication style"
+        description="Communication style",
     )
 
     expertise: list[str] | None = Field(
         default=None,
-        description="Areas of expertise"
+        description="Areas of expertise",
     )
 
     goal: str | None = Field(
         default=None,
-        description="What success looks like — the objective of the interaction"
+        description="What success looks like — the objective of the interaction",
     )
 
-    def render(self) -> str:
+    persona_scope: str | None = Field(
+        default=None,
+        description=(
+            "Bounds the role's applicability — prevents the persona from drifting "
+            "outside its intended domain. "
+            "e.g. 'Limit analysis to backend Python code only.'"
+        ),
+    )
+
+    def render(
+        self,
+        provider: str = "generic",
+        include_goal: bool = True,
+        include_rules: bool = True,
+        include_style: bool = True,
+    ) -> str:
         """
         Render guidance as a system prompt.
+
+        Args:
+            provider: One of "generic", "openai", "anthropic", "gemini".
+                      Gemini appends trait adjectives; others use role title only.
+            include_goal: When False, skips the goal line. Set to False in
+                          research_flow assembly because the flow renders goal
+                          as its own dedicated section (②).
+            include_rules: When False, skips rules. Set to False in research_flow
+                           because the flow renders rules as its own section (③).
+            include_style: When False, skips style. Set to False in research_flow
+                           because the flow renders style as its own section (④).
 
         Returns:
             Formatted system prompt
         """
-        parts = [f"You are {self.role}."]
+        if provider == "gemini" and self.style and include_style:
+            # Gemini responds well to explicit trait adjectives appended to the role
+            traits = self._style_to_traits(self.style)
+            parts = [f"You are {self.role}. You are {traits}."]
+        else:
+            parts = [f"You are {self.role}."]
 
-        if self.goal:
-            parts.append(f"Goal: {self.goal}")
+        if self.goal and include_goal:
+            # Imperative framing — drives completion rather than passive description
+            parts.append(f"Your mission: {self.goal} — accomplish this fully.")
+
+        if self.persona_scope:
+            parts.append(f"Scope: {self.persona_scope}")
 
         if self.expertise:
             expertise_text = ", ".join(self.expertise)
             parts.append(f"Your areas of expertise include: {expertise_text}.")
 
-        if self.rules:
+        if self.rules and include_rules:
             rules_text = "\n".join(f"{i+1}. {rule}" for i, rule in enumerate(self.rules))
             parts.append(f"\nFollow these rules:\n{rules_text}")
 
-        if self.style:
+        if self.style and include_style and provider != "gemini":
             parts.append(f"\nCommunication style: {self.style}")
 
         return "\n".join(parts)
+
+    @staticmethod
+    def _style_to_traits(style: str) -> str:
+        """Convert a style string to a comma-separated trait list for Gemini.
+
+        Simple heuristic: split on commas/semicolons and lowercase each segment.
+        Falls back to the raw style string if no delimiters found.
+        """
+        import re
+        segments = re.split(r"[,;]+", style)
+        traits = [s.strip().lower() for s in segments if s.strip()]
+        if len(traits) > 1:
+            return ", ".join(traits)
+        return style.lower()
 
     def __repr__(self) -> str:
         """String representation"""
