@@ -253,7 +253,7 @@ Be direct and efficient. Avoid unnecessary preamble.
 
 Provider-specific formatting was validated against official documentation from OpenAI (GPT-4.1 Prompting Guide), Anthropic (Claude prompt engineering docs), and Google (Gemini API prompting strategies). A 2026 benchmark across 600 model calls found format deltas of ≤0.3% between XML and Markdown on frontier models — the differences matter most for **constraint compliance** and **long-context recall**, not general accuracy.
 
-See [Prompt Engineering Foundation →](../research/prompt-engineering-foundation) for the full research.
+See the research section for the full background on prompt ordering and architecture.
 
 ---
 
@@ -610,4 +610,4 @@ The `generation_meta` field contains the raw spec the LLM produced. Inspect it t
 
 ---
 
-**See also:** [Context Object →](./context-object) | [Guidance →](./guidance) | [Constraints →](./constraints) | [API Reference →](../api/overview) | [Prompt Engineering Foundation →](../research/prompt-engineering-foundation)
+**See also:** [Context Object →](./context-object) | [Guidance →](./guidance) | [Constraints →](./constraints) | [API Reference →](../api/overview)

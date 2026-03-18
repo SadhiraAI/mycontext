@@ -370,4 +370,4 @@ Want to evaluate the output too?
 
 - [QualityMetrics →](./quality-metrics) — Score a context before sending it
 - [OutputEvaluator →](./output-evaluator) — Score an LLM response after receiving it
-- [Research: 9-Section Ordering →](../research/prompt-engineering-foundation) — Why the order matters
+- [QualityMetrics →](./quality-metrics) — Detailed scoring dimensions
