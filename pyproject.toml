@@ -97,9 +97,23 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-# Exclude enterprise for free-only PyPI release
+# Exclude enterprise and all non-essential repo content to stay under PyPI 100 MB limit
 exclude = [
     "src/mycontext/templates/enterprise",
+    "docs/",
+    "app/",
+    "website/",
+    "examples/",
+    "tutorials/",
+    "tools/",
+    "output/",
+    "tests/",
+    ".cursor/",
+    ".agent/",
+    "*.pdf",
+    "*.png",
+    "*.jpg",
+    "*.ipynb",
 ]
 
 [tool.ruff]
