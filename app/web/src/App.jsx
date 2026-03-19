@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import Academy from "./pages/Academy";
 
 import Changelog from "./pages/Changelog";
+import Guidebooks from "./pages/Guidebooks";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/guidebooks" element={<Guidebooks />} />
       <Route path="/" element={<HomeOrApp />}>
         <Route index element={<Dashboard />} />
         <Route path="templates" element={<Templates />} />

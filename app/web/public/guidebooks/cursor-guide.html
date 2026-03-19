@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Only Cursor Guide You'll Ever Need — By Dhiraj Pokhrel · Sadhira AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --bg:           #f5f9f8;
+  --bg-card:      #ffffff;
+  --bg-surface:   #eaf3f1;
+  --bg-hover:     #dff0ec;
+  --border:       rgba(75,130,120,0.18);
+  --border-dim:   rgba(75,130,120,0.10);
+  --border-bright:rgba(61,139,128,0.40);
+  --text:         #1a3a36;
+  --text-dim:     #3d6b64;
+  --text-faint:   #8aada9;
+
+  --teal:         #3d8b80;
+  --teal-dark:    #2d7268;
+  --teal-darker:  #1f5a52;
+  --teal-dim:     rgba(61,139,128,0.10);
+  --teal-glow:    rgba(61,139,128,0.06);
+
+  --purple:       #7c3aed;
+  --purple-dim:   rgba(124,58,237,0.08);
+
+  --success:      #1f6b4a;
+  --success-dim:  rgba(31,107,74,0.10);
+  --warn:         #92620a;
+  --warn-dim:     rgba(146,98,10,0.10);
+  --danger:       #be3a30;
+  --danger-dim:   rgba(190,58,48,0.09);
+
+  --gradient:     linear-gradient(135deg,#4a9e94 0%,#3d8b80 100%);
+  --gradient-hero:linear-gradient(135deg,#3d8b80 0%,#7c3aed 100%);
+
+  --font-serif: 'Instrument Serif',Georgia,serif;
+  --font-sans:  'DM Sans',system-ui,sans-serif;
+  --font-mono:  'JetBrains Mono','Courier New',monospace;
+
+  --page-w: 880px;
+  --radius: 10px;
+}
+
+/* ─── Print / PDF ──────────────────────────────────── */
+@page { size: A4; margin: 1.8cm 1.5cm 1.8cm 1.5cm; }
+
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .no-print { display:none!important; }
+  body { font-size: 10.5pt; background: #f5f9f8 !important; color: #1a3a36 !important; margin: 0 !important; }
+  .page { padding: 0 1.5cm 1cm !important; max-width: 100% !important; margin: 0 !important; }
+
+  .cover {
+    min-height: 0 !important; height: auto !important;
+    padding: 1.5cm 0 1.2cm !important;
+    display: block !important; justify-content: unset !important;
+  }
+  .cover-bg, .cover-grid { display: none !important; }
+  .toc { padding: 0.8cm 0 !important; }
+
+  .chapter-block {
+    padding: 1.2cm 0 0.5cm !important; margin-top: 0 !important;
+    border-top: 1.5px solid rgba(75,130,120,0.3) !important;
+  }
+
+  h2, h3 { page-break-after: avoid; break-after: avoid; }
+  .callout, .compare-pair { page-break-inside: avoid; break-inside: avoid; }
+  .code-block, .table-wrap { page-break-inside: auto; break-inside: auto; }
+
+  .fade-up, .fade-up.visible, [class*="fade"] {
+    opacity: 1 !important; transform: none !important; transition: none !important;
+  }
+  [style*="opacity"] { opacity: 1 !important; }
+  [style*="transform"] { transform: none !important; }
+
+  .cover h1 em { -webkit-text-fill-color: #2d7268 !important; background: none !important; color: #2d7268 !important; }
+  .toc-n, .ch-eyebrow, .cover-label { color: #3d8b80 !important; }
+  .cover-rule, .ch-rule { background: #4a9e94 !important; }
+  h1, h2, h3, h4 { color: #1a3a36 !important; }
+  .chapter-block h2 { color: #1a3a36 !important; }
+  .ch-intro, .cover-sub { color: #3d6b64 !important; }
+  p { color: #3d6b64 !important; }
+
+  a.toc-row { color: #1a3a36 !important; text-decoration: none !important; }
+  .toc-t { color: #1a3a36 !important; }
+  .toc-ch { color: #8aada9 !important; }
+  .toc-dots { border-color: rgba(75,130,120,0.3) !important; }
+
+  .callout { background: rgba(61,139,128,0.08) !important; border-color: #3d8b80 !important; color: #3d6b64 !important; }
+  .callout.warn { background: rgba(146,98,10,0.08) !important; border-color: #92620a !important; }
+  .callout.danger { background: rgba(190,58,48,0.08) !important; border-color: #be3a30 !important; }
+  .callout strong { color: #1a3a36 !important; }
+
+  code { background: rgba(61,139,128,0.10) !important; color: #2d7268 !important; }
+  .code-block { border-color: rgba(75,130,120,0.2) !important; background: #fff !important; }
+  .code-label { background: #eaf3f1 !important; color: #8aada9 !important; }
+  .code-block pre {
+    background: #eaf3f1 !important; color: #3d6b64 !important;
+    white-space: pre-wrap !important; overflow-x: visible !important;
+    word-break: break-word !important; font-size: 0.72rem !important;
+  }
+
+  .data-table { border-color: rgba(75,130,120,0.2) !important; font-size: 0.72rem !important; }
+  .data-table th { background: #eaf3f1 !important; color: #1a3a36 !important; border-color: rgba(75,130,120,0.2) !important; }
+  .data-table td { color: #3d6b64 !important; border-color: rgba(75,130,120,0.12) !important; }
+
+  .step-block { background: rgba(61,139,128,0.06) !important; border-color: rgba(61,139,128,0.25) !important; }
+  .step-num { background: #3d8b80 !important; color: #fff !important; }
+
+  .cover-pill { background: rgba(61,139,128,0.10) !important; color: #3d8b80 !important; border-color: rgba(61,139,128,0.3) !important; }
+  .cover-meta span { color: #8aada9 !important; }
+  .cover-meta strong { color: #3d6b64 !important; }
+  .footer span { color: #8aada9 !important; }
+  .footer a { color: #3d8b80 !important; }
+}
+
+/* ─── Base ─────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* ─── Cover ─────────────────────────────────────────── */
+.cover {
+  min-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 4rem;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.cover-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 65% 55% at 80% 15%, rgba(61,139,128,0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 40% at 15% 75%, rgba(124,58,237,0.07) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cover-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(75,130,120,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(75,130,120,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+.cover-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.4rem;
+}
+.cover h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.13;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+.cover h1 em {
+  font-style: italic;
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cover-sub {
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  line-height: 1.6;
+  margin-bottom: 1.8rem;
+}
+.cover-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+.cover-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--teal);
+  background: var(--teal-dim);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  padding: 0.25rem 0.8rem;
+}
+.cover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  margin-bottom: 2rem;
+}
+.cover-meta strong { color: var(--text-dim); }
+.cover-rule {
+  width: 48px; height: 3px;
+  background: var(--gradient);
+  border-radius: 2px;
+  margin-bottom: 2rem;
+}
+
+/* ─── Download bar ──────────────────────────────────── */
+.download-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 3rem;
+}
+.download-bar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.4rem;
+  background: var(--gradient);
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.download-bar a:hover { opacity: 0.9; }
+.download-bar-note {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+
+/* ─── TOC ───────────────────────────────────────────── */
+.toc {
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4rem;
+}
+.toc h2 {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  margin-bottom: 1.4rem;
+  color: var(--text);
+}
+.toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.05rem; }
+a.toc-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0;
+  text-decoration: none;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-dim);
+  transition: color 0.15s;
+}
+a.toc-row:hover { color: var(--teal); }
+.toc-n {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--teal);
+  min-width: 32px;
+  flex-shrink: 0;
+}
+.toc-t { font-size: 0.9rem; font-weight: 500; flex: 1; }
+.toc-ch { font-size: 0.75rem; color: var(--text-faint); flex-shrink: 0; }
+.toc-dots {
+  flex: 1;
+  min-width: 20px;
+  border-bottom: 1px dotted rgba(75,130,120,0.25);
+  margin: 0 0.4rem;
+  margin-bottom: 3px;
+}
+
+/* ─── Chapter blocks ────────────────────────────────── */
+.chapter-block {
+  padding: 3.5rem 0 1rem;
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+}
+.chapter-block:first-of-type { border-top: none; }
+.ch-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.5rem;
+}
+.ch-rule {
+  width: 32px; height: 2px;
+  background: var(--gradient);
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+.chapter-block h2 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+.ch-intro {
+  font-size: 1.02rem;
+  color: var(--text-dim);
+  max-width: 700px;
+  line-height: 1.65;
+  margin-bottom: 2rem;
+}
+
+/* ─── Typography ────────────────────────────────────── */
+h3 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--text);
+  margin: 2rem 0 0.6rem;
+}
+h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 1.4rem 0 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+p { color: var(--text-dim); margin-bottom: 1rem; line-height: 1.7; }
+p:last-child { margin-bottom: 0; }
+strong { color: var(--text); }
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul, ol { padding-left: 1.4rem; margin-bottom: 1rem; color: var(--text-dim); }
+li { margin-bottom: 0.3rem; line-height: 1.6; }
+code {
+  font-family: var(--font-mono);
+  font-size: 0.83em;
+  background: var(--teal-dim);
+  color: var(--teal-dark);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* ─── Code blocks ───────────────────────────────────── */
+.code-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1.2rem 0;
+  background: var(--bg-card);
+}
+.code-label {
+  padding: 0.4rem 0.9rem;
+  background: var(--bg-surface);
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+.code-block pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--text-dim);
+  background: var(--bg-card);
+}
+
+/* ─── Callouts ──────────────────────────────────────── */
+.callout {
+  display: flex;
+  gap: 0.9rem;
+  padding: 1rem 1.2rem;
+  background: var(--teal-dim);
+  border: 1px solid var(--border-bright);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius);
+  margin: 1.2rem 0;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.callout.warn {
+  background: var(--warn-dim);
+  border-color: var(--warn);
+  border-left-color: var(--warn);
+}
+.callout.danger {
+  background: var(--danger-dim);
+  border-color: var(--danger);
+  border-left-color: var(--danger);
+}
+.callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+.callout strong { color: var(--text); }
+
+/* ─── Tables ────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.data-table th {
+  background: var(--bg-surface);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.data-table td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border-dim);
+  color: var(--text-dim);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--bg-hover); }
+
+/* ─── Step blocks ───────────────────────────────────── */
+.steps { display: flex; flex-direction: column; gap: 1rem; margin: 1.2rem 0; }
+.step-block {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: var(--teal-glow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--gradient);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.step-body h4 { margin: 0 0 0.3rem; font-size: 0.9rem; text-transform: none; letter-spacing: 0; }
+.step-body p { margin: 0; font-size: 0.88rem; }
+
+/* ─── File tree ─────────────────────────────────────── */
+.file-tree {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--text-dim);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.3rem;
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+.file-tree .comment { color: var(--teal); }
+
+/* ─── MCP grid ──────────────────────────────────────── */
+.mcp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+}
+.mcp-card {
+  padding: 1rem 1.1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.mcp-card h4 { margin: 0 0 0.25rem; font-size: 0.88rem; text-transform: none; letter-spacing: 0; color: var(--text); }
+.mcp-card p { margin: 0; font-size: 0.82rem; color: var(--text-faint); line-height: 1.45; }
+.mcp-card .mcp-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1em 0.5em;
+  border-radius: 3px;
+  margin-top: 0.4rem;
+  background: var(--teal-dim);
+  color: var(--teal);
+}
+
+/* ─── Insight block ─────────────────────────────────── */
+.insight {
+  padding: 1.4rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 1.4rem 0;
+  position: relative;
+}
+.insight-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.5rem;
+}
+.insight p { margin: 0; font-size: 0.92rem; }
+
+/* ─── Compare pair ──────────────────────────────────── */
+.compare-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+}
+.compare-card {
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.86rem;
+}
+.compare-card.weak {
+  background: var(--danger-dim);
+  border: 1px solid rgba(190,58,48,0.2);
+  color: var(--danger);
+}
+.compare-card.strong {
+  background: var(--success-dim);
+  border: 1px solid rgba(31,107,74,0.2);
+  color: var(--success);
+}
+.ctag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 0.35rem;
+  opacity: 0.7;
+}
+.compare-card p { margin: 0; font-size: 0.86rem; color: inherit; }
+
+/* ─── Layer table ───────────────────────────────────── */
+.layer-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1.2rem 0;
+}
+.layer-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr;
+  border-bottom: 1px solid var(--border-dim);
+}
+.layer-row:last-child { border-bottom: none; }
+.layer-row.header { background: var(--bg-surface); }
+.layer-cell {
+  padding: 0.6rem 0.9rem;
+  font-size: 0.84rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  border-right: 1px solid var(--border-dim);
+}
+.layer-cell:last-child { border-right: none; }
+.layer-row.header .layer-cell {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+/* ─── Road map ──────────────────────────────────────── */
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1.2rem 0;
+}
+.roadmap-row {
+  display: grid;
+  grid-template-columns: 100px 130px 1fr 1fr;
+  border-bottom: 1px solid var(--border-dim);
+}
+.roadmap-row:last-child { border-bottom: none; }
+.roadmap-row.header { background: var(--bg-surface); }
+.roadmap-cell {
+  padding: 0.55rem 0.8rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  border-right: 1px solid var(--border-dim);
+  line-height: 1.4;
+}
+.roadmap-cell:last-child { border-right: none; }
+.roadmap-row.header .roadmap-cell {
+  font-weight: 700;
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+/* ─── Inline figure ─────────────────────────────────── */
+.flow-diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  margin: 1.4rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.65;
+}
+.flow-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.7rem;
+}
+
+/* ─── Session callout ───────────────────────────────── */
+.session-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1.4rem 0;
+}
+.session-header {
+  padding: 0.55rem 1rem;
+  background: var(--bg-surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+.session-body {
+  padding: 1rem 1.1rem;
+  background: var(--bg-card);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+/* ─── Footer ────────────────────────────────────────── */
+.footer {
+  padding: 3rem 0 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.footer span { font-size: 0.82rem; color: var(--text-faint); }
+.footer a { color: var(--teal); }
+
+/* ─── Sticky download (screen only) ────────────────── */
+.sticky-dl {
+  position: fixed;
+  bottom: 1.4rem;
+  right: 1.4rem;
+  z-index: 100;
+}
+.sticky-dl a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.3rem;
+  background: var(--gradient);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(61,139,128,0.35);
+}
+.sticky-dl a:hover { opacity: 0.9; }
+@media print { .sticky-dl { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- Sticky download -->
+<div class="sticky-dl no-print">
+  <a href="#" onclick="window.print(); return false;">
+    ↓ Download PDF
+  </a>
+</div>
+
+<div class="page">
+
+  <!-- ─── Cover ─────────────────────────────────────── -->
+  <section class="cover">
+    <div class="cover-bg"></div>
+    <div class="cover-grid"></div>
+    <div class="cover-label">Free Guide · Sadhira AI</div>
+    <h1>The Only Cursor Guide<br><em>You'll Ever Need</em></h1>
+    <p class="cover-sub">Every configuration file. Every capability. From zero to a fully autonomous AI development environment — in one document. Rules. Skills. Subagents. MCP servers. Hooks. Plugins. Browser automation. Worktrees. Model selection. Cost optimization. Nothing left out.</p>
+    <div class="cover-pills">
+      <span class="cover-pill">Part 0: Getting Started</span>
+      <span class="cover-pill">Rules &amp; MCP</span>
+      <span class="cover-pill">Skills &amp; Subagents</span>
+      <span class="cover-pill">Hooks &amp; Plugins</span>
+      <span class="cover-pill">Browser Automation</span>
+      <span class="cover-pill">Worktrees</span>
+      <span class="cover-pill">Model Selection</span>
+      <span class="cover-pill">Best Practices</span>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-meta">
+      <span><strong>By Dhiraj Pokhrel</strong> · Co-authored with Cursor</span>
+      <span>Published by <strong>Sadhira AI</strong></span>
+      <span>12 Parts · 1,500+ lines · 2026</span>
+    </div>
+  </section>
+
+  <!-- ─── Download bar ───────────────────────────────── -->
+  <div class="download-bar no-print">
+    <a href="#" onclick="window.print(); return false;">
+      ↓ Download as PDF
+    </a>
+    <span class="download-bar-note">Use your browser's Print → Save as PDF. Works best in Chrome or Edge.</span>
+  </div>
+
+  <!-- ─── TOC ──────────────────────────────────────── -->
+  <section class="toc">
+    <h2>Contents</h2>
+    <ul class="toc-list">
+      <li><a href="#part0" class="toc-row"><span class="toc-n">00</span><span class="toc-t">Getting Started (For Beginners)</span><span class="toc-dots"></span><span class="toc-ch">What Is Cursor · Four Modes · Key Shortcuts</span></a></li>
+      <li><a href="#core-idea" class="toc-row"><span class="toc-n">◆</span><span class="toc-t">The Core Idea</span><span class="toc-dots"></span><span class="toc-ch">The .cursor/ folder — every file explained</span></a></li>
+      <li><a href="#part1" class="toc-row"><span class="toc-n">01</span><span class="toc-t">Rules — What the AI Should Always Know</span><span class="toc-dots"></span><span class="toc-ch">4 types · workstream rules · best practices</span></a></li>
+      <li><a href="#part2" class="toc-row"><span class="toc-n">02</span><span class="toc-t">MCP Servers — Give the AI Access to Live Tools</span><span class="toc-dots"></span><span class="toc-ch">Context7 · Playwright · DevOps · 20+ free servers</span></a></li>
+      <li><a href="#part3" class="toc-row"><span class="toc-n">03</span><span class="toc-t">Skills — Repeatable Workflows</span><span class="toc-dots"></span><span class="toc-ch">SKILL.md structure · examples · invocation</span></a></li>
+      <li><a href="#part4" class="toc-row"><span class="toc-n">04</span><span class="toc-t">Subagents — Parallel Workers</span><span class="toc-dots"></span><span class="toc-ch">Built-in · custom · foreground vs background</span></a></li>
+      <li><a href="#part5" class="toc-row"><span class="toc-n">05</span><span class="toc-t">Hooks — Automated Guardrails</span><span class="toc-dots"></span><span class="toc-ch">hooks.json · auto-format · block dangerous commands</span></a></li>
+      <li><a href="#part6" class="toc-row"><span class="toc-n">06</span><span class="toc-t">Browser Automation — Test Your UI From Chat</span><span class="toc-dots"></span><span class="toc-ch">Playwright MCP · accessibility snapshots · test flows</span></a></li>
+      <li><a href="#part7" class="toc-row"><span class="toc-n">07</span><span class="toc-t">GitHub Integration</span><span class="toc-dots"></span><span class="toc-ch">GitHub MCP · PRs · issues · without MCP</span></a></li>
+      <li><a href="#part8" class="toc-row"><span class="toc-n">08</span><span class="toc-t">Plugins — Share Everything as a Package</span><span class="toc-dots"></span><span class="toc-ch">Plugin structure · marketplace · Continual Learning</span></a></li>
+      <li><a href="#part9" class="toc-row"><span class="toc-n">09</span><span class="toc-t">settings.json and the Plugin System</span><span class="toc-dots"></span><span class="toc-ch">What it is · Continual Learning · top plugins</span></a></li>
+      <li><a href="#best-practices" class="toc-row"><span class="toc-n">◆</span><span class="toc-t">Best Practices</span><span class="toc-dots"></span><span class="toc-ch">Plan first · specific prompts · parallel agents</span></a></li>
+      <li><a href="#complete-setup" class="toc-row"><span class="toc-n">◆</span><span class="toc-t">What a Complete .cursor/ Setup Looks Like</span><span class="toc-dots"></span><span class="toc-ch">Full file tree · layer table · build order</span></a></li>
+      <li><a href="#session" class="toc-row"><span class="toc-n">◆</span><span class="toc-t">How It All Works Together — A Real Session</span><span class="toc-dots"></span><span class="toc-ch">7 steps from open to ship</span></a></li>
+      <li><a href="#part10" class="toc-row"><span class="toc-n">10</span><span class="toc-t">Worktrees &amp; Parallel Agents</span><span class="toc-dots"></span><span class="toc-ch">Best-of-N · independent tasks · worktrees.json</span></a></li>
+      <li><a href="#part11" class="toc-row"><span class="toc-n">11</span><span class="toc-t">Model Selection &amp; Reducing Waste</span><span class="toc-dots"></span><span class="toc-ch">Two pools · which model · cost tips</span></a></li>
+      <li><a href="#part12" class="toc-row"><span class="toc-n">12</span><span class="toc-t">Keeping Your .cursor/ Setup Lean</span><span class="toc-dots"></span><span class="toc-ch">Skill overlap · alwaysApply · right-size guide</span></a></li>
+      <li><a href="#reference" class="toc-row"><span class="toc-n">◆</span><span class="toc-t">Reference</span><span class="toc-dots"></span><span class="toc-ch">Config files table · essential links</span></a></li>
+    </ul>
+  </section>
+
+  <!-- ─── Part 0: Getting Started ───────────────────── -->
+  <section class="chapter-block" id="part0">
+    <div class="ch-eyebrow">Part 0</div>
+    <div class="ch-rule"></div>
+    <h2>Getting Started (For Beginners)</h2>
+    <p class="ch-intro">If you've never used Cursor before, start here. If you're already comfortable, jump to <a href="#core-idea">The Core Idea</a>.</p>
+
+    <h3>What Is Cursor?</h3>
+    <p>Cursor is a code editor (built on VS Code) with an AI agent built in. The agent can read and edit files across your project, run terminal commands (tests, builds, git), search your codebase by meaning rather than just text, control a browser to test web applications, and connect to external tools via MCP servers. You interact with it by typing in the chat sidebar — <code>Cmd+I</code> on Mac, <code>Ctrl+I</code> on Windows.</p>
+
+    <h3>First Steps: Open a Project</h3>
+    <div class="code-block">
+      <div class="code-label">bash</div>
+      <pre>git clone https://github.com/your-org/your-project.git
+cd your-project
+cursor .</pre>
+    </div>
+    <p>That last command opens the current folder in Cursor. If <code>cursor</code> isn't in your PATH, open Cursor manually and use File → Open Folder. <strong>Wait for indexing</strong> — Cursor indexes your codebase on first open. Don't start chatting until the indexing indicator (bottom-right) finishes.</p>
+
+    <h3>Your First Prompt</h3>
+    <p>Open Agent chat (<code>Cmd+I</code>) and type:</p>
+    <div class="code-block">
+      <div class="code-label">prompt</div>
+      <pre>Explain this codebase. Point me to the main entry points, key modules,
+and anything I should read before making changes.</pre>
+    </div>
+
+    <h3>The Four Modes</h3>
+    <p>Cursor has four distinct modes. Cycle between them with <code>Shift+Tab</code> in the agent input, or use the mode picker dropdown.</p>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Mode</th><th>What It Does</th><th>When to Use</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Agent</strong></td><td>Reads, edits files, runs commands, uses tools</td><td>Default — building features, fixing bugs, running tests</td></tr>
+          <tr><td><strong>Ask</strong></td><td>Read-only — explores code, answers questions, never edits</td><td>Understanding unfamiliar code, tracing a flow, learning a module</td></tr>
+          <tr><td><strong>Plan</strong></td><td>Researches codebase, asks questions, creates a reviewable plan — no code until you approve</td><td>Multi-file changes, architectural decisions, unclear requirements</td></tr>
+          <tr><td><strong>Debug</strong></td><td>Instruments code with logging, collects runtime evidence, makes targeted fixes</td><td>Tricky bugs you can reproduce but can't figure out</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="callout-icon">💡</span>
+      <div><strong>Ask Mode</strong> is the most overlooked. Use it to understand code without changing anything — faster than reading files yourself because it follows the call chain for you. <strong>Plan Mode</strong> is underused and extremely valuable: it creates a reviewable Markdown plan before writing any code.</div>
+    </div>
+
+    <h3>Key Shortcuts</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+        <tbody>
+          <tr><td>Open Agent</td><td><code>Cmd+I</code></td><td><code>Ctrl+I</code></td></tr>
+          <tr><td>Toggle Plan Mode</td><td><code>Shift+Tab</code> in input</td><td><code>Shift+Tab</code> in input</td></tr>
+          <tr><td>Attach context</td><td>Type <code>@</code></td><td>Type <code>@</code></td></tr>
+          <tr><td>Send immediately</td><td><code>Cmd+Enter</code></td><td><code>Ctrl+Enter</code></td></tr>
+          <tr><td>Change model</td><td><code>Cmd+/</code></td><td><code>Ctrl+/</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── Core Idea ──────────────────────────────────── -->
+  <section class="chapter-block" id="core-idea">
+    <div class="ch-eyebrow">Foundation</div>
+    <div class="ch-rule"></div>
+    <h2>The Core Idea</h2>
+    <p class="ch-intro">Cursor's agent starts every session with amnesia. It doesn't know your conventions, your file structure, or your testing strategy. The fix is a set of configuration files — all in <code>.cursor/</code> — that give the agent persistent memory, external tools, and automated guardrails.</p>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>File/Directory</th><th>What It Does</th><th>Analogy</th></tr></thead>
+        <tbody>
+          <tr><td><code>.cursor/rules/*.mdc</code></td><td>Injects project conventions into every relevant chat</td><td>Like <code>.editorconfig</code> but for AI behavior</td></tr>
+          <tr><td><code>.cursor/skills/*/SKILL.md</code></td><td>Teaches the agent repeatable workflows</td><td>Like shell aliases for complex procedures</td></tr>
+          <tr><td><code>.cursor/agents/*.md</code></td><td>Defines specialist sub-assistants with their own context</td><td>Like microservices — each has a single job</td></tr>
+          <tr><td><code>.cursor/mcp.json</code></td><td>Connects the agent to external tools and live documentation</td><td>Like <code>package.json</code> for AI tool dependencies</td></tr>
+          <tr><td><code>.cursor/hooks.json</code></td><td>Runs scripts before/after agent actions</td><td>Like git hooks, but for the AI loop</td></tr>
+          <tr><td><code>AGENTS.md</code></td><td>Plain-text project instructions (simpler alternative to rules)</td><td>Like a README the AI actually reads</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="callout-icon">✅</span>
+      <div>All of these are <strong>version-controlled</strong>. Commit <code>.cursor/</code> to git, and every contributor gets the same AI behavior automatically.</div>
+    </div>
+  </section>
+
+  <!-- ─── Part 1: Rules ─────────────────────────────── -->
+  <section class="chapter-block" id="part1">
+    <div class="ch-eyebrow">Part 1</div>
+    <div class="ch-rule"></div>
+    <h2>Rules — What the AI Should Always Know</h2>
+    <p class="ch-intro">A rule is a markdown file with YAML frontmatter. When you open a file matching a rule's glob pattern, that rule is silently injected into the agent's context. You never have to explain it again.</p>
+
+    <h3>How to Create a Rule</h3>
+    <p>Two options: type <code>/create-rule</code> in chat and describe what you want, or manually create a <code>.mdc</code> file in <code>.cursor/rules/</code>.</p>
+
+    <h3>The Four Rule Types</h3>
+    <div class="code-block">
+      <div class="code-label">rule types</div>
+      <pre>Always Apply        → Every chat session, no matter what file is open
+Apply Intelligently → Agent reads the description and decides
+Glob-Scoped         → Only when files matching the pattern are in context
+Manual              → Only when you type @rule-name in chat</pre>
+    </div>
+
+    <h3>Rules Tailored to Each Workstream</h3>
+
+    <h4>SDK / Library Rule</h4>
+    <div class="code-block">
+      <div class="code-label">.cursor/rules/sdk-library.mdc</div>
+      <pre>---
+description: SDK coding conventions
+globs: ["src/**/*.py"]
+alwaysApply: false
+---
+
+- Every public class must have a docstring explaining purpose and usage
+- Use Pydantic v2 for parameter validation
+- Depth/verbosity parameters should produce meaningfully different output per level
+- See src/core/base_pattern.py as the reference implementation
+- Constraints must be specific ("include severity rating") not vague ("be thorough")</pre>
+    </div>
+
+    <h4>Backend Rule</h4>
+    <div class="code-block">
+      <div class="code-label">.cursor/rules/app-backend.mdc</div>
+      <pre>---
+description: FastAPI backend conventions
+globs: ["app/api/**/*.py", "app/services/**/*.py"]
+alwaysApply: false
+---
+
+- Services in app/services/, routers in app/api/ — keep routers thin
+- All routes use Depends() for auth injection
+- Settings via pydantic-settings BaseSettings, loaded through get_settings()
+- DB models in app/db/models.py using SQLAlchemy
+- All endpoints must be async</pre>
+    </div>
+
+    <h4>Frontend Rule</h4>
+    <div class="code-block">
+      <div class="code-label">.cursor/rules/app-frontend.mdc</div>
+      <pre>---
+description: React frontend conventions
+globs: ["app/web/src/**/*.{jsx,tsx,css}"]
+alwaysApply: false
+---
+
+- Functional components only, no class components
+- Auth via useAuth() hook from context/AuthContext
+- Routing: react-router-dom, protected routes wrap with ProtectedRoute
+- CSS: per-component .css files, CSS variables for theming (var(--accent))
+- API calls go through a centralized api/client.js</pre>
+    </div>
+
+    <h4>Always-On Rule (Core Standards)</h4>
+    <div class="code-block">
+      <div class="code-label">.cursor/rules/core-standards.mdc</div>
+      <pre>---
+description: Core project standards
+alwaysApply: true
+---
+
+- Python 3.11+, type hints everywhere, Pydantic v2
+- Linting: ruff. Formatting: ruff format. Never use flake8.
+- Tests: pytest in tests/, run with pytest -v
+- All LLM calls route through LiteLLM (not direct OpenAI/Anthropic clients)</pre>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">📌</span>
+      <div><strong>What good rules look like:</strong> Short (under 50 lines), specific (not "write good code"), and grounded (reference real files with <code>@filename</code>). Think of them as the 10 things a new team member needs to know before touching a file.</div>
+    </div>
+  </section>
+
+  <!-- ─── Part 2: MCP Servers ───────────────────────── -->
+  <section class="chapter-block" id="part2">
+    <div class="ch-eyebrow">Part 2</div>
+    <div class="ch-rule"></div>
+    <h2>MCP Servers — Give the AI Access to Live Tools</h2>
+    <p class="ch-intro">This is the single biggest productivity lever most developers ignore. MCP servers connect Cursor to live data — documentation, GitHub, browsers, databases — so the agent uses real, current information instead of hallucinating outdated APIs.</p>
+
+    <div class="compare-pair">
+      <div class="compare-card weak">
+        <span class="ctag">Without MCP</span>
+        <p>Agent guesses from training data (possibly 2 years old). You debug hallucinated APIs instead of your code.</p>
+      </div>
+      <div class="compare-card strong">
+        <span class="ctag">With MCP</span>
+        <p>Agent fetches live documentation. You get correct, current code on the first try.</p>
+      </div>
+    </div>
+
+    <h3>Setup</h3>
+    <p>Create <code>.cursor/mcp.json</code> in your project root (shared) or <code>~/.cursor/mcp.json</code> (personal).</p>
+
+    <h3>The Essential Stack (All Free)</h3>
+    <div class="code-block">
+      <div class="code-label">.cursor/mcp.json</div>
+      <pre>{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}</pre>
+    </div>
+
+    <h4>Context7 — Live Documentation for 9,000+ Libraries</h4>
+    <p>Context7 indexes source repos and serves current documentation on demand. When you ask about Pydantic v2, FastAPI, React, LiteLLM, or Docusaurus — it fetches the real docs, not what the LLM memorized from training.</p>
+    <p><strong>Usage:</strong> Add "use context7" to your prompt, or create a rule that triggers it automatically for all library questions.</p>
+
+    <h4>Playwright — Browser Automation</h4>
+    <p>Microsoft's official MCP for controlling browsers. The agent can navigate to your running app, take accessibility snapshots, click elements, fill forms, and report what it finds. Essential for any project with a web frontend.</p>
+
+    <h3>MCPs for Research and Discovery</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>MCP</th><th>What It Does</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Fetch</strong> (Anthropic)</td><td>Downloads any webpage, converts to markdown</td><td>Free — built into Cursor</td></tr>
+          <tr><td><strong>Tavily</strong></td><td>AI-optimized web search — great for papers and technical articles</td><td>Free tier</td></tr>
+          <tr><td><strong>Perplexity</strong></td><td>AI search engine as a tool</td><td>Free tier</td></tr>
+          <tr><td><strong>Stack Overflow</strong></td><td>Search and read SO threads</td><td>Free</td></tr>
+          <tr><td><strong>Markitdown</strong> (Microsoft)</td><td>Convert PDF, DOCX, XLSX to markdown — useful for research papers</td><td>Free</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>MCPs for DevOps</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>MCP</th><th>What It Does</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td><strong>GitHub</strong></td><td>Create PRs, search issues, read diffs — from chat</td><td>Free (needs PAT)</td></tr>
+          <tr><td><strong>Vercel</strong></td><td>Manage deployments</td><td>Free tier (OAuth)</td></tr>
+          <tr><td><strong>Linear</strong></td><td>Issue tracking</td><td>Free tier (OAuth)</td></tr>
+          <tr><td><strong>Sentry</strong></td><td>Error tracking — ask "what errors happened today?"</td><td>Free tier (OAuth)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>MCPs for Framework Documentation (All Free SSE Servers)</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Framework</th><th>MCP URL</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cloudflare</strong></td><td><code>https://docs.mcp.cloudflare.com/mcp</code></td></tr>
+          <tr><td><strong>Svelte</strong></td><td><code>https://mcp.svelte.dev/mcp</code></td></tr>
+          <tr><td><strong>Astro</strong></td><td><code>https://mcp.docs.astro.build/mcp</code></td></tr>
+          <tr><td><strong>MS Learn</strong></td><td><code>https://learn.microsoft.com/api/mcp</code></td></tr>
+          <tr><td><strong>Angular</strong></td><td><code>npx -y @angular/cli mcp</code></td></tr>
+          <tr><td><strong>LiveKit</strong></td><td><code>https://docs.livekit.io/mcp</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">🔍</span>
+      <div>Discover more at <strong>cursormcp.dev</strong> (1,500+ servers) and the <strong>Cursor Marketplace</strong>. Use <code>${env:GITHUB_TOKEN}</code>, <code>${workspaceFolder}</code>, <code>${userHome}</code> in <code>mcp.json</code> values — never hardcode secrets.</div>
+    </div>
+  </section>
+
+  <!-- ─── Part 3: Skills ────────────────────────────── -->
+  <section class="chapter-block" id="part3">
+    <div class="ch-eyebrow">Part 3</div>
+    <div class="ch-rule"></div>
+    <h2>Skills — Repeatable Workflows</h2>
+    <p class="ch-intro">A skill is a set of instructions the agent can invoke as a single command. Think of it as a saved prompt with structure — it includes when to trigger, what steps to follow, and what scripts to run.</p>
+
+    <h3>Skill Structure</h3>
+    <p>A skill lives in <code>.cursor/skills/skill-name/SKILL.md</code> (project-level) or <code>~/.cursor/skills/</code> (personal, cross-project).</p>
+    <div class="file-tree"><span class="comment">.cursor/skills/</span>
+├── code-reviewer/
+│   └── SKILL.md
+├── write-blog-post/
+│   └── SKILL.md
+└── deploy-staging/
+    ├── SKILL.md
+    └── scripts/
+        └── validate-env.sh</div>
+
+    <h3>Example: Code Review Skill</h3>
+    <div class="code-block">
+      <div class="code-label">.cursor/skills/code-reviewer/SKILL.md</div>
+      <pre>---
+name: code-reviewer
+description: >
+  Review code changes for quality, security, and adherence to project
+  conventions. Use when the user asks for a code review or quality check.
+---
+
+# Code Reviewer
+
+## Steps
+
+1. Identify the changed files (use git diff or the user's description)
+2. For each file, read the corresponding rule from .cursor/rules/
+3. Check for: type hints, error handling, test coverage, security issues
+4. Verify naming conventions and file organization match project patterns
+5. Run: ruff check . and mypy --strict on changed files
+6. Report: issues found, severity, suggested fixes — grouped by file</pre>
+    </div>
+
+    <h3>Example: Blog Post Skill</h3>
+    <div class="code-block">
+      <div class="code-label">.cursor/skills/write-blog-post/SKILL.md</div>
+      <pre>---
+name: write-blog-post
+description: >
+  Write a blog post for the documentation site. Use when the user asks to
+  create a new blog post, article, or content piece.
+---
+
+## Steps
+
+1. Ask for the topic and target audience if not provided
+2. Check existing posts for tone, format, and frontmatter style
+3. Use Context7 MCP to fetch current API examples for any libraries mentioned
+4. Write with proper frontmatter (title, authors, tags, date)
+5. Include code examples that use real project imports — never pseudocode
+6. Save to the blog directory with naming convention: YYYY-MM-DD-slug.md</pre>
+    </div>
+
+    <h3>Invocation</h3>
+    <ul>
+      <li><strong>Automatic:</strong> Agent sees the description and applies when relevant</li>
+      <li><strong>Manual:</strong> Type <code>/code-reviewer</code> or <code>/write-blog-post</code> in chat</li>
+      <li><strong>Slash-command only:</strong> Add <code>disable-model-invocation: true</code> to frontmatter — agent won't invoke automatically</li>
+    </ul>
+  </section>
+
+  <!-- ─── Part 4: Subagents ─────────────────────────── -->
+  <section class="chapter-block" id="part4">
+    <div class="ch-eyebrow">Part 4</div>
+    <div class="ch-rule"></div>
+    <h2>Subagents — Parallel Workers With Separate Context</h2>
+    <p class="ch-intro">Subagents handle heavy work — codebase searches, shell commands, browser sessions — in a separate context window, then return a summary. Your main chat stays clean and focused.</p>
+
+    <h3>Built-in Subagents (Already Active)</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Subagent</th><th>When It's Used</th><th>Why It Matters</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Explore</strong></td><td>"Find all classes that implement the process method"</td><td>Runs 10+ parallel searches on a fast model. You see a summary, not raw grep output.</td></tr>
+          <tr><td><strong>Bash</strong></td><td>"Run the test suite and tell me what failed"</td><td>Verbose pytest output stays in the subagent. You get pass/fail + specific failures.</td></tr>
+          <tr><td><strong>Browser</strong></td><td>"Open localhost:5173 and click through onboarding"</td><td>DOM snapshots stay isolated. You get a report of what happened.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Custom Subagents</h3>
+    <p>Create <code>.cursor/agents/</code> and add a markdown file for each specialist.</p>
+    <div class="code-block">
+      <div class="code-label">.cursor/agents/post-edit-verifier.md</div>
+      <pre>---
+name: post-edit-verifier
+description: >
+  Validates code after changes. Use proactively when source files are
+  modified. Runs tests, checks types, verifies the change didn't break anything.
+model: fast
+---
+
+You verify code changes. When invoked:
+
+1. Identify which files were modified
+2. Run the relevant test suite: pytest -k &lt;module_name&gt; -v
+3. Run type checking: mypy --strict on the changed files
+4. Run linting: ruff check on the changed files
+5. Report: pass/fail, specific issues, suggestions
+
+Do not fix issues yourself — only report what you find.</pre>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">⚡</span>
+      <div>The <code>model: fast</code> directive routes to a cheaper, faster model — use it for anything that doesn't need deep reasoning: running tests, formatting checks, grepping, validation. <code>inherit</code> (the default) uses the same model as the main agent.</div>
+    </div>
+
+    <h3>Foreground vs Background</h3>
+    <ul>
+      <li><strong>Foreground</strong> — Blocks until done. Use for "verify this before I continue."</li>
+      <li><strong>Background</strong> — Returns immediately. Use for "run the full test suite while I keep working."</li>
+    </ul>
+  </section>
+
+  <!-- ─── Part 5: Hooks ─────────────────────────────── -->
+  <section class="chapter-block" id="part5">
+    <div class="ch-eyebrow">Part 5</div>
+    <div class="ch-rule"></div>
+    <h2>Hooks — Automated Guardrails</h2>
+    <p class="ch-intro">Hooks run scripts before or after agent actions — auto-formatting, blocking dangerous commands, auditing what the agent does. They're the safety net you set up once and forget.</p>
+
+    <div class="code-block">
+      <div class="code-label">.cursor/hooks.json</div>
+      <pre>{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/format-python.sh",
+        "matcher": "*.py"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/block-dangerous.sh",
+        "matcher": "rm -rf|drop table|curl.*prod"
+      }
+    ]
+  }
+}</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">.cursor/hooks/format-python.sh</div>
+      <pre>#!/bin/bash
+cat > /dev/null  # consume stdin
+ruff check --fix . 2>/dev/null
+ruff format . 2>/dev/null
+exit 0</pre>
+    </div>
+
+    <h3>What Hooks Can Do</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Hook Event</th><th>Practical Use</th></tr></thead>
+        <tbody>
+          <tr><td><code>afterFileEdit</code></td><td>Auto-run ruff/black on Python, Prettier on JS — every edit auto-formatted</td></tr>
+          <tr><td><code>beforeShellExecution</code></td><td>Block <code>rm -rf</code>, <code>curl</code> to production URLs, <code>git push --force</code></td></tr>
+          <tr><td><code>sessionStart</code></td><td>Inject environment context (branch name, recent commits)</td></tr>
+          <tr><td><code>beforeMCPExecution</code></td><td>Audit which MCP tools are being called</td></tr>
+          <tr><td><code>subagentStart/Stop</code></td><td>Track subagent usage and cost</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Prompt-Based Hooks (No Script Needed)</h3>
+    <div class="code-block">
+      <div class="code-label">.cursor/hooks.json — prompt hook</div>
+      <pre>{
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "type": "prompt",
+        "prompt": "Is this shell command safe for a development environment? Block anything that modifies production data or deletes files recursively."
+      }
+    ]
+  }
+}</pre>
+    </div>
+  </section>
+
+  <!-- ─── Part 6: Browser Automation ───────────────── -->
+  <section class="chapter-block" id="part6">
+    <div class="ch-eyebrow">Part 6</div>
+    <div class="ch-rule"></div>
+    <h2>Browser Automation — Test Your UI From Chat</h2>
+    <p class="ch-intro">With the Playwright MCP installed, you can test your web app without writing test scripts. Just describe what to check in plain English.</p>
+
+    <h3>What You Can Do</h3>
+    <ul>
+      <li>"Open localhost:3000, log in with test credentials, and check if the Dashboard loads"</li>
+      <li>"Navigate to the Settings page and verify all form fields render correctly"</li>
+      <li>"Click through the checkout flow and report any console errors"</li>
+      <li>"Take a screenshot of the signup page on mobile viewport"</li>
+    </ul>
+
+    <h3>How It Works</h3>
+    <div class="steps">
+      <div class="step-block"><div class="step-num">1</div><div class="step-body"><h4>Open browser</h4><p>The agent uses Playwright to open a browser and navigate to the target URL.</p></div></div>
+      <div class="step-block"><div class="step-num">2</div><div class="step-body"><h4>Accessibility snapshot</h4><p>Takes a structured DOM snapshot — not raw HTML. Elements are referenced by role, label, and position.</p></div></div>
+      <div class="step-block"><div class="step-num">3</div><div class="step-body"><h4>Interact</h4><p>Clicks, types, scrolls, fills forms — all by element reference, not fragile CSS selectors.</p></div></div>
+      <div class="step-block"><div class="step-num">4</div><div class="step-body"><h4>Report</h4><p>Returns a summary of what it found — errors, unexpected states, missing elements.</p></div></div>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">🌐</span>
+      <div>This is especially powerful after UI changes — instead of manually clicking through flows, ask the agent to verify them. <strong>No test scripts to write, no Selenium boilerplate.</strong></div>
+    </div>
+  </section>
+
+  <!-- ─── Part 7: GitHub ────────────────────────────── -->
+  <section class="chapter-block" id="part7">
+    <div class="ch-eyebrow">Part 7</div>
+    <div class="ch-rule"></div>
+    <h2>GitHub Integration</h2>
+    <p class="ch-intro">With the GitHub MCP, you can create PRs, search issues, and manage your repo without leaving Cursor.</p>
+
+    <div class="code-block">
+      <div class="code-label">.cursor/mcp.json — GitHub server</div>
+      <pre>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    }
+  }
+}</pre>
+    </div>
+    <p>Set <code>GITHUB_TOKEN</code> in your shell environment — never hardcode it in the file.</p>
+
+    <h3>What This Enables</h3>
+    <ul>
+      <li><strong>"Create a PR for these changes"</strong> — Agent writes a description and opens the PR</li>
+      <li><strong>"What issues mention the payment flow?"</strong> — Searches issues without leaving Cursor</li>
+      <li><strong>"Summarize the comments on PR #42"</strong> — Reads PR review comments</li>
+      <li><strong>"Add a label to issue #15"</strong> — Direct repo management</li>
+    </ul>
+
+    <div class="callout">
+      <span class="callout-icon">ℹ️</span>
+      <div>Cursor has built-in git support (commits, diffs, history). For GitHub-specific features (PRs, issues, reviews), you need the MCP server.</div>
+    </div>
+  </section>
+
+  <!-- ─── Part 8: Plugins ───────────────────────────── -->
+  <section class="chapter-block" id="part8">
+    <div class="ch-eyebrow">Part 8</div>
+    <div class="ch-rule"></div>
+    <h2>Plugins — Share Everything as a Package</h2>
+    <p class="ch-intro">A plugin bundles rules, skills, agents, MCP configs, and hooks into a single installable package. Anyone who installs it gets your entire setup automatically.</p>
+
+    <h3>Plugin Structure</h3>
+    <div class="file-tree">your-cursor-plugin/
+├── .cursor-plugin/
+│   └── plugin.json     <span class="comment">← {"name": "your-plugin", "version": "1.0.0"}</span>
+├── rules/
+│   ├── backend.mdc
+│   └── frontend.mdc
+├── skills/
+│   └── code-reviewer/
+│       └── SKILL.md
+├── agents/
+│   └── post-edit-verifier.md
+├── .mcp.json
+└── README.md</div>
+
+    <h3>When to Create a Plugin</h3>
+    <ul>
+      <li>You want open-source contributors to get your project conventions automatically</li>
+      <li>You want to share the same setup across multiple repos in your organization</li>
+      <li>You want to publish to the <a href="https://cursor.com/marketplace">Cursor Marketplace</a></li>
+    </ul>
+  </section>
+
+  <!-- ─── Part 9: settings.json ─────────────────────── -->
+  <section class="chapter-block" id="part9">
+    <div class="ch-eyebrow">Part 9</div>
+    <div class="ch-rule"></div>
+    <h2>settings.json and the Plugin System</h2>
+    <p class="ch-intro"><code>.cursor/settings.json</code> enables or disables Cursor plugins for your project. It is <em>not</em> VS Code settings — when you install a plugin, Cursor adds the entry automatically.</p>
+
+    <div class="code-block">
+      <div class="code-label">.cursor/settings.json</div>
+      <pre>{
+  "plugins": {
+    "continual-learning": {
+      "enabled": true
+    }
+  }
+}</pre>
+    </div>
+
+    <h3>Top Plugins to Know About</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Plugin</th><th>What It Does</th><th>Install</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Continual Learning</strong></td><td>Mines chat sessions, extracts corrections, writes them to AGENTS.md automatically</td><td><code>/add-plugin continual-learning</code></td></tr>
+          <tr><td><strong>Cursor Team Kit</strong></td><td>CI monitoring, PR creation, code review, merge conflicts</td><td><code>/add-plugin cursor-team-kit</code></td></tr>
+          <tr><td><strong>Superpowers</strong></td><td>Core skills library — TDD, debugging, collaboration patterns</td><td><code>/add-plugin superpowers</code></td></tr>
+          <tr><td><strong>Figma</strong></td><td>Figma MCP server + design workflow skills</td><td>From marketplace</td></tr>
+          <tr><td><strong>Vercel</strong></td><td>React/Next.js best practices + deploy to Vercel</td><td>From marketplace</td></tr>
+          <tr><td><strong>Sentry</strong></td><td>Error tracking — debug production issues from chat</td><td>From marketplace</td></tr>
+          <tr><td><strong>Langfuse</strong></td><td>LLM tracing, prompt management, evaluation</td><td>From marketplace</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>The Continual Learning Plugin (Recommended)</h3>
+    <p>This solves the problem of the agent forgetting your corrections between sessions.</p>
+    <div class="steps">
+      <div class="step-block"><div class="step-num">1</div><div class="step-body"><h4>Observes</h4><p>After each session, it scans your conversation for recurring corrections and workspace facts.</p></div></div>
+      <div class="step-block"><div class="step-num">2</div><div class="step-body"><h4>Writes</h4><p>Writes them as bullet points into <code>AGENTS.md</code> in your project root.</p></div></div>
+      <div class="step-block"><div class="step-num">3</div><div class="step-body"><h4>Remembers</h4><p>Next session, the agent reads <code>AGENTS.md</code> and already knows your preferences. You never make that correction again.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ─── Best Practices ────────────────────────────── -->
+  <section class="chapter-block" id="best-practices">
+    <div class="ch-eyebrow">Best Practices</div>
+    <div class="ch-rule"></div>
+    <h2>Best Practices</h2>
+    <p class="ch-intro">Drawn from <a href="https://cursor.com/blog/agent-best-practices">Cursor's official best practices</a>, the prompting docs, and real-world usage across a multi-pillar project.</p>
+
+    <h3>1. Plan Before You Code</h3>
+    <p>For anything non-trivial, use <strong>Plan Mode</strong> (<code>Shift+Tab</code>). The agent researches your codebase, asks questions, and writes a plan. You approve before it writes code. Save plans to <code>.cursor/plans/</code> — they double as team documentation.</p>
+
+    <h3>2. Write Specific Prompts</h3>
+    <div class="compare-pair">
+      <div class="compare-card weak">
+        <span class="ctag">Bad</span>
+        <p>"Add tests for auth"</p>
+      </div>
+      <div class="compare-card strong">
+        <span class="ctag">Good</span>
+        <p>"Write a test for the logout endpoint in app/auth/router.py covering the edge case when the session has expired. Use the patterns in tests/unit/. Don't mock the database — use test fixtures in conftest.py."</p>
+      </div>
+    </div>
+
+    <h3>3. Let the Agent Find Context</h3>
+    <p>You don't need to <code>@</code>-mention every file. The agent has semantic search — it finds relevant files automatically. Only use <code>@filename</code> when you know the exact file. Including irrelevant files confuses the agent about what matters.</p>
+
+    <h3>4. Know When to Start a New Chat</h3>
+    <p><strong>Start fresh</strong> when you finished a logical unit of work, the agent keeps making the same mistake, or you're switching tasks. <strong>Continue</strong> when you're debugging what it just built or iterating on the same feature. Long conversations accumulate noise.</p>
+
+    <h3>5. Provide Verifiable Goals</h3>
+    <p>Agents can't fix what they can't check. Give them tests, type checking, and linting as acceptance criteria. The best workflow: write tests first (or ask the agent to), then ask it to implement until tests pass.</p>
+
+    <h3>6. Use Checkpoints for Safety</h3>
+    <p>The agent creates checkpoints before major edits. If it goes wrong, click any checkpoint to preview and restore. This is separate from git — use git for permanent version control, checkpoints for quick undo.</p>
+
+    <h3>7. Run Agents in Parallel</h3>
+    <p>For hard problems, run the same prompt on multiple models simultaneously using <strong>worktrees</strong> — each model gets its own isolated copy. Compare results side by side and click Apply to merge the best one.</p>
+
+    <h3>8. Use Images</h3>
+    <p>Paste screenshots directly into chat: design mockups → "Implement this UI", error screenshots → "Debug this", console errors → faster than typing the stack trace.</p>
+
+    <h3>9. Start Simple, Add Rules Gradually</h3>
+    <p>Don't write 20 rules on day one. Start with one always-apply rule for core standards. Add more only when you notice the agent making the same mistake repeatedly.</p>
+  </section>
+
+  <!-- ─── Complete Setup ────────────────────────────── -->
+  <section class="chapter-block" id="complete-setup">
+    <div class="ch-eyebrow">Reference</div>
+    <div class="ch-rule"></div>
+    <h2>What a Complete .cursor/ Setup Looks Like</h2>
+    <p class="ch-intro">Here's the full file tree of a production-ready Cursor configuration, with every file explained. This is what you're building toward.</p>
+
+    <div class="file-tree">your-project/
+├── .cursor/
+│   ├── rules/
+│   │   ├── core-standards.mdc          <span class="comment">← Always-on: Python/JS standards, testing, imports</span>
+│   │   ├── sdk-library.mdc             <span class="comment">← Glob: src/**/*.py — SDK patterns, class hierarchy</span>
+│   │   ├── app-backend.mdc             <span class="comment">← Glob: app/api/**/*.py — FastAPI, auth, DB conventions</span>
+│   │   ├── app-frontend.mdc            <span class="comment">← Glob: app/web/src/**/*.{jsx,tsx} — React, routing, CSS</span>
+│   │   ├── website-docs.mdc            <span class="comment">← Glob: website/docs/**/*.md — Docusaurus, frontmatter</span>
+│   │   └── research-notebooks.mdc      <span class="comment">← Glob: docs/**/*.ipynb — notebook conventions, metrics</span>
+│   │
+│   ├── skills/
+│   │   ├── code-reviewer/
+│   │   │   └── SKILL.md                <span class="comment">← Multi-step: read changes → check conventions → run lints</span>
+│   │   └── write-blog-post/
+│   │       └── SKILL.md                <span class="comment">← Multi-step: pick topic → fetch docs → write → save</span>
+│   │
+│   ├── agents/
+│   │   └── post-edit-verifier.md       <span class="comment">← Fast subagent: runs tests + types + lint after changes</span>
+│   │
+│   ├── hooks/
+│   │   ├── format-python.sh            <span class="comment">← Auto-runs ruff check --fix && ruff format after edits</span>
+│   │   └── block-dangerous.sh          <span class="comment">← Blocks rm -rf, drop table, curl to prod URLs</span>
+│   │
+│   ├── mcp.json                        <span class="comment">← Context7 + Playwright + GitHub</span>
+│   ├── hooks.json                      <span class="comment">← Maps hook scripts to file patterns and events</span>
+│   └── settings.json                   <span class="comment">← Plugin toggles (e.g., continual-learning: enabled)</span>
+│
+├── AGENTS.md                           <span class="comment">← Root-level instructions — simpler alternative to rules</span>
+└── ...</div>
+
+    <h3>What Each Layer Does</h3>
+    <div class="layer-table">
+      <div class="layer-row header"><div class="layer-cell">Layer</div><div class="layer-cell">Files</div><div class="layer-cell">Effect</div></div>
+      <div class="layer-row"><div class="layer-cell"><strong>Rules</strong></div><div class="layer-cell">6 <code>.mdc</code> files</div><div class="layer-cell">Agent automatically knows conventions for whichever file you're editing. No re-explaining.</div></div>
+      <div class="layer-row"><div class="layer-cell"><strong>Skills</strong></div><div class="layer-cell">2 <code>SKILL.md</code> files</div><div class="layer-cell">Complex workflows become one-command operations.</div></div>
+      <div class="layer-row"><div class="layer-cell"><strong>Subagents</strong></div><div class="layer-cell">1 <code>.md</code> agent</div><div class="layer-cell">Verification runs in parallel on a fast model. You keep working while it checks.</div></div>
+      <div class="layer-row"><div class="layer-cell"><strong>Hooks</strong></div><div class="layer-cell">2 shell scripts</div><div class="layer-cell">Every Python file auto-formatted on save. Dangerous commands blocked before execution.</div></div>
+      <div class="layer-row"><div class="layer-cell"><strong>MCP servers</strong></div><div class="layer-cell">3–5 servers</div><div class="layer-cell">Live docs (Context7), browser testing (Playwright), repo management (GitHub).</div></div>
+      <div class="layer-row"><div class="layer-cell"><strong>Plugins</strong></div><div class="layer-cell"><code>settings.json</code></div><div class="layer-cell">Continual Learning mines your corrections and writes them to AGENTS.md automatically.</div></div>
+    </div>
+
+    <h3>The Order to Build It</h3>
+    <p>You don't need everything on day one. Build in layers:</p>
+    <div class="roadmap">
+      <div class="roadmap-row header"><div class="roadmap-cell">When</div><div class="roadmap-cell">What to Add</div><div class="roadmap-cell">Time</div><div class="roadmap-cell">Impact</div></div>
+      <div class="roadmap-row"><div class="roadmap-cell"><strong>Day 1</strong></div><div class="roadmap-cell"><code>mcp.json</code> (Context7) + 1 always-on rule</div><div class="roadmap-cell">5 min</div><div class="roadmap-cell">Agent stops hallucinating library APIs</div></div>
+      <div class="roadmap-row"><div class="roadmap-cell"><strong>Week 1</strong></div><div class="roadmap-cell">Add Playwright MCP + per-workstream rules</div><div class="roadmap-cell">30 min</div><div class="roadmap-cell">Agent knows your conventions per area</div></div>
+      <div class="roadmap-row"><div class="roadmap-cell"><strong>Week 2</strong></div><div class="roadmap-cell">Add 1 skill + 1 subagent + hooks</div><div class="roadmap-cell">30 min</div><div class="roadmap-cell">Repeatable workflows + auto-formatting</div></div>
+      <div class="roadmap-row"><div class="roadmap-cell"><strong>Week 3</strong></div><div class="roadmap-cell">Add GitHub MCP + research MCPs + AGENTS.md</div><div class="roadmap-cell">20 min</div><div class="roadmap-cell">Full workflow — PRs, research, docs from chat</div></div>
+      <div class="roadmap-row"><div class="roadmap-cell"><strong>Month 2</strong></div><div class="roadmap-cell">Install Continual Learning plugin</div><div class="roadmap-cell">2 min</div><div class="roadmap-cell">Agent learns from your corrections automatically</div></div>
+    </div>
+  </section>
+
+  <!-- ─── Real Session ──────────────────────────────── -->
+  <section class="chapter-block" id="session">
+    <div class="ch-eyebrow">End-to-End Walkthrough</div>
+    <div class="ch-rule"></div>
+    <h2>How It All Works Together — A Real Session</h2>
+    <p class="ch-intro">You've seen every file. Now watch them work as a system — from the moment you open Cursor to the end of a productive session.</p>
+
+    <h3>Step 1: You Open the Project</h3>
+    <p>Before you type a single prompt, Cursor scans <code>.cursor/</code> and loads everything:</p>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>What Cursor Loads</th><th>When</th><th>How You Verify</th></tr></thead>
+        <tbody>
+          <tr><td><code>settings.json</code></td><td>Immediately</td><td>Continual Learning plugin activates silently</td></tr>
+          <tr><td><code>rules/*.mdc</code></td><td>Immediately</td><td>Settings → Cursor → Rules — all 6 listed with glob patterns</td></tr>
+          <tr><td><code>mcp.json</code></td><td>Immediately</td><td>Settings → Features → MCP — each server shows green or red</td></tr>
+          <tr><td><code>hooks.json</code></td><td>Immediately</td><td>Active but invisible until triggered</td></tr>
+          <tr><td><code>skills/</code></td><td>Indexed on open</td><td>Type <code>/</code> in chat — skills appear in the menu</td></tr>
+          <tr><td><code>AGENTS.md</code></td><td>Read at chat start</td><td>Injected into every new conversation automatically</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 2: You Open a File — The Right Rules Activate</h3>
+    <p>You open <code>src/templates/step_reasoner.py</code> and type "Improve this template's prompt quality". Behind the scenes, Cursor checks every rule's globs against the open file:</p>
+    <div class="callout">
+      <span class="callout-icon">⚙️</span>
+      <div><strong>Result:</strong> <code>core-standards.mdc</code> (alwaysApply) + <code>sdk-library.mdc</code> (matches <code>src/**/*.py</code>) are injected. The other 4 rules are skipped. The agent knows SDK conventions without you saying anything. If you switch to <code>app/web/src/pages/Dashboard.jsx</code>, the SDK rule deactivates and the frontend rule activates instead.</div>
+    </div>
+
+    <h3>Step 3: MCP Fetches Live Docs</h3>
+    <p>You type "Update the LiteLLM integration to use the latest provider format. Use context7." The agent calls the Context7 MCP server, which fetches the current LiteLLM documentation from source. You get correct, current code on the first try — not what the model memorized from training data two years ago.</p>
+
+    <h3>Step 4: The Agent Edits a File — Hooks Auto-Format</h3>
+    <p>The agent edits <code>src/utils/helpers.py</code>. The <code>afterFileEdit</code> hook triggers, runs <code>ruff check --fix .</code> and <code>ruff format .</code>, and the file is auto-formatted. If the agent tries to run <code>rm -rf /</code>, the <code>beforeShellExecution</code> hook blocks it — the command never executes.</p>
+
+    <h3>Step 5: You Invoke a Skill</h3>
+    <p>You type <code>/code-reviewer</code>. The agent loads <code>SKILL.md</code>, follows each step (read changed files → check conventions → run lints → report issues) — the same thorough workflow every time, not a different improvised approach each session.</p>
+
+    <h3>Step 6: A Subagent Runs in Parallel</h3>
+    <p>After the agent makes changes, the post-edit verifier spawns in its own context window. It runs tests, checks types, and runs linting in the background while you keep working. You see: <em>"Verifier passed: 14 tests pass, types clean, no lint issues."</em> The 200 lines of pytest output never appear in your main chat.</p>
+
+    <h3>Step 7: Continual Learning Observes</h3>
+    <p>You correct the agent during the session: "No, use ruff not flake8." The Continual Learning plugin detects the pattern across sessions and adds <code>- Use ruff for linting, not flake8</code> to <code>AGENTS.md</code>. Next session, the agent already knows. You never make that correction again.</p>
+
+    <div class="session-block">
+      <div class="session-header">A Typical Day With This Setup</div>
+      <div class="session-body">Morning — SDK work:
+  Open Cursor → everything loads automatically (2 seconds)
+  Open a library file → SDK rule activates
+  "Improve this class" → agent knows patterns, follows the skill
+  Agent edits .py → hook auto-formats with ruff (instant)
+  "Run the tests" → subagent runs pytest in background, reports pass/fail
+
+Afternoon — Frontend work:
+  Open Dashboard.jsx → frontend rule activates, SDK rule deactivates
+  "Add a loading spinner to the data table" → agent knows React conventions
+  "Test it" → Playwright MCP opens localhost, clicks through the flow, reports
+
+End of day — Ship it:
+  "Create a PR for today's changes" → GitHub MCP creates the PR with description
+  "Write a blog post about the improvements" → blog skill activates
+  Agent uses Context7 to fetch current Docusaurus frontmatter format
+  Hook auto-formats. Subagent verifies. PR is ready for review.</div>
+    </div>
+  </section>
+
+  <!-- ─── Part 10: Worktrees ────────────────────────── -->
+  <section class="chapter-block" id="part10">
+    <div class="ch-eyebrow">Part 10</div>
+    <div class="ch-rule"></div>
+    <h2>Worktrees &amp; Parallel Agents</h2>
+    <p class="ch-intro">One of Cursor's most powerful features — and the one most developers never discover. Run multiple agents simultaneously on the same codebase, each in isolation.</p>
+
+    <h3>What Is a Worktree?</h3>
+    <p>A <strong>git worktree</strong> gives you a second (or third) fully checked-out copy of the same repo in a separate folder — each on its own branch, completely independent. Cursor automates this entirely — you don't run <code>git worktree add</code> manually.</p>
+
+    <h3>Best-of-N: Same Prompt, Multiple Models</h3>
+    <div class="steps">
+      <div class="step-block"><div class="step-num">1</div><div class="step-body"><h4>Ensure a single Git repo</h4><p>Open with File → Open Folder (not "Add folder to workspace"). The feature is hidden in multi-root workspaces.</p></div></div>
+      <div class="step-block"><div class="step-num">2</div><div class="step-body"><h4>Click the model selector</h4><p>Look for <strong>Use Multiple Models</strong> — separate from Auto / Max Mode toggles.</p></div></div>
+      <div class="step-block"><div class="step-num">3</div><div class="step-body"><h4>Select models</h4><p>Select 2–3 models (e.g., Composer 1.5 and Claude Sonnet).</p></div></div>
+      <div class="step-block"><div class="step-num">4</div><div class="step-body"><h4>Type your prompt</h4><p>Both models run simultaneously — each in its own worktree, each making its own edits.</p></div></div>
+      <div class="step-block"><div class="step-num">5</div><div class="step-body"><h4>Click Apply</h4><p>Review two cards in the chat. Click Apply on the one you prefer — Cursor merges it into your main branch.</p></div></div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Situation</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>You want the best possible result for a hard problem</td><td>Worktree — Best-of-N</td></tr>
+          <tr><td>You want to compare two approaches side by side</td><td>Worktree — parallel agents</td></tr>
+          <tr><td>You have two completely unrelated tasks</td><td>Worktree — run them in parallel</td></tr>
+          <tr><td>Routine edit, simple fix, quick question</td><td>Single agent — worktrees add overhead</td></tr>
+          <tr><td>You're on the Pro plan watching costs</td><td>Single agent — worktrees multiply usage</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>worktrees.json — Setup Script</h3>
+    <div class="code-block">
+      <div class="code-label">.cursor/worktrees.json — Python (uv)</div>
+      <pre>{
+  "setup-worktree": [
+    "uv sync",
+    "cp $ROOT_WORKTREE_PATH/.env .env"
+  ]
+}</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-label">.cursor/worktrees.json — Node.js</div>
+      <pre>{
+  "setup-worktree": [
+    "npm ci",
+    "cp $ROOT_WORKTREE_PATH/.env .env"
+  ]
+}</pre>
+    </div>
+    <p><code>$ROOT_WORKTREE_PATH</code> points to your main working directory so you can copy files like <code>.env</code> across. <strong>Note:</strong> LSP (linting/autocomplete) is not supported in worktrees — the agent can still run commands and tests, but won't get inline lint feedback.</p>
+  </section>
+
+  <!-- ─── Part 11: Model Selection ──────────────────── -->
+  <section class="chapter-block" id="part11">
+    <div class="ch-eyebrow">Part 11</div>
+    <div class="ch-rule"></div>
+    <h2>Model Selection &amp; Reducing Waste</h2>
+    <p class="ch-intro">Every Cursor chat consumes tokens. The model you pick determines both quality and cost — and the default behavior is often not optimal for the full range of tasks you actually do.</p>
+
+    <h3>Two Usage Pools</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Pool</th><th>When It's Used</th><th>Pro Plan Includes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Auto + Composer</strong></td><td>When you select Auto or Composer 1.5</td><td>Generous included usage</td></tr>
+          <tr><td><strong>API pool</strong></td><td>When you pick a specific model (Claude, GPT, Gemini)</td><td>$20/mo</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>If you're burning through your $20 API pool on simple tasks, switching those to Auto or Composer 1.5 extends your budget significantly.</p>
+
+    <h3>Which Model for Which Task</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Task</th><th>Best Choice</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Understanding code, grepping, Q&amp;A</td><td>Ask mode + Auto</td><td>Read-only — no premium reasoning needed</td></tr>
+          <tr><td>Simple edits, small refactors</td><td>Auto or Composer 1.5</td><td>Fast, included in the generous pool</td></tr>
+          <tr><td>Multi-file refactors, architecture</td><td>Claude Sonnet or Premium</td><td>Worth the quality lift</td></tr>
+          <tr><td>Security review, complex reasoning</td><td>Claude Opus or Premium</td><td>Reasoning depth matters</td></tr>
+          <tr><td>Subagent tasks (tests, lint, verify)</td><td><code>model: fast</code> in agent file</td><td>Mechanical work — fast model is sufficient</td></tr>
+          <tr><td>Best-of-N comparison</td><td>1 fast + 1 premium</td><td>Most quality gain at half the cost of 2 premium</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Practical Cost Tips</h3>
+    <ol>
+      <li><strong>Use Ask mode for exploration</strong> — switch to Agent only when you're ready to make edits.</li>
+      <li><strong>Start new chats when switching tasks</strong> — long conversations accumulate context, which costs more per turn.</li>
+      <li><strong>Don't over-@mention files</strong> — every <code>@filename</code> is loaded into context. Let the agent search instead.</li>
+      <li><strong>Best-of-N: 2 models max</strong> — 1 fast + 1 premium gives a comparison at half the cost of 2 premium models.</li>
+      <li><strong>Turn off on-demand usage</strong> in billing settings if you want a hard spending cap. Without this, Cursor auto-charges overage at the same rates — which can accumulate to $200–300+ without notice.</li>
+      <li><strong>Subagents multiply token usage</strong> — 3 parallel subagents = ~3x tokens. Use parallel execution when time savings justify the cost, not reflexively.</li>
+    </ol>
+  </section>
+
+  <!-- ─── Part 12: Lean Setup ───────────────────────── -->
+  <section class="chapter-block" id="part12">
+    <div class="ch-eyebrow">Part 12</div>
+    <div class="ch-rule"></div>
+    <h2>Keeping Your .cursor/ Setup Lean</h2>
+    <p class="ch-intro">As your project matures, <code>.cursor/</code> accumulates skills, rules, and agents. More isn't always better — redundant skills create noise that makes selection less accurate.</p>
+
+    <h3>Skills: Watch for Overlap</h3>
+    <p>The agent decides which skill to use based on the <code>description</code> field alone. If two skills have similar descriptions and overlapping trigger words, the agent may invoke the wrong one.</p>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Symptom</th><th>Likely Cause</th></tr></thead>
+        <tbody>
+          <tr><td>Agent keeps invoking the wrong skill</td><td>Two skills with similar trigger words</td></tr>
+          <tr><td>Agent uses a skill when you didn't ask</td><td>Description is too broad</td></tr>
+          <tr><td>Agent asks which skill to use</td><td>Two skills with identical use cases</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Use <code>disable-model-invocation: true</code> for skills that are rarely needed or take a long time — release workflows, deep research sessions, ecosystem scans.</p>
+
+    <h3>Rules: Keep alwaysApply Minimal</h3>
+    <p>Only one rule should have <code>alwaysApply: true</code> — your core standards. Everything else should use <code>globs</code> so it only loads when relevant files are open.</p>
+
+    <h3>The Right Size for a Mature Setup</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Item</th><th>Reasonable Ceiling</th><th>Warning Sign</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Rules</strong></td><td>6–8</td><td>More than 10 with <code>alwaysApply: true</code></td></tr>
+          <tr><td><strong>Skills</strong></td><td>8–12</td><td>Overlapping descriptions, wrong skill invoked</td></tr>
+          <tr><td><strong>Subagents</strong></td><td>2–4</td><td>Vague descriptions, agent doesn't know when to use</td></tr>
+          <tr><td><strong>Plans</strong></td><td>0–3 active</td><td>More than 5 that are done/stale</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">🎯</span>
+      <div>Start lean. Add only when you notice a repeated gap — the agent making the same mistake, a workflow you explain manually every time, or a task that always needs a specific model.</div>
+    </div>
+  </section>
+
+  <!-- ─── Reference ─────────────────────────────────── -->
+  <section class="chapter-block" id="reference">
+    <div class="ch-eyebrow">Reference</div>
+    <div class="ch-rule"></div>
+    <h2>Reference</h2>
+
+    <h3>Configuration Files</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>File</th><th>Purpose</th><th>Docs</th></tr></thead>
+        <tbody>
+          <tr><td><code>.cursor/rules/*.mdc</code></td><td>Persistent AI guidance, scoped by file pattern</td><td><a href="https://cursor.com/docs/rules">cursor.com/docs/rules</a></td></tr>
+          <tr><td><code>.cursor/skills/*/SKILL.md</code></td><td>Repeatable workflows the agent can invoke</td><td><a href="https://cursor.com/docs/skills">cursor.com/docs/skills</a></td></tr>
+          <tr><td><code>.cursor/agents/*.md</code></td><td>Custom subagents with separate context windows</td><td><a href="https://cursor.com/docs/subagents">cursor.com/docs/subagents</a></td></tr>
+          <tr><td><code>.cursor/mcp.json</code></td><td>External tools (docs, GitHub, browser, etc.)</td><td><a href="https://cursor.com/docs/mcp">cursor.com/docs/mcp</a></td></tr>
+          <tr><td><code>.cursor/hooks.json</code></td><td>Scripts that run before/after agent actions</td><td><a href="https://cursor.com/docs/hooks">cursor.com/docs/hooks</a></td></tr>
+          <tr><td><code>.cursor/settings.json</code></td><td>Plugin configuration</td><td><a href="https://cursor.com/docs/plugins">cursor.com/docs/plugins</a></td></tr>
+          <tr><td><code>.cursor/worktrees.json</code></td><td>Setup script for parallel agent worktrees</td><td><a href="https://cursor.com/docs/configuration/worktrees">cursor.com/docs/worktrees</a></td></tr>
+          <tr><td><code>AGENTS.md</code></td><td>Simple markdown instructions (alternative to rules)</td><td><a href="https://cursor.com/docs/rules">cursor.com/docs/rules</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Essential Links</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Resource</th><th>URL</th></tr></thead>
+        <tbody>
+          <tr><td>Cursor Docs Sitemap</td><td><a href="https://cursor.com/llms.txt">cursor.com/llms.txt</a></td></tr>
+          <tr><td>Best Practices Blog</td><td><a href="https://cursor.com/blog/agent-best-practices">cursor.com/blog/agent-best-practices</a></td></tr>
+          <tr><td>MCP Directory (1,500+ servers)</td><td><a href="https://cursormcp.dev">cursormcp.dev</a></td></tr>
+          <tr><td>Cursor Marketplace (plugins)</td><td><a href="https://cursor.com/marketplace">cursor.com/marketplace</a></td></tr>
+          <tr><td>Context7 Setup for Cursor</td><td><a href="https://context7.com/docs/clients/cursor">context7.com/docs/clients/cursor</a></td></tr>
+          <tr><td>Agent Skills Standard</td><td><a href="https://agentskills.io">agentskills.io</a></td></tr>
+          <tr><td>Prompting Guide</td><td><a href="https://cursor.com/docs/agent/prompting">cursor.com/docs/agent/prompting</a></td></tr>
+          <tr><td>Worktrees &amp; Parallel Agents</td><td><a href="https://cursor.com/docs/configuration/worktrees">cursor.com/docs/configuration/worktrees</a></td></tr>
+          <tr><td>Models &amp; Pricing</td><td><a href="https://cursor.com/docs/models-and-pricing">cursor.com/docs/models-and-pricing</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight">
+      <div class="insight-label">Closing Thought</div>
+      <p>Most developers use Cursor as a smarter autocomplete. The developers who get 10x value spend an hour configuring it. Rules eliminate re-explanation. MCP servers eliminate hallucination. Hooks eliminate manual formatting. Skills eliminate re-inventing workflows. Subagents eliminate context overload. Plugins make all of it shareable.</p>
+      <p style="margin-top:0.6rem;">The entire setup lives in a <code>.cursor/</code> folder you commit to git. Every contributor who clones the repo inherits it. <strong>No onboarding doc to read, no setup script to run. The AI just <em>knows</em> how your project works.</strong></p>
+    </div>
+  </section>
+
+  <!-- ─── Footer ────────────────────────────────────── -->
+  <footer class="footer">
+    <span>Ideated and co-written with Cursor by <strong>Dhiraj Pokhrel</strong></span>
+    <span>Published by <a href="https://sadhiraai.com">Sadhira AI</a> · Built while developing <a href="https://app.sadhiraai.com">mycontext-ai</a></span>
+    <span>Based on <a href="https://cursor.com/llms.txt">Cursor Docs</a>, <a href="https://cursor.com/blog/agent-best-practices">Cursor's best practices blog</a>, and hands-on implementation.</span>
+    <span style="margin-top:0.5rem;font-size:0.75rem;">© 2026 Sadhira AI &amp; Analytics · <a href="https://sadhiraai.com">sadhiraai.com</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

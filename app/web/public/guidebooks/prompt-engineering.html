@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stop Guessing. Start Contextualizing Prompts. — The Complete Prompt Engineering Guidebook by Sadhira AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset ──────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* ─── Brand tokens — Sadhira AI light palette (product video) ── */
+:root {
+  --bg:           #f5f9f8;
+  --bg-card:      #ffffff;
+  --bg-surface:   #eaf3f1;
+  --bg-hover:     #dff0ec;
+  --border:       rgba(75,130,120,0.18);
+  --border-dim:   rgba(75,130,120,0.10);
+  --border-bright:rgba(61,139,128,0.40);
+  --text:         #1a3a36;
+  --text-dim:     #3d6b64;
+  --text-faint:   #8aada9;
+
+  --teal:         #3d8b80;
+  --teal-dark:    #2d7268;
+  --teal-darker:  #1f5a52;
+  --teal-dim:     rgba(61,139,128,0.10);
+  --teal-glow:    rgba(61,139,128,0.06);
+
+  --purple:       #7c3aed;
+  --purple-dim:   rgba(124,58,237,0.08);
+
+  --success:      #1f6b4a;
+  --success-dim:  rgba(31,107,74,0.10);
+  --warn:         #92620a;
+  --warn-dim:     rgba(146,98,10,0.10);
+  --danger:       #be3a30;
+  --danger-dim:   rgba(190,58,48,0.09);
+
+  --gradient:     linear-gradient(135deg,#4a9e94 0%,#3d8b80 100%);
+  --gradient-hero:linear-gradient(135deg,#3d8b80 0%,#7c3aed 100%);
+
+  --font-serif: 'Instrument Serif',Georgia,serif;
+  --font-sans:  'DM Sans',system-ui,sans-serif;
+  --font-mono:  'JetBrains Mono','Courier New',monospace;
+
+  --page-w: 880px;
+  --radius: 10px;
+}
+
+/* ─── Print / PDF ────────────────────────────────────────── */
+@page {
+  size: A4;
+  margin: 1.8cm 1.5cm 1.8cm 1.5cm;
+}
+
+@media print {
+  /* Force background graphics so teal panels print */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  .no-print { display:none!important; }
+  body { font-size: 10.5pt; background: #f5f9f8 !important; color: #1a3a36 !important; margin: 0 !important; }
+  .page { padding: 0 1.5cm 1cm !important; max-width: 100% !important; margin: 0 !important; }
+
+  /* ── Layout: no forced breaks, no gaps ── */
+  .cover {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 1.5cm 0 1.2cm !important;
+    display: block !important;
+    justify-content: unset !important;
+    /* NO page-break-after — let cover and TOC share a page */
+  }
+  .cover-bg, .cover-grid { display: none !important; }
+  .toc { padding: 0.8cm 0 !important; }
+
+  /* Chapter blocks — compact padding, no forced breaks */
+  .chapter-block {
+    padding: 1.2cm 0 0.5cm !important;
+    margin-top: 0 !important;
+    border-top: 1.5px solid rgba(75,130,120,0.3) !important;
+  }
+
+  /* Keep headings glued to their following content */
+  h2, h3 { page-break-after: avoid; break-after: avoid; }
+  /* Small elements: avoid breaking inside */
+  .callout, .compare-pair { page-break-inside: avoid; break-inside: avoid; }
+  /* Tall elements: allow breaking — they won't fit on one page */
+  .diagram-wrap, .provider-block, .code-block { page-break-inside: auto; break-inside: auto; }
+
+  /* JS fade-up elements are invisible until IntersectionObserver fires — force visible in print */
+  .fade-up,
+  .fade-up.visible,
+  [class*="fade"] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  /* Kill any inline style opacity/transform that JS may have left at 0 */
+  [style*="opacity"] { opacity: 1 !important; }
+  [style*="transform"] { transform: none !important; }
+
+  /* Fix gradient text — gradient-clip is invisible in PDF, use solid colour */
+  .cover h1 em {
+    -webkit-text-fill-color: #2d7268 !important;
+    background: none !important;
+    color: #2d7268 !important;
+  }
+  .toc-n, .ch-eyebrow, .cover-label, .diagram-label::before { color: #3d8b80 !important; }
+  .cover-rule, .ch-rule { background: #4a9e94 !important; }
+
+  /* Headings — ensure solid dark colour */
+  h1, h2, h3, h4 { color: #1a3a36 !important; }
+  .cover h1        { color: #1a3a36 !important; }
+  .chapter-block h2 { color: #1a3a36 !important; }
+  .ch-intro, .cover-sub { color: #3d6b64 !important; }
+  p { color: #3d6b64 !important; }
+
+  /* TOC */
+  a.toc-row { color: #1a3a36 !important; text-decoration: none !important; }
+  .toc-t    { color: #1a3a36 !important; }
+  .toc-ch   { color: #8aada9 !important; }
+  .toc-dots { border-color: rgba(75,130,120,0.3) !important; }
+
+  /* Arch diagram sections */
+  .arch-section   { background: #eaf3f1 !important; border-color: rgba(75,130,120,0.2) !important; }
+  .arch-name      { color: #1a3a36 !important; }
+  .arch-field     { color: #3d8b80 !important; }
+  .arch-why       { color: #8aada9 !important; display: block !important; }
+  .arch-num       { color: #8aada9 !important; }
+  .arch-connector { color: #8aada9 !important; }
+  .arch-legend-item { color: #3d6b64 !important; }
+
+  /* Zone labels */
+  .arch-zone-label { color: #fff !important; }
+
+  /* Diagram wrappers */
+  .diagram-wrap   { border-color: rgba(75,130,120,0.25) !important; background: #fff !important; box-shadow: none !important; }
+  .diagram-label  { background: #eaf3f1 !important; color: #8aada9 !important; }
+  .diagram-inner  { background: #fff !important; }
+
+  /* Positive/Negative grid */
+  .pn-col-label.bad  { background: rgba(190,58,48,0.09) !important; color: #be3a30 !important; }
+  .pn-col-label.good { background: rgba(31,107,74,0.10) !important; color: #1f6b4a !important; }
+  .pn-row-bad  { background: rgba(190,58,48,0.07) !important; color: #be3a30 !important; border-color: rgba(190,58,48,0.2) !important; }
+  .pn-row-good { background: rgba(31,107,74,0.07) !important;  color: #1f6b4a !important; border-color: rgba(31,107,74,0.2) !important; }
+  .pn-arrow    { background: #eaf3f1 !important; color: #8aada9 !important; }
+  .pn-featured { background: rgba(146,98,10,0.09) !important; border-color: rgba(146,98,10,0.3) !important; }
+  .pn-featured strong { color: #1a3a36 !important; }
+  .pn-featured em     { color: #3d6b64 !important; }
+  .pn-featured-label  { color: #92620a !important; }
+
+  /* Spectrum */
+  .spectrum-label   { background: #eaf3f1 !important; color: #3d6b64 !important; }
+  .spec-item:nth-child(1) { background: rgba(190,58,48,0.09) !important; color: #be3a30 !important; }
+  .spec-item:nth-child(2) { background: rgba(190,58,48,0.04) !important; color: #3d6b64 !important; }
+  .spec-item:nth-child(3) { background: rgba(31,107,74,0.04) !important;  color: #3d6b64 !important; }
+  .spec-item:nth-child(4) { background: rgba(31,107,74,0.10) !important;  color: #1f6b4a !important; }
+  .spectrum-axis span { color: #8aada9 !important; }
+
+  /* Provider comparison grid */
+  .provider-grid { border-color: rgba(75,130,120,0.25) !important; }
+  .pg-head       { background: #eaf3f1 !important; border-color: rgba(75,130,120,0.25) !important; }
+  .pg-head.openai { color: #10a37f !important; }
+  .pg-head.claude { color: #b45309 !important; }
+  .pg-head.gemini { color: #4285f4 !important; }
+  .pg-rl   { background: #eaf3f1 !important; color: #3d6b64 !important; border-color: rgba(75,130,120,0.2) !important; }
+  .pg-cell { color: #3d6b64 !important; border-color: rgba(75,130,120,0.12) !important; }
+  .tag-xml { background: rgba(146,98,10,0.10) !important;  color: #92620a !important; }
+  .tag-md  { background: rgba(124,58,237,0.08) !important; color: #7c3aed !important; }
+  .tag-pos { background: rgba(31,107,74,0.10) !important;  color: #1f6b4a !important; }
+  .tag-neg { background: rgba(190,58,48,0.09) !important;  color: #be3a30 !important; }
+  code { background: rgba(61,139,128,0.10) !important; color: #2d7268 !important; }
+
+  /* Provider template blocks — force text wrap so nothing clips */
+  .provider-block { border-color: rgba(75,130,120,0.25) !important; }
+  .provider-head.openai { background: rgba(16,163,127,0.08) !important; color: #10a37f !important; }
+  .provider-head.claude { background: rgba(180,83,9,0.08) !important;  color: #b45309 !important; }
+  .provider-head.gemini { background: rgba(66,133,244,0.08) !important; color: #4285f4 !important; }
+  .provider-block pre {
+    background: #eaf3f1 !important; color: #3d6b64 !important;
+    white-space: pre-wrap !important;   /* wrap long lines — no horizontal scroll in PDF */
+    overflow-x: visible !important;
+    word-break: break-word !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Code blocks */
+  .code-block { border-color: rgba(75,130,120,0.2) !important; background: #fff !important; }
+  .code-label { background: #eaf3f1 !important; color: #8aada9 !important; }
+  .code-block pre {
+    background: #eaf3f1 !important; color: #3d6b64 !important;
+    white-space: pre-wrap !important;
+    overflow-x: visible !important;
+    word-break: break-word !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Provider comparison grid — tighten so 4 columns fit A4 width */
+  .provider-grid { grid-template-columns: 110px 1fr 1fr 1fr !important; font-size: 0.7rem !important; }
+  .pg-head, .pg-rl, .pg-cell { padding: 0.35rem 0.5rem !important; font-size: 0.68rem !important; }
+  .diagram-inner { padding: 0 !important; overflow-x: visible !important; }
+
+  /* Callouts */
+  .callout        { background: rgba(61,139,128,0.08) !important; border-color: #3d8b80 !important; color: #3d6b64 !important; }
+  .callout.warn   { background: rgba(146,98,10,0.08) !important;  border-color: #92620a !important; }
+  .callout.danger { background: rgba(190,58,48,0.08) !important;  border-color: #be3a30 !important; }
+  .callout strong { color: #1a3a36 !important; }
+
+  /* Compare cards */
+  .compare-card.weak   { background: rgba(190,58,48,0.08) !important; color: #be3a30 !important; border-color: rgba(190,58,48,0.2) !important; }
+  .compare-card.strong { background: rgba(31,107,74,0.08) !important;  color: #1f6b4a !important; border-color: rgba(31,107,74,0.2) !important; }
+  .ctag { color: inherit !important; opacity: 0.6; }
+
+  /* Rules list */
+  .rules-list li         { color: #3d6b64 !important; border-color: rgba(75,130,120,0.15) !important; }
+  .rules-list li::before { color: #3d8b80 !important; }
+  .rules-list li div strong { color: #1a3a36 !important; }
+
+  /* SDK section */
+  .sdk-card         { background: #fff !important; border-color: rgba(75,130,120,0.2) !important; }
+  .sdk-card-label   { color: #3d8b80 !important; }
+  .sdk-card p       { color: #3d6b64 !important; }
+  .sdk-link         { color: #3d8b80 !important; }
+  .feat-table       { border-color: rgba(75,130,120,0.2) !important; }
+  .ft-head          { background: #eaf3f1 !important; border-color: rgba(75,130,120,0.2) !important; }
+  .ft-head:first-child { color: #be3a30 !important; }
+  .ft-head:last-child  { color: #3d8b80 !important; }
+  .ft-bad  { background: rgba(190,58,48,0.06) !important; color: #be3a30 !important; border-color: rgba(75,130,120,0.12) !important; }
+  .ft-good { background: rgba(31,107,74,0.06) !important;  color: #1f6b4a !important; border-color: rgba(75,130,120,0.12) !important; }
+
+  /* Cover pills */
+  .cover-pill     { background: rgba(61,139,128,0.10) !important; color: #3d8b80 !important; border-color: rgba(61,139,128,0.3) !important; }
+  .cover-meta span { color: #8aada9 !important; }
+  .cover-meta strong { color: #3d6b64 !important; }
+
+  /* Footer */
+  .footer span  { color: #8aada9 !important; }
+  .footer a     { color: #3d8b80 !important; }
+
+  /* SVG text in attention curve */
+  svg text { fill: #3d6b64 !important; }
+  svg text[fill="#8b949e"] { fill: #8aada9 !important; }
+  svg text[fill="#c0392b"] { fill: #be3a30 !important; }
+  svg text[fill="#5ba8a0"] { fill: #3d8b80 !important; }
+  svg path[stroke="url(#cg)"] { stroke: #3d8b80 !important; }
+}
+
+/* ─── Base ───────────────────────────────────────────────── */
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-sans);
+  font-size:16px;
+  line-height:1.65;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+.page{
+  max-width:var(--page-w);
+  margin:0 auto;
+  padding:0 2rem 6rem;
+}
+
+/* ─── Cover ──────────────────────────────────────────────── */
+.cover{
+  min-height:95vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:0 0 4rem;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.cover-bg{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 65% 55% at 80% 15%, rgba(61,139,128,0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 40% at 15% 75%, rgba(124,58,237,0.07) 0%, transparent 60%);
+  pointer-events:none;
+}
+.cover-grid{
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(75,130,120,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(75,130,120,0.07) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+}
+.cover-label{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:2rem;
+  position:relative;
+  z-index:1;
+}
+.cover-eyebrow{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:1rem;
+  position:relative;
+  z-index:1;
+}
+.cover h1{
+  font-family:var(--font-serif);
+  font-weight:400;
+  font-size:clamp(2.8rem,7vw,5.2rem);
+  line-height:1.04;
+  letter-spacing:-0.02em;
+  color:var(--text);
+  margin-bottom:0;
+  position:relative;
+  z-index:1;
+  max-width:720px;
+}
+.cover h1 em{
+  font-style:italic;
+  background:var(--gradient-hero);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.cover-rule{
+  width:60px; height:2px;
+  background:var(--gradient);
+  border:none;
+  margin:2.2rem 0;
+  position:relative;
+  z-index:1;
+}
+.cover-sub{
+  font-family:var(--font-serif);
+  font-style:italic;
+  font-size:1.2rem;
+  color:var(--text-dim);
+  margin-bottom:2.5rem;
+  max-width:560px;
+  line-height:1.65;
+  position:relative;
+  z-index:1;
+}
+.cover-meta{
+  display:flex;
+  flex-direction:column;
+  gap:0.35rem;
+  position:relative;
+  z-index:1;
+}
+.cover-meta span{
+  font-family:var(--font-mono);
+  font-size:0.73rem;
+  color:var(--text-faint);
+  letter-spacing:0.03em;
+}
+.cover-meta strong{ color:var(--text-dim); font-weight:600; }
+.cover-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.5rem;
+  position:relative;
+  z-index:1;
+}
+.cover-pill{
+  font-family:var(--font-mono);
+  font-size:0.66rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:0.25rem 0.7rem;
+  border-radius:20px;
+  border:1px solid var(--border-bright);
+  color:var(--teal);
+  background:var(--teal-dim);
+}
+
+/* ─── TOC ────────────────────────────────────────────────── */
+.toc{
+  padding:3rem 0;
+  border-bottom:1px solid var(--border);
+}
+.toc-heading{
+  font-family:var(--font-mono);
+  font-size:0.66rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:2rem;
+}
+.toc-list{ list-style:none; max-width:640px; }
+.toc-list li{ border-bottom:1px solid var(--border-dim); }
+a.toc-row{
+  display:flex;
+  align-items:center;
+  gap:0;
+  padding:0.75rem 0;
+  text-decoration:none;
+  color:var(--text-dim);
+  transition:color 0.15s;
+}
+a.toc-row:hover{ color:var(--teal); }
+a.toc-row:hover .toc-dots{ border-color:var(--teal-dark); opacity:0.4; }
+.toc-n{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  font-weight:700;
+  color:var(--teal);
+  width:2.4rem;
+  flex-shrink:0;
+}
+.toc-t{
+  font-family:var(--font-serif);
+  font-size:1rem;
+  flex:1;
+}
+.toc-dots{
+  flex:1;
+  border-bottom:1px dotted var(--border);
+  margin:0 0.8rem 0.15rem;
+  min-width:16px;
+  transition:border-color 0.15s;
+}
+.toc-ch{
+  font-family:var(--font-mono);
+  font-size:0.63rem;
+  color:var(--text-faint);
+  flex-shrink:0;
+}
+
+/* ─── Chapter Block (opener + body merged) ───────────────── */
+.chapter-block{
+  padding:3.5rem 0 3rem;
+  border-top:1px solid var(--border);
+  /* No position:relative, no overflow:hidden, no ::before ghosts */
+}
+.ch-eyebrow{
+  font-family:var(--font-mono);
+  font-size:0.66rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:1.1rem;
+}
+.chapter-block h2{
+  font-family:var(--font-serif);
+  font-weight:400;
+  font-size:clamp(2.2rem,5.5vw,3.6rem);
+  line-height:1.06;
+  letter-spacing:-0.02em;
+  color:var(--text);
+  margin-bottom:1.5rem;
+  max-width:580px;
+}
+.ch-rule{
+  width:48px; height:2px;
+  background:var(--gradient);
+  border:none;
+  margin-bottom:1.5rem;
+}
+.ch-intro{
+  font-family:var(--font-serif);
+  font-style:italic;
+  font-size:1.1rem;
+  color:var(--text-dim);
+  line-height:1.75;
+  max-width:600px;
+  margin-bottom:2rem;
+}
+
+/* ─── Section headings ───────────────────────────────────── */
+h3{
+  font-family:var(--font-sans);
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--text);
+  margin:2.2rem 0 0.65rem;
+  letter-spacing:-0.01em;
+}
+p{
+  color:var(--text-dim);
+  margin-bottom:0.95rem;
+  max-width:680px;
+  line-height:1.7;
+}
+code{
+  font-family:var(--font-mono);
+  font-size:0.82em;
+  background:var(--teal-dim);
+  color:var(--teal);
+  padding:0.1em 0.38em;
+  border-radius:4px;
+}
+
+/* ─── Callout ────────────────────────────────────────────── */
+.callout{
+  border-left:3px solid var(--teal);
+  background:var(--teal-dim);
+  padding:0.9rem 1.1rem;
+  border-radius:0 var(--radius) var(--radius) 0;
+  margin:1.4rem 0;
+  font-size:0.875rem;
+  color:var(--text-dim);
+  max-width:680px;
+  line-height:1.65;
+}
+.callout strong{ color:var(--text); }
+.callout.warn{ border-color:var(--warn); background:var(--warn-dim); }
+.callout.danger{ border-color:var(--danger); background:var(--danger-dim); }
+.callout.success{ border-color:var(--success); background:var(--success-dim); }
+.callout.purple{ border-color:var(--purple); background:var(--purple-dim); }
+
+/* ─── Compare pair ───────────────────────────────────────── */
+.compare-pair{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0.75rem;
+  margin:1rem 0;
+  max-width:680px;
+}
+@media(max-width:560px){.compare-pair{grid-template-columns:1fr;}}
+.compare-card{
+  border-radius:var(--radius);
+  padding:0.85rem 1rem;
+  font-size:0.82rem;
+  line-height:1.55;
+  border:1px solid transparent;
+}
+.compare-card.weak{
+  background:var(--danger-dim);
+  border-color:rgba(248,81,73,0.2);
+  color:#f8a09a;
+}
+.compare-card.strong{
+  background:var(--success-dim);
+  border-color:rgba(109,188,154,0.2);
+  color:var(--success);
+}
+.ctag{
+  font-family:var(--font-mono);
+  font-size:0.6rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  font-weight:700;
+  opacity:0.65;
+  display:block;
+  margin-bottom:0.4rem;
+}
+
+/* ─── Rules list ─────────────────────────────────────────── */
+.rules-list{ list-style:none; max-width:680px; margin:0.8rem 0; }
+.rules-list li{
+  display:flex;
+  gap:0.9rem;
+  padding:0.5rem 0;
+  border-bottom:1px solid var(--border-dim);
+  font-size:0.84rem;
+  color:var(--text-dim);
+  align-items:baseline;
+  line-height:1.55;
+}
+.rules-list li::before{
+  content:attr(data-n);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  color:var(--teal);
+  flex-shrink:0;
+  font-weight:700;
+  min-width:1.6rem;
+}
+
+/* ─── Diagram wrapper ────────────────────────────────────── */
+.diagram-wrap{
+  margin:2rem 0 2.5rem;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  background:var(--bg-card);
+  box-shadow:0 4px 20px rgba(0,0,0,0.25);
+}
+.diagram-label{
+  font-family:var(--font-mono);
+  font-size:0.67rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  padding:0.6rem 1.2rem;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-surface);
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.diagram-label::before{
+  content:'';
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--teal);
+  flex-shrink:0;
+}
+.diagram-inner{ padding:1.5rem; }
+
+/* ─── Arch diagram ───────────────────────────────────────── */
+.arch-diagram{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  max-width:560px;
+  margin:0 auto;
+}
+.arch-zone{ display:flex; align-items:stretch; }
+.arch-zone-label{
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  transform:rotate(180deg);
+  font-family:var(--font-mono);
+  font-size:0.55rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  font-weight:700;
+  padding:0.5rem 0.4rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  flex-shrink:0;
+  color:#fff;
+}
+.zone-primacy .arch-zone-label  { background:#c0392b; }
+.zone-instruct .arch-zone-label { background:#2d7a72; }
+.zone-middle .arch-zone-label   { background:#6c3fcf; }
+.zone-late .arch-zone-label     { background:#b8860b; }
+.zone-recency .arch-zone-label  { background:#c0392b; }
+.arch-sections{ flex:1; display:flex; flex-direction:column; gap:3px; padding:3px 0; }
+.arch-section{
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  padding:0.5rem 0.85rem;
+  border-radius:5px;
+  background:var(--bg-surface);
+  border:1px solid var(--border-dim);
+  transition:background 0.15s, transform 0.15s;
+  cursor:default;
+}
+.arch-section:hover{ background:var(--bg-hover); transform:translateX(3px); }
+.arch-num{ font-family:var(--font-mono); font-size:0.75rem; font-weight:700; width:20px; flex-shrink:0; color:var(--text-faint); }
+.arch-name{ font-family:var(--font-sans); font-size:0.8rem; font-weight:700; flex:0 0 120px; color:var(--text); }
+.arch-field{ font-family:var(--font-mono); font-size:0.67rem; color:var(--teal); flex:1; }
+.arch-why{ font-size:0.68rem; color:var(--text-faint); flex:2; text-align:right; display:none; }
+@media(min-width:600px){ .arch-why{ display:block; } }
+.arch-connector{ text-align:center; font-family:var(--font-mono); font-size:0.65rem; color:var(--text-faint); padding:0.1rem 0; margin-left:26px; }
+.arch-legend{
+  display:flex; flex-wrap:wrap; gap:0.5rem 1.2rem;
+  margin-top:1rem; padding-top:1rem;
+  border-top:1px solid var(--border-dim);
+  justify-content:center;
+}
+.arch-legend-item{ display:flex; align-items:center; gap:0.4rem; font-size:0.7rem; color:var(--text-dim); }
+.arch-legend-dot{ width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
+/* ─── Positive/Negative grid ─────────────────────────────── */
+.pn-grid{ display:grid; grid-template-columns:1fr 28px 1fr; gap:0; align-items:stretch; }
+.pn-col-label{
+  font-family:var(--font-mono); font-size:0.63rem;
+  letter-spacing:0.12em; text-transform:uppercase; font-weight:700;
+  padding:0.5rem 0.8rem; text-align:center;
+}
+.pn-col-label.bad { background:rgba(248,81,73,0.15); color:#f85149; border-radius:6px 0 0 0; }
+.pn-col-label.good{ background:rgba(109,188,154,0.15); color:var(--success); border-radius:0 6px 0 0; }
+.pn-col-label.mid { background:var(--bg-surface); }
+.pn-row-bad{
+  background:rgba(248,81,73,0.07); border:1px solid rgba(248,81,73,0.12);
+  padding:0.55rem 0.8rem; font-size:0.78rem; color:#f8a09a;
+  display:flex; align-items:center; border-top:none;
+}
+.pn-row-good{
+  background:rgba(109,188,154,0.07); border:1px solid rgba(109,188,154,0.12);
+  padding:0.55rem 0.8rem; font-size:0.78rem; color:var(--success);
+  display:flex; align-items:center; border-top:none;
+}
+.pn-arrow{
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bg-surface); font-size:0.8rem; color:var(--text-faint);
+  border-top:none;
+}
+.pn-featured{
+  grid-column:1/-1;
+  background:var(--warn-dim); border:1.5px solid rgba(210,153,34,0.35);
+  border-radius:6px; padding:0.85rem 1rem; margin:0.6rem 0;
+  font-size:0.78rem; color:var(--text-dim); line-height:1.55;
+}
+.pn-featured-label{
+  font-family:var(--font-mono); font-size:0.62rem;
+  letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--warn); margin-bottom:0.35rem; font-weight:700;
+}
+
+/* ─── Spectrum ───────────────────────────────────────────── */
+.spectrum-axis{
+  display:flex; justify-content:space-between;
+  padding:0 0 0.6rem 108px;
+}
+.spectrum-axis span{ font-family:var(--font-mono); font-size:0.6rem; color:var(--text-faint); }
+.spectrum-row{
+  display:flex; align-items:stretch; gap:0;
+  margin-bottom:0.5rem; border-radius:6px; overflow:hidden;
+  border:1px solid var(--border-dim);
+}
+.spectrum-label{
+  font-family:var(--font-mono); font-size:0.65rem;
+  letter-spacing:0.08em; text-transform:uppercase; font-weight:700;
+  padding:0.4rem 0.65rem; width:108px; flex-shrink:0;
+  display:flex; align-items:center;
+  background:var(--bg-surface); color:var(--text-dim);
+}
+.spectrum-examples{ flex:1; display:flex; align-items:stretch; }
+.spec-item{
+  flex:1; padding:0.4rem 0.55rem; font-size:0.73rem;
+  border-left:1px solid var(--border-dim);
+  display:flex; align-items:center; line-height:1.3;
+}
+.spec-item:nth-child(1){ background:rgba(248,81,73,0.10); color:#f8a09a; }
+.spec-item:nth-child(2){ background:rgba(248,81,73,0.04); color:var(--text-dim); }
+.spec-item:nth-child(3){ background:rgba(109,188,154,0.04); color:var(--text-dim); }
+.spec-item:nth-child(4){ background:rgba(109,188,154,0.12); color:var(--success); font-weight:600; }
+
+/* ─── Provider comparison grid ───────────────────────────── */
+.provider-grid{
+  display:grid; grid-template-columns:150px 1fr 1fr 1fr;
+  gap:0; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;
+}
+.pg-head{
+  background:var(--bg-surface); padding:0.5rem 0.7rem;
+  font-family:var(--font-mono); font-size:0.66rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); border-right:1px solid var(--border);
+  color:var(--text-dim);
+}
+.pg-head:last-child{ border-right:none; }
+.pg-head.openai{ color:#10a37f; }
+.pg-head.claude{ color:#b45309; }
+.pg-head.gemini{ color:#4285f4; }
+.pg-rl{
+  padding:0.5rem 0.7rem; font-family:var(--font-sans); font-size:0.73rem; font-weight:600;
+  color:var(--text-dim); background:var(--bg-surface);
+  border-right:1px solid var(--border); border-bottom:1px solid var(--border-dim);
+  display:flex; align-items:center;
+}
+.pg-cell{
+  padding:0.5rem 0.7rem; border-right:1px solid var(--border-dim);
+  border-bottom:1px solid var(--border-dim); color:var(--text-dim);
+  font-size:0.76rem; line-height:1.45;
+}
+.pg-cell:last-child{ border-right:none; }
+.pg-rl:last-of-type,.pg-cell:nth-last-child(-n+4){ border-bottom:none; }
+.tag{
+  display:inline-block; padding:0.08rem 0.4rem; border-radius:3px;
+  font-family:var(--font-mono); font-size:0.62rem; font-weight:700; letter-spacing:0.04em;
+}
+.tag-xml{ background:var(--warn-dim); color:var(--warn); }
+.tag-md { background:rgba(139,92,246,0.15); color:var(--purple); }
+.tag-pos{ background:var(--success-dim); color:var(--success); }
+.tag-neg{ background:var(--danger-dim); color:var(--danger); }
+
+/* ─── Provider template blocks ───────────────────────────── */
+.provider-block{
+  border:1px solid var(--border); border-radius:var(--radius);
+  overflow:hidden; margin:1.2rem 0; max-width:680px;
+}
+.provider-head{
+  padding:0.55rem 1rem; font-family:var(--font-mono);
+  font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+}
+.provider-head.openai{ background:rgba(16,163,127,0.08); color:#10a37f; border-bottom:1px solid rgba(16,163,127,0.18); }
+.provider-head.claude{ background:rgba(180,83,9,0.08);  color:#b45309; border-bottom:1px solid rgba(180,83,9,0.18); }
+.provider-head.gemini{ background:rgba(66,133,244,0.08); color:#4285f4; border-bottom:1px solid rgba(66,133,244,0.18); }
+.provider-block pre{
+  font-family:var(--font-mono); font-size:0.73rem; line-height:1.65;
+  padding:1rem; overflow-x:auto; white-space:pre;
+  background:var(--bg-surface); color:var(--text-dim);
+}
+
+/* ─── Code block ─────────────────────────────────────────── */
+.code-block{
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden; margin:1rem 0; max-width:680px;
+}
+.code-label{
+  font-family:var(--font-mono); font-size:0.63rem; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--text-faint); padding:0.35rem 0.8rem;
+  border-bottom:1px solid var(--border); background:var(--bg-surface);
+}
+.code-block pre{
+  font-family:var(--font-mono); font-size:0.76rem; line-height:1.65;
+  padding:0.9rem 1rem; overflow-x:auto; white-space:pre-wrap;
+  word-break:break-word; color:var(--text-dim);
+}
+
+/* ─── SDK cards ──────────────────────────────────────────── */
+.sdk-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;
+  max-width:680px; margin:1.2rem 0;
+}
+@media(max-width:560px){ .sdk-grid{ grid-template-columns:1fr; } }
+.sdk-card{
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1rem 1.1rem;
+  transition:border-color 0.15s;
+}
+.sdk-card:hover{ border-color:var(--border-bright); }
+.sdk-card-label{
+  font-family:var(--font-mono); font-size:0.63rem; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--teal); font-weight:700; margin-bottom:0.4rem;
+}
+.sdk-card p{ font-size:0.82rem; margin:0; color:var(--text-dim); line-height:1.5; }
+.sdk-link{
+  display:inline-flex; align-items:center; gap:0.35rem;
+  font-family:var(--font-mono); font-size:0.7rem; color:var(--teal);
+  text-decoration:none; margin-top:0.5rem;
+  border-bottom:1px solid transparent;
+  transition:border-color 0.15s;
+}
+.sdk-link:hover{ border-color:var(--teal); }
+
+/* ─── Feature table (SDK auto-handles) ───────────────────── */
+.feat-table{
+  display:grid; grid-template-columns:1fr 1fr;
+  border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;
+  max-width:680px; margin:1rem 0;
+}
+.ft-head{
+  background:var(--bg-surface); padding:0.45rem 0.8rem;
+  font-family:var(--font-mono); font-size:0.66rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); color:var(--text-dim);
+}
+.ft-head:first-child{ border-right:1px solid var(--border); color:var(--danger); }
+.ft-head:last-child{ color:var(--teal); }
+.ft-bad{
+  padding:0.45rem 0.8rem; border-right:1px solid var(--border-dim);
+  border-bottom:1px solid var(--border-dim); font-size:0.77rem;
+  color:#f8a09a; background:rgba(248,81,73,0.04);
+  display:flex; align-items:center;
+}
+.ft-good{
+  padding:0.45rem 0.8rem; border-bottom:1px solid var(--border-dim);
+  font-size:0.77rem; color:var(--success); background:rgba(109,188,154,0.04);
+  display:flex; align-items:center;
+}
+.ft-bad:last-of-type,.ft-good:last-of-type{ border-bottom:none; }
+
+/* ─── Section rule ───────────────────────────────────────── */
+.sec-rule{ border:none; border-top:1px solid var(--border-dim); margin:2.5rem 0; }
+
+/* ─── Footer ─────────────────────────────────────────────── */
+.footer{
+  margin-top:4rem; padding:2.5rem 0;
+  border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:0.4rem;
+}
+.footer span{ font-family:var(--font-mono); font-size:0.7rem; color:var(--text-faint); }
+.footer a{ color:var(--teal); text-decoration:none; }
+.footer a:hover{ text-decoration:underline; }
+
+/* ─── Print PDF button ───────────────────────────────────── */
+.print-btn{
+  position:fixed; bottom:1.8rem; right:1.8rem;
+  background:var(--gradient); color:#fff; border:none;
+  border-radius:8px; padding:0.65rem 1.3rem;
+  font-family:var(--font-sans); font-size:0.82rem; font-weight:700;
+  cursor:pointer; z-index:100;
+  box-shadow:0 4px 20px rgba(91,168,160,0.25);
+  transition:opacity 0.2s, transform 0.15s;
+}
+.print-btn:hover{ opacity:0.9; transform:translateY(-1px); }
+@media print{ .print-btn{ display:none; } }
+
+/* ─── Scroll animations ──────────────────────────────────── */
+@media(prefers-reduced-motion:no-preference){
+  .fade-up{
+    opacity:0; transform:translateY(18px);
+    transition:opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-up.visible{ opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">⬇ Save as PDF</button>
+
+<div class="page">
+
+<!-- ══════════════════════════════════════════ COVER -->
+<div class="cover">
+  <div class="cover-bg"></div>
+  <div class="cover-grid"></div>
+  <div class="cover-eyebrow">Sadhira AI — Reference Edition — 2026</div>
+  <h1>Stop Guessing.<br><em>Start Contextualizing Prompts.</em></h1>
+  <hr class="cover-rule">
+  <p class="cover-sub">The complete, research-backed guide to writing prompts that actually work — across every major AI provider.</p>
+  <div class="cover-meta">
+    <span><strong>Conceived and authored by</strong> Dhiraj Pokhrel</span>
+    <span><strong>Research and experiments by</strong> Sadhira AI</span>
+    <span><strong>Backed by</strong> 14 academic papers &amp; 4 Sadhira AI experiments</span>
+  </div>
+  <div class="cover-pills">
+    <span class="cover-pill">OpenAI</span>
+    <span class="cover-pill">Anthropic Claude</span>
+    <span class="cover-pill">Google Gemini</span>
+    <span class="cover-pill">mycontext-ai SDK</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ TOC -->
+<nav class="toc">
+  <div class="toc-heading">Table of Contents</div>
+  <ul class="toc-list">
+    <li><a href="#ch1" class="toc-row"><span class="toc-n">01</span><span class="toc-t">Why Most Prompts Fail</span><span class="toc-dots"></span><span class="toc-ch">Chapter 1</span></a></li>
+    <li><a href="#ch2" class="toc-row"><span class="toc-n">02</span><span class="toc-t">The 9-Section Architecture</span><span class="toc-dots"></span><span class="toc-ch">Chapter 2</span></a></li>
+    <li><a href="#ch3" class="toc-row"><span class="toc-n">03</span><span class="toc-t">Section-by-Section Guide</span><span class="toc-dots"></span><span class="toc-ch">Chapter 3</span></a></li>
+    <li><a href="#ch4" class="toc-row"><span class="toc-n">04</span><span class="toc-t">The Language of Prompts</span><span class="toc-dots"></span><span class="toc-ch">Chapter 4</span></a></li>
+    <li><a href="#ch5" class="toc-row"><span class="toc-n">05</span><span class="toc-t">Provider-Specific Formatting</span><span class="toc-dots"></span><span class="toc-ch">Chapter 5</span></a></li>
+    <li><a href="#ch6" class="toc-row"><span class="toc-n">06</span><span class="toc-t">Complete Worked Examples</span><span class="toc-dots"></span><span class="toc-ch">Chapter 6</span></a></li>
+    <li><a href="#ch7" class="toc-row"><span class="toc-n">07</span><span class="toc-t">The 20 Most Common Mistakes</span><span class="toc-dots"></span><span class="toc-ch">Chapter 7</span></a></li>
+    <li><a href="#ch8" class="toc-row"><span class="toc-n">08</span><span class="toc-t">The mycontext-ai SDK</span><span class="toc-dots"></span><span class="toc-ch">Chapter 8</span></a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════════ CH1 -->
+<div id="ch1" class="chapter-block">
+  <div class="ch-eyebrow">Chapter One</div>
+  <h2>Why Most<br>Prompts Fail</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">Prompt failures are not a wording problem. They are a structure problem. Every vague instruction is a decision you've accidentally delegated to the model.</p>
+  <p>Open any LLM. Type: <em>"Summarize this article."</em> You'll get a summary. Sometimes good. Often generic. Occasionally wrong. That unpredictability isn't the AI being difficult — it's the prompt being underspecified.</p>
+  <p>A prompt like "summarize this article" is simultaneously missing: a role, a goal, constraints, a format, and a reasoning strategy. The AI fills in all of those blanks itself. Every time. Randomly. That's why results vary.</p>
+  <div class="callout">
+    <strong>The fix is not better wording. It is structure.</strong><br>
+    A structured prompt with a cheap model outperforms an unstructured prompt with an expensive model. The structure provides the scaffold. The model provides the intelligence. Neither works without the other.
+  </div>
+  <p>This guidebook shows you the structure — backed by 14 published studies and 4 Sadhira AI experiments — that turns unpredictable AI output into reliable, production-grade results.</p>
+</div>
+
+<!-- ══════════════════════════════════════════ CH2 -->
+<div id="ch2" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Two</div>
+  <h2>The 9-Section<br>Architecture</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">Nine sections. A specific order. Grounded in how transformer attention is allocated across long contexts — not convention, not intuition.</p>
+
+    <!-- FIG 1: Attention Curve -->
+    <div class="diagram-wrap fade-up">
+      <div class="diagram-label">Fig. 1 — The U-Shaped Attention Curve (Liu et al., 2023)</div>
+      <div class="diagram-inner">
+        <svg viewBox="0 0 600 185" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;max-width:100%">
+          <defs>
+            <linearGradient id="cg" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#c0392b" stop-opacity="0.8"/>
+              <stop offset="28%"  stop-color="#d29922" stop-opacity="0.35"/>
+              <stop offset="50%"  stop-color="#444d58" stop-opacity="0.2"/>
+              <stop offset="72%"  stop-color="#d29922" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#c0392b" stop-opacity="0.8"/>
+            </linearGradient>
+            <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#5ba8a0" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#5ba8a0" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="42" y1="20" x2="42" y2="152" stroke="#37414150" stroke-width="1"/>
+          <line x1="42" y1="152" x2="572" y2="152" stroke="#37414150" stroke-width="1"/>
+          <path d="M42,32 C85,30 115,62 185,104 C245,132 302,148 362,143 C422,132 462,92 514,57 C544,39 562,32 572,30 L572,152 L42,152 Z" fill="url(#fg)"/>
+          <path d="M42,32 C85,30 115,62 185,104 C245,132 302,148 362,143 C422,132 462,92 514,57 C544,39 562,32 572,30" fill="none" stroke="url(#cg)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="42"  cy="32"  r="5" fill="#c0392b"/>
+          <circle cx="302" cy="148" r="5" fill="#444d58"/>
+          <circle cx="572" cy="30"  r="5" fill="#c0392b"/>
+          <text x="42"  y="20"  text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#c0392b" font-weight="700">PRIMACY</text>
+          <text x="302" y="168" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">MIDDLE — lowest recall</text>
+          <text x="572" y="20"  text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#c0392b" font-weight="700">RECENCY</text>
+          <text x="20" y="91" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#8b949e" transform="rotate(-90,20,91)">RECALL STRENGTH</text>
+          <text x="307" y="180" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#8b949e">POSITION IN PROMPT →</text>
+          <line x1="82"  y1="42" x2="82"  y2="152" stroke="#5ba8a0" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <line x1="205" y1="42" x2="205" y2="152" stroke="#5ba8a0" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <line x1="385" y1="42" x2="385" y2="152" stroke="#5ba8a0" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <line x1="485" y1="42" x2="485" y2="152" stroke="#5ba8a0" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <text x="46"  y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">①②</text>
+          <text x="210" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">③④⑤⑥</text>
+          <text x="390" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">⑦⑧</text>
+          <text x="492" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">⑨</text>
+        </svg>
+      </div>
+    </div>
+
+    <p>LLMs show the same <strong>U-shaped attention curve</strong> as humans in memory experiments. Information at the start and end of a prompt is recalled most reliably; information buried in the middle is recalled least reliably (Liu et al., 2023). The 9-section ordering is engineered around this curve.</p>
+
+    <!-- FIG 2: Architecture -->
+    <div class="diagram-wrap fade-up">
+      <div class="diagram-label">Fig. 2 — The 9-Section Prompt Architecture</div>
+      <div class="diagram-inner">
+        <div class="arch-diagram">
+          <div class="arch-zone zone-primacy">
+            <div class="arch-zone-label">Primacy</div>
+            <div class="arch-sections">
+              <div class="arch-section"><span class="arch-num">①</span><span class="arch-name">ROLE</span><span class="arch-field">Guidance.role + persona_scope</span><span class="arch-why">Identity lens for all interpretation</span></div>
+              <div class="arch-section"><span class="arch-num">②</span><span class="arch-name">GOAL</span><span class="arch-field">Guidance.goal</span><span class="arch-why">"Your mission: X — accomplish this fully."</span></div>
+            </div>
+          </div>
+          <div class="arch-connector">↓</div>
+          <div class="arch-zone zone-instruct">
+            <div class="arch-zone-label">Instruct</div>
+            <div class="arch-sections">
+              <div class="arch-section"><span class="arch-num">③</span><span class="arch-name">RULES</span><span class="arch-field">Guidance.rules[ ]</span><span class="arch-why">Hard constraints first, soft last</span></div>
+              <div class="arch-section"><span class="arch-num">④</span><span class="arch-name">STYLE</span><span class="arch-field">Constraints.style_guide</span><span class="arch-why">Voice, register, tone — separate from format</span></div>
+            </div>
+          </div>
+          <div class="arch-connector">↓</div>
+          <div class="arch-zone zone-middle">
+            <div class="arch-zone-label">Middle</div>
+            <div class="arch-sections">
+              <div class="arch-section"><span class="arch-num">⑤</span><span class="arch-name">REASONING</span><span class="arch-field">thinking_strategy</span><span class="arch-why">step_by_step / multiple_angles / verify</span></div>
+              <div class="arch-section"><span class="arch-num">⑥</span><span class="arch-name">EXAMPLES</span><span class="arch-field">examples[ ]</span><span class="arch-why">2–5 input→output demos</span></div>
+            </div>
+          </div>
+          <div class="arch-connector">↓</div>
+          <div class="arch-zone zone-late">
+            <div class="arch-zone-label">Late</div>
+            <div class="arch-sections">
+              <div class="arch-section"><span class="arch-num">⑦</span><span class="arch-name">OUTPUT FORMAT</span><span class="arch-field">Constraints.output_contract</span><span class="arch-why">"Return ONLY…" — shape of response</span></div>
+              <div class="arch-section"><span class="arch-num">⑧</span><span class="arch-name">GUARD RAILS</span><span class="arch-field">must_not_include / must_include</span><span class="arch-why">What to never produce</span></div>
+            </div>
+          </div>
+          <div class="arch-connector">↓</div>
+          <div class="arch-zone zone-recency">
+            <div class="arch-zone-label">Recency</div>
+            <div class="arch-sections">
+              <div class="arch-section" style="border:1.5px solid #c0392b;background:rgba(192,57,43,0.08)">
+                <span class="arch-num" style="color:#c0392b">⑨</span>
+                <span class="arch-name">TASK</span>
+                <span class="arch-field" style="color:#c0392b">Directive.content</span>
+                <span class="arch-why" style="display:block;color:#c0392b;font-weight:700">ALWAYS LAST — +9.7 BLEU (Li et al., 2023)</span>
+              </div>
+            </div>
+          </div>
+          <div class="arch-legend">
+            <div class="arch-legend-item"><div class="arch-legend-dot" style="background:#c0392b"></div>Highest recall (primacy/recency)</div>
+            <div class="arch-legend-item"><div class="arch-legend-dot" style="background:#2d7a72"></div>Instruction zone</div>
+            <div class="arch-legend-item"><div class="arch-legend-dot" style="background:#6c3fcf"></div>Calibration zone</div>
+            <div class="arch-legend-item"><div class="arch-legend-dot" style="background:#b8860b"></div>Output shaping</div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════ CH3 -->
+<div id="ch3" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Three</div>
+  <h2>Section-by-Section<br>Guide</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">What to write in each section, why it matters, and the exact language patterns that produce reliable results.</p>
+    <div class="callout success" style="margin-bottom:1.5rem">
+      <strong>Do it in the app.</strong> All nine steps can be accomplished in <strong>Sadhira AI Context Studio</strong> — a guided wizard that walks you through each section with the exact formulas from this guidebook. No coding required. Use the Context Studio in the Sadhira AI app to build prompts step by step.
+    </div>
+    <h3>① Role — Who the AI Is</h3>
+    <p>Start with <code>You are</code>. Add seniority, domain, and a <strong>scope boundary</strong> to prevent the Persona Effect — strongly established personas expand into adjacent domains over long interactions (Shanahan et al., 2023).</p>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Too vague</span>You are an expert.</div>
+      <div class="compare-card strong"><span class="ctag">Specific + scoped</span>You are a senior application security engineer.<br>Scope: Review application-layer code only. Do not assess infrastructure or team practices.</div>
+    </div>
+
+    <h3>② Goal — What Success Looks Like</h3>
+    <p>The goal must be <strong>imperative</strong>, not declarative. Imperative framing creates a completion commitment; declarative framing creates awareness without obligation (Wierzbicka, 1987).</p>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Declarative (weak)</span>Goal: Analyze the data.</div>
+      <div class="compare-card strong"><span class="ctag">Imperative (strong)</span>Your mission: Surface every statistically significant anomaly in Q4 revenue — accomplish this fully.</div>
+    </div>
+
+    <h3>③ Rules — Non-Negotiable Behaviors</h3>
+    <p>Write rules as guarantees, not preferences. Order them most-critical first — models apply earlier rules more reliably when instructions conflict (Zhang et al., 2025).</p>
+    <ul class="rules-list">
+      <li data-n="✓">Every vulnerability must cite the exact file path and line number.</li>
+      <li data-n="✓">Every finding must include a working code fix, not just a description.</li>
+      <li data-n="✓">Rank findings: Critical → High → Medium → Low.</li>
+      <li data-n="✓">If the code is secure, state that explicitly.</li>
+    </ul>
+
+    <h3>⑦ Output Contract — Exactly What to Return</h3>
+    <p>The most underused section. Start with <code>Return ONLY</code> and specify the exact shape. This goes just before the task — for maximum compliance.</p>
+    <div class="code-block">
+      <div class="code-label">Output contract examples</div>
+      <pre>Return ONLY a ranked bullet list of findings.
+Each bullet: [metric] | [delta %] | [magnitude σ] | [confidence] | [cause]
+No preamble. No summary paragraph.
+
+---
+
+Return ONLY valid JSON matching this schema:
+{"sentiment": "positive|negative|mixed", "confidence": 0.0–1.0, "reasoning": "one sentence"}
+No markdown wrapper. No explanation outside the JSON.</pre>
+    </div>
+
+    <h3>⑧ Guard Rails — What to Never Include</h3>
+    <p>Use positive redirects, not bare negation. "Do not speculate" is weaker than "Base every claim on the data provided." Chapter 4 covers this fully — including the most common ineffective instruction on the internet.</p>
+</div>
+
+<!-- ══════════════════════════════════════════ CH4 -->
+<div id="ch4" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Four</div>
+  <h2>The Language<br>of Prompts</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">Every word choice is a decision about how much authority to delegate. Four linguistic patterns determine whether instructions are followed reliably or treated as suggestions.</p>
+
+    <!-- FIG 3: Positive vs Negative -->
+    <div class="diagram-wrap fade-up">
+      <div class="diagram-label">Fig. 3 — Positive Redirect vs. Bare Negation</div>
+      <div class="diagram-inner">
+        <div class="pn-grid">
+          <div class="pn-col-label bad">Bare Negation — Weaker</div>
+          <div class="pn-col-label mid"></div>
+          <div class="pn-col-label good">Positive Redirect — Stronger</div>
+          <div class="pn-featured">
+            <div class="pn-featured-label">⚠ Most common ineffective instruction on the internet</div>
+            <strong>"Do not hallucinate"</strong> requires the model to activate the concept of hallucination, then suppress it. Step 2 fails inconsistently (Ettinger, 2020).<br><br>
+            <strong>Replace with:</strong> <em>"Every factual claim must be directly supported by the source material provided. If the answer is not present, state: 'Not found in the provided material.'"</em>
+          </div>
+          <div class="pn-row-bad">Do not hallucinate.</div>
+          <div class="pn-arrow">→</div>
+          <div class="pn-row-good">Every claim must be supported by the source material. If not present: "Not found in the provided material."</div>
+          <div class="pn-row-bad">Do not speculate.</div>
+          <div class="pn-arrow">→</div>
+          <div class="pn-row-good">Base every claim on the data provided.</div>
+          <div class="pn-row-bad">Do not give generic advice.</div>
+          <div class="pn-arrow">→</div>
+          <div class="pn-row-good">Every recommendation must reference the specific situation described above.</div>
+          <div class="pn-row-bad">Do not make assumptions.</div>
+          <div class="pn-arrow">→</div>
+          <div class="pn-row-good">If information is missing, state explicitly what is unknown and why it matters.</div>
+          <div class="pn-row-bad">Do not be vague.</div>
+          <div class="pn-arrow">→</div>
+          <div class="pn-row-good">Every claim must include a specific example or data point.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIG 4: Language Spectrum -->
+    <div class="diagram-wrap fade-up">
+      <div class="diagram-label">Fig. 4 — Language Strength Spectrum</div>
+      <div class="diagram-inner">
+        <div class="spectrum-axis"><span>← Weaker (suggestive)</span><span>Stronger (binding) →</span></div>
+        <div class="spectrum-row"><div class="spectrum-label">Goal framing</div><div class="spectrum-examples"><div class="spec-item">Goal: Analyze the data.</div><div class="spec-item">Please analyze thoroughly.</div><div class="spec-item">Analyze and find issues.</div><div class="spec-item">Your mission: Surface every anomaly above 2σ — accomplish this fully.</div></div></div>
+        <div class="spectrum-row"><div class="spectrum-label">Rules</div><div class="spectrum-examples"><div class="spec-item">Try to be thorough.</div><div class="spec-item">You should cite sources.</div><div class="spec-item">Always cite sources.</div><div class="spec-item">Every factual claim must include source name and year.</div></div></div>
+        <div class="spectrum-row"><div class="spectrum-label">Constraints</div><div class="spectrum-examples"><div class="spec-item">Don't speculate.</div><div class="spec-item">Avoid speculation.</div><div class="spec-item">Omit speculation.</div><div class="spec-item">Base every claim on the data provided. No inference beyond it.</div></div></div>
+        <div class="spectrum-row"><div class="spectrum-label">Output format</div><div class="spectrum-examples"><div class="spec-item">Use JSON if possible.</div><div class="spec-item">Respond in JSON.</div><div class="spec-item">Respond with JSON only.</div><div class="spec-item">Return ONLY valid JSON. No prose, no markdown wrapper.</div></div></div>
+      </div>
+    </div>
+
+    <h3>Binding vs. Suggestive Modals</h3>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Suggestive — often ignored</span>You <strong>should</strong> include a confidence score.<br><strong>Try to</strong> be concise.<br><strong>Consider</strong> edge cases.</div>
+      <div class="compare-card strong"><span class="ctag">Binding — reliably followed</span>Every finding <strong>must</strong> include a confidence score.<br>Response <strong>must not</strong> exceed 500 words.<br><strong>Always</strong> address edge cases explicitly.</div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════ CH5 -->
+<div id="ch5" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Five</div>
+  <h2>Provider-Specific<br>Formatting</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">The same content, rendered differently. A 2026 benchmark found accuracy deltas of ≤0.3% between formats — but the differences matter for constraint compliance and long-context recall.</p>
+
+    <!-- FIG 5: Provider Grid -->
+    <div class="diagram-wrap fade-up">
+      <div class="diagram-label">Fig. 5 — Provider Formatting Comparison</div>
+      <div class="diagram-inner" style="padding:0;overflow-x:auto">
+        <div class="provider-grid">
+          <div class="pg-head">Aspect</div>
+          <div class="pg-head openai">OpenAI</div>
+          <div class="pg-head claude">Anthropic Claude</div>
+          <div class="pg-head gemini">Google Gemini</div>
+          <div class="pg-rl">Delimiters</div>
+          <div class="pg-cell"><span class="tag tag-md">## Markdown</span> headings preferred</div>
+          <div class="pg-cell"><span class="tag tag-xml">&lt;xml&gt;</span> tags — primary recommendation</div>
+          <div class="pg-cell"><span class="tag tag-xml">&lt;xml&gt;</span> or Markdown; pick one, be consistent</div>
+          <div class="pg-rl">Constraints</div>
+          <div class="pg-cell"><span class="tag tag-neg">Must NOT: X</span> — model is highly literal</div>
+          <div class="pg-cell"><span class="tag tag-pos">Omit X.</span> Positive redirect + reason for non-obvious rules</div>
+          <div class="pg-cell"><span class="tag tag-pos">Omit X.</span> Direct &amp; concise. No repeated guardrails.</div>
+          <div class="pg-rl">Role / persona</div>
+          <div class="pg-cell">Title + org context</div>
+          <div class="pg-cell">Title + domain only</div>
+          <div class="pg-cell">Title + <strong>trait adjectives</strong>: "precise, methodical, direct"</div>
+          <div class="pg-rl">Long context</div>
+          <div class="pg-cell"><strong>Mirror</strong> key instructions at top AND bottom of long knowledge blocks</div>
+          <div class="pg-cell">Documents at top, query at <strong>bottom</strong> — up to 30% quality improvement</div>
+          <div class="pg-cell">Context first, task at very end. Keep prompts concise.</div>
+          <div class="pg-rl">Verbosity</div>
+          <div class="pg-cell">Specify fallback for every constraint</div>
+          <div class="pg-cell">Infers context; explain rationale for unusual rules</div>
+          <div class="pg-cell">Add <code>"Be direct and efficient."</code> to task section</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>OpenAI — Full Template</h3>
+    <div class="provider-block">
+      <div class="provider-head openai">OpenAI — Markdown Format</div>
+      <pre>## ROLE
+
+You are a senior revenue analyst with 10 years of FP&A experience.
+Scope: Limit analysis to the Q4 data provided. Do not forecast.
+
+## GOAL
+
+Your mission: Surface every statistically significant anomaly
+in Q4 revenue — accomplish this fully.
+
+## RULES
+
+1. Back every claim with a specific number from the data.
+2. Flag every anomaly above 2 standard deviations from Q3 average.
+3. Separate observations from interpretations.
+4. If data is missing, say so before drawing conclusions.
+
+## OUTPUT FORMAT
+
+Return ONLY a ranked bullet list of findings.
+Each bullet: [metric] | [delta %] | [magnitude σ] | [confidence] | [interpretation]
+No preamble. No summary paragraph.
+
+## GUARD RAILS
+
+- Must NOT include: speculation about future performance.
+- Must NOT include: generic financial commentary.
+- Must NOT include: hedging phrases (probably, might, could be).
+
+---
+
+## YOUR TASK
+
+Analyze the Q4 revenue data below:
+
+[data here]
+
+---
+
+## REMINDER (re-stated after long data)
+
+Surface every anomaly above 2σ. Ranked bullet list only.</pre>
+    </div>
+
+    <h3>Anthropic Claude — Full Template</h3>
+    <div class="provider-block">
+      <div class="provider-head claude">Anthropic Claude — XML Format</div>
+      <pre>&lt;role&gt;
+You are a senior revenue analyst with 10 years of FP&A experience.
+Scope: Limit analysis to Q4 data only. Do not forecast.
+&lt;/role&gt;
+
+&lt;goal&gt;
+Your mission: Surface every statistically significant anomaly
+in Q4 revenue — accomplish this fully.
+&lt;/goal&gt;
+
+&lt;rules&gt;
+1. Back every claim with a specific number from the data.
+2. Flag every anomaly above 2 standard deviations from Q3.
+3. Separate observations from interpretations.
+&lt;/rules&gt;
+
+&lt;output_format&gt;
+Return ONLY a ranked bullet list of findings.
+Each bullet: [metric] | [delta %] | [magnitude σ] | [confidence] | [interpretation]
+&lt;/output_format&gt;
+
+&lt;guard_rails&gt;
+Omit speculation. (Reason: this output goes directly to the board.)
+Omit generic financial commentary.
+Omit hedging: probably, might, could be, appears to.
+&lt;/guard_rails&gt;
+
+&lt;context&gt;
+[Q4 revenue data here]
+&lt;/context&gt;
+
+&lt;task&gt;
+Analyze the Q4 data above. Surface every anomaly above 2σ.
+Return findings as a ranked bullet list.
+&lt;/task&gt;</pre>
+    </div>
+
+    <h3>Google Gemini — Full Template</h3>
+    <div class="provider-block">
+      <div class="provider-head gemini">Google Gemini — XML Format + Trait Adjectives</div>
+      <pre>&lt;role&gt;
+You are a senior revenue analyst with 10 years of FP&A experience.
+You are precise, methodical, and direct.
+Scope: Limit analysis to Q4 data only. Do not forecast.
+&lt;/role&gt;
+
+&lt;goal&gt;
+Your mission: Surface every statistically significant anomaly
+in Q4 revenue — accomplish this fully.
+&lt;/goal&gt;
+
+&lt;rules&gt;
+1. Back every claim with a specific number from the data.
+2. Flag every anomaly above 2 standard deviations from Q3.
+3. Separate observations from interpretations.
+&lt;/rules&gt;
+
+&lt;output_format&gt;
+Return ONLY a ranked bullet list of findings.
+Each bullet: [metric] | [delta %] | [magnitude σ] | [confidence] | [interpretation]
+&lt;/output_format&gt;
+
+&lt;guard_rails&gt;
+Omit speculation. Omit generic commentary. Omit hedging language.
+&lt;/guard_rails&gt;
+
+&lt;context&gt;
+[Q4 revenue data here]
+&lt;/context&gt;
+
+&lt;task&gt;
+Analyze the Q4 data above. Surface every anomaly above 2σ.
+Return findings as a ranked bullet list.
+
+Be direct and efficient. Avoid unnecessary preamble.
+&lt;/task&gt;</pre>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════ CH6 -->
+<div id="ch6" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Six</div>
+  <h2>Complete Worked<br>Examples</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">From a vague starting point to a production-ready prompt — two full builds across security review and executive briefing.</p>
+    <h3>Example 1 — Security Code Review (OpenAI)</h3>
+    <div class="callout danger"><strong>Starting point:</strong> "Review my code for security issues."<br>
+    <strong>Problem:</strong> No role, no scope, no rules, no format, no guard rails. The AI produces a generic list of theoretical vulnerabilities with no locations, no severity ranking, and no specific fixes.</div>
+    <div class="provider-block">
+      <div class="provider-head openai">Production-ready — OpenAI</div>
+      <pre>## ROLE
+
+You are a staff-level application security engineer specializing in Python.
+Scope: Review only the Python files provided. Do not assess infrastructure
+or CI/CD pipelines.
+
+## GOAL
+
+Your mission: Identify every exploitable vulnerability in the authentication
+module and provide a working remediation for each — accomplish this fully.
+
+## RULES
+
+1. Every vulnerability must cite the exact file path and line number.
+2. Every finding must include a working code fix, not just a description.
+3. Rank findings: Critical → High → Medium → Low.
+4. Do not flag theoretical risks without evidence in the provided code.
+5. If the code is secure, state that explicitly.
+
+## OUTPUT FORMAT
+
+Return ONLY a numbered list:
+[SEVERITY] file_path:line — Description — Fix
+
+## GUARD RAILS
+
+- Must NOT include: generic security advice.
+- Must NOT include: findings without a file location.
+- Must NOT include: style or naming convention issues.
+
+---
+
+## YOUR TASK
+
+Review the following Python authentication module:
+
+[code here]</pre>
+    </div>
+
+    <h3>Example 2 — Executive Summary (Anthropic)</h3>
+    <div class="callout danger"><strong>Starting point:</strong> "Summarize this research report for my CEO."<br>
+    <strong>Problem:</strong> No length limit, no format, no understanding that a CEO needs decisions not details, no guard rails against jargon.</div>
+    <div class="provider-block">
+      <div class="provider-head claude">Production-ready — Anthropic Claude</div>
+      <pre>&lt;role&gt;
+You are an executive communications specialist who translates technical
+research into board-level briefings.
+Scope: Summarize only the content of the report provided.
+&lt;/role&gt;
+
+&lt;goal&gt;
+Your mission: Give the CEO one clear decision and the minimum evidence
+needed to defend it in a board meeting — accomplish this fully.
+&lt;/goal&gt;
+
+&lt;rules&gt;
+1. Lead with the decision — never the methodology.
+2. Every claim must trace directly to the report.
+3. Define every acronym on first use.
+4. If the report does not support a clear recommendation, state that.
+&lt;/rules&gt;
+
+&lt;output_format&gt;
+Return a 3-part structure:
+1. DECISION (1 sentence)
+2. THREE KEY FINDINGS (3 bullets)
+3. BIGGEST RISK (1 sentence)
+No other sections. No preamble.
+&lt;/output_format&gt;
+
+&lt;guard_rails&gt;
+Omit statistical methodology and p-values.
+Omit technical implementation detail.
+Omit hedging: probably, might, appears to.
+&lt;/guard_rails&gt;
+
+&lt;context&gt;[research report here]&lt;/context&gt;
+
+&lt;task&gt;Produce the executive briefing for the report above.&lt;/task&gt;</pre>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════ CH7 -->
+<div id="ch7" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Seven</div>
+  <h2>The 20 Most<br>Common Mistakes</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">A reference checklist. Review your prompt against this list before sending it.</p>
+    <ul class="rules-list" style="max-width:100%">
+      <li data-n="01"><div><strong>No role at all.</strong> The AI defaults to a generic helpful assistant. Specify who it is.</div></li>
+      <li data-n="02"><div><strong>Generic role.</strong> "You are an expert" is meaningless. Add seniority, domain, and context.</div></li>
+      <li data-n="03"><div><strong>Task at the beginning.</strong> The task should always be last. Anything before it is context for it.</div></li>
+      <li data-n="04"><div><strong>Declarative goal.</strong> "Goal: analyze the data" describes an area. "Your mission: identify every anomaly above 2σ — accomplish this fully" defines done.</div></li>
+      <li data-n="05"><div><strong>Writing "Do not hallucinate."</strong> The most common ineffective instruction. Replace with: "Every claim must be supported by the source material. If not present, state: 'Not found in the provided material.'"</div></li>
+      <li data-n="06"><div><strong>Bare negation in guard rails.</strong> "Do not speculate" fails more often than "Base every claim on the data provided."</div></li>
+      <li data-n="07"><div><strong>Suggestive modals in hard constraints.</strong> "You should include a confidence score" is optional. "Every finding must include a confidence score" is not.</div></li>
+      <li data-n="08"><div><strong>No output contract.</strong> Without one, the AI decides the format. It will produce more than you need — with preamble and unsolicited conclusions.</div></li>
+      <li data-n="09"><div><strong>Format and style mixed together.</strong> "Be formal and use bullet points and no headers and be direct" is one instruction parsed inconsistently. Separate voice from structure.</div></li>
+      <li data-n="10"><div><strong>Role without scope.</strong> Specific roles expand. "Security engineer" will review your entire infrastructure. Add a <code>Scope:</code> line.</div></li>
+      <li data-n="11"><div><strong>Examples at the start.</strong> Examples should go after rules — so the model understands constraints before seeing demos.</div></li>
+      <li data-n="12"><div><strong>Too many examples.</strong> More than 5 rarely improves quality. 2–3 representative examples outperform 8 exhaustive ones.</div></li>
+      <li data-n="13"><div><strong>Vague "be thorough" instructions.</strong> Not measurable, not binding. "Every finding must include at least 3 supporting data points" is.</div></li>
+      <li data-n="14"><div><strong>No instruction for missing information.</strong> If data is missing, what should the AI do? State it explicitly.</div></li>
+      <li data-n="15"><div><strong>Passive voice in instructions.</strong> "Confidence scores should be included" is weaker than "Include a confidence score in every finding."</div></li>
+      <li data-n="16"><div><strong>No reasoning strategy for multi-step problems.</strong> Without <code>step_by_step</code>, the model jumps to conclusions.</div></li>
+      <li data-n="17"><div><strong>Conflicting instructions without priority.</strong> If two rules conflict, the model resolves it arbitrarily. State priority explicitly.</div></li>
+      <li data-n="18"><div><strong>Not specifying the audience.</strong> "Write for a non-technical audience" is meaningfully different from "Write for a senior engineer."</div></li>
+      <li data-n="19"><div><strong>Not using "Return ONLY".</strong> The two words that most reliably suppress preamble, hedging, and unwanted conclusions.</div></li>
+      <li data-n="20"><div><strong>Not iterating.</strong> A first prompt is a hypothesis. Run it, identify which section failed, fix that section. Good prompts are engineered, not typed.</div></li>
+    </ul>
+</div>
+
+<!-- ══════════════════════════════════════════ CH8 -->
+<div id="ch8" class="chapter-block">
+  <div class="ch-eyebrow">Chapter Eight</div>
+  <h2>The mycontext-ai<br>SDK</h2>
+  <hr class="ch-rule">
+  <p class="ch-intro">Every principle in this guide — the 9-section architecture, binding rules, positive constraint framing, provider rendering — is built into the mycontext-ai SDK. Three layers: build prompts, optimize them automatically, and evaluate outputs with research-backed rubrics.</p>
+
+    <h3>Install</h3>
+    <div class="code-block">
+      <div class="code-label">pip</div>
+      <pre>pip install mycontext-ai</pre>
+    </div>
+
+    <div class="sdk-grid">
+      <div class="sdk-card">
+        <div class="sdk-card-label">SDK Source</div>
+        <p>Python SDK — install via pip and start building with cognitive templates.</p>
+        <a href="https://pypi.org/project/mycontext-ai/" class="sdk-link" target="_blank">pypi.org/project/mycontext-ai →</a>
+      </div>
+      <div class="sdk-card">
+        <div class="sdk-card-label">Documentation Site</div>
+        <p>Full API reference, guides, cognitive pattern catalog, and interactive examples.</p>
+        <a href="https://mycontext-docs.pages.dev" class="sdk-link" target="_blank">mycontext-docs.pages.dev →</a>
+      </div>
+      <div class="sdk-card">
+        <div class="sdk-card-label">Web App</div>
+        <p>Browser-based prompt builder, chain builder, and template library — no setup required.</p>
+        <a href="https://app.sadhiraai.com" class="sdk-link" target="_blank">app.sadhiraai.com →</a>
+      </div>
+      <div class="sdk-card">
+        <div class="sdk-card-label">PyPI</div>
+        <p>Latest release, version history, and install instructions on PyPI.</p>
+        <a href="https://pypi.org/project/mycontext-ai" class="sdk-link" target="_blank">pypi.org/project/mycontext-ai →</a>
+      </div>
+    </div>
+
+    <hr class="sec-rule">
+
+    <!-- ── LAYER 1: Context (build) ── -->
+    <h3>Layer 1 — Build: <code>Context</code></h3>
+    <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1.2rem">Turn the 9-section architecture into a structured Python object. The SDK handles section ordering, provider-specific formatting, and imperative goal framing automatically.</p>
+    <div class="code-block">
+      <div class="code-label">Python — mycontext-ai</div>
+      <pre>from mycontext import Context, Guidance, Directive, Constraints
+
+ctx = Context(
+    guidance=Guidance(
+        role="Senior revenue analyst with 10 years of FP&amp;A experience",
+        goal="Surface every statistically significant anomaly in Q4 revenue",
+        persona_scope="Limit analysis to the data provided. Do not forecast.",
+        rules=[
+            "Back every claim with a specific number from the data",
+            "Flag every anomaly above 2 standard deviations from Q3",
+            "Separate observations from interpretations",
+            "State confidence level (high/medium/low) for every interpretation",
+        ],
+        style="Formal, analytical, third-person. No hedging.",
+    ),
+    directive=Directive("Analyze the Q4 revenue data below for anomalies."),
+    constraints=Constraints(
+        output_contract="Return ONLY a ranked bullet list: metric | delta % | magnitude | confidence | interpretation.",
+        must_not_include=["speculation", "forecasts", "generic commentary"],
+    ),
+    research_flow=True,         # 9-section ordering — always correct
+    provider_hint="anthropic",  # XML delimiters + positive constraint reframe
+)
+
+result = ctx.execute(provider="anthropic", model="claude-opus-4-5")
+
+# Same context, three provider renderings — no manual reformatting
+ctx_openai = ctx.model_copy(update={"provider_hint": "openai"})   # Markdown headings
+ctx_gemini = ctx.model_copy(update={"provider_hint": "gemini"})   # XML + trait adjectives</pre>
+    </div>
+
+    <h3>What the SDK handles automatically</h3>
+    <div class="feat-table">
+      <div class="ft-head">Writing manually</div>
+      <div class="ft-head">mycontext-ai</div>
+      <div class="ft-bad">Remembering the correct section order</div>
+      <div class="ft-good">Built in via <code>research_flow=True</code> — always correct</div>
+      <div class="ft-bad">Writing imperative goal framing</div>
+      <div class="ft-good">Automatic: "Your mission: X — accomplish this fully."</div>
+      <div class="ft-bad">Switching delimiters per provider</div>
+      <div class="ft-good"><code>provider_hint="anthropic"</code> → XML; <code>"openai"</code> → Markdown</div>
+      <div class="ft-bad">Positive reframing of must_not_include</div>
+      <div class="ft-good">Automatic for Anthropic and Gemini provider hints</div>
+      <div class="ft-bad">Quality scoring before sending</div>
+      <div class="ft-good"><code>QualityMetrics().evaluate(ctx)</code> — 6 dimensions, heuristic or LLM</div>
+      <div class="ft-bad">Framework export</div>
+      <div class="ft-good"><code>ctx.to_langchain()</code>, <code>ctx.to_crewai()</code>, <code>ctx.to_autogen()</code></div>
+    </div>
+
+    <hr class="sec-rule">
+
+    <!-- ── LAYER 2: PromptArchitect ── -->
+    <h3>Layer 2 — Optimize: <code>PromptArchitect</code></h3>
+    <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1.2rem">Takes any raw prompt string and applies the 9-section architecture automatically — parsing what exists, scoring quality, rewriting weak or missing sections, and returning a before/after diff. Also builds complete prompts from a plain task description.</p>
+    <div class="callout success" style="margin-bottom:1.2rem">
+      <strong>Three entry points</strong> — <code>parse()</code> detects sections heuristically (no LLM). <code>build()</code> constructs a full 9-section prompt from a task description (1 LLM call). <code>improve()</code> rewrites an existing prompt and scores the change.
+    </div>
+    <div class="code-block">
+      <div class="code-label">Python — PromptArchitect</div>
+      <pre>from mycontext.intelligence import PromptArchitect
+
+arch = PromptArchitect(provider="openai", model="gpt-4o-mini")
+
+# ── Improve an existing weak prompt ──────────────────────────────
+result = arch.improve("You are an analyst. Summarize this data.")
+
+print(result.summary())
+# Score: 18% → 74%  (+56%)
+# Added sections: role, goal, rules, style, reasoning, output_contract, guard_rails
+# Resolved 5 issues: missing_goal; missing_rules; generic_role; ...
+
+print(result.diff_report())
+# [STRENGTHENED]  § ROLE
+#   BEFORE: analyst
+#   AFTER:  Senior data analyst specializing in business metrics and trend analysis
+#   WHY:    Existing content was weak — upgraded per: Include seniority level
+
+# [ADDED]  § GOAL
+#   AFTER:  Identify the three most significant patterns and state their business impact
+#   WHY:    Section was absent; added: Use imperative framing
+
+# ── Build from a task description ────────────────────────────────
+result = arch.build("Analyze customer churn and identify at-risk segments")
+print(result.improved_prompt)   # Complete 9-section prompt, ready to use</pre>
+    </div>
+
+    <hr class="sec-rule">
+
+    <!-- ── LAYER 2b: GuidanceOptimizer ── -->
+    <h3>Layer 2 — Optimize SDK Templates: <code>GuidanceOptimizer</code></h3>
+    <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1.2rem">For SDK templates that use <code>Guidance</code> objects — audits every rule for the three most common weaknesses and rewrites only the weak ones using an LLM. Binding rules are kept exactly as written.</p>
+    <div class="callout warn" style="margin-bottom:1.2rem">
+      <strong>Three weaknesses it targets:</strong> (1) Suggestive modals — "should/try to/ideally" → "must/always/never". (2) Vague directives — "be accurate" → a specific, testable criterion. (3) Under-specified rules — anything under 5 words with no measurable condition.
+    </div>
+    <div class="code-block">
+      <div class="code-label">Python — GuidanceOptimizer</div>
+      <pre>from mycontext.intelligence import GuidanceOptimizer
+from mycontext.foundation import Guidance
+
+guidance = Guidance(
+    role="Data analyst",
+    rules=[
+        "Try to look for patterns",          # weak: suggestive modal
+        "You should mention limitations",    # weak: suggestive modal
+        "Be accurate",                       # weak: vague directive
+        "Every claim must cite the specific data point that supports it",  # binding — kept
+    ],
+)
+
+opt = GuidanceOptimizer(provider="openai", model="gpt-4o-mini")
+
+# Audit only — no LLM call
+audit = opt.audit(guidance)
+print(audit.summary())
+# Rules: 4 total  |  1 binding  |  3 weak  |  Strength: 28%
+
+# Optimize — rewrites weak rules only
+result = opt.optimize(guidance)
+print(result.audit_report())
+# Rule strength: 28% → 91%  (+63%)  |  3/4 rules rewritten
+
+print(result.optimized_guidance.rules)
+# [
+#   "Identify and quantify every pattern — report the metric and its value.",
+#   "Must explicitly state each data gap: what is absent and what it prevents.",
+#   "Every numeric claim must reference the exact figure from the dataset.",
+#   "Every claim must cite the specific data point that supports it.",   # unchanged
+# ]</pre>
+    </div>
+
+    <hr class="sec-rule">
+
+    <!-- ── LAYER 3: Evaluate — our own metrics ── -->
+    <h3>Layer 3 — Evaluate: <code>QualityMetrics</code> + <code>OutputEvaluator</code></h3>
+    <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1.2rem">Two built-in evaluators — no external dependencies, no LLM cost in heuristic mode. One scores your <strong>prompt before you send it</strong>. The other scores the <strong>model's response after you receive it</strong>. Together they close the full feedback loop.</p>
+
+    <div class="callout success" style="margin-bottom:1.2rem">
+      <strong>QualityMetrics</strong> — scores the prompt itself across 6 dimensions: Clarity, Completeness, Specificity, Relevance, Structure, Efficiency. Runs in &lt;1ms heuristically. Use it as a gate before sending — catch missing roles, vague rules, and weak directives before they cost you a model call.
+    </div>
+    <div class="code-block">
+      <div class="code-label">Python — QualityMetrics (prompt quality, before sending)</div>
+      <pre>from mycontext.intelligence import QualityMetrics
+
+qm = QualityMetrics()   # heuristic by default — free, instant
+
+score = qm.evaluate(ctx)
+print(f"Overall: {score.overall:.0%}")   # e.g. 72%
+
+# Per-dimension breakdown
+for dim, s in score.dimensions.items():
+    print(f"  {dim.value}: {s:.0%}")
+# clarity:       85%   ← strong binding language, low pronoun ratio
+# completeness:  60%   ← missing examples
+# specificity:   70%   ← good, could add edge cases
+# relevance:     80%
+# structure:     75%
+# efficiency:    65%
+
+# Issues the evaluator caught
+for issue in score.issues:
+    print(f"  ! {issue}")
+# ! No examples -- add concrete examples of expected input/output
+# ! Directive is long (112 words) -- move detail into rules/constraints
+
+# Actionable suggestions
+for s in score.suggestions:
+    print(f"  → {s}")
+# → Add concrete examples and tighter constraints to reach excellence.</pre>
+    </div>
+
+    <div class="callout success" style="margin-bottom:1.2rem;margin-top:1.5rem">
+      <strong>OutputEvaluator</strong> — scores the model's response across 5 dimensions: Instruction Following, Reasoning Depth, Actionability, Structure Compliance, Cognitive Scaffolding. Heuristic by default; switch to LLM mode for deeper analysis. Detects hedging, vague conclusions, missing structure, and refusals.
+    </div>
+    <div class="code-block">
+      <div class="code-label">Python — OutputEvaluator (output quality, after receiving)</div>
+      <pre>from mycontext.intelligence import OutputEvaluator
+
+evaluator = OutputEvaluator()         # heuristic — free, instant
+# evaluator = OutputEvaluator(mode="llm")      # LLM judge — deeper, costs ~$0.002/eval
+# evaluator = OutputEvaluator(mode="hybrid")   # heuristic first, LLM only if borderline
+
+score = evaluator.evaluate(context=ctx, output=llm_response)
+print(f"Overall: {score.overall:.0%}")   # e.g. 81%
+
+# Per-dimension breakdown
+for dim, s in score.dimensions.items():
+    ev = score.evidence[dim]
+    print(f"  {dim.value}: {s:.0%}  ({ev})")
+# instruction_following: 88%  (Matched 7/8 action verbs, 3/3 required terms)
+# reasoning_depth:       75%  (12 reasoning markers, 4 quantified claims)
+# actionability:         70%  (8 action phrases | Gap-honest statements: 2)
+# structure_compliance:  90%  (List found, Headers found)
+# cognitive_scaffolding: 80%  (Output uses 3/4 cognitive frameworks from context)
+
+print(evaluator.report(score))   # Full formatted report</pre>
+    </div>
+
+    <div class="feat-table" style="margin-top:1.5rem">
+      <div class="ft-head">Dimension</div>
+      <div class="ft-head">What it catches</div>
+      <div class="ft-bad">Clarity (QM)</div>
+      <div class="ft-good">Vague words, high pronoun ratio, suggestive modals ("should/try to"), hedge density</div>
+      <div class="ft-bad">Completeness (QM)</div>
+      <div class="ft-good">Missing role, goal, rules, constraints, or examples in the prompt</div>
+      <div class="ft-bad">Specificity (QM)</div>
+      <div class="ft-good">Generic phrases ("be helpful"), no domain terminology, brief directives</div>
+      <div class="ft-bad">Instruction Following (OE)</div>
+      <div class="ft-good">Model ignored action verbs, missed required terms, or gave a refusal</div>
+      <div class="ft-bad">Reasoning Depth (OE)</div>
+      <div class="ft-good">No causal markers, no quantified claims, no evidence citations</div>
+      <div class="ft-bad">Actionability (OE)</div>
+      <div class="ft-good">Heavy hedging ("it depends", "generally speaking"), no concrete next steps</div>
+      <div class="ft-bad">Structure Compliance (OE)</div>
+      <div class="ft-good">Expected JSON/list/headers missing from output</div>
+      <div class="ft-bad">Cognitive Scaffolding (OE)</div>
+      <div class="ft-good">Model ignored the analytical framework the prompt was built around</div>
+    </div>
+
+    <h3 style="margin-top:2rem">Using both together — the quality gate pattern</h3>
+    <div class="code-block">
+      <div class="code-label">Python — full quality gate</div>
+      <pre>from mycontext.intelligence import QualityMetrics, OutputEvaluator
+
+qm = QualityMetrics()
+evaluator = OutputEvaluator()
+
+# ── Step 1: Gate the prompt before sending ────────────────────────
+prompt_score = qm.evaluate(ctx)
+if prompt_score.overall < 0.65:
+    print("Prompt quality too low — fix before sending:")
+    for issue in prompt_score.issues:
+        print(f"  ! {issue}")
+else:
+    # ── Step 2: Send and score the output ─────────────────────────
+    result = ctx.execute(provider="openai", model="gpt-4o-mini")
+    output_score = evaluator.evaluate(context=ctx, output=result.response)
+
+    print(f"Prompt quality:  {prompt_score.overall:.0%}")
+    print(f"Output quality:  {output_score.overall:.0%}")
+
+    if output_score.overall < 0.60:
+        print("Output quality low — check these weaknesses:")
+        for w in output_score.weaknesses:
+            print(f"  - {w}")</pre>
+    </div>
+
+    <hr class="sec-rule">
+
+    <!-- ── Optional deeper layer: eval_criteria ── -->
+    <h3>Optional deeper layer: <code>eval_criteria</code></h3>
+    <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1.2rem">When heuristic scoring isn't enough — for experiment validation, benchmarking new templates, or catching nuanced failures the regex can't see — <code>eval_criteria</code> provides pre-built LLM-judge rubrics that plug directly into DeepEval. Use on-demand, not on every run.</p>
+    <div class="callout" style="margin-bottom:1.2rem">
+      <strong>When to use:</strong> The built-in heuristic evaluators catch structural problems fast and free. <code>eval_criteria</code> catches <em>semantic</em> problems — a claim that looks evidenced but isn't, a data gap that's hedged over instead of named, causation asserted without a mechanism. Run it when you need ground truth on a set of test cases, not in your production loop.
+    </div>
+    <div class="code-block">
+      <div class="code-label">Python — eval_criteria (optional, requires: pip install deepeval)</div>
+      <pre>from mycontext.intelligence.eval_criteria import get_criteria, to_deepeval_metrics
+
+# Pre-built bundles — pick one for your use case
+criteria = get_criteria("data_analysis")
+# Includes: evidence_citation, causation_discipline, data_gap_honesty, actionability
+
+# Available bundles:
+# "data_analysis"         → evidence_citation, causation_discipline, data_gap_honesty, actionability
+# "reasoning"             → reasoning_soundness, evidence_citation, causation_discipline, cognitive_scaffolding_use
+# "instruction_following" → instruction_adherence, structure_compliance
+# "code_review"           → code_review_severity_accuracy, code_review_actionability
+# "general"               → instruction_adherence, actionability, reasoning_soundness
+
+metrics = to_deepeval_metrics(criteria, model="gpt-4o-mini")</pre>
+    </div>
+
+    <hr class="sec-rule">
+
+    <!-- ── Three-layer summary ── -->
+    <h3>The three layers together</h3>
+    <div class="feat-table">
+      <div class="ft-head">Layer</div>
+      <div class="ft-head">Tool &amp; purpose</div>
+      <div class="ft-bad">1 — Build</div>
+      <div class="ft-good"><code>Context</code> · <code>Guidance</code> · <code>Directive</code> · <code>Constraints</code> — structured 9-section prompt assembly with automatic provider rendering</div>
+      <div class="ft-bad">2 — Optimize</div>
+      <div class="ft-good"><code>PromptArchitect</code> (raw prompts) · <code>GuidanceOptimizer</code> (SDK templates) — parse, score, rewrite, section-level diff</div>
+      <div class="ft-bad">3 — Evaluate (primary)</div>
+      <div class="ft-good"><code>QualityMetrics</code> — prompt quality before sending · <code>OutputEvaluator</code> — output quality after receiving · both heuristic, no cost</div>
+      <div class="ft-bad">3 — Evaluate (deep)</div>
+      <div class="ft-good"><code>eval_criteria</code> — LLM-judge rubrics via DeepEval · use for experiment validation and benchmark runs, not production loop</div>
+    </div>
+
+    <hr class="sec-rule">
+
+    <h3>Citations</h3>
+    <ul class="rules-list" style="max-width:100%;font-size:0.78rem">
+      <li data-n="[1]"><div><strong>Liu et al. (2023)</strong> — Lost in the Middle: How Language Models Use Long Contexts. arXiv:2307.03172 → U-shaped attention curve; primacy/recency zone placement.</div></li>
+      <li data-n="[2]"><div><strong>Li et al. (2023)</strong> — Contrastive Length Learning → +9.7 BLEU from placing task instruction in recency zone.</div></li>
+      <li data-n="[3]"><div><strong>Li et al. (2025)</strong> — The Role of Demonstration Position in Few-Shot Learning → Middle-zone examples produce more stable calibration.</div></li>
+      <li data-n="[4]"><div><strong>Ettinger (2020)</strong> — What BERT Is Not. Transactions of ACL, 8, 34–48 → Negation processing failures; positive reframing basis.</div></li>
+      <li data-n="[5]"><div><strong>Shanahan et al. (2023)</strong> — Role Play with Large Language Models. Nature, 623, 493–498 → The Persona Effect — role scope expansion.</div></li>
+      <li data-n="[6]"><div><strong>Wierzbicka (1987)</strong> — English Speech Act Verbs → Imperative vs. declarative linguistic force.</div></li>
+      <li data-n="[7]"><div><strong>Zhang et al. (2025)</strong> — Order Matters: Instruction Ordering Effects in LLMs → Hard constraints placed earlier are applied more reliably.</div></li>
+      <li data-n="[8]"><div><strong>Sweller (1988)</strong> — Cognitive Load Theory → Separating style and format instructions.</div></li>
+      <li data-n="[9]"><div><strong>Ng (2024)</strong> — CO-STAR Framework. GovTech Singapore → Output format and guard rails positioning.</div></li>
+      <li data-n="[10]"><div><strong>OpenAI (2025)</strong> — GPT-4.1 Prompting Guide. cookbook.openai.com → Markdown-first, instruction mirroring for long context.</div></li>
+      <li data-n="[11]"><div><strong>Anthropic (2025)</strong> — Prompt Engineering: Use XML Tags. docs.anthropic.com → XML primary, positive framing, docs-at-top/query-at-bottom.</div></li>
+      <li data-n="[12]"><div><strong>Google (2025)</strong> — Gemini API Prompting Strategies. ai.google.dev → Context-first, XML/Markdown, verbosity control, trait adjectives.</div></li>
+      <li data-n="[13]"><div><strong>Sadhira AI (2026)</strong> — The Delimiter Hypothesis. 600 model calls across OpenAI and Anthropic frontier models → Format deltas ≤0.3%; XML most robust under adversarial conditions.</div></li>
+      <li data-n="[14]"><div><strong>Sadhira AI (2026)</strong> — Structured Reasoning: Model Cost vs. Accuracy → All model tiers achieve identical accuracy with a structured template.</div></li>
+    </ul>
+</div>
+
+<!-- ══════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  <span><strong style="color:var(--text)">Stop Guessing. Start Contextualizing Prompts.</strong> — The Complete Prompt Engineering Guidebook</span>
+  <span>Conceived and authored by <strong style="color:var(--text-dim)">Dhiraj Pokhrel</strong> — Sadhira AI — 2026</span>
+  <span>Docs: <a href="https://mycontext-docs.pages.dev">mycontext-docs.pages.dev</a> &nbsp;·&nbsp; App: <a href="https://app.sadhiraai.com">app.sadhiraai.com</a></span>
+  <span>Version 1.0 — Research-backed. Production-ready.</span>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// Scroll-triggered fade-up for diagrams (screen only)
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+// Before printing / saving as PDF: make ALL fade-up elements visible
+// so blank gaps never appear in the PDF
+function revealAll() {
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.classList.add('visible');
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  });
+}
+window.addEventListener('beforeprint', revealAll);
+// Also reveal immediately if user clicks the PDF button
+document.querySelector('.print-btn')?.addEventListener('click', revealAll);
+</script>
+</body>
+</html>

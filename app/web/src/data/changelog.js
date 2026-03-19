@@ -1,4 +1,16 @@
-﻿export const CHANGELOG_ENTRIES = [
+export const CHANGELOG_ENTRIES = [
+  {
+    date: "2026-03-18",
+    title: "Context Studio v0.8 (Frontend)",
+    items: [
+      "Pit Stop — prompt improver now in the same panel as Take the Wheel and Let AI Drive",
+      "Let AI Drive: copilot fixed to right edge for full-width wizard, same feel as Take the Wheel",
+      "Analyze (Free) works without login — heuristic section detection, no API key needed",
+      "Model dropdown with choices (OpenAI, Anthropic, Google) in Pit Stop",
+      "Profile dropdown always visible above copilot (z-index fix)",
+      "Fixed duplicate output format and role/goal text duplication in assembled prompts",
+    ],
+  },
   {
     date: "2026-02-15",
     title: "Complete UI Revamp",

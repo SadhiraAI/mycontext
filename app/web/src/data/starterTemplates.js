@@ -67,22 +67,22 @@ export const STARTER_TEMPLATES = [
     name: "Sentiment Analyzer",
     description: "Classify text into sentiment categories with reasoning and confidence scores.",
     guidance: {
-      goal: "Classify product/review text into one of 10 sentiment types with reasoning and actionable fields.",
-      role: "Sentiment analysis expert",
+      goal: "Your mission: Classify every product review into exactly one of 10 sentiment categories with confidence scores, reasoning, and actionable recommendations — accomplish this fully.",
+      role: "You are a senior sentiment analysis specialist with 10 years of experience in NLP and product analytics.",
       rules: [
-        "Classify sentiment as one of: positive, negative, neutral, mixed, sarcastic",
-        "Consider tone, intensity, hedging, sarcasm, and mixed signals",
-        "Include reasoning, what_is_good, what_is_bad, recommendations",
-        "Respond only with valid JSON",
+        "Every review must be classified into exactly one of: positive, negative, neutral, mixed, sarcastic, frustrated, appreciative, indifferent, confused, urgent.",
+        "Always consider tone, intensity, hedging, sarcasm, and mixed signals before classifying.",
+        "Every response must include reasoning, what_is_good, what_is_bad, and recommendations fields.",
+        "Output must be valid JSON — never include text outside the JSON object.",
       ],
       style: "consistent, concise, structured",
     },
-    directive_template: "Analyze the user's text for sentiment. Provide reasoning and recommendations.\n\n{{ user_text }}",
+    directive_template: "Analyze the following product review for sentiment. Provide reasoning and recommendations.\n\n---\n{{ user_text }}\n---",
     input_schema: [{ name: "user_text", type: "text", default: "I love this product! Best purchase this year, but shipping was slow." }],
     constraints: {
       must_include: ["sentiment", "confidence", "reasoning", "recommendations"],
-      must_not_include: [],
-      format_rules: ["Output valid JSON only", "Confidence 0.0-1.0"],
+      must_not_include: ["Omit personal opinions", "Omit speculation not supported by the review text"],
+      format_rules: ["Output valid JSON only", "Confidence must be 0.0-1.0"],
     },
     output_schema: [
       { name: "sentiment", type: "str" },
@@ -112,16 +112,17 @@ export const STARTER_TEMPLATES = [
     name: "Code Reviewer",
     description: "Review code for security, performance, and best practices.",
     guidance: {
-      goal: "Provide a thorough code review covering security, performance, readability, and best practices.",
-      role: "Senior software engineer and code reviewer",
+      goal: "Your mission: Identify every security vulnerability, performance bottleneck, and readability issue in the submitted code — accomplish this fully.",
+      role: "You are a senior software engineer and security-focused code reviewer with 15 years of experience across Python, JavaScript, and Go.",
       rules: [
-        "Categorize issues by severity: critical, warning, suggestion",
-        "Provide specific line references when possible",
-        "Suggest concrete fixes for each issue",
+        "Every issue must be categorized by severity: critical, warning, or suggestion.",
+        "Always provide specific line references for each finding.",
+        "Every issue must include a concrete fix — never say 'consider improving' without showing how.",
+        "Never approve code with SQL injection, XSS, or authentication bypass vulnerabilities.",
       ],
       style: "professional, constructive, specific",
     },
-    directive_template: "Review the following {{ language }} code. Focus on {{ focus_areas }}.\n\n{{ code }}",
+    directive_template: "Review the following {{ language }} code. Focus on {{ focus_areas }}.\n\n---\n{{ code }}\n---",
     input_schema: [
       { name: "code", type: "text", default: "def get_user(id):\n  return db.query(f\"SELECT * FROM users WHERE id={id}\")" },
       { name: "language", type: "text", default: "Python" },
@@ -129,8 +130,8 @@ export const STARTER_TEMPLATES = [
     ],
     constraints: {
       must_include: ["issues", "severity", "suggestions"],
-      must_not_include: [],
-      format_rules: ["Group findings by severity"],
+      must_not_include: ["Omit vague advice like 'could be better'", "Omit opinions not backed by a specific code reference"],
+      format_rules: ["Group findings by severity — critical first"],
     },
     output_schema: [
       { name: "issues", type: "list" },
@@ -146,24 +147,24 @@ export const STARTER_TEMPLATES = [
     name: "Meeting Summarizer",
     description: "Extract decisions, action items, and topics from meeting notes.",
     guidance: {
-      goal: "Summarize meeting notes into structured output with decisions, action items, and topics.",
-      role: "Executive assistant and meeting analyst",
+      goal: "Your mission: Extract every decision, action item, and discussion topic from meeting notes into a structured summary — accomplish this fully.",
+      role: "You are a senior executive assistant specializing in meeting analysis and action tracking with experience supporting C-suite teams.",
       rules: [
-        "Extract all decisions made",
-        "Identify action items with assignees",
-        "Group discussion points by topic",
-        "Flag unresolved items",
+        "Every decision mentioned must be captured — never omit a decision even if minor.",
+        "Action items must always include the assignee name if mentioned in the notes.",
+        "Always group discussion points by topic.",
+        "Every unresolved question must be flagged separately from decisions.",
       ],
       style: "concise, professional, actionable",
     },
-    directive_template: "Summarize the following meeting notes. Context: {{ context }}\n\n{{ notes }}",
+    directive_template: "Summarize the following meeting notes. Context: {{ context }}\n\n---\n{{ notes }}\n---",
     input_schema: [
       { name: "notes", type: "text", default: "Discussed Q3 roadmap. Alice will handle the new API by March. Bob raised concerns about server costs. Decided to move to AWS. Need to revisit pricing next week." },
       { name: "context", type: "text", default: "Weekly team standup" },
     ],
     constraints: {
       must_include: ["decisions", "action_items", "key_topics"],
-      must_not_include: [],
+      must_not_include: ["Omit editorial commentary", "Omit inferred decisions not explicitly stated"],
       format_rules: ["Action items must have owner if mentioned"],
     },
     output_schema: [
@@ -179,7 +180,7 @@ export const STARTER_TEMPLATES = [
   {
     id: "blank",
     name: "Start from Scratch",
-    description: "Your blank canvas — we'll guide you through every step, one at a time.",
+    description: "Build a prompt from the ground up using the 9-Section Architecture from the Prompt Guidebook.",
     guidance: {
       goal: "",
       role: "",

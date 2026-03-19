@@ -1,5 +1,6 @@
 """API routers."""
 
+from app.api.architect import router as architect_router
 from app.api.chains import router as chains_router
 from app.api.chat import router as chat_router
 from app.api.custom_templates import router as custom_templates_router
@@ -13,6 +14,7 @@ from app.api.templates import router as templates_router
 from app.api.transform import router as transform_router
 
 __all__ = [
+    "architect_router",
     "chains_router",
     "chat_router",
     "custom_templates_router",

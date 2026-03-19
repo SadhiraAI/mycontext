@@ -12,10 +12,10 @@ from pydantic import BaseModel, Field
 class Directive(BaseModel):
     """
     A single instruction unit - the atomic building block of context.
-    
+
     Directives are focused, actionable instructions that tell the LLM
     exactly what to do. They are the "what" of context engineering.
-    
+
     Example:
         ```python
         directive = Directive(

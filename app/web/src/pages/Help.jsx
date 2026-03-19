@@ -13,9 +13,9 @@ const CONCEPTS = [
 
 const FAQ = [
   { q: "How do I get started?", a: "Go to Templates, pick a pattern, fill in the parameters, and click Build. That's it — your structured context is ready to download." },
-  { q: "What's the difference between Templates and Custom?", a: "Templates are pre-built, research-backed patterns (85 total). Custom lets you create your own templates from scratch using a step-by-step wizard." },
+  { q: "What's the difference between Templates and Custom?", a: "Templates are pre-built, research-backed patterns (87 total). Custom lets you create your own templates from scratch using a step-by-step wizard." },
   { q: "How does quality scoring work?", a: "Fast mode uses heuristics (no API key needed). Accurate mode uses an LLM to semantically evaluate your context across 6 dimensions. Add an API key in Account settings." },
-  { q: "What is Enterprise?", a: "Enterprise adds 69 advanced patterns for decision-making, systems thinking, ethical reasoning, metacognition, and more. Enter a license key in your Account." },
+  { q: "What is Enterprise?", a: "Enterprise adds 71 advanced patterns for decision-making, systems thinking, ethical reasoning, metacognition, and more. Enter a license key in your Account." },
   { q: "Can I export to my LLM framework?", a: "Yes. We support OpenAI, Anthropic, Google, LangChain, LlamaIndex, CrewAI, AutoGen, DSPy, Semantic Kernel, and raw formats (JSON, YAML, Markdown)." },
   { q: "Is there a Python SDK?", a: "Yes. Install with: pip install mycontext-ai. See the PyPI page for documentation." },
 ];
@@ -59,7 +59,7 @@ export default function Help() {
           </a>
           <Link to="/templates" className="help-link-card">
             <strong>Browse Templates</strong>
-            <p>85 research-backed patterns</p>
+            <p>87 research-backed patterns</p>
           </Link>
           <Link to="/custom" className="help-link-card">
             <strong>Build Custom</strong>

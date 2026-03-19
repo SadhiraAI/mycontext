@@ -47,7 +47,8 @@ async def execute(
 
     content = body.assembled_content
     ofmt = (body.output_format or "").lower()
-    if ofmt in ("json", "markdown"):
+    has_output_section = "## OUTPUT FORMAT" in content
+    if ofmt in ("json", "markdown") and not has_output_section:
         from mycontext.utils import output_format
         content = content + "\n\n" + output_format(ofmt)
 

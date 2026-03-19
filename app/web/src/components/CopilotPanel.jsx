@@ -401,14 +401,14 @@ export default function CopilotPanel({ form, onApplySuggestion, provider, onErro
       <div className="copilot-messages">
         {messages.length === 0 && (
           <div className="copilot-welcome">
-            <h3>Let's build your AI context together.</h3>
-            <p>Tell me what you want to build — I'll guide you through name, role, rules, thinking strategy, examples, output, and your task.</p>
+            <h3>Let's build your AI context — following the 9-Section Architecture.</h3>
+            <p>Tell me what you want to build. I'll guide you through each section from the Prompt Guidebook: Role, Goal, Rules, Style, Reasoning, Examples, Output Contract, Guard Rails, and Task.</p>
             <div className="copilot-starters">
               {[
                 "I want to build a data analysis assistant",
                 "Help me create a code reviewer",
-                "Help me choose a thinking strategy",
                 "Build me a document summarizer",
+                "I need a customer support classifier",
               ].map(s => (
                 <button key={s} type="button" onClick={() => sendMessage(s)} className="copilot-starter">{s}</button>
               ))}

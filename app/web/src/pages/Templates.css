@@ -896,3 +896,670 @@
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ══════════════════════════════════════════════════════════
+   NEW TWO-COLUMN LAYOUT
+══════════════════════════════════════════════════════════ */
+
+.tpl-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .tpl-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Sidebar ─────────────────────────────────────────── */
+.tpl-sidebar {
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tpl-sidebar-search input {
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.88rem;
+  box-sizing: border-box;
+}
+
+.tpl-sidebar-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tpl-sidebar-license {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tpl-license-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.tpl-license-btn:hover { background: var(--bg-hover); color: var(--text); }
+.tpl-license-btn.active {
+  background: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tpl-category-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.tpl-cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.42rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tpl-cat-item:last-child { border-bottom: none; }
+.tpl-cat-item:hover { background: var(--bg-hover); color: var(--text); }
+.tpl-cat-item.active {
+  background: rgba(var(--accent-rgb, 74 130 120), 0.08);
+  color: var(--accent);
+  font-weight: 600;
+  border-left: 3px solid var(--accent);
+}
+
+.tpl-cat-name { flex: 1; }
+
+.tpl-cat-count {
+  font-size: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 0.05rem 0.35rem;
+  border-radius: 20px;
+  color: var(--text-muted);
+  min-width: 22px;
+  text-align: center;
+}
+
+.tpl-cat-item.active .tpl-cat-count {
+  background: rgba(var(--accent-rgb, 74 130 120), 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Main Area ───────────────────────────────────────── */
+.tpl-main { min-width: 0; }
+
+.tpl-grid-header {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tpl-grid-count {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* ── Card Grid ───────────────────────────────────────── */
+.tpl-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.tpl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  color: var(--text);
+}
+
+.tpl-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.tpl-card.active {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb, 74 130 120), 0.04);
+}
+
+.tpl-card.locked { opacity: 0.7; }
+
+.tpl-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.tpl-card-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.tpl-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.tpl-card-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tpl-card-cat {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+/* ── Detail Panel (replaces action panel) ─────────────── */
+.tpl-detail-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin-top: 0.25rem;
+}
+
+.tpl-detail-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.tpl-detail-cat-pill {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.12rem 0.45rem;
+  border-radius: 50px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Mode Tab Bar ────────────────────────────────────── */
+.tpl-mode-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 1rem 0 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 1rem;
+}
+
+.tpl-mode-tab {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.tpl-mode-tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.tpl-mode-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+/* ── Mode Panel ─────────────────────────────────────── */
+.tpl-mode-panel {
+  margin-top: 1.25rem;
+}
+
+.tpl-mode-info {
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* ── Post-Build Action Bar ───────────────────────────── */
+.tpl-postbuild-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+}
+
+.tpl-postbuild-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 0.25rem;
+}
+
+.tpl-postbuild-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tpl-postbuild-btn {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.tpl-postbuild-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tpl-postbuild-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.tpl-postbuild-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Execute Result ──────────────────────────────────── */
+.tpl-execute-result {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tpl-execute-output {
+  padding: 1rem;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: var(--bg);
+  margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ── Tool Panels (Quality / CAI) ─────────────────────── */
+.tpl-tool-panel {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.tpl-tool-panel h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.tpl-tool-error {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Refine Result ───────────────────────────────────── */
+.tpl-refine-result {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tpl-refine-message {
+  padding: 0.75rem 1rem;
+  background: var(--bg-surface);
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  margin: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tpl-refine-output {
+  padding: 1rem;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: var(--bg);
+  margin: 0;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+/* ── Prompt Improver ────────────────────────────────── */
+.tpl-improve-llm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tpl-improve-llm label { font-weight: 500; }
+
+.tpl-improve-llm select {
+  padding: 0.35rem 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.tpl-improve-input {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  line-height: 1.55;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 0.75rem;
+}
+
+.tpl-improve-input:focus { outline: none; border-color: var(--accent); }
+
+.tpl-improve-btns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.tpl-secondary-btn {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.tpl-secondary-btn:hover:not(:disabled) { background: rgba(var(--accent-rgb, 74 130 120), 0.08); }
+.tpl-secondary-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Parse Result (section chips) ───────────────────── */
+.tpl-parse-result {
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.tpl-parse-result h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.tpl-section-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.tpl-section-chip {
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.tpl-section-chip.present {
+  background: rgba(34, 197, 94, 0.1);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.tpl-section-chip.missing {
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.tpl-parse-hint {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.tpl-parse-hint--good { color: #15803d; }
+
+/* ── Improve Result ─────────────────────────────────── */
+.tpl-improve-result { margin-top: 0.5rem; }
+
+.tpl-improve-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.tpl-improve-score-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tpl-improve-score {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.tpl-improve-score.before { color: var(--text-muted); }
+.tpl-improve-score.after { color: var(--accent); }
+
+.tpl-improve-arrow {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.tpl-improve-delta {
+  background: rgba(34, 197, 94, 0.1);
+  color: #15803d;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.tpl-diff-details {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tpl-diff-details summary {
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font-size: 0.87rem;
+  font-weight: 500;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.tpl-diff-list {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tpl-diff-item {
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid;
+  background: var(--bg-card);
+}
+
+.tpl-diff-added { border-color: #22c55e; }
+.tpl-diff-strengthened { border-color: var(--accent); }
+.tpl-diff-kept { border-color: var(--border); opacity: 0.7; }
+
+.tpl-diff-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 0.4rem;
+  color: var(--text-muted);
+}
+
+.tpl-diff-section {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.tpl-diff-after {
+  font-size: 0.83rem;
+  color: var(--text);
+  margin: 0.35rem 0 0.2rem;
+  line-height: 1.45;
+}
+
+.tpl-diff-rationale {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.tpl-improve-output {
+  padding: 1rem;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin: 0.75rem 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ── Search input (inside sidebar) ──────────────────── */
+.tpl-search-input {
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.88rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.tpl-search-input:focus { outline: none; border-color: var(--accent); }

@@ -125,6 +125,8 @@ extend-exclude = [
     "src",
     "research",
     "website",
+    "scripts",
+    "tools",
 ]
 
 [tool.ruff.lint]

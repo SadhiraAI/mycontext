@@ -1,4 +1,4 @@
-﻿"""
+"""
 CLI benchmark runner for cognitive templates.
 
 Usage:
@@ -19,7 +19,7 @@ def main():
     sub = parser.add_subparsers(dest="command")
 
     # list
-    list_cmd = sub.add_parser("list", help="List available benchmarks")
+    sub.add_parser("list", help="List available benchmarks")
 
     # run
     run_cmd = sub.add_parser("run", help="Run benchmark for a single template")
@@ -76,7 +76,7 @@ def main():
 
     elif args.command == "run-all":
         results = bench.run_all(**kwargs)
-        for name, result in results.items():
+        for _name, result in results.items():
             print(TemplateBenchmark.report(result))
             print()
         if args.output:

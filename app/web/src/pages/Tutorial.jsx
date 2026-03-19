@@ -93,7 +93,7 @@ export default function Tutorial() {
           <tbody>
             <tr><td><code>/</code></td><td>Launchpad</td><td>Main dashboard</td></tr>
             <tr><td><code>/custom</code></td><td>Context Studio</td><td>Build custom contexts with 9-step wizard</td></tr>
-            <tr><td><code>/templates</code></td><td>Cognitive Studio</td><td>Browse 85 research-backed patterns</td></tr>
+            <tr><td><code>/templates</code></td><td>Cognitive Studio</td><td>Browse 87 research-backed patterns</td></tr>
             <tr><td><code>/chains</code></td><td>Chain Composer</td><td>Compose multi-pattern analysis pipelines</td></tr>
           </tbody>
         </table>
@@ -106,7 +106,7 @@ export default function Tutorial() {
         <ul>
           <li>Welcome message and stats</li>
           <li><strong>Your Journey</strong> — three cards: Context Studio, Cognitive Studio, Chain Composer</li>
-          <li><strong>Platform at a Glance</strong> — 85 patterns, 13 export formats, 6 quality metrics</li>
+          <li><strong>Platform at a Glance</strong> — 87 patterns, 13 export formats, 6 quality metrics</li>
           <li><strong>Milestones</strong> — checklist to track progress</li>
         </ul>
       </section>
@@ -137,7 +137,7 @@ export default function Tutorial() {
       <section className="tutorial-section">
         <h2>6. Cognitive Studio</h2>
         <p><strong>Path:</strong> <Link to="/templates">/templates</Link></p>
-        <p>Browse and use 85 research-backed cognitive patterns. Search, select a pattern, fill parameters, Build, then Export or Execute.</p>
+        <p>Browse and use 87 research-backed cognitive patterns. Search, select a pattern, fill parameters, Build, then Export or Execute.</p>
       </section>
 
       <section className="tutorial-section">

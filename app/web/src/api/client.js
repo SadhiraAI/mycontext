@@ -455,6 +455,26 @@ export async function resendVerification() {
   return handleResponse(res);
 }
 
+/** Parse a raw prompt into 9 sections — free, no LLM call. */
+export async function parsePrompt(prompt) {
+  const res = await fetch(`${API_BASE}/architect/parse`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ prompt }),
+  });
+  return handleResponse(res);
+}
+
+/** Improve a raw prompt using the 9-Section Architecture — requires API key. */
+export async function improvePrompt(prompt, provider = "openai", model = null) {
+  const res = await fetch(`${API_BASE}/architect/improve`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ prompt, provider, model }),
+  });
+  return handleResponse(res);
+}
+
 export async function submitFeedback(feedbackType, message, pageUrl = null) {
   const res = await fetch(`${API_BASE}/feedback`, {
     method: "POST",

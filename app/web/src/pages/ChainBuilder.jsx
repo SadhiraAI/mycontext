@@ -14,7 +14,7 @@ const MODE_INFO = {
     badgeClass: "",
     icon: "\u{1F50D}",
     title: "Heuristic Context Chaining",
-    desc: "Keyword-based pattern matching across all 85 templates. Instant results, no API key required. Best for quick exploration when you want fast suggestions.",
+    desc: "Keyword-based pattern matching across all 87 templates. Instant results, no API key required. Best for quick exploration when you want fast suggestions.",
     needsKey: false,
     apiMode: "quick",
   },
@@ -24,7 +24,7 @@ const MODE_INFO = {
     badgeClass: "chain-tab-badge--llm",
     icon: "\u{1F9E0}",
     title: "Smart Chain Composer",
-    desc: "Your LLM reasons through all 85 cognitive patterns, analyzes your question's complexity, domain, and structure, then selects the optimal chain with ordering and rationale.",
+    desc: "Your LLM reasons through all 87 cognitive patterns, analyzes your question's complexity, domain, and structure, then selects the optimal chain with ordering and rationale.",
     needsKey: true,
     apiMode: "smart",
   },
@@ -69,6 +69,18 @@ export default function ChainBuilder() {
   const [integratedResult, setIntegratedResult] = useState(null);
   const [integrateError, setIntegrateError] = useState("");
 
+  // Post-chain action mode: null | "integrate" | "compile-generic" | "compile-prompt" | "execute"
+  const [chainAction, setChainAction] = useState(null);
+  const [compileGenericResult, setCompileGenericResult] = useState(null);
+  const [compileGenericLoading, setCompileGenericLoading] = useState(false);
+  const [compileGenericError, setCompileGenericError] = useState("");
+  const [compilePromptResult, setCompilePromptResult] = useState(null);
+  const [compilePromptLoading, setCompilePromptLoading] = useState(false);
+  const [compilePromptError, setCompilePromptError] = useState("");
+  const [executeChainResult, setExecuteChainResult] = useState(null);
+  const [executeChainLoading, setExecuteChainLoading] = useState(false);
+  const [executeChainError, setExecuteChainError] = useState("");
+
   const [toast, setToast] = useState("");
   const [editableChain, setEditableChain] = useState([]);
   const [showAddPicker, setShowAddPicker] = useState(false);
@@ -107,6 +119,56 @@ export default function ChainBuilder() {
     setEditableChain([]);
     setSuggestError("");
     setIntegrateError("");
+    setChainAction(null);
+    setCompileGenericResult(null);
+    setCompilePromptResult(null);
+    setExecuteChainResult(null);
+    setCompileGenericError("");
+    setCompilePromptError("");
+    setExecuteChainError("");
+  }
+
+  async function handleCompileGeneric() {
+    if (editableChain.length === 0 || !question.trim()) return;
+    setCompileGenericLoading(true);
+    setCompileGenericResult(null);
+    setCompileGenericError("");
+    try {
+      const res = await api.compileGeneric(question.trim(), editableChain);
+      setCompileGenericResult(res);
+    } catch (e) { setCompileGenericError(e.message); }
+    finally { setCompileGenericLoading(false); }
+  }
+
+  async function handleCompilePrompt() {
+    if (editableChain.length === 0 || !question.trim()) return;
+    setCompilePromptLoading(true);
+    setCompilePromptResult(null);
+    setCompilePromptError("");
+    try {
+      const res = await api.compilePrompt(question.trim(), editableChain, provider, true);
+      setCompilePromptResult(res);
+    } catch (e) { setCompilePromptError(e.message); }
+    finally { setCompilePromptLoading(false); }
+  }
+
+  async function handleExecuteChain() {
+    if (editableChain.length === 0 || !question.trim()) return;
+    setExecuteChainLoading(true);
+    setExecuteChainResult(null);
+    setExecuteChainError("");
+    try {
+      // Execute the integrated template if we have one, else the first template in chain
+      const contextToRun = integratedResult?.integrated_template || compilePromptResult?.prompt || compileGenericResult?.prompt || "";
+      if (!contextToRun) {
+        setExecuteChainError("Generate a prompt first (Integrate, Compile Prompt, or Compile Generic) before executing.");
+        setExecuteChainLoading(false);
+        return;
+      }
+      const res = await api.executeContext(contextToRun, provider, question.trim(), null);
+      setExecuteChainResult(res);
+    } catch (e) { setExecuteChainError(e.message); }
+    finally { setExecuteChainLoading(false); }
   }
 
   async function runCompose(q, tab) {
@@ -370,7 +432,7 @@ export default function ChainBuilder() {
         </button>
 
         {isRunning && activeTab !== "heuristic" && (
-          <p className="chain-loading-hint">The LLM is analyzing your question, reviewing all 85 patterns, and selecting the optimal chain. This can take 15\u201330 seconds.</p>
+          <p className="chain-loading-hint">The LLM is analyzing your question, reviewing all 87 patterns, and selecting the optimal chain. This can take 15\u201330 seconds.</p>
         )}
 
         {currentError && <p className="chain-error">{currentError}</p>}
@@ -475,7 +537,167 @@ export default function ChainBuilder() {
             )}
           </div>
 
+          {/* ── Chain Action Panel ──────────────────── */}
+          <div className="chain-action-panel">
+            <h4 className="chain-action-title">What do you want to do with this chain?</h4>
+            <div className="chain-action-tabs">
+              <button
+                type="button"
+                className={`chain-action-tab ${chainAction === "integrate" ? "active" : ""}`}
+                onClick={() => setChainAction(chainAction === "integrate" ? null : "integrate")}
+              >
+                🧩 Integrate Templates
+                <span className="chain-action-tab-sub">Merge all patterns into one unified prompt</span>
+              </button>
+              <button
+                type="button"
+                className={`chain-action-tab ${chainAction === "compile-generic" ? "active" : ""}`}
+                onClick={() => setChainAction(chainAction === "compile-generic" ? null : "compile-generic")}
+              >
+                ⚡ Compile Generic
+                <span className="chain-action-tab-sub">Zero-cost composite prompt — no LLM calls</span>
+              </button>
+              <button
+                type="button"
+                className={`chain-action-tab ${chainAction === "compile-prompt" ? "active" : ""} ${!hasKey ? "chain-action-tab--disabled" : ""}`}
+                onClick={() => setChainAction(chainAction === "compile-prompt" ? null : "compile-prompt")}
+                title={!hasKey ? "Requires API key" : ""}
+              >
+                🔧 Compile Prompt
+                <span className="chain-action-tab-sub">LLM-refined single-prompt compilation</span>
+              </button>
+              <button
+                type="button"
+                className={`chain-action-tab ${chainAction === "execute" ? "active" : ""} ${!hasKey ? "chain-action-tab--disabled" : ""}`}
+                onClick={() => setChainAction(chainAction === "execute" ? null : "execute")}
+                title={!hasKey ? "Requires API key" : ""}
+              >
+                ▶ Execute Chain
+                <span className="chain-action-tab-sub">Run your chain against your question</span>
+              </button>
+            </div>
+
+            {/* Compile Generic */}
+            {chainAction === "compile-generic" && (
+              <div className="chain-action-body fade-in">
+                <p className="chain-action-desc">
+                  Compiles all {editableChain.length} patterns into a single zero-cost composite prompt using pre-authored generic prompts.
+                  No LLM calls — instant results.
+                </p>
+                <button
+                  type="button"
+                  className="chain-btn chain-btn--action"
+                  onClick={handleCompileGeneric}
+                  disabled={compileGenericLoading || editableChain.length === 0 || !question.trim()}
+                >
+                  {compileGenericLoading ? "Compiling..." : `Compile Generic Prompt (${editableChain.length} patterns)`}
+                </button>
+                {compileGenericError && <p className="chain-error">{compileGenericError}</p>}
+                {compileGenericResult && (
+                  <div className="chain-action-result fade-in">
+                    <div className="chain-result-output-header">
+                      <h5>Generic Chain Prompt</h5>
+                      <div className="chain-integrated-actions">
+                        <button type="button" onClick={() => navigator.clipboard.writeText(compileGenericResult.prompt || "").then(() => setToast("Copied"))} className="chain-copy-btn">Copy</button>
+                      </div>
+                    </div>
+                    <pre className="chain-action-output">{compileGenericResult.prompt}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Compile Prompt */}
+            {chainAction === "compile-prompt" && (
+              <div className="chain-action-body fade-in">
+                {!hasKey ? (
+                  <div className="chain-key-needed">
+                    <span className="chain-key-icon">{"\uD83D\uDD11"}</span>
+                    <div>
+                      <strong>API key required</strong>
+                      <p>Add an API key in <span className="chain-link" onClick={() => navigate("/settings")} role="button" tabIndex={0}>Settings</span> to compile prompts.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="chain-action-desc">
+                      Your LLM compiles all {editableChain.length} patterns into one optimized prompt, then refines it for coherence and quality.
+                    </p>
+                    <button
+                      type="button"
+                      className="chain-btn chain-btn--action"
+                      onClick={handleCompilePrompt}
+                      disabled={compilePromptLoading || editableChain.length === 0 || !question.trim()}
+                    >
+                      {compilePromptLoading ? "Compiling (may take 15–30s)..." : `Compile Prompt with ${provider}`}
+                    </button>
+                    {compilePromptError && <p className="chain-error">{compilePromptError}</p>}
+                    {compilePromptResult && (
+                      <div className="chain-action-result fade-in">
+                        <div className="chain-result-output-header">
+                          <h5>Compiled Chain Prompt</h5>
+                          <div className="chain-integrated-actions">
+                            <button type="button" onClick={() => navigator.clipboard.writeText(compilePromptResult.prompt || "").then(() => setToast("Copied"))} className="chain-copy-btn">Copy</button>
+                          </div>
+                        </div>
+                        {compilePromptResult.score != null && (
+                          <p className="chain-action-score">Quality score: {Math.round(compilePromptResult.score * 100)}%</p>
+                        )}
+                        <pre className="chain-action-output">{compilePromptResult.prompt}</pre>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Execute Chain */}
+            {chainAction === "execute" && (
+              <div className="chain-action-body fade-in">
+                {!hasKey ? (
+                  <div className="chain-key-needed">
+                    <span className="chain-key-icon">{"\uD83D\uDD11"}</span>
+                    <div>
+                      <strong>API key required</strong>
+                      <p>Add an API key in <span className="chain-link" onClick={() => navigate("/settings")} role="button" tabIndex={0}>Settings</span> to execute chains.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="chain-action-desc">
+                      Runs your compiled chain against your question using {provider}. You must first generate a prompt using Integrate, Compile Prompt, or Compile Generic above.
+                    </p>
+                    {!integratedResult?.integrated_template && !compilePromptResult?.prompt && !compileGenericResult?.prompt && (
+                      <p className="chain-action-prereq">
+                        ⚠️ No prompt generated yet. Use <strong>Integrate Templates</strong>, <strong>Compile Prompt</strong>, or <strong>Compile Generic</strong> first.
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      className="chain-btn chain-btn--action"
+                      onClick={handleExecuteChain}
+                      disabled={executeChainLoading || (!integratedResult?.integrated_template && !compilePromptResult?.prompt && !compileGenericResult?.prompt)}
+                    >
+                      {executeChainLoading ? `Running with ${provider}...` : `▶ Execute with ${provider}`}
+                    </button>
+                    {executeChainError && <p className="chain-error">{executeChainError}</p>}
+                    {executeChainResult && (
+                      <div className="chain-action-result fade-in">
+                        <div className="chain-result-output-header">
+                          <h5>Chain Response</h5>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(executeChainResult.response || "").then(() => setToast("Copied"))} className="chain-copy-btn">Copy</button>
+                        </div>
+                        <pre className="chain-action-output">{executeChainResult.response}</pre>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* ── Template Integrator ─────────────────── */}
+          {chainAction === "integrate" && (
           <div className="chain-integrate-section">
             <div className="chain-integrate-header">
               <span className="chain-integrate-icon">{"\uD83E\uDDE9"}</span>
@@ -551,6 +773,7 @@ export default function ChainBuilder() {
               </div>
             )}
           </div>
+          )}
         </div>
       )}
 

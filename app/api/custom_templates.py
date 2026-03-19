@@ -135,7 +135,8 @@ async def build_preview(
         raise HTTPException(500, detail="Failed to build context")
     assembled = ctx.assemble()
     ofmt = (body.output_format or "").lower()
-    if ofmt in ("json", "markdown"):
+    has_output_section = "## OUTPUT FORMAT" in assembled
+    if ofmt in ("json", "markdown") and not has_output_section:
         from mycontext.utils import output_format
         assembled = assembled + "\n\n" + output_format(ofmt)
     from mycontext import Context as MxContext
@@ -250,7 +251,8 @@ async def build_custom(
         raise HTTPException(500, detail="Failed to build context")
     assembled = ctx.assemble()
     ofmt = (body.output_format or "").lower()
-    if ofmt in ("json", "markdown"):
+    has_output_section = "## OUTPUT FORMAT" in assembled
+    if ofmt in ("json", "markdown") and not has_output_section:
         from mycontext.utils import output_format
         assembled = assembled + "\n\n" + output_format(ofmt)
     from mycontext import Context as MxContext

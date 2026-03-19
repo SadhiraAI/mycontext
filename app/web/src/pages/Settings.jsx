@@ -261,15 +261,15 @@ export default function Settings() {
               </span>
               <p className="settings-license-desc">
                 {user?.enterprise_license
-                  ? "Full access to all 85 patterns."
-                  : "Access to 16 free patterns. Upgrade to Enterprise for 69 advanced patterns."}
+                  ? "Full access to all 87 patterns."
+                  : "Access to 16 free patterns. Upgrade to Enterprise for 71 advanced patterns."}
               </p>
             </div>
 
             {!user?.enterprise_license && (
               <div className="settings-license-activate">
                 <h3>Activate Enterprise License</h3>
-                <p className="settings-intro-hint">Enter your license key to unlock all 85 cognitive patterns, advanced decision-making, systems thinking, and ethical reasoning frameworks.</p>
+                <p className="settings-intro-hint">Enter your license key to unlock all 87 cognitive patterns, advanced decision-making, systems thinking, and ethical reasoning frameworks.</p>
                 <form onSubmit={handleActivateLicense} className="settings-form">
                   <input
                     type="text"
@@ -294,7 +294,7 @@ export default function Settings() {
                 <span className="settings-license-check">&#x2705;</span>
                 <div>
                   <strong>Enterprise license is active</strong>
-                  <p>You have full access to all 85 cognitive patterns and advanced features.</p>
+                  <p>You have full access to all 87 cognitive patterns and advanced features.</p>
                 </div>
               </div>
             )}
@@ -305,7 +305,7 @@ export default function Settings() {
             <table className="settings-compare-table">
               <thead><tr><th>Feature</th><th>Free</th><th>Enterprise</th></tr></thead>
               <tbody>
-                <tr><td>Cognitive patterns</td><td>16</td><td>85</td></tr>
+                <tr><td>Cognitive patterns</td><td>16</td><td>87</td></tr>
                 <tr><td>Export formats</td><td>13</td><td>13</td></tr>
                 <tr><td>Custom templates</td><td>Yes</td><td>Yes</td></tr>
                 <tr><td>Quality scoring</td><td>Heuristic</td><td>Heuristic + LLM</td></tr>

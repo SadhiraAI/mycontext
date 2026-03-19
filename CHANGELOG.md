@@ -6,6 +6,28 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.9.0] — 2026-03-18 (planned)
+
+### Added
+
+- **Pit Stop** — Prompt improver integrated into the Pick Your Adventure panel alongside Take the Wheel and Let AI Drive. Three equal path cards with amber styling for the tune-up flow.
+- **Model dropdown** in Pit Stop — Provider and model selectors with choices from `MODEL_CATALOG` (OpenAI, Anthropic, Google models).
+
+### Changed
+
+- **Let AI Drive layout** — Copilot panel fixed to the right edge of the viewport instead of inline flex. Wizard gets full width like Take the Wheel; copilot no longer crowds the prompt panel.
+- **`POST /api/architect/parse`** — No longer requires authentication. Analyze (Free) works without login; heuristic section detection only, no LLM call.
+- **Output format handling** — `build-preview`, `build`, and `execute` endpoints no longer append a duplicate OUTPUT FORMAT block when the assembled prompt already contains one. Fixes double "OUTPUT FORMAT" and empty `{}` schema at the end.
+- **Guidance rendering** — Role and goal text no longer duplicated when user input already includes "You are" or "Your mission: ... — accomplish this fully." Prefixes/suffixes are stripped before wrapping.
+- **Profile dropdown z-index** — Lowered copilot panel z-index (90) below header (100) so the profile dropdown is always visible when the copilot is open.
+
+### Fixed
+
+- Pit Stop provider/model dropdowns and blocks now visible (CSS uses `--text` and `--bg` instead of undefined `--text-primary` / `--bg-input`).
+- Profile dropdown hidden behind copilot when Let AI Drive or FAB copilot was open — resolved by z-index hierarchy.
+
+---
+
 ## [0.8.0] — 2026-03-18
 
 ### Added

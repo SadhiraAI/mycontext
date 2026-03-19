@@ -6,6 +6,7 @@ import QualityScore from "../components/QualityScore";
 import MarkdownContent from "../components/MarkdownContent";
 import CopilotPanel from "../components/CopilotPanel";
 import { STARTER_TEMPLATES, THINKING_STRATEGIES } from "../data/starterTemplates";
+import { modelsForProvider, defaultModelForProvider } from "../config/models";
 import "./CustomTemplates.css";
 
 /* ── Research references for the prompt flow ──────────── */
@@ -95,39 +96,48 @@ function ResearchDrawer({ open, onClose }) {
 const FORMAT_LABELS = { markdown: "Markdown", json: "JSON", yaml: "YAML", openai: "OpenAI", anthropic: "Anthropic", google: "Google", langchain: "LangChain", llamaindex: "LlamaIndex" };
 const FORMAT_ORDER = ["markdown", "json", "yaml", "openai", "anthropic", "google", "langchain", "llamaindex"];
 
+// Aligned with The Prompt Guidebook 9-Section Architecture (docs/THE_PROMPT_GUIDEBOOK.md)
 const WIZARD_STEPS = [
-  { title: "Pick Your Adventure", short: "Adventure" },  // 0
-  { title: "Give It a Name", short: "Name" },             // 1
-  { title: "Who Should It Be?", short: "Who" },           // 2
-  { title: "House Rules", short: "Rules" },                // 3
-  { title: "Teach It to Think", short: "Think" },          // 4
-  { title: "Shape the Answer", short: "Answer" },          // 5 — output schema only
-  { title: "Guard Rails", short: "Guards" },               // 6 — constraints
-  { title: "The Big Ask", short: "Ask" },                  // 7
-  { title: "Ship It!", short: "Ship!" },                   // 8
+  { title: "Pick Your Adventure", short: "Adventure", guidebook: null },           // 0
+  { title: "Give It a Name", short: "Name", guidebook: "② Goal" },                 // 1 — name, description, goal
+  { title: "Who Should It Be?", short: "Who", guidebook: "① Role, ④ Style" },     // 2
+  { title: "House Rules", short: "Rules", guidebook: "③ Rules" },                  // 3
+  { title: "Teach It to Think", short: "Think", guidebook: "⑤ Reasoning, ⑥ Examples" }, // 4
+  { title: "Shape the Answer", short: "Answer", guidebook: "⑦ Output Contract" }, // 5
+  { title: "Guard Rails", short: "Guards", guidebook: "⑧ Guard Rails" },           // 6
+  { title: "The Big Ask", short: "Ask", guidebook: "⑨ Task" },                     // 7
+  { title: "Ship It!", short: "Ship!", guidebook: "Review all 9 sections" },       // 8
 ];
+
+const SECTION_LABELS = {
+  role: "① Role", goal: "② Goal", rules: "③ Rules", style: "④ Style",
+  reasoning: "⑤ Reasoning", examples: "⑥ Examples",
+  output_contract: "⑦ Output Contract", guard_rails: "⑧ Guard Rails", task: "⑨ Task",
+};
+
+const IMPROVE_PROVIDERS = ["openai", "anthropic", "google"];
 
 const DEFAULT_GUIDANCE = { goal: "", role: "", rules: [], style: "" };
 const DEFAULT_SCHEMA = [{ name: "topic", type: "text", default: "" }];
 const OUTPUT_TYPES = ["str", "float", "int", "bool", "list"];
 
 const ROLE_EXAMPLES = [
-  { template: "SWOT Analyzer", value: "Expert Strategic Analyst and Business Consultant" },
-  { template: "Root Cause Analyzer", value: "Root Cause Analysis Specialist and Systems Thinker" },
-  { template: "Technical Translator", value: "Expert Technical Communicator and Plain Language Specialist" },
-  { template: "Sentiment Analyzer", value: "Sentiment analysis expert" },
-  { template: "Code Reviewer", value: "Senior software engineer and code reviewer" },
+  { template: "SWOT Analyzer", value: "You are a senior strategic analyst and business consultant with Fortune 500 advisory experience." },
+  { template: "Root Cause Analyzer", value: "You are a root cause analysis specialist and systems thinker with Six Sigma Black Belt certification." },
+  { template: "Technical Translator", value: "You are an expert technical communicator specializing in translating complex systems into plain language for non-technical stakeholders." },
+  { template: "Sentiment Analyzer", value: "You are a senior sentiment analysis specialist with 10 years of experience in NLP and product analytics." },
+  { template: "Code Reviewer", value: "You are a senior software engineer and security-focused code reviewer with 15 years of experience across Python, JavaScript, and Go." },
 ];
 
 const RULE_EXAMPLES = [
-  { template: "SWOT", value: "Be honest about weaknesses — don't sugarcoat" },
-  { template: "Root Cause", value: "Distinguish symptoms from causes" },
-  { template: "Root Cause", value: "Use evidence, not speculation" },
-  { template: "Translator", value: "Replace jargon with common words" },
-  { template: "Sentiment", value: "Consider tone, intensity, hedging, sarcasm, and mixed signals" },
-  { template: "Sentiment", value: "Respond only with valid JSON matching the required schema" },
-  { template: "Code Review", value: "Categorize issues by severity: critical, warning, suggestion" },
-  { template: "Code Review", value: "Suggest concrete fixes for each issue" },
+  { template: "SWOT", value: "Every weakness must be stated directly — never soften or omit a genuine vulnerability." },
+  { template: "Root Cause", value: "Always distinguish symptoms from root causes — never list a symptom as a cause." },
+  { template: "Root Cause", value: "Every claim must cite specific evidence from the input data." },
+  { template: "Translator", value: "Every technical term must be replaced with a common-language equivalent." },
+  { template: "Sentiment", value: "Always consider tone, intensity, hedging, sarcasm, and mixed signals before classifying." },
+  { template: "Sentiment", value: "Output must be valid JSON — never include text outside the JSON object." },
+  { template: "Code Review", value: "Every issue must be categorized by severity: critical, warning, or suggestion." },
+  { template: "Code Review", value: "Every issue must include a concrete fix — never say 'consider improving' without showing how." },
 ];
 
 const STYLE_EXAMPLES = [
@@ -139,10 +149,10 @@ const STYLE_EXAMPLES = [
 ];
 
 const RULE_PLACEHOLDERS = [
-  "What's the #1 thing the AI must do? e.g., Always cite sources",
-  "How should the output look? e.g., Use bullet points with headers",
-  "What should the AI avoid? e.g., Never make up information",
-  "Any quality standards? e.g., Rate confidence from 0.0 to 1.0",
+  "e.g. Every claim must cite a specific data point from the input.",
+  "e.g. Output must be valid JSON — never include text outside the object.",
+  "e.g. Never speculate — omit any claim not supported by the input data.",
+  "e.g. Confidence scores must always be between 0.0 and 1.0.",
   "Add another rule...",
 ];
 
@@ -600,9 +610,48 @@ export default function CustomTemplates() {
   const directiveDisplay = toDisplay(form.directive_template);
   const selectedStrategy = THINKING_STRATEGIES.find(s => s.id === form.thinking_strategy) || THINKING_STRATEGIES[0];
 
+  // When in fullscreen step mode (step > 0) the copilot becomes a FAB
+  const [copilotOpen, setCopilotOpen] = useState(false);
+  const [copilotMode, setCopilotMode] = useState(false);
+
+  const [improverOpen, setImproverOpen] = useState(false);
+  const [improveInput, setImproveInput] = useState("");
+  const [parseResult, setParseResult] = useState(null);
+  const [parseLoading, setParseLoading] = useState(false);
+  const [improveResult, setImproveResult] = useState(null);
+  const [improveLoading, setImproveLoading] = useState(false);
+  const [improveError, setImproveError] = useState("");
+  const [improveProvider, setImproveProvider] = useState("openai");
+  const [improveModel, setImproveModel] = useState(""); // empty = Auto (gpt-4o-mini or provider default)
+
+  async function handleParsePrompt() {
+    if (!improveInput.trim()) return;
+    setParseLoading(true);
+    setParseResult(null);
+    setImproveResult(null);
+    setImproveError("");
+    try {
+      const res = await api.parsePrompt(improveInput.trim());
+      setParseResult(res);
+    } catch (e) { setImproveError(e.message); }
+    finally { setParseLoading(false); }
+  }
+
+  async function handleImprovePrompt() {
+    if (!improveInput.trim()) return;
+    setImproveLoading(true);
+    setImproveResult(null);
+    setImproveError("");
+    try {
+      const res = await api.improvePrompt(improveInput.trim(), improveProvider, improveModel || null);
+      setImproveResult(res);
+    } catch (e) { setImproveError(e.message); }
+    finally { setImproveLoading(false); }
+  }
+
   // ── Render ──────────────────────────────────────────────
   return (
-    <div className={`ps-page ${wizardActive && step > 0 ? "ps-page--copilot-active" : ""}`}>
+    <div className={`ps-page ${wizardActive && step > 0 ? "ps-page--fullscreen-step" : ""} ${wizardActive && step > 0 && copilotMode ? "ps-page--copilot-active" : ""}`}>
       <div className="ps-page-header">
         <div>
           <div className="page-header-styled">
@@ -650,12 +699,12 @@ export default function CustomTemplates() {
             <p className="ps-splash-subtitle">Two ways to build your prompt. Pick the one that fits you.</p>
           </div>
 
-          <div className="ps-two-paths">
+          <div className="ps-three-paths">
             {/* ── Manual Path ── */}
             <button
               type="button"
               className="ps-path-card ps-path-manual"
-              onClick={() => startFromStarter(STARTER_TEMPLATES.find(s => s.id === "blank"))}
+              onClick={() => { setCopilotMode(false); setCopilotOpen(false); startFromStarter(STARTER_TEMPLATES.find(s => s.id === "blank")); }}
             >
               <div className="ps-path-rec">Recommended</div>
               <div className="ps-path-icon">{"\uD83D\uDEE3\uFE0F"}</div>
@@ -684,7 +733,7 @@ export default function CustomTemplates() {
             <button
               type="button"
               className="ps-path-card ps-path-ai"
-              onClick={() => startFromStarter(STARTER_TEMPLATES.find(s => s.id === "blank"))}
+              onClick={() => { setCopilotMode(true); setCopilotOpen(true); startFromStarter(STARTER_TEMPLATES.find(s => s.id === "blank")); }}
             >
               <div className="ps-path-icon">{"\uD83E\uDD16"}</div>
               <h3>Let AI Drive</h3>
@@ -714,13 +763,37 @@ export default function CustomTemplates() {
               <p className="ps-path-why">Best if you want fast results or aren't sure where to start.</p>
               <span className="ps-path-cta ps-path-cta-ai">Let Copilot guide me {"\u2192"}</span>
             </button>
+
+            {/* ── Pit Stop: Improve Existing Prompt ── */}
+            <button
+              type="button"
+              className="ps-path-card ps-path-improve"
+              onClick={() => setImproverOpen(true)}
+            >
+              <div className="ps-path-icon">{"\uD83D\uDD27"}</div>
+              <h3>Pit Stop</h3>
+              <p className="ps-path-tagline">Already have a prompt? Tune it up.</p>
+              <p className="ps-path-desc">
+                Paste any existing prompt — we'll <strong>X-ray it</strong> against the 9-Section Architecture,
+                show what's missing, and rewrite it with AI. Free analysis, no key required.
+              </p>
+              <div className="ps-path-pitstop-flow">
+                <span className="ps-path-pitstop-step">Paste prompt</span>
+                <div className="ps-path-road-arrow">{"\u2192"}</div>
+                <span className="ps-path-pitstop-step">9-Section X-Ray</span>
+                <div className="ps-path-road-arrow">{"\u2192"}</div>
+                <span className="ps-path-pitstop-step">AI upgrade</span>
+              </div>
+              <p className="ps-path-why">Best if you already have a prompt and want to level it up.</p>
+              <span className="ps-path-cta ps-path-cta-improve">Open Pit Stop {"\u2192"}</span>
+            </button>
           </div>
 
           <div className="ps-splash-pick-label">Pick a starting point</div>
 
           <div className="ps-starters ps-starters-splash">
             {STARTER_TEMPLATES.map((s) => (
-              <button key={s.id} type="button" className="ps-starter-card" onClick={() => startFromStarter(s)}>
+              <button key={s.id} type="button" className="ps-starter-card" onClick={() => { setCopilotMode(false); setCopilotOpen(false); startFromStarter(s); }}>
                 <h3>{s.name}</h3>
                 <p>{s.description}</p>
                 {s.id !== "blank" && <span className="ps-starter-badge">Pre-filled</span>}
@@ -748,24 +821,42 @@ export default function CustomTemplates() {
       {wizardActive && step > 0 && (
         <div className="ps-workspace">
         <div className="ps-wizard">
-          <div className="ps-progress ps-progress-9">
-            {WIZARD_STEPS.map((ws, i) => (
-              <div key={i} className={`ps-progress-step ${i === step ? "active" : ""} ${i < step ? "done" : ""}`} onClick={() => { if (i < step) setStep(i); }}>
-                <span className="ps-step-num">{i < step ? "✓" : i + 1}</span>
-                <span className="ps-step-label">{ws.short}</span>
-              </div>
-            ))}
+
+          {/* ── Full-page step header ─────────────────── */}
+          <div className="ps-step-screen-header">
+            <div className="ps-step-screen-progress">
+              {WIZARD_STEPS.slice(1).map((ws, i) => {
+                const stepNum = i + 1;
+                return (
+                  <div
+                    key={i}
+                    className={`ps-step-dot ${stepNum === step ? "active" : ""} ${stepNum < step ? "done" : ""}`}
+                    onClick={() => { if (stepNum < step) setStep(stepNum); }}
+                    title={ws.title}
+                  >
+                    <span className="ps-dot-num">{stepNum < step ? "✓" : stepNum}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="ps-step-screen-meta">
+              <span className="ps-step-screen-num">Step {step} of {WIZARD_STEPS.length - 1}</span>
+              <span className="ps-step-screen-title">{WIZARD_STEPS[step]?.title}</span>
+              {WIZARD_STEPS[step]?.guidebook && (
+                <span className="ps-step-screen-guidebook">9-Section Architecture: {WIZARD_STEPS[step].guidebook}</span>
+              )}
+            </div>
           </div>
 
-          {/* ── Step 1: Give It a Name ──────────── */}
+          {/* ── Step 1: Name + Goal (② Goal from Guidebook) ── */}
           {step === 1 && (
             <div className="ps-panel fade-in">
               <h2>Give It a Name</h2>
-              <p className="ps-hint">Think of it like naming a tool. What does this prompt do? Who is it for?</p>
+              <p className="ps-hint">Every great prompt starts with a clear mission. Name your template, then define what "done well" looks like.</p>
 
               <div className="ps-field">
                 <label>Template Name <span className="ps-required">*</span></label>
-                <p className="ps-field-hint">A short name — like naming a file. Use underscores instead of spaces.</p>
+                <p className="ps-field-hint">A short identifier — use underscores instead of spaces. Think of it like a filename.</p>
                 <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. sentiment_analyzer" />
               </div>
 
@@ -776,35 +867,41 @@ export default function CustomTemplates() {
               </div>
 
               <div className="ps-field">
-                <label>Goal</label>
-                <p className="ps-field-hint">What exactly do you want the AI to accomplish? Be as specific as you can.</p>
-                <textarea value={form.guidance?.goal || ""} onChange={(e) => setForm((f) => ({ ...f, guidance: { ...f.guidance, goal: e.target.value } }))} rows={2} placeholder="e.g. Classify reviews into 10 sentiment types with confidence scores and recommendations" />
+                <label>Goal <span className="ps-guidebook-tag">② Goal — What Success Looks Like</span></label>
+                <p className="ps-field-hint">
+                  Use the <strong>imperative formula</strong> from the Prompt Guidebook: <em>"Your mission: [specific achievement] — accomplish this fully."</em> This tells the AI exactly what "done" looks like. Vague goals like "analyze data" produce vague output.
+                </p>
+                <textarea value={form.guidance?.goal || ""} onChange={(e) => setForm((f) => ({ ...f, guidance: { ...f.guidance, goal: e.target.value } }))} rows={3} placeholder='e.g. Your mission: Identify every statistically significant anomaly in the Q4 revenue data — accomplish this fully.' />
               </div>
 
-              <WalkthroughBox title="Here's a complete example to follow" visible={showWalkthrough}>
-                <div className="ps-wt-row"><strong>Name:</strong> sentiment_analyzer</div>
-                <div className="ps-wt-row"><strong>Description:</strong> Classify product reviews into sentiment categories with confidence scores</div>
-                <div className="ps-wt-row"><strong>Goal:</strong> Classify product/review text into one of 10 sentiment types with reasoning and actionable fields</div>
-                <p className="ps-wt-note">Notice how the goal is very specific — it says <em>exactly</em> how many types (10), and what extra info to include (reasoning, actionable fields). The more detail here, the better your AI output will be.</p>
+              <WalkthroughBox title="The Guidebook formula for goals" visible={true}>
+                <p className="ps-wt-note"><strong>Declarative (weak):</strong> "Goal: Analyze the data."</p>
+                <p className="ps-wt-note"><strong>Imperative (strong):</strong> "Your mission: Surface every statistically significant anomaly in the Q4 revenue data — accomplish this fully."</p>
+                <p className="ps-wt-note">The imperative form creates a <em>completion criterion</em> — the AI knows what success looks like and can evaluate its own output against it.</p>
+                <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>More examples:</strong></div>
+                <ul className="ps-wt-list">
+                  <li>"Your mission: Classify product reviews into sentiment categories with confidence scores and reasoning — accomplish this fully."</li>
+                  <li>"Your mission: Identify every security vulnerability in this authentication module, rank by exploitability, and provide a concrete remediation for each — accomplish this fully."</li>
+                </ul>
               </WalkthroughBox>
 
-              {!showWalkthrough && (
-                <Tip>A specific goal like "Classify reviews into 10 categories with confidence scores" works much better than a vague one like "Analyze text".</Tip>
-              )}
+              <Tip>The phrase "accomplish this fully" is a <strong>completion anchor</strong> — it signals that partial responses are insufficient. Always include it.</Tip>
             </div>
           )}
 
-          {/* ── Step 2: Who Should It Be? ──────── */}
+          {/* ── Step 2: Role + Style (① Role, ④ Style from Guidebook) ── */}
           {step === 2 && (
             <div className="ps-panel fade-in">
               <h2>Who Should It Be?</h2>
-              <p className="ps-hint">Imagine you're hiring an expert for this task. What's their job title? How should they write?</p>
+              <p className="ps-hint">The Guidebook says: <em>"You are"</em> are the two most powerful words in prompt engineering. They activate an expert persona that shapes every word the AI writes.</p>
 
               <div className="ps-field">
-                <label>Role <span className="ps-required">*</span></label>
-                <p className="ps-field-hint">Give the AI a job title. Be specific — "Senior data analyst with 10 years experience" works way better than just "analyst".</p>
-                <input value={form.guidance?.role || ""} onChange={(e) => setForm((f) => ({ ...f, guidance: { ...f.guidance, role: e.target.value } }))} placeholder="e.g. Senior software engineer and code reviewer" />
-                <ExamplesDrawer title="See roles from our 85 built-in templates (click to use)">
+                <label>Role <span className="ps-required">*</span> <span className="ps-guidebook-tag">① Role — The Expert Identity</span></label>
+                <p className="ps-field-hint">
+                  Use the formula: <strong>"You are a [seniority] [domain] [specialist] with [specific context]."</strong> This single sentence primes the AI's knowledge, vocabulary, and judgment. Always start with "You are".
+                </p>
+                <input value={form.guidance?.role || ""} onChange={(e) => setForm((f) => ({ ...f, guidance: { ...f.guidance, role: e.target.value } }))} placeholder='e.g. You are a senior data scientist specializing in NLP sentiment analysis with 10 years of product analytics experience.' />
+                <ExamplesDrawer title="See roles from our 87 built-in templates (click to use)">
                   <div className="ps-example-list">
                     {ROLE_EXAMPLES.map((ex, i) => (
                       <div key={i} className="ps-example-item clickable" onClick={() => setForm((f) => ({ ...f, guidance: { ...f.guidance, role: ex.value } }))}>
@@ -816,10 +913,18 @@ export default function CustomTemplates() {
                 </ExamplesDrawer>
               </div>
 
-              <div className="ps-field">
-                <label>Writing Style</label>
-                <p className="ps-field-hint">Pick 2–4 words that describe how the AI should write. Think about tone and format.</p>
-                <input value={form.guidance?.style || ""} onChange={(e) => setForm((f) => ({ ...f, guidance: { ...f.guidance, style: e.target.value } }))} placeholder="e.g. professional, concise, actionable" />
+              <WalkthroughBox title="The 'You are' formula (from Guidebook)" visible={true}>
+                <p className="ps-wt-note"><strong>Weak:</strong> "analyst"</p>
+                <p className="ps-wt-note"><strong>Strong:</strong> "You are a senior financial analyst specializing in forensic accounting with SEC investigation experience."</p>
+                <p className="ps-wt-note">The "You are" opener triggers <em>persona priming</em> — the AI anchors its vocabulary, reasoning depth, and judgment to the declared expert. Include seniority, domain, and relevant context.</p>
+              </WalkthroughBox>
+
+              <div className="ps-field" style={{marginTop:"1.5rem"}}>
+                <label>Writing Style <span className="ps-guidebook-tag">④ Style — Persona's Voice</span></label>
+                <p className="ps-field-hint">
+                  Pick 2–4 adjectives that define the voice: how formal, how concise, how technical. Style is <em>separate</em> from the Role — the same expert can write differently for different audiences.
+                </p>
+                <input value={form.guidance?.style || ""} onChange={(e) => setForm((f) => ({ ...f, guidance: { ...f.guidance, style: e.target.value } }))} placeholder="e.g. concise, evidence-based, professional" />
                 <ExamplesDrawer title="See styles from our built-in templates (click to use)">
                   <div className="ps-example-list">
                     {STYLE_EXAMPLES.map((ex, i) => (
@@ -832,26 +937,21 @@ export default function CustomTemplates() {
                 </ExamplesDrawer>
               </div>
 
-              <WalkthroughBox title="Here's how the Sentiment Analyzer does it" visible={showWalkthrough}>
-                <div className="ps-wt-row"><strong>Role:</strong> Sentiment analysis expert</div>
-                <div className="ps-wt-row"><strong>Style:</strong> consistent, concise, structured</div>
-                <p className="ps-wt-note">A clear role + style combo like this helps the AI produce focused, consistently-formatted output from the very first response.</p>
-              </WalkthroughBox>
-
-              {!showWalkthrough && (
-                <Tip>The more specific the role, the better. "Expert data scientist specializing in NLP" beats "data scientist" every time.</Tip>
-              )}
+              <Tip>Keep Role and Style separate. The role says <em>who</em> the AI is; the style says <em>how</em> it writes. A "senior security engineer" might write in a "terse, tactical, action-oriented" style — or a "thorough, educational, tutorial" style depending on the audience.</Tip>
             </div>
           )}
 
-          {/* ── Step 3: House Rules ──────────────── */}
+          {/* ── Step 3: Rules (③ Rules from Guidebook) ── */}
           {step === 3 && (
             <div className="ps-panel fade-in">
               <h2>House Rules</h2>
-              <p className="ps-hint">These are the instructions that control how the AI behaves. Think of them like rules for an employee — add one at a time and aim for 3 to 6 rules.</p>
+              <p className="ps-hint">Rules are <em>guarantees, not preferences</em>. The Guidebook says: write each rule as a non-negotiable constraint — one sentence, binding language ("must", "always", "never"), ordered by criticality.</p>
 
               <div className="ps-field">
-                <label>Rules</label>
+                <label>Rules <span className="ps-guidebook-tag">③ Rules — Non-Negotiable Constraints</span></label>
+                <p className="ps-field-hint">
+                  Write each rule with <strong>binding modals</strong> (must, shall, always, never). Think of them as contractual clauses — the AI treats "should" as optional but "must" as mandatory. Order by criticality: most important first. Aim for 3–6 rules.
+                </p>
                 <div className="ps-rules-list">
                   {safeRules(form.guidance?.rules).map((rule, idx) => (
                     <div key={idx} className="ps-rule-row">
@@ -874,32 +974,33 @@ export default function CustomTemplates() {
                 </ExamplesDrawer>
               </div>
 
-              <WalkthroughBox title="Here's how the Sentiment Analyzer does it" visible={showWalkthrough}>
-                <div className="ps-wt-row"><strong>Rules:</strong></div>
+              <WalkthroughBox title="Guidebook rule-writing formula" visible={true}>
+                <p className="ps-wt-note"><strong>Weak (preference):</strong> "Try to use accurate data."</p>
+                <p className="ps-wt-note"><strong>Strong (guarantee):</strong> "Every claim must cite a specific data point from the input."</p>
+                <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>Binding modals:</strong> must | shall | always | never | exactly | only</div>
+                <div className="ps-wt-row" style={{marginTop:"0.3rem"}}><strong>Ordering:</strong> Most critical rule first — if the AI truncates, the top rule survives.</div>
+                <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>Sentiment Analyzer example:</strong></div>
                 <ol className="ps-wt-rules">
-                  <li>Classify sentiment as one of: positive, negative, neutral, mixed, sarcastic</li>
-                  <li>Consider tone, intensity, hedging, sarcasm, and mixed signals</li>
-                  <li>Include reasoning, what_is_good, what_is_bad, recommendations</li>
-                  <li>Respond only with valid JSON</li>
+                  <li>Every review must be classified into exactly one of: positive, negative, neutral, mixed, sarcastic.</li>
+                  <li>Always consider tone, intensity, hedging, sarcasm, and mixed signals before classifying.</li>
+                  <li>Every response must include reasoning, what_is_good, what_is_bad, and recommendations fields.</li>
+                  <li>Output must be valid JSON — never include text outside the JSON object.</li>
                 </ol>
-                <p className="ps-wt-note">See the pattern? Rule 1 says <em>what to do</em>, Rules 2–3 say <em>what to include</em>, Rule 4 says <em>what format</em>. That's a great formula for any prompt!</p>
               </WalkthroughBox>
 
-              {!showWalkthrough && (
-                <Tip>A good recipe: Rule 1 = what to do, Rule 2 = what to include, Rule 3 = what format to use, Rule 4 = what to avoid.</Tip>
-              )}
+              <Tip>The Guidebook's key insight: the difference between "should" and "must" is the difference between a suggestion and a contract. Use "must" for every rule.</Tip>
             </div>
           )}
 
-          {/* ── Step 4: Teach It to Think ─────── */}
+          {/* ── Step 4: Reasoning + Examples (⑤ Reasoning, ⑥ Examples from Guidebook) ── */}
           {step === 4 && (
             <div className="ps-panel fade-in">
               <h2>Teach It to Think</h2>
-              <p className="ps-hint">Now let's teach the AI <em>how</em> to approach your task. Pick the thinking style that fits, and optionally show it examples of what you expect.</p>
+              <p className="ps-hint">The Guidebook defines <strong>five reasoning strategies</strong> — each controls <em>how</em> the AI approaches your task. Pick the one that fits, then optionally show examples of what "good" looks like.</p>
 
               <div className="ps-field ps-think-question">
-                <label className="ps-think-ask">How do you want the AI to think?</label>
-                <p className="ps-field-hint">Each option changes how the AI reasons through your task. Pick one and we'll inject the right instructions behind the scenes.</p>
+                <label className="ps-think-ask">How do you want the AI to think? <span className="ps-guidebook-tag">⑤ Reasoning Strategy</span></label>
+                <p className="ps-field-hint">Each strategy fundamentally changes the AI's reasoning path. The Guidebook says: pick the strategy that matches your task's complexity — and stick to one per prompt.</p>
 
                 <div className="ps-strategy-cards">
                   {THINKING_STRATEGIES.map((strategy) => (
@@ -935,8 +1036,8 @@ export default function CustomTemplates() {
               </div>
 
               <div className="ps-field ps-examples-section">
-                <label className="ps-think-ask">Want to show it some examples?  <span className="ps-optional">(optional but powerful)</span></label>
-                <p className="ps-field-hint">Give the AI a few input → output pairs so it knows exactly what "good" looks like. Even 2–3 examples dramatically improve accuracy.</p>
+                <label className="ps-think-ask">Show it what "good" looks like <span className="ps-guidebook-tag">⑥ Examples — Few-Shot Anchors</span></label>
+                <p className="ps-field-hint">The Guidebook says: <strong>2–5 examples, representative of edge cases, matching the exact output format.</strong> Few-shot examples are the single strongest accuracy lever — they teach by demonstration, not instruction.</p>
 
                 {safeArray(form.examples).map((ex, idx) => (
                   <div key={idx} className="ps-example-pair">
@@ -968,32 +1069,36 @@ export default function CustomTemplates() {
                 <button type="button" onClick={addExample} className="ps-add-btn">+ Add Example</button>
               </div>
 
-              <WalkthroughBox title="Here's how the Sentiment Analyzer does it" visible={showWalkthrough}>
-                <div className="ps-wt-row"><strong>Strategy:</strong> Walk me through it (Chain of Thought)</div>
-                <div className="ps-wt-row"><strong>Examples:</strong></div>
+              <WalkthroughBox title="Guidebook: Reasoning + Examples are the strongest accuracy combo" visible={true}>
+                <div className="ps-wt-row"><strong>Reasoning strategy</strong> controls <em>how</em> the AI thinks.</div>
+                <div className="ps-wt-row"><strong>Examples</strong> show <em>what good looks like</em>.</div>
+                <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>Guidebook example guidelines:</strong></div>
+                <ul className="ps-wt-list">
+                  <li>Include <strong>2–5 examples</strong> (diminishing returns beyond 5)</li>
+                  <li>Make them <strong>representative of edge cases</strong> — not just easy ones</li>
+                  <li>Match the <strong>exact output format</strong> you defined in step 5</li>
+                </ul>
+                <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>Sentiment Analyzer examples:</strong></div>
                 <div className="ps-wt-example">"This product is amazing!" → Positive — strong enthusiasm, superlative language</div>
                 <div className="ps-wt-example">"Terrible experience, would not recommend" → Negative — strong negative language</div>
-                <div className="ps-wt-example">"Delivery was fast but product broke" → Mixed — positive on delivery, negative on durability</div>
-                <p className="ps-wt-note">The thinking strategy tells the AI <em>how</em> to approach the problem, and the examples show it <em>exactly</em> what you expect. Together, they're the most powerful combo in prompt engineering.</p>
+                <div className="ps-wt-example">"Delivery was fast but product broke" → Mixed — positive + negative in same review</div>
               </WalkthroughBox>
 
-              {!showWalkthrough && (
-                <Tip>"Walk me through it" is the most popular choice — it works great for analysis, math, and anything with multiple parts. When in doubt, start there!</Tip>
-              )}
+              <Tip>The Guidebook's golden rule for examples: <strong>include at least one edge case</strong> (mixed sentiment, ambiguous input, sarcasm). Edge-case examples prevent the most common AI mistakes.</Tip>
             </div>
           )}
 
-          {/* ── Step 5: Shape the Answer (output schema only) ── */}
+          {/* ── Step 5: Output Contract (⑦ Output Contract from Guidebook) ── */}
           {step === 5 && (
             <div className="ps-panel fade-in">
               <div className="ps-split">
                 <div className="ps-form-side">
                   <h2>Shape the Answer</h2>
-                  <p className="ps-hint">Define what fields the AI should return. This tells the AI exactly what structure you expect in its response.</p>
+                  <p className="ps-hint">The Guidebook says: <strong>"Return ONLY [form] structured as [structure]. Exclude [X]."</strong> This is your output contract — it locks the AI into a specific response shape.</p>
 
                   <div className="ps-field">
-                    <label>Output Fields</label>
-                    <p className="ps-field-hint">Add each field the AI must return. Pick a type for each one (str = text, float = decimal number, int = whole number, bool = true/false, list = multiple items).</p>
+                    <label>Output Fields <span className="ps-guidebook-tag">⑦ Output Contract — The "Return ONLY" Clause</span></label>
+                    <p className="ps-field-hint">Define <strong>form</strong> (field names), <strong>structure</strong> (types), and <strong>what to exclude</strong>. Every field you add becomes a non-negotiable part of the response. The AI will return exactly these fields, nothing more.</p>
                     <div className="ps-schema-list">
                       {safeArray(form.outputSchema).map((field, idx) => (
                         <div key={idx} className="ps-schema-row">
@@ -1017,18 +1122,19 @@ export default function CustomTemplates() {
                     <button type="button" onClick={addOutputField} className="ps-add-btn">+ Add Field</button>
                   </div>
 
-                  <WalkthroughBox title="Here's how the Sentiment Analyzer does it" visible={showWalkthrough}>
-                    <div className="ps-wt-row"><strong>Output Schema</strong> — these are the fields the AI must return:</div>
+                  <WalkthroughBox title="The Guidebook's 'Return ONLY' formula" visible={true}>
+                    <p className="ps-wt-note"><strong>Formula:</strong> "Return ONLY [form] structured as [structure]. Exclude [X]."</p>
+                    <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>Sentiment Analyzer output contract:</strong></div>
                     <table className="ps-wt-schema">
                       <tbody>
-                        <tr><td>sentiment</td><td className="ps-type">str</td><td className="ps-explain">positive, negative, neutral...</td></tr>
-                        <tr><td>confidence</td><td className="ps-type">float</td><td className="ps-explain">0.0 to 1.0</td></tr>
-                        <tr><td>reasoning</td><td className="ps-type">str</td><td className="ps-explain">why the AI chose that label</td></tr>
+                        <tr><td>sentiment</td><td className="ps-type">str</td><td className="ps-explain">"Return ONLY a JSON object"</td></tr>
+                        <tr><td>confidence</td><td className="ps-type">float</td><td className="ps-explain">"structured as {'{'}sentiment, confidence, ...{'}'}"</td></tr>
+                        <tr><td>reasoning</td><td className="ps-type">str</td><td className="ps-explain">"Exclude any preamble or explanation"</td></tr>
                         <tr><td>needs_human_review</td><td className="ps-type">bool</td><td className="ps-explain">true/false flag</td></tr>
                         <tr><td>recommendations</td><td className="ps-type">str</td><td className="ps-explain">actionable next steps</td></tr>
                       </tbody>
                     </table>
-                    <p className="ps-wt-note">The output schema tells the AI <em>exactly</em> what to return and the types to use. You'll add quality checks in the next step.</p>
+                    <p className="ps-wt-note">Each field you define here becomes enforceable in the Guard Rails step. The AI treats this as a binding contract — it will return exactly these fields in the exact types specified.</p>
                   </WalkthroughBox>
                 </div>
 
@@ -1037,17 +1143,17 @@ export default function CustomTemplates() {
             </div>
           )}
 
-          {/* ── Step 6: Guard Rails (constraints) ── */}
+          {/* ── Step 6: Guard Rails (⑧ Guard Rails from Guidebook) ── */}
           {step === 6 && (
             <div className="ps-panel fade-in">
               <div className="ps-split">
                 <div className="ps-form-side">
                   <h2>Guard Rails</h2>
-                  <p className="ps-hint">Set boundaries for the AI. What must always be in its response? What should it never say? Any formatting rules?</p>
+                  <p className="ps-hint">The Guidebook says: <strong>use positive redirects over bare negation.</strong> Instead of "Don't speculate," say "Omit any claim not supported by the input data." Positive phrasing tells the AI what to do <em>instead</em>, which is more effective.</p>
 
                   <div className="ps-field">
-                    <label>Must NOT Include</label>
-                    <p className="ps-field-hint">What should the AI never put in its response? These are the strongest constraints — listed first so the AI pays extra attention.</p>
+                    <label>Must NOT Include <span className="ps-guidebook-tag">⑧ Guard Rails — Boundary Fences</span></label>
+                    <p className="ps-field-hint">Use the <strong>"Omit [X]"</strong> pattern from the Guidebook. "Omit personal opinions" is clearer than "Don't give opinions." Add a <strong>fallback phrase</strong> where possible: "If uncertain, respond with 'Insufficient data' rather than guessing."</p>
                     <div className="ps-constraint-list">
                       {safeArray(form.constraints?.must_not_include).map((item, idx) => (
                         <div key={idx} className="ps-constraint-row">
@@ -1061,7 +1167,7 @@ export default function CustomTemplates() {
 
                   <div className="ps-field">
                     <label>Must Include</label>
-                    <p className="ps-field-hint">What should always be in the AI's response?</p>
+                    <p className="ps-field-hint">What must <em>always</em> appear in the response? These are your inclusion guarantees — the AI treats each as a mandatory checklist item.</p>
                     <div className="ps-constraint-list">
                       {safeArray(form.constraints?.must_include).map((item, idx) => (
                         <div key={idx} className="ps-constraint-row">
@@ -1075,7 +1181,7 @@ export default function CustomTemplates() {
 
                   <div className="ps-field">
                     <label>Format Rules</label>
-                    <p className="ps-field-hint">Any rules about how the output should look?</p>
+                    <p className="ps-field-hint">Structural enforcement: "Output valid JSON only", "Confidence must be 0.0–1.0", "Maximum 500 words". These control the <em>shape</em> of the response.</p>
                     <div className="ps-constraint-list">
                       {safeArray(form.constraints?.format_rules).map((item, idx) => (
                         <div key={idx} className="ps-constraint-row">
@@ -1087,13 +1193,16 @@ export default function CustomTemplates() {
                     <button type="button" onClick={() => addConstraintItem("format_rules")} className="ps-add-btn">+ Add</button>
                   </div>
 
-                  <WalkthroughBox title="Why Guard Rails matter" visible={showWalkthrough}>
-                    <p className="ps-wt-note"><strong>"Must NOT"</strong> constraints are listed first because research shows LLMs pay strongest attention to information at the <strong>beginning</strong> (primacy effect) and <strong>end</strong> (recency effect). Placing hard restrictions early prevents violations.</p>
-                    <div className="ps-wt-row" style={{ marginTop: "0.5rem" }}><strong>Example Guard Rails</strong>:</div>
+                  <WalkthroughBox title="Guidebook: Positive redirect over bare negation" visible={true}>
+                    <p className="ps-wt-note"><strong>Bare negation (weak):</strong> "Don't speculate."</p>
+                    <p className="ps-wt-note"><strong>Positive redirect (strong):</strong> "Omit any claim not directly supported by the input data."</p>
+                    <p className="ps-wt-note"><strong>With fallback (strongest):</strong> "If the input lacks sufficient evidence, respond with 'Insufficient data to determine' rather than guessing."</p>
+                    <div className="ps-wt-row" style={{ marginTop: "0.5rem" }}><strong>Sentiment Analyzer guard rails:</strong></div>
                     <ul className="ps-wt-list">
-                      <li>Must NOT include: personal opinions, speculation</li>
-                      <li>Must include: sentiment, confidence, reasoning</li>
-                      <li>Format rules: Output valid JSON only, Confidence 0.0–1.0</li>
+                      <li><strong>Omit:</strong> personal opinions, speculation, text outside the JSON object</li>
+                      <li><strong>Always include:</strong> sentiment, confidence, reasoning for every classification</li>
+                      <li><strong>Format:</strong> Output valid JSON only, confidence 0.0–1.0</li>
+                      <li><strong>Fallback:</strong> If sentiment is unclear, classify as "mixed" with confidence &lt; 0.5</li>
                     </ul>
                   </WalkthroughBox>
                 </div>
@@ -1103,18 +1212,17 @@ export default function CustomTemplates() {
             </div>
           )}
 
-          {/* ── Step 7: The Big Ask ────────────── */}
+          {/* ── Step 7: Task (⑨ Task from Guidebook) ── */}
           {step === 7 && (
             <div className="ps-panel fade-in">
               <div className="ps-split">
                 <div className="ps-form-side">
                   <h2>The Big Ask</h2>
-                  <p className="ps-hint">Everything above tells the AI <em>who it is</em> and <em>how to think</em>. Now tell it <strong>what to do</strong>.</p>
+                  <p className="ps-hint">The Guidebook says: <strong>Task always comes last.</strong> By the time the AI reads the task, it already knows who it is, how to think, what rules to follow, and what format to return. The task is the trigger that fires everything.</p>
 
-                  {/* Instructions first — the main event */}
                   <div className="ps-field">
-                    <label>What should the AI do? <span className="ps-required">*</span></label>
-                    <p className="ps-field-hint">Write the task in plain language. Use <code>[variable_name]</code> for parts that change each time.</p>
+                    <label>What should the AI do? <span className="ps-required">*</span> <span className="ps-guidebook-tag">⑨ Task — The Trigger</span></label>
+                    <p className="ps-field-hint">Write the core instruction in plain language. Reference your input <strong>specifically</strong> — use <code>[variable_name]</code> for parts that change each time. Use <code>---</code> separators to clearly mark where input data begins.</p>
                     <textarea
                       ref={directiveRef}
                       value={directiveDisplay}
@@ -1158,12 +1266,12 @@ export default function CustomTemplates() {
                     </div>
                   )}
 
-                  <WalkthroughBox title="Here's how the Sentiment Analyzer does it" visible={showWalkthrough}>
-                    <div className="ps-wt-row"><strong>Task:</strong> "Analyze the user's text for sentiment. Provide reasoning and recommendations."</div>
-                    <div className="ps-wt-row"><strong>Variable:</strong> <code>[user_text]</code> gets replaced with the actual review text each time</div>
-                    <div className="ps-wt-row"><strong>What the AI sees:</strong></div>
-                    <div className="ps-wt-code">Analyze the user's text for sentiment. Provide reasoning and recommendations.<br/><br/><span className="ps-var-chip filled">I love this product! Best purchase this year, but shipping was really slow.</span></div>
-                    <p className="ps-wt-note">The task comes first, then the actual text at the bottom. The AI reads the instructions before seeing the input — like briefing someone before handing them a document.</p>
+                  <WalkthroughBox title="Guidebook: Task always last, specific input reference" visible={true}>
+                    <p className="ps-wt-note"><strong>Why last?</strong> The AI reads instructions before data. By placing the task at the end, the AI has full context (role, rules, reasoning, output format) before it processes your input.</p>
+                    <div className="ps-wt-row" style={{marginTop:"0.5rem"}}><strong>Use separators for clarity:</strong></div>
+                    <div className="ps-wt-code">Analyze the following product review for sentiment. Provide reasoning and recommendations.<br/><br/>---<br/><span className="ps-var-chip filled">I love this product! Best purchase this year, but shipping was really slow.</span><br/>---</div>
+                    <p className="ps-wt-note">The <code>---</code> separators clearly mark where user input begins and ends — this prevents prompt injection and keeps the AI focused on the right data.</p>
+                    <p className="ps-wt-note"><strong>Specific input reference:</strong> Say "Analyze the following product review" not just "Analyze this." The AI needs to know <em>what</em> it's looking at.</p>
                   </WalkthroughBox>
                 </div>
 
@@ -1387,26 +1495,61 @@ export default function CustomTemplates() {
           })()}
 
           {/* ── Navigation ─────────────────────── */}
-          <div className="ps-nav">
-            <button type="button" onClick={() => setStep(step - 1)} className="ps-btn secondary">
+          <div className="ps-nav ps-nav-fullscreen">
+            <button type="button" onClick={() => setStep(step - 1)} className="ps-btn secondary large">
               {"\u2190"} Back
             </button>
+            <div className="ps-nav-center-hint">
+              {step < 8 ? (
+                <span className="ps-nav-skip" onClick={() => setStep(step + 1)}>Skip this step →</span>
+              ) : null}
+            </div>
             {step < 8 && (
-              <button type="button" onClick={() => setStep(step + 1)} disabled={!canProceed()} className="ps-btn primary">Next {"\u2192"}</button>
+              <button type="button" onClick={() => setStep(step + 1)} disabled={!canProceed()} className="ps-btn primary large">
+                Next: {WIZARD_STEPS[step + 1]?.short || "Continue"} {"\u2192"}
+              </button>
             )}
           </div>
         </div>
 
-        <CopilotPanel
-          form={form}
-          onApplySuggestion={handleCopilotSuggestion}
-          onError={setError}
-          onBuildPreview={handleBuildPreview}
-          onGoToReview={() => setStep(8)}
-          previewReady={!!builderBuilt}
-          builderBuilt={builderBuilt}
-          docked
-        />
+        {/* ── Copilot: fixed right panel (always-open for AI Drive, toggle FAB for manual) ── */}
+        {copilotMode ? (
+          <div className="ps-copilot-fixed-right">
+            <CopilotPanel
+              form={form}
+              onApplySuggestion={(s) => { handleCopilotSuggestion(s); }}
+              onError={setError}
+              onBuildPreview={handleBuildPreview}
+              onGoToReview={() => setStep(8)}
+              previewReady={!!builderBuilt}
+              builderBuilt={builderBuilt}
+            />
+          </div>
+        ) : (
+          <div className={`ps-copilot-fab-wrapper ${copilotOpen ? "open" : ""}`}>
+            <button
+              type="button"
+              className="ps-copilot-fab"
+              onClick={() => setCopilotOpen(!copilotOpen)}
+              title="Open AI Copilot"
+            >
+              {copilotOpen ? "✕" : "🤖"} {copilotOpen ? "Close" : "Copilot"}
+            </button>
+            {copilotOpen && (
+              <div className="ps-copilot-fab-panel">
+                <CopilotPanel
+                  form={form}
+                  onApplySuggestion={(s) => { handleCopilotSuggestion(s); }}
+                  onError={setError}
+                  onBuildPreview={handleBuildPreview}
+                  onGoToReview={() => { setStep(8); setCopilotOpen(false); }}
+                  previewReady={!!builderBuilt}
+                  builderBuilt={builderBuilt}
+                />
+              </div>
+            )}
+          </div>
+        )}
         </div>
       )}
 
@@ -1439,6 +1582,116 @@ export default function CustomTemplates() {
               <button type="button" onClick={() => { resetWizard(); setWizardActive(true); }} className="ps-btn primary large">Create Your First Prompt</button>
             </div>
           )}
+        </>
+      )}
+
+      {/* ── Prompt Improver Overlay ─────────────────────── */}
+      {improverOpen && (
+        <>
+          <div className="ps-improver-overlay" onClick={() => setImproverOpen(false)} />
+          <div className="ps-improver-panel">
+            <div className="ps-improver-header">
+              <h2>{"\uD83D\uDD27"} Pit Stop</h2>
+              <p>Paste any existing prompt. We'll X-ray it against the 9 sections, then upgrade it using the Guidebook's architecture.</p>
+              <button type="button" className="ps-improver-close" onClick={() => setImproverOpen(false)}>&times;</button>
+            </div>
+
+            <div className="ps-improver-body">
+              <div className="ps-improver-llm-bar">
+                <label>Provider</label>
+                <select value={improveProvider} onChange={(e) => { setImproveProvider(e.target.value); setImproveModel(""); }}>
+                  {IMPROVE_PROVIDERS.map((p) => (<option key={p} value={p}>{p}</option>))}
+                </select>
+                <label>Model</label>
+                <select value={improveModel} onChange={(e) => setImproveModel(e.target.value)} className="ps-improver-model-input">
+                  <option value="">Auto (recommended)</option>
+                  {modelsForProvider(improveProvider).map((m) => (
+                    <option key={m.id} value={m.id}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <textarea
+                className="ps-improver-input"
+                rows={8}
+                placeholder="Paste your existing prompt here..."
+                value={improveInput}
+                onChange={(e) => { setImproveInput(e.target.value); setParseResult(null); setImproveResult(null); setImproveError(""); }}
+              />
+
+              <div className="ps-improver-actions">
+                <button type="button" onClick={handleParsePrompt} disabled={parseLoading || !improveInput.trim()} className="ps-btn secondary">
+                  {parseLoading ? "Analyzing..." : "Analyze (Free)"}
+                </button>
+                <button type="button" onClick={handleImprovePrompt} disabled={improveLoading || !improveInput.trim() || !hasKey} className="ps-btn primary" title={!hasKey ? "Add an API key in Settings first" : ""}>
+                  {improveLoading ? "Improving..." : "\u2728 Improve with AI (API key)"}
+                </button>
+              </div>
+
+              {improveError && <p className="ps-improver-error">{improveError}</p>}
+
+              {parseResult && (
+                <div className="ps-improver-result fade-in">
+                  <h4>9-Section Analysis</h4>
+                  <div className="ps-improver-chips">
+                    {Object.entries(SECTION_LABELS).map(([key, label]) => {
+                      const present = parseResult.present?.includes(key);
+                      return (
+                        <span key={key} className={`ps-improver-chip ${present ? "present" : "missing"}`}>
+                          {present ? "\u2713" : "\u2717"} {label}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  {parseResult.missing?.length > 0 && (
+                    <p className="ps-improver-hint">
+                      <strong>{parseResult.missing.length} section{parseResult.missing.length !== 1 ? "s" : ""} missing.</strong> Click <strong>Improve with AI</strong> to fill them in.
+                    </p>
+                  )}
+                  {parseResult.present?.length === 9 && (
+                    <p className="ps-improver-hint ps-improver-hint--good">All 9 sections detected. Click Improve to strengthen weak ones.</p>
+                  )}
+                </div>
+              )}
+
+              {improveResult && (
+                <div className="ps-improver-result fade-in">
+                  <div className="ps-improver-score-bar">
+                    <span className="ps-improver-score-label">Quality</span>
+                    <span className="ps-improver-score before">{Math.round((improveResult.before_score || 0) * 100)}%</span>
+                    <span className="ps-improver-arrow">{"\u2192"}</span>
+                    <span className="ps-improver-score after">{Math.round((improveResult.after_score || 0) * 100)}%</span>
+                    <span className="ps-improver-delta">+{Math.round((improveResult.score_delta || 0) * 100)}%</span>
+                  </div>
+
+                  {improveResult.diffs?.length > 0 && (
+                    <details className="ps-improver-diffs">
+                      <summary>Section-by-section changes ({improveResult.diffs.filter((d) => d.action !== "unchanged").length} changed)</summary>
+                      <div className="ps-improver-diff-list">
+                        {improveResult.diffs.filter((d) => d.action !== "unchanged").map((d, i) => (
+                          <div key={i} className={`ps-improver-diff ps-improver-diff--${d.action}`}>
+                            <span className="ps-improver-diff-badge">{d.action.toUpperCase()}</span>
+                            <span className="ps-improver-diff-section">{SECTION_LABELS[d.section] || d.section}</span>
+                            {d.after && <p className="ps-improver-diff-after">{d.after}</p>}
+                            <p className="ps-improver-diff-rationale">{d.rationale}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+
+                  <div className="ps-improver-output-header">
+                    <h4>Improved Prompt</h4>
+                    <div className="ps-improver-output-actions">
+                      <button type="button" className="ps-btn secondary" onClick={async () => { try { await navigator.clipboard.writeText(improveResult.improved_prompt); setToast("Copied!"); } catch { setToast("Copy failed"); } }}>Copy</button>
+                      <button type="button" className="ps-btn secondary" onClick={() => { const blob = new Blob([improveResult.improved_prompt], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "improved_prompt.txt"; a.click(); URL.revokeObjectURL(url); setToast("Downloaded"); }}>Download</button>
+                    </div>
+                  </div>
+                  <pre className="ps-improver-output">{improveResult.improved_prompt}</pre>
+                </div>
+              )}
+            </div>
+          </div>
         </>
       )}
 

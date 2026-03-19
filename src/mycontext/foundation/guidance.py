@@ -99,16 +99,23 @@ class Guidance(BaseModel):
         Returns:
             Formatted system prompt
         """
+        role_text = self.role
+        if role_text.lower().startswith("you are "):
+            role_text = role_text[8:]
+        role_text = role_text.rstrip(".")
+
         if provider == "gemini" and self.style and include_style:
-            # Gemini responds well to explicit trait adjectives appended to the role
             traits = self._style_to_traits(self.style)
-            parts = [f"You are {self.role}. You are {traits}."]
+            parts = [f"You are {role_text}. You are {traits}."]
         else:
-            parts = [f"You are {self.role}."]
+            parts = [f"You are {role_text}."]
 
         if self.goal and include_goal:
-            # Imperative framing — drives completion rather than passive description
-            parts.append(f"Your mission: {self.goal} — accomplish this fully.")
+            goal_text = self.goal
+            if goal_text.lower().startswith("your mission:"):
+                goal_text = goal_text[len("your mission:"):].strip()
+            goal_text = goal_text.removesuffix("— accomplish this fully").removesuffix("— accomplish this fully.").strip().rstrip(".")
+            parts.append(f"Your mission: {goal_text} — accomplish this fully.")
 
         if self.persona_scope:
             parts.append(f"Scope: {self.persona_scope}")

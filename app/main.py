@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.api import (
+    architect_router,
     chains_router,
     chat_router,
     custom_templates_router,
@@ -103,6 +104,7 @@ async def rate_limit_auth(request: Request, call_next):
 # --- Routers ---
 
 app.include_router(auth_router)
+app.include_router(architect_router)
 app.include_router(keys_router)
 app.include_router(license_router)
 app.include_router(templates_router)

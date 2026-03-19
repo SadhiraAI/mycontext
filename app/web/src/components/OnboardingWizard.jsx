@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./OnboardingWizard.css";
 
 const INTENTS = [
-  { id: "prompts", label: "I want better AI prompts", path: "/templates", desc: "Browse 85 templates and build structured contexts" },
+  { id: "prompts", label: "I want better AI prompts", path: "/templates", desc: "Browse 87 templates and build structured contexts" },
   { id: "product", label: "I'm building an AI product", path: "/custom", desc: "Create custom templates for your use case" },
   { id: "explore", label: "I'm exploring context engineering", path: "/templates", desc: "See how structured contexts improve AI output" },
 ];
@@ -66,7 +66,7 @@ export default function OnboardingWizard({ onComplete }) {
             <div className="onboard-flow">
               <div className="onboard-flow-step">
                 <span className="onboard-flow-num">1</span>
-                <div><strong>Pick a pattern</strong><p>85 research-backed templates for analysis, reasoning, decisions, and more.</p></div>
+                <div><strong>Pick a pattern</strong><p>87 research-backed templates for analysis, reasoning, decisions, and more.</p></div>
               </div>
               <div className="onboard-flow-step">
                 <span className="onboard-flow-num">2</span>

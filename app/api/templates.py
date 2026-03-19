@@ -81,7 +81,8 @@ async def build_context(
 
     assembled = ctx.assemble()
     ofmt = (body.output_format or "").lower()
-    if ofmt in ("json", "markdown"):
+    has_output_section = "## OUTPUT FORMAT" in assembled
+    if ofmt in ("json", "markdown") and not has_output_section:
         from mycontext.utils import output_format
         assembled = assembled + "\n\n" + output_format(ofmt)
     ctx_export = MxContext(directive=assembled)

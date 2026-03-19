@@ -271,6 +271,7 @@ export default function Landing() {
         </span>
         <div className="landing-header-actions">
           <ThemeToggle />
+          <Link to="/guidebooks" className="landing-btn landing-btn-guidebooks">📖 Guidebooks</Link>
           <Link to="/login" className="landing-btn secondary">Log in</Link>
           <Link to="/signup" className="landing-btn primary">Get started free</Link>
         </div>
@@ -331,48 +332,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ── Free Guide Download ────────────────────── */}
-        <section className="landing-section landing-guide-section">
-          <div className="landing-guide-card">
-            <div className="landing-guide-content">
-              <span className="landing-guide-badge">Free PDF Guide</span>
-              <h2 className="landing-guide-title">The Only Cursor Guide You'll Ever Need</h2>
-              <p className="landing-guide-desc">
-                Every Cursor capability in one document — rules, skills, subagents, MCP servers,
-                hooks, plugins, browser automation, and best practices. From zero to a fully
-                autonomous development environment.
-              </p>
-              <ul className="landing-guide-highlights">
-                <li>All 8 configuration systems explained with real examples</li>
-                <li>20+ free MCP servers categorized by use case</li>
-                <li>Step-by-step "How It All Works Together" walkthrough</li>
-                <li>Beginner-friendly — works for any codebase, any language</li>
-              </ul>
-              <div className="landing-guide-meta">
-                <span>By Dhiraj Pokhrel</span>
-                <span className="landing-guide-sep">·</span>
-                <span>1,200+ lines</span>
-                <span className="landing-guide-sep">·</span>
-                <span>PDF</span>
-              </div>
-            </div>
-            <div className="landing-guide-action">
-              <a
-                href="/cursor_guide.pdf"
-                download="The_Only_Cursor_Guide_Youll_Ever_Need.pdf"
-                className="landing-btn primary large landing-guide-download"
-              >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Download Free PDF
-              </a>
-              <span className="landing-guide-note">No signup required</span>
-            </div>
-          </div>
-        </section>
 
         {/* ── Problem ──────────────────────────────────── */}
         <section className="landing-section">
@@ -415,6 +374,18 @@ export default function Landing() {
               </button>
             ))}
           </div>
+        </section>
+
+        {/* ── Browse Guidebooks ────────────────────────── */}
+        <section className="landing-section landing-guidebooks-cta">
+          <Link to="/guidebooks" className="landing-guidebooks-card">
+            <span className="landing-guidebooks-icon">📖</span>
+            <div className="landing-guidebooks-body">
+              <h3>Browse Guidebooks</h3>
+              <p>Free, downloadable guides — Prompt Engineering (9-Section Architecture), Cursor IDE setup, and more. Open, read, download as PDF. No signup required.</p>
+            </div>
+            <span className="landing-guidebooks-arrow">→</span>
+          </Link>
         </section>
 
         {/* ── Product Suite ────────────────────────────── */}
@@ -695,7 +666,7 @@ export default function Landing() {
             <Link to="/signup" className="landing-btn primary large">Get started free</Link>
           </div>
           <p className="landing-dev-link">
-            Developers: <a href="https://mycontext-docs.pages.dev/" target="_blank" rel="noopener noreferrer">SDK Docs</a> · <a href="https://pypi.org/project/mycontext-ai/" target="_blank" rel="noopener noreferrer">PyPI</a> · <a href="https://github.com/SadhiraAI/mycontext" target="_blank" rel="noopener noreferrer">GitHub</a>
+            Developers: <a href="https://mycontext-docs.pages.dev/" target="_blank" rel="noopener noreferrer">SDK Docs</a> · <a href="https://pypi.org/project/mycontext-ai/" target="_blank" rel="noopener noreferrer">PyPI</a>
           </p>
         </section>
       </main>
@@ -719,9 +690,6 @@ export default function Landing() {
           </a>
           <a href="#" title="LinkedIn" className="landing-social-badge" aria-label="LinkedIn">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
-          <a href="#" title="GitHub" className="landing-social-badge" aria-label="GitHub">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
           </a>
         </div>
         <p className="landing-footer-copy">&copy; {new Date().getFullYear()} Sadhira AI &amp; Analytics. All rights reserved.</p>

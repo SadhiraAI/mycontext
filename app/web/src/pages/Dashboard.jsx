@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTour } from "../context/TourContext";
 import * as api from "../api/client";
+import SmartExecutePanel from "../components/SmartExecutePanel";
+import useActiveProvider from "../hooks/useActiveProvider";
 import "./Dashboard.css";
 
 const JOURNEY = [
@@ -18,7 +20,7 @@ const JOURNEY = [
     step: "\uD83E\uDDE0",
     title: "Cognitive Studio",
     sub: "Adept",
-    desc: "Pick from 85 research-backed cognitive frameworks. Each one is a structured reasoning template — not a generic prompt. Fill parameters, export to any LLM.",
+    desc: "Pick from 87 research-backed cognitive frameworks. Each one is a structured reasoning template — not a generic prompt. Fill parameters, export to any LLM.",
     to: "/templates",
     color: "var(--accent)",
   },
@@ -33,11 +35,11 @@ const JOURNEY = [
 ];
 
 const CAPABILITIES = [
-  { label: "Cognitive Patterns", value: "85", detail: "research-backed reasoning frameworks" },
-  { label: "Export Formats", value: "13", detail: "OpenAI, Anthropic, Google, LangChain, and more" },
+  { label: "Cognitive Patterns", value: "87", detail: "research-backed reasoning frameworks" },
+  { label: "Pattern Categories", value: "16", detail: "analysis, reasoning, creative, and more" },
+  { label: "Export Formats", value: "8", detail: "Markdown, JSON, YAML, OpenAI, Anthropic, Google, LangChain, LlamaIndex" },
   { label: "Quality Metrics", value: "6", detail: "dimensions scored for every context you build" },
   { label: "Orchestrators", value: "7", detail: "LangChain, CrewAI, AutoGen, DSPy, and more" },
-  { label: "Generic Prompts", value: "85", detail: "pre-authored zero-cost prompts per template" },
   { label: "Execution Tiers", value: "3", detail: "Static Generic / Dynamic Compiled / Full Response" },
 ];
 
@@ -51,7 +53,8 @@ const MILESTONES = [
 export default function Dashboard() {
   const { user } = useAuth();
   const { isTourDone, startTour } = useTour();
-  const [templateCount, setTemplateCount] = useState(85);
+  const active = useActiveProvider();
+  const [templateCount, setTemplateCount] = useState(87);
   const [customCount, setCustomCount] = useState(0);
   const [milestones, setMilestones] = useState(() => {
     try { return JSON.parse(localStorage.getItem("mc_milestones") || "{}"); } catch { return {}; }
@@ -127,6 +130,24 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="lp-section">
+        <h2>Try Smart Execute</h2>
+        <p className="lp-section-sub">
+          Ask any question — Smart Execute automatically picks the right cognitive pattern, compiles your context, and runs it.
+          The fastest way to experience what mycontext does.
+        </p>
+        <SmartExecutePanel
+          provider={active.provider || "openai"}
+          hasKey={active.hasKey}
+          compact
+        />
+        {!active.hasKey && (
+          <p className="lp-smart-hint">
+            <Link to="/settings">Add an API key in Settings</Link> to try Smart Execute.
+          </p>
+        )}
       </section>
 
       {!allDone && (

@@ -30,7 +30,7 @@ ProviderHint = Literal["openai", "anthropic", "gemini", "generic"]
 # Threshold (chars) above which OpenAI instruction mirroring kicks in
 _OPENAI_MIRROR_THRESHOLD = 1500
 
-from .foundation import Constraints, Directive, Guidance  # noqa: E402 — intentional: placed after module-level constants
+from .foundation import Constraints, Directive, Guidance  # noqa: E402, I001 — intentional: placed after module-level constants
 
 # ── Thinking-strategy registry ────────────────────────────────────
 THINKING_STRATEGIES: dict[str, tuple[str, str]] = {
@@ -416,7 +416,11 @@ class Context(BaseModel):
         # ② GOAL
         goal = getattr(self.guidance, "goal", None) if self.guidance else None
         if goal:
-            goal_body = f"**Your mission:** {goal} — accomplish this fully."
+            goal_clean = goal
+            if goal_clean.lower().startswith("your mission:"):
+                goal_clean = goal_clean[len("your mission:"):].strip()
+            goal_clean = goal_clean.removesuffix("— accomplish this fully").removesuffix("— accomplish this fully.").strip().rstrip(".")
+            goal_body = f"**Your mission:** {goal_clean} — accomplish this fully."
             sections.append(_wrap("GOAL", goal_body))
 
         # ③ RULES (hard → easy, Zhang et al. 2025)
