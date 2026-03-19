@@ -1090,6 +1090,26 @@ code{
       <li data-n="✓">If the code is secure, state that explicitly.</li>
     </ul>
 
+    <h3>④ Style — Persona's Voice</h3>
+    <p>Separate voice and tone from output format. Mixing them — "Be formal and use bullet points and no headers" — is parsed inconsistently (Sweller, 1988). Style is <em>how</em> the AI speaks; format is <em>what shape</em> the output takes.</p>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Mixed</span>Be formal, use bullet points, no preamble, and be direct.</div>
+      <div class="compare-card strong"><span class="ctag">Separated</span><strong>Style:</strong> Formal, analytical, third-person. No hedging.<br><strong>Output format:</strong> Return ONLY a ranked bullet list. No preamble.</div>
+    </div>
+
+    <h3>⑤ Reasoning Strategy — How the AI Thinks</h3>
+    <p>For multi-step or analytical tasks, specify the reasoning approach. Without it, the model may jump to conclusions. Common strategies: <code>step_by_step</code> (sequential), <code>multiple_angles</code> (consider alternatives), <code>verify</code> (check before concluding).</p>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Implicit</span>Analyze the data and identify anomalies.</div>
+      <div class="compare-card strong"><span class="ctag">Explicit</span>Reason step by step: (1) Identify each metric and its baseline. (2) Compute deviation. (3) Rank by magnitude. (4) State confidence before interpretation.</div>
+    </div>
+
+    <h3>⑥ Examples — Few-Shot Anchors</h3>
+    <p>2–5 input→output demos in the middle zone produce more stable calibration than examples at the start (Li et al., 2025). Place them after rules so the model understands constraints before seeing demos. More than 5 rarely improves quality.</p>
+    <div class="callout">
+      <strong>Example placement:</strong> Rules first, then examples. Each example should show the exact format you want — including structure, level of detail, and how edge cases are handled.
+    </div>
+
     <h3>⑦ Output Contract — Exactly What to Return</h3>
     <p>The most underused section. Start with <code>Return ONLY</code> and specify the exact shape. This goes just before the task — for maximum compliance.</p>
     <div class="code-block">
@@ -1107,6 +1127,14 @@ No markdown wrapper. No explanation outside the JSON.</pre>
 
     <h3>⑧ Guard Rails — What to Never Include</h3>
     <p>Use positive redirects, not bare negation. "Do not speculate" is weaker than "Base every claim on the data provided." Chapter 4 covers this fully — including the most common ineffective instruction on the internet.</p>
+
+    <h3>⑨ Task — The Trigger (Always Last)</h3>
+    <p>The task must always be last. Placing it in the recency zone yields +9.7 BLEU (Li et al., 2023). Anything before it is context for it.</p>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Task at start</span>Analyze this data: [data below]. You are a senior analyst...</div>
+      <div class="compare-card strong"><span class="ctag">Task at end</span>[Role, goal, rules, format, guard rails above.]<br><br><strong>Your task:</strong> Analyze the Q4 revenue data below and surface every anomaly above 2σ.</div>
+    </div>
+    <p>Keep the task concise. Move detail into rules or context. For long inputs, mirror key instructions at the bottom — "Surface every anomaly above 2σ. Ranked bullet list only." — so the model sees them in the recency zone.</p>
 </div>
 
 <!-- ══════════════════════════════════════════ CH4 -->
@@ -1227,6 +1255,20 @@ in Q4 revenue — accomplish this fully.
 3. Separate observations from interpretations.
 4. If data is missing, say so before drawing conclusions.
 
+## STYLE
+
+Formal, analytical, third-person. No hedging.
+
+## REASONING
+
+Reason step by step: (1) Identify each metric and its baseline. (2) Compute deviation from Q3. (3) Rank by magnitude. (4) State confidence before interpretation.
+
+## EXAMPLES
+
+Example format:
+• Revenue: +12% | 2.1σ | high | Q4 campaign drove uplift; cite line 4.
+• Margin: −3% | 1.8σ | medium | Cost spike in Nov; cite line 12.
+
 ## OUTPUT FORMAT
 
 Return ONLY a ranked bullet list of findings.
@@ -1273,6 +1315,16 @@ in Q4 revenue — accomplish this fully.
 3. Separate observations from interpretations.
 &lt;/rules&gt;
 
+&lt;style&gt;Formal, analytical, third-person. No hedging.&lt;/style&gt;
+
+&lt;reasoning&gt;Reason step by step: (1) Identify each metric and its baseline. (2) Compute deviation from Q3. (3) Rank by magnitude. (4) State confidence before interpretation.&lt;/reasoning&gt;
+
+&lt;examples&gt;
+Example format:
+• Revenue: +12% | 2.1σ | high | Q4 campaign drove uplift; cite line 4.
+• Margin: −3% | 1.8σ | medium | Cost spike in Nov; cite line 12.
+&lt;/examples&gt;
+
 &lt;output_format&gt;
 Return ONLY a ranked bullet list of findings.
 Each bullet: [metric] | [delta %] | [magnitude σ] | [confidence] | [interpretation]
@@ -1313,6 +1365,16 @@ in Q4 revenue — accomplish this fully.
 2. Flag every anomaly above 2 standard deviations from Q3.
 3. Separate observations from interpretations.
 &lt;/rules&gt;
+
+&lt;style&gt;Formal, analytical, third-person. Precise, methodical, direct. No hedging.&lt;/style&gt;
+
+&lt;reasoning&gt;Reason step by step: (1) Identify each metric and its baseline. (2) Compute deviation from Q3. (3) Rank by magnitude. (4) State confidence before interpretation.&lt;/reasoning&gt;
+
+&lt;examples&gt;
+Example format:
+• Revenue: +12% | 2.1σ | high | Q4 campaign drove uplift; cite line 4.
+• Margin: −3% | 1.8σ | medium | Cost spike in Nov; cite line 12.
+&lt;/examples&gt;
 
 &lt;output_format&gt;
 Return ONLY a ranked bullet list of findings.
@@ -1366,6 +1428,20 @@ module and provide a working remediation for each — accomplish this fully.
 4. Do not flag theoretical risks without evidence in the provided code.
 5. If the code is secure, state that explicitly.
 
+## STYLE
+
+Technical, direct, third-person. No hedging.
+
+## REASONING
+
+Reason step by step: (1) Identify each function and its attack surface. (2) Trace inputs to outputs. (3) Flag real vulnerabilities with evidence. (4) Provide fix before moving on.
+
+## EXAMPLES
+
+Example format:
+• [Critical] auth.py:47 — Hardcoded secret in login; use env var.
+• [High] utils.py:12 — SQL injection via user input; parameterize query.
+
 ## OUTPUT FORMAT
 
 Return ONLY a numbered list:
@@ -1408,6 +1484,17 @@ needed to defend it in a board meeting — accomplish this fully.
 3. Define every acronym on first use.
 4. If the report does not support a clear recommendation, state that.
 &lt;/rules&gt;
+
+&lt;style&gt;Executive, decisive, third-person. No hedging.&lt;/style&gt;
+
+&lt;reasoning&gt;Reason step by step: (1) Extract the core recommendation. (2) Identify the three strongest supporting findings. (3) Identify the biggest risk. (4) Assemble in DECISION → FINDINGS → RISK order.&lt;/reasoning&gt;
+
+&lt;examples&gt;
+Example format:
+DECISION: Proceed with Phase 2 rollout.
+THREE KEY FINDINGS: • Finding A. • Finding B. • Finding C.
+BIGGEST RISK: Budget overrun if vendor timeline slips.
+&lt;/examples&gt;
 
 &lt;output_format&gt;
 Return a 3-part structure:
