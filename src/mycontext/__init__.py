@@ -6,7 +6,7 @@ Transform raw questions into perfect, portable contexts for any AI system.
 Context as Code™ - Research-backed cognitive patterns for systematic context engineering.
 """
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 # Core exports
 # Templates module (lazy loading)

@@ -1,6 +1,6 @@
 [project]
 name = "mycontext-ai"
-version = "0.8.0"
+version = "0.8.1"
 description = "Context engineering for LLMs — 87 cognitive patterns, prompt compilation, 3-tier execution, 13 export formats"
 readme = "README.md"
 requires-python = ">=3.11"

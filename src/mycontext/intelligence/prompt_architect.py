@@ -23,7 +23,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..core import Context
+from ..core import Context, ProviderHint
 from ..foundation import Constraints, Directive, Guidance
 
 logger = logging.getLogger(__name__)
@@ -41,6 +41,27 @@ SECTION_NAMES = [
     "guard_rails",
     "task",
 ]
+
+# ── Linguistic rules distilled from research (THE_PROMPT_GUIDEBOOK.md) ────────
+# Embedded into every LLM rewriting call so the generated content follows the
+# same word-choice, framing, and specificity standards as hand-built prompts.
+
+_LINGUISTIC_RULES = """\
+LINGUISTIC RULES — apply to EVERY field you write:
+1. IMPERATIVE framing — goals and tasks as directives, not descriptions.
+   BAD: "Analyze the data."  GOOD: "Your mission: Surface every anomaly in Q4 revenue — accomplish this fully."
+2. POSITIVE REDIRECT — never bare negation ("Do not hallucinate"). State the positive action + an explicit fallback phrase.
+   BAD: "Do not hallucinate."  GOOD: "Every claim must be grounded in the provided source material. If the answer is absent, state: 'Not found in the provided material.'"
+3. BINDING MODALS — must / always / never / shall / will. Never use should / try / ideally / consider / might for constraints.
+4. SPECIFICITY — every rule must be objectively testable. If a reviewer cannot verify compliance, rewrite.
+   BAD: "Be detailed."  GOOD: "Every finding must include ≥3 supporting data points."
+5. ONE RULE = ONE SENTENCE — split compound rules into separate items.
+6. CRITICAL-FIRST ordering — place the most important rules first; models apply earlier rules more reliably when conflicts arise.
+7. SCOPE BOUNDING — after the role, add "Scope: Limit to X. Do not Y." to prevent persona drift.
+8. OUTPUT CONTRACT — start with "Return ONLY" to suppress preamble.
+9. GUARD RAILS — use "Omit X" + the positive behavior. Add an explicit fallback phrase for uncertainty. Suppress hedging: probably, might, could be, seems to, appears to.
+10. TASK LAST — the task/instruction goes in the final position (recency zone) for highest recall at generation start.\
+"""
 
 # ── Result dataclasses ───────────────────────────────────────────────────────
 
@@ -181,52 +202,74 @@ class PromptArchitect:
 
     # ── Construction rules used during rewriting ──────────────────────────────
 
+    # ── Per-section construction rules (research-backed, THE_PROMPT_GUIDEBOOK) ─
+
     _ROLE_UPGRADE_HINTS = [
-        "Include seniority level (e.g. Senior, Principal, Lead).",
-        "Specify the domain of expertise precisely.",
-        "Avoid generic titles like 'Expert Assistant' or 'Helpful AI'.",
+        "Formula: 'You are' + seniority + domain + optional context/setting.",
+        "BAD: 'You are an expert.' GOOD: 'You are a senior data analyst with 10 years of experience in B2B SaaS revenue analysis.'",
+        "Immediately after the role add: 'Scope: Limit [analysis/review/work] to [X]. Do not [Y].' — prevents persona drift.",
+        "Reject generics: 'Expert Assistant', 'Helpful AI', 'AI helper' activate no domain knowledge.",
     ]
 
     _GOAL_UPGRADE_HINTS = [
-        "Use imperative framing: 'Identify...', 'Produce...', 'Determine...'",
-        "State what a successful output looks like in one sentence.",
-        "Place the goal immediately after the role (primacy zone).",
+        "Formula: 'Your mission: [specific achievement] — accomplish this fully.'",
+        "State the completion criterion — what does success look like? The model must be able to judge its own output.",
+        "Use imperative framing (directive, not description). BAD: 'Goal: Analyze data.' GOOD: 'Your mission: Identify every revenue anomaly above 2σ and rank by impact.'",
+        "Place immediately after role (primacy zone — highest recall position).",
     ]
 
     _RULES_UPGRADE_HINTS = [
-        "Use binding language: must/will/always/never — not should/try/ideally.",
-        "Each rule must be concrete enough to be violated (testable).",
-        "Include at least 3 rules; aim for 4-6.",
+        "Rules are guarantees, not preferences. BAD: 'Try to be thorough.' GOOD: 'Every finding must include a code location, severity, and remediation step.'",
+        "BINDING modals only: must / always / never / shall / will. Never should / try / ideally / consider.",
+        "Each rule must be testable — a reviewer can objectively verify compliance.",
+        "One rule = one sentence. Split compound rules.",
+        "Order critical-first (Zhang et al. — earlier rules win conflicts).",
+        "4-6 rules. Fewer than 3 leaves gaps; more than 8 dilutes attention.",
     ]
 
     _STYLE_UPGRADE_HINTS = [
-        "Name 2-3 specific tone adjectives (e.g. 'precise, direct, evidence-first').",
-        "Avoid generic: 'clear and helpful' is not a style.",
+        "Specify formality (formal/casual/technical), pace (concise/thorough/step-by-step), audience (senior engineer/executive/general public).",
+        "Add negative style constraints: 'No hedging language', 'No jargon without definition', 'No preamble or greeting'.",
+        "Keep style (voice/tone) separate from format (structure/layout) — do not mix.",
+        "Reject generics: 'clear and helpful' is not a style. Name 2-3 specific, measurable tone adjectives.",
     ]
 
     _REASONING_UPGRADE_HINTS = [
-        "Specify a thinking strategy: chain-of-thought, tree-of-thought, or self-reflection.",
-        "Tell the model WHEN to use reasoning, not just 'think carefully'.",
+        "Pick ONE strategy matching the task type — write it explicitly:",
+        "  step_by_step (CoT) — multi-step problems where early errors propagate.",
+        "  multiple_angles (ToT) — decisions with genuine trade-offs.",
+        "  verify (Self-Reflection) — high-stakes outputs acted on without review.",
+        "  explain_simply (Simplification) — non-technical audiences.",
+        "  creative (Divergent) — tasks where novelty is the criterion.",
+        "Tell the model WHEN and HOW to apply the strategy, not just 'think carefully'.",
     ]
 
     _EXAMPLES_UPGRADE_HINTS = [
-        "Include at least one negative example (WRONG approach) and one positive.",
-        "Examples should match the exact output format you expect.",
+        "2-5 representative examples. Fewer than 2 = too much ambiguity; more than 5 = token waste.",
+        "Examples must match the exact output format (JSON → JSON, bullets → bullets).",
+        "Include at least one edge case or negative example showing what WRONG looks like.",
+        "Place after the reasoning strategy (middle zone — calibration position).",
     ]
 
     _OUTPUT_CONTRACT_UPGRADE_HINTS = [
-        "Define the exact structure: sections, JSON schema, or format.",
-        "State what must NOT appear (prose wrappers, apologies, markdown if not wanted).",
+        "Start with 'Return ONLY' — these two words reliably suppress preamble.",
+        "Specify: (1) form (JSON/bullets/table/prose), (2) structure of each item, (3) what to exclude (no preamble, no summary, no markdown if unwanted).",
+        "BAD: 'Output a summary.' GOOD: 'Return ONLY a 3-part structure: 1) KEY FINDING (1 sentence), 2) EVIDENCE (2-3 bullets), 3) RECOMMENDED ACTION (1 sentence).'",
     ]
 
     _GUARD_RAILS_UPGRADE_HINTS = [
-        "List explicit exclusions: topics, phrases, behaviors to avoid.",
-        "Add edge-case handling: what to do when data is missing or ambiguous.",
+        "POSITIVE REDIRECTS only. BAD: 'Do not hallucinate.' GOOD: 'Every claim must be grounded in the source material. If absent, state: \"Not found in the provided material.\"'",
+        "Use 'Omit' for exclusions: 'Omit speculation', 'Omit hedging language: probably, might, could be, seems to, appears to.'",
+        "For every exclusion, provide the positive alternative: what the model SHOULD do instead.",
+        "Include an explicit fallback phrase for uncertainty — exact words to produce instead of guessing.",
+        "Add edge-case handling: missing data, ambiguous input, or out-of-scope requests.",
     ]
 
     _TASK_UPGRADE_HINTS = [
-        "Restate the core task in one sentence at the very end (recency zone).",
-        "The final sentence should be the clearest, most direct instruction in the prompt.",
+        "Place LAST (recency zone — highest attention when generation begins).",
+        "Be specific about the input: refer to exactly what data/material is provided.",
+        "The final sentence must be the clearest, most direct imperative in the entire prompt.",
+        "For long-context tasks (>1500 chars of data), add a REMINDER after the data restating the core instruction.",
     ]
 
     _HINTS: dict[str, list[str]] = {
@@ -245,9 +288,29 @@ class PromptArchitect:
         self,
         provider: str = "openai",
         model: str = "gpt-4o-mini",
+        *,
+        assembly_provider_hint: ProviderHint | None = None,
     ):
         self.provider = provider
         self.model = model
+        # How assemble() formats headings/XML (openai / anthropic / gemini).
+        # None → inferred from *provider* (the LLM used for improve/build).
+        self._assembly_provider_hint = assembly_provider_hint
+
+    def _resolve_assembly_provider_hint(self) -> ProviderHint | None:
+        if self._assembly_provider_hint is not None:
+            return self._assembly_provider_hint
+        p = (self.provider or "").lower().strip()
+        direct: dict[str, ProviderHint] = {
+            "openai": "openai",
+            "anthropic": "anthropic",
+            "gemini": "gemini",
+        }
+        if p in direct:
+            return direct[p]
+        if p in ("google", "vertex", "genai"):
+            return "gemini"
+        return None
 
     # ── Public API ────────────────────────────────────────────────────────────
 
@@ -610,7 +673,15 @@ class PromptArchitect:
                 must_not_include=guard_rails or None,
             )
 
-        return Context(guidance=guidance, directive=directive, constraints=constraints)
+        # Match hand-built Contexts: same 9-section renderer + provider-tuned wording
+        # (headings vs XML, constraint phrasing, OpenAI long-knowledge mirror, etc.).
+        return Context(
+            guidance=guidance,
+            directive=directive,
+            constraints=constraints,
+            research_flow=True,
+            provider_hint=self._resolve_assembly_provider_hint(),
+        )
 
     # ── LLM calls ─────────────────────────────────────────────────────────────
 
@@ -642,8 +713,9 @@ class PromptArchitect:
         present_summary = ", ".join(present) if present else "none detected"
 
         system = (
-            "You are a world-class prompt engineer. "
-            "You apply the 9-Section Prompt Architecture to improve prompts. "
+            "You are a world-class prompt engineer applying the 9-Section "
+            "Prompt Architecture.\n\n"
+            f"{_LINGUISTIC_RULES}\n\n"
             "You output ONLY valid JSON — no commentary, no markdown wrapper."
         )
 
@@ -659,18 +731,19 @@ SECTIONS MISSING OR WEAK: {', '.join(missing + weak_sections) or 'none'}
 
 Your task: rewrite the prompt by completing ALL 9 sections.
 Preserve the intent of the original. Upgrade weak sections. Add missing ones.
+Apply every LINGUISTIC RULE from your instructions to every field you write.
 
 Return ONLY this JSON (fill every field — use null only if truly not applicable):
 {{
-  "role": "<seniority + domain role>",
-  "goal": "<one-sentence imperative goal>",
-  "rules": ["<binding rule 1>", "<binding rule 2>", "<binding rule 3>", "<binding rule 4>"],
-  "style": "<2-3 tone adjectives>",
-  "reasoning": "<thinking strategy to use, or null>",
-  "examples": ["<example 1>", "<example 2 — optional>"],
-  "output_contract": "<exact output structure required>",
-  "guard_rails": ["<must not do 1>", "<must not do 2>"],
-  "task": "<restated task in one clear imperative sentence>"
+  "role": "'You are' + seniority + domain. Follow with 'Scope: Limit to X. Do not Y.'",
+  "goal": "'Your mission: [specific achievement] — accomplish this fully.' (imperative, not declarative)",
+  "rules": ["binding-modal rule 1 (testable, one sentence)", "rule 2", "rule 3", "rule 4 — order critical-first"],
+  "style": "formality + pace + audience. Add negative style constraints.",
+  "reasoning": "one of: step_by_step / multiple_angles / verify / explain_simply / creative, or null",
+  "examples": ["example matching output format", "edge-case or negative example — optional"],
+  "output_contract": "'Return ONLY …' + form + structure + exclusions",
+  "guard_rails": ["positive redirect + fallback phrase", "Omit hedging: probably, might, could be"],
+  "task": "clearest imperative sentence — placed last (recency zone)"
 }}"""
 
         return self._call_llm_for_json(system, user, provider, model, **kwargs)
@@ -689,8 +762,9 @@ Return ONLY this JSON (fill every field — use null only if truly not applicabl
             hints_block += "\n".join(f"  - {h}" for h in hints)
 
         system = (
-            "You are a world-class prompt engineer. "
-            "You construct expert prompts using the 9-Section Prompt Architecture. "
+            "You are a world-class prompt engineer applying the 9-Section "
+            "Prompt Architecture.\n\n"
+            f"{_LINGUISTIC_RULES}\n\n"
             "You output ONLY valid JSON — no commentary, no markdown wrapper."
         )
 
@@ -698,19 +772,20 @@ Return ONLY this JSON (fill every field — use null only if truly not applicabl
 \"{task}\"
 
 Build a complete 9-section prompt for this task.
+Apply every LINGUISTIC RULE from your instructions to every field you write.
 {hints_block}
 
 Return ONLY this JSON (fill every field — use null only if truly not applicable):
 {{
-  "role": "<seniority + domain role>",
-  "goal": "<one-sentence imperative goal>",
-  "rules": ["<binding rule 1>", "<binding rule 2>", "<binding rule 3>", "<binding rule 4>"],
-  "style": "<2-3 tone adjectives>",
-  "reasoning": "<thinking strategy, or null>",
-  "examples": ["<illustrative example — or null>"],
-  "output_contract": "<exact output structure required>",
-  "guard_rails": ["<must not do 1>", "<must not do 2>"],
-  "task": "<task restated as a final, clear imperative sentence>"
+  "role": "'You are' + seniority + domain. Follow with 'Scope: Limit to X. Do not Y.'",
+  "goal": "'Your mission: [specific achievement] — accomplish this fully.' (imperative, not declarative)",
+  "rules": ["binding-modal rule 1 (testable, one sentence)", "rule 2", "rule 3", "rule 4 — order critical-first"],
+  "style": "formality + pace + audience. Add negative style constraints.",
+  "reasoning": "one of: step_by_step / multiple_angles / verify / explain_simply / creative, or null",
+  "examples": ["example matching output format", "edge-case or negative example — optional"],
+  "output_contract": "'Return ONLY …' + form + structure + exclusions",
+  "guard_rails": ["positive redirect + fallback phrase", "Omit hedging: probably, might, could be"],
+  "task": "clearest imperative sentence — placed last (recency zone)"
 }}"""
 
         return self._call_llm_for_json(system, user, provider, model, **kwargs)

@@ -6,6 +6,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.8.1] — 2026-03-20
+
+### Changed
+
+- **`PromptArchitect`** (`improve` / `build`) — Internal rewriting LLM is now instructed with distilled linguistic rules from the project prompt-engineering guidebook (imperative framing, positive redirects, binding modals, testable specificity, scope bounding, “Return ONLY” output contracts, recency-zone task placement). Per-section upgrade hints were expanded with concrete BAD/GOOD patterns and formulas for role, goal, rules, style, reasoning strategies, examples, output contract, guard rails, and task.
+- **`PromptArchitect`** — Contexts produced from LLM JSON now use `research_flow=True` and a resolved `provider_hint` so assembled prompts match the 9-section research-backed renderer and provider-specific formatting (when the architect’s provider maps to OpenAI, Anthropic, or Gemini).
+
+---
+
 ## [0.9.0] — 2026-03-18 (planned)
 
 ### Added
