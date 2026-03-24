@@ -29,6 +29,8 @@ Context(
     thinking_strategy: str | None = None,
     examples: list[dict[str, str]] | None = None,
     research_flow: bool = False,
+    provider_hint: str | None = None,
+    task_contract: TaskContract | None = None,
 )
 ```
 
@@ -41,6 +43,8 @@ Strings passed to `guidance` or `directive` are automatically promoted to `Guida
 | `research_flow` | `bool` | When `True`, uses 9-section research-backed assembly. Default `False` |
 | `thinking_strategy` | `str \| None` | Reasoning strategy: `step_by_step`, `multiple_angles`, `verify`, `explain_simply`, `creative` |
 | `examples` | `list[dict] \| None` | Few-shot pairs `[{"input": "...", "output": "..."}]` — placed in middle zone when `research_flow=True` |
+| `provider_hint` | `str \| None` | `openai`, `anthropic`, `gemini`, or `generic` — assembly formatting only |
+| `task_contract` | `TaskContract \| None` | L0 table at top of research-flow prompt when set. See below. |
 
 ### Class Methods
 
@@ -83,6 +87,29 @@ Strings passed to `guidance` or `directive` are automatically promoted to `Guida
 ---
 
 ## Foundations — `mycontext.foundation`
+
+### `TaskContract`
+
+```python
+from mycontext import TaskContract
+# or: from mycontext.foundation import TaskContract
+
+TaskContract(
+    domain: str | None = None,
+    audience: str | None = None,
+    genre: str | None = None,
+    grounding: str | None = None,
+    metaphor: str | None = None,
+)
+```
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `has_content()` | `bool` | Any field populated |
+| `to_dict()` | `dict[str, str]` | Non-null fields only |
+| `from_dict(d)` | `TaskContract` | Class method — e.g. migrate `metadata["l0"]` |
+
+Full guide: [Task Contract (L0)](../foundations/task-contract).
 
 ### `Guidance`
 

@@ -6,7 +6,7 @@ Transform raw questions into perfect, portable contexts for any AI system.
 Context as Code™ - Research-backed cognitive patterns for systematic context engineering.
 """
 
-__version__ = "0.8.1"
+__version__ = "0.9.0"
 
 # Core exports
 # Templates module (lazy loading)
@@ -16,7 +16,7 @@ __version__ = "0.8.1"
 # Agent Skills (executable, quality-assured, pattern-anchored skills)
 from . import integrations, intelligence, skills, templates, utils
 from .core import THINKING_STRATEGIES, Context
-from .foundation import Constraints, Directive, Guidance
+from .foundation import Constraints, Directive, Guidance, TaskContract
 from .intelligence import (
     BenchmarkResult,
     CAIResult,
@@ -51,6 +51,7 @@ __all__ = [
     "Directive",
     "Guidance",
     "Constraints",
+    "TaskContract",
     # Structure
     "Pattern",
     "Blueprint",

@@ -30,7 +30,7 @@ ProviderHint = Literal["openai", "anthropic", "gemini", "generic"]
 # Threshold (chars) above which OpenAI instruction mirroring kicks in
 _OPENAI_MIRROR_THRESHOLD = 1500
 
-from .foundation import Constraints, Directive, Guidance  # noqa: E402, I001 — intentional: placed after module-level constants
+from .foundation import Constraints, Directive, Guidance, TaskContract  # noqa: E402, I001 — intentional: placed after module-level constants
 
 # ── Thinking-strategy registry ────────────────────────────────────
 THINKING_STRATEGIES: dict[str, tuple[str, str]] = {
@@ -174,6 +174,15 @@ class Context(BaseModel):
             "'openai' → Markdown headings + instruction mirror for long knowledge; "
             "'gemini' → XML delimiters + trait adjectives on role + verbosity anchor. "
             "Does not affect which provider execute() calls — set that separately."
+        ),
+    )
+
+    task_contract: TaskContract | None = Field(
+        default=None,
+        description=(
+            "L0 task contract — declares domain, audience, genre, and grounding "
+            "protocol. Rendered at the very top of research-flow prompts (primacy "
+            "zone). Calibrates every downstream section."
         ),
     )
 
@@ -371,7 +380,7 @@ class Context(BaseModel):
         """Build prompt in the research-backed 9-section order.
 
         Zones (Liu et al. 2023 — primacy / recency bias):
-          PRIMACY    ① Role  ② Goal         — strongest recall
+          PRIMACY    L0 Meta (optional)  ① Role  ② Goal  — strongest recall
           EARLY      ③ Rules  ④ Style        — instructions first (OpenAI)
           MIDDLE     ⑤ Reasoning  ⑥ Examples — demos stabilize (Li et al. 2025)
           LATE       ⑦ Output Format  ⑧ Guard Rails — near the ask (CO-STAR)
@@ -403,6 +412,21 @@ class Context(BaseModel):
 
         sections: list[str] = []
 
+        # L0 — TASK CONTRACT (optional, before Role for primacy)
+        tc = self.task_contract
+        if tc is None and self.metadata:
+            legacy_l0 = self.metadata.get("l0")
+            if legacy_l0 and isinstance(legacy_l0, dict):
+                tc = TaskContract.from_dict(legacy_l0)
+
+        if tc and tc.has_content():
+            l0_rows: list[str] = []
+            for key, val in tc.to_dict().items():
+                l0_rows.append(f"| **{key.title()}** | {val} |")
+            if l0_rows:
+                table = "| L0 dimension | Value |\n|--------------|--------|\n" + "\n".join(l0_rows)
+                sections.append(_wrap("L0 — TASK CONTRACT", table))
+
         # ① ROLE (primacy zone) — goal/rules/style rendered in their own sections below
         if self.guidance:
             role_text = self.guidance.render(
@@ -426,7 +450,7 @@ class Context(BaseModel):
         # ③ RULES (hard → easy, Zhang et al. 2025)
         rules = getattr(self.guidance, "rules", []) if self.guidance else []
         if rules:
-            items = "\n".join(f"  {i+1}. {r}" for i, r in enumerate(rules))
+            items = "\n".join(f"  {i+1}. {str(r)}" for i, r in enumerate(rules))
             rules_body = f"**You MUST follow these rules at all times:**\n{items}"
             sections.append(_wrap("RULES", rules_body))
 
@@ -531,7 +555,7 @@ class Context(BaseModel):
             reminders.append(f"Reminder — your mission: {self.guidance.goal}")
         if self.guidance and self.guidance.rules:
             top_rules = self.guidance.rules[:3]
-            rules_text = "; ".join(top_rules)
+            rules_text = "; ".join(str(r) for r in top_rules)
             reminders.append(f"Key rules to apply: {rules_text}")
         if self.directive:
             content = self.directive.render().strip()

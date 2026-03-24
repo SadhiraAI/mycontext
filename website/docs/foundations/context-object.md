@@ -29,6 +29,8 @@ Context(
     thinking_strategy: str | None = None,
     examples: list[dict[str, str]] | None = None,
     research_flow: bool = False,
+    provider_hint: str | None = None,  # "openai" | "anthropic" | "gemini" | "generic"
+    task_contract: TaskContract | None = None,
 )
 ```
 
@@ -53,6 +55,8 @@ ctx = Context(guidance=Guidance(role="You are a senior data analyst"))
 | `thinking_strategy` | `str \| None` | No | Reasoning strategy injected before the task. Options: `step_by_step`, `multiple_angles`, `verify`, `explain_simply`, `creative` |
 | `examples` | `list[dict] \| None` | No | Few-shot examples as `[{"input": "...", "output": "..."}]` |
 | `research_flow` | `bool` | No | When `True`, uses research-backed 9-section prompt ordering. Default: `False` |
+| `provider_hint` | `str \| None` | No | Target provider for assembly tweaks (`openai`, `anthropic`, `gemini`). Does not change `execute()` routing. |
+| `task_contract` | `TaskContract \| None` | No | L0 metadata (domain, audience, genre, grounding, metaphor). Rendered first when `research_flow=True`. See [Task Contract](./task-contract). |
 
 ## Basic Usage
 
@@ -80,7 +84,13 @@ ctx = Context(
 
 ## Assembly
 
-`assemble()` converts the Context into the formatted text sent to the LLM. With `research_flow=True`, it produces a nine-section structured prompt where each section maps to a specific field:
+`assemble()` converts the Context into the formatted text sent to the LLM. With `research_flow=True`, if you set `task_contract` (or legacy `metadata["l0"]`), an **L0 — TASK CONTRACT** table is rendered **before** the nine main sections:
+
+```
+L0 TASK CONTRACT (optional) → ① ROLE → ② GOAL → … → ⑨ TASK
+```
+
+Otherwise the main chain is:
 
 ```
 ① ROLE → ② GOAL → ③ RULES → ④ STYLE → ⑤ REASONING → ⑥ EXAMPLES → ⑦ OUTPUT FORMAT → ⑧ GUARD RAILS → ⑨ TASK

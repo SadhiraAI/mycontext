@@ -23,8 +23,31 @@ from mycontext.intelligence import PromptArchitect
 | Method | LLM call | Use when |
 |--------|----------|----------|
 | `parse(prompt)` | No | You want to see which sections exist and what quality score the current prompt gets |
-| `build(task)` | Yes | You have a plain task description and want a complete 9-section prompt generated from scratch |
-| `improve(prompt)` | Yes | You have an existing prompt and want it upgraded in place, with a diff |
+| `build(task, …)` | Yes | You have a plain task description and want a complete 9-section prompt generated from scratch |
+| `improve(prompt, …)` | Yes | You have an existing prompt and want it upgraded in place, with a diff |
+
+### Optional arguments (`build` / `improve`)
+
+Both methods accept the same optional keyword arguments (passed through to the internal LLM call, e.g. `api_key`, `temperature`):
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `user_message` | `str \| None` | The real user/task message the model will see at runtime. When set, the rewriter can infer required headings, markers (e.g. `[NOT IN PACKET]`), and output shape so `output_contract` matches the task. |
+| `task_contract` | `TaskContract \| None` | L0 metadata (`domain`, `audience`, `genre`, `grounding`, `metaphor`). Calibrates every generated section; **genre** is used to avoid mismatches (e.g. internal brief vs JSON-only contract). |
+
+```python
+from mycontext import TaskContract
+from mycontext.intelligence import PromptArchitect
+
+tc = TaskContract(genre="internal brief", audience="Engineering leadership")
+
+arch = PromptArchitect(model="gpt-4o-mini")
+result = arch.improve(
+    flat_system_prompt,
+    user_message=full_user_message,
+    task_contract=tc,
+)
+```
 
 ## `parse()` — detect sections, no LLM
 
@@ -110,6 +133,7 @@ else:
 
 ## See also
 
+- [Task Contract (L0)](../foundations/task-contract) — shared L0 model for manual `Context` builds and `PromptArchitect`
 - [GuidanceOptimizer](./guidance-optimizer) — upgrade `Guidance` objects in SDK templates
 - [Prompt Optimization Workflow](../quality/prompt-optimization-workflow) — end-to-end workflow using both tools
 - [QualityMetrics](../quality/quality-metrics) — score any `Context` across 6 dimensions

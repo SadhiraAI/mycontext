@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
         'foundations/guidance',
         'foundations/directive',
         'foundations/constraints',
+        'foundations/task-contract',
         'foundations/research-flow',
         'foundations/patterns',
       ],

@@ -4,12 +4,14 @@ Output Evaluator - Measure LLM output quality against its context
 Evaluates the *output* of an LLM (not the prompt), scoring how well the
 response leverages the cognitive scaffolding provided by the context.
 
-Five dimensions (distinct from QualityMetrics' prompt-level dimensions):
+Seven dimensions (distinct from QualityMetrics' prompt-level dimensions):
   - Instruction Following
   - Reasoning Depth
   - Actionability
   - Structure Compliance
   - Cognitive Scaffolding
+  - Groundedness       (v2: does every claim trace to provided material?)
+  - Register Fit       (v2: does tone/vocab match audience and genre?)
 """
 
 from __future__ import annotations
@@ -28,6 +30,8 @@ class OutputDimension(Enum):
     ACTIONABILITY = "actionability"
     STRUCTURE_COMPLIANCE = "structure_compliance"
     COGNITIVE_SCAFFOLDING = "cognitive_scaffolding"
+    GROUNDEDNESS = "groundedness"
+    REGISTER_FIT = "register_fit"
 
 
 @dataclass
@@ -41,11 +45,13 @@ class OutputQualityScore:
 
 
 _DIMENSION_WEIGHTS = {
-    OutputDimension.INSTRUCTION_FOLLOWING: 0.25,
-    OutputDimension.REASONING_DEPTH: 0.20,
-    OutputDimension.ACTIONABILITY: 0.20,
-    OutputDimension.STRUCTURE_COMPLIANCE: 0.15,
-    OutputDimension.COGNITIVE_SCAFFOLDING: 0.20,
+    OutputDimension.INSTRUCTION_FOLLOWING: 0.20,
+    OutputDimension.REASONING_DEPTH: 0.15,
+    OutputDimension.ACTIONABILITY: 0.15,
+    OutputDimension.STRUCTURE_COMPLIANCE: 0.10,
+    OutputDimension.COGNITIVE_SCAFFOLDING: 0.15,
+    OutputDimension.GROUNDEDNESS: 0.15,
+    OutputDimension.REGISTER_FIT: 0.10,
 }
 
 
@@ -68,10 +74,17 @@ class OutputEvaluator:
         mode: str = "heuristic",
         provider: str = "openai",
         model: str = "gpt-4o-mini",
+        dimension_weights: dict[str, float] | None = None,
     ):
         self.mode = mode
         self.provider = provider
         self.model = model
+        self._custom_weights: dict[OutputDimension, float] | None = None
+        if dimension_weights:
+            self._custom_weights = {
+                OutputDimension(k): v for k, v in dimension_weights.items()
+                if k in {d.value for d in OutputDimension}
+            }
 
     def evaluate(
         self,
@@ -119,6 +132,14 @@ class OutputEvaluator:
         dims[OutputDimension.COGNITIVE_SCAFFOLDING] = cs_score
         evidence[OutputDimension.COGNITIVE_SCAFFOLDING] = cs_ev
 
+        gr_score, gr_ev = self._score_groundedness(assembled, output)
+        dims[OutputDimension.GROUNDEDNESS] = gr_score
+        evidence[OutputDimension.GROUNDEDNESS] = gr_ev
+
+        rf_score, rf_ev = self._score_register_fit(assembled, output)
+        dims[OutputDimension.REGISTER_FIT] = rf_score
+        evidence[OutputDimension.REGISTER_FIT] = rf_ev
+
         for dim, score in dims.items():
             label = dim.value.replace("_", " ").title()
             if score >= 0.7:
@@ -126,7 +147,8 @@ class OutputEvaluator:
             elif score < 0.4:
                 weaknesses.append(f"Weak {label}")
 
-        overall = sum(s * _DIMENSION_WEIGHTS[d] for d, s in dims.items())
+        weights = self._custom_weights or _DIMENSION_WEIGHTS
+        overall = sum(s * weights.get(d, 0.0) for d, s in dims.items())
         if word_count < 20:
             overall = min(overall, 0.30)
             weaknesses.append("Output is too short to demonstrate quality")
@@ -403,6 +425,130 @@ class OutputEvaluator:
         ev = f"Output uses {used}/{len(ctx_frameworks)} cognitive frameworks from context"
         return max(0.0, min(1.0, score)), ev
 
+    def _score_groundedness(
+        self, assembled: str, output: str
+    ) -> tuple:
+        """How well does the output stay within the provided context/material?"""
+        lower_out = output.lower()
+        lower_ctx = assembled.lower()
+
+        score = 0.50
+        notes: list[str] = []
+
+        grounding_markers = [
+            "according to", "based on the", "the provided", "from the context",
+            "the data shows", "the material", "as stated", "per the",
+            "source material", "the packet", "[not in packet]",
+            "not found in the provided", "not available in the",
+        ]
+        marker_hits = sum(1 for m in grounding_markers if m in lower_out)
+        if marker_hits >= 3:
+            score += 0.25
+            notes.append(f"{marker_hits} grounding markers")
+        elif marker_hits >= 1:
+            score += 0.15
+            notes.append(f"{marker_hits} grounding markers")
+
+        hedge_inventions = [
+            "it is widely known", "experts agree that",
+            "studies have shown", "research suggests",
+            "it is common knowledge", "as we all know",
+            "it goes without saying",
+        ]
+        ctx_allows = any(p in lower_ctx for p in [
+            "widely known", "experts agree", "studies have shown",
+            "research suggests", "common knowledge",
+        ])
+        if not ctx_allows:
+            invention_hits = sum(1 for h in hedge_inventions if h in lower_out)
+            if invention_hits >= 2:
+                score -= 0.20
+                notes.append(f"{invention_hits} unsourced authority claims")
+            elif invention_hits >= 1:
+                score -= 0.10
+                notes.append(f"{invention_hits} unsourced authority claim")
+
+        has_grounding_instruction = any(
+            p in lower_ctx for p in [
+                "only use", "do not invent", "stay within",
+                "not in packet", "grounding", "factual",
+                "do not fabricate", "source material only",
+            ]
+        )
+        if has_grounding_instruction:
+            score += 0.10
+            notes.append("Context includes grounding instructions")
+
+        ev = "; ".join(notes) if notes else "Default groundedness assessment"
+        return max(0.0, min(1.0, score)), ev
+
+    def _score_register_fit(
+        self, assembled: str, output: str
+    ) -> tuple:
+        """Does the output's register/tone match the context's declared audience and genre?"""
+        lower_ctx = assembled.lower()
+        lower_out = output.lower()
+
+        score = 0.50
+        notes: list[str] = []
+
+        _AI_BOILERPLATE = [
+            "in today's rapidly evolving", "in today's fast-paced",
+            "let's dive in", "without further ado",
+            "game-changer", "game changer", "cutting-edge",
+            "leverage the power", "unlock the full potential",
+            "embark on a journey", "navigate the complexities",
+            "delve into", "in the realm of", "tapestry of",
+            "it's no wonder that", "ever-evolving", "ever-changing",
+            "paramount importance", "of a lifetime",
+        ]
+        boilerplate_hits = sum(1 for bp in _AI_BOILERPLATE if bp in lower_out)
+        if boilerplate_hits >= 4:
+            score -= 0.30
+            notes.append(f"{boilerplate_hits} AI boilerplate phrases — heavy generic tone")
+        elif boilerplate_hits >= 2:
+            score -= 0.15
+            notes.append(f"{boilerplate_hits} AI boilerplate phrases")
+        elif boilerplate_hits == 0:
+            score += 0.15
+            notes.append("No AI boilerplate detected")
+
+        is_technical = any(p in lower_ctx for p in [
+            "technical", "engineer", "developer", "staff", "senior",
+            "internal brief", "incident", "architecture",
+        ])
+        is_casual = any(p in lower_ctx for p in [
+            "blog", "traveler", "tourist", "visitor", "general public",
+            "casual", "approachable",
+        ])
+
+        if is_technical:
+            casual_markers = sum(1 for m in [
+                "exciting", "amazing", "wonderful", "fantastic",
+                "awesome", "incredible", "stunning",
+            ] if m in lower_out)
+            if casual_markers >= 3:
+                score -= 0.15
+                notes.append("Casual superlatives in a technical context")
+            else:
+                score += 0.10
+                notes.append("Tone consistent with technical context")
+
+        if is_casual:
+            jargon_markers = sum(1 for m in [
+                "pursuant to", "heretofore", "aforementioned",
+                "notwithstanding", "whereby", "therein",
+            ] if m in lower_out)
+            if jargon_markers >= 2:
+                score -= 0.15
+                notes.append("Formal jargon in a casual context")
+            else:
+                score += 0.10
+                notes.append("Tone consistent with casual/blog context")
+
+        ev = "; ".join(notes) if notes else "Default register assessment"
+        return max(0.0, min(1.0, score)), ev
+
     # -- LLM evaluation -------------------------------------------------------
 
     def _evaluate_llm(
@@ -411,47 +557,71 @@ class OutputEvaluator:
         import json
 
         assembled = context.assemble()
-        prompt = (
-            "You are an expert evaluator of LLM outputs. Score this output "
-            "against the context that produced it.\n\n"
-            "Be STRICT. Most outputs score 0.4-0.7. Only exceptional outputs "
-            "score above 0.85.\n\n"
-            f"<context>\n{assembled[:4000]}\n</context>\n\n"
-            f"<output>\n{output[:8000]}\n</output>\n\n"
-            "Rate on 5 dimensions (0.0-1.0):\n"
-            "1. **instruction_following** -- Did it follow directive/rules/constraints?\n"
-            "2. **reasoning_depth** -- Multi-step reasoning, not surface answers?\n"
-            "3. **actionability** -- Concrete, implementable recommendations?\n"
-            "4. **structure_compliance** -- Matches requested format?\n"
-            "5. **cognitive_scaffolding** -- Uses the cognitive framework from the template?\n\n"
-            "Output ONLY valid JSON:\n"
-            '{"instruction_following": 0.0, "reasoning_depth": 0.0, '
-            '"actionability": 0.0, "structure_compliance": 0.0, '
-            '"cognitive_scaffolding": 0.0, '
-            '"evidence": {"instruction_following": "...", "reasoning_depth": "...", '
-            '"actionability": "...", "structure_compliance": "...", '
-            '"cognitive_scaffolding": "..."}, '
-            '"strengths": ["..."], "weaknesses": ["..."]}'
+        user_task = kwargs.pop("user_task", None) or ""
+
+        prompt = f"""You are an expert evaluator of LLM outputs. Score this output against the context that produced it.
+
+CALIBRATION — be strict and differentiate:
+  0.0–0.2  Broken / off-topic / refusal
+  0.2–0.4  Superficial or mostly misses the ask
+  0.4–0.6  Adequate but generic; a competent baseline would do this
+  0.6–0.8  Good — follows instructions, adds depth, concrete details
+  0.8–0.9  Very good — tight, specific, well-grounded, uses frameworks
+  0.9–1.0  Exceptional — publishable quality, no wasted words
+
+IMPORTANT: Outputs that are structurally similar but differ in depth, specificity, or grounding MUST receive DIFFERENT scores. Identical scores across arms indicate a failed evaluation.
+
+<system_context>
+{assembled[:6000]}
+</system_context>
+
+{f"<user_task>{chr(10)}{user_task[:2000]}{chr(10)}</user_task>" if user_task else ""}
+
+<output>
+{output[:10000]}
+</output>
+
+Rate on 7 dimensions (0.0–1.0):
+
+1. **instruction_following** — Did it follow every directive, rule, and constraint from the system context? Count missed instructions.
+   - 0.3 = ignores most instructions; 0.6 = follows major ones, misses details; 0.9 = follows all
+
+2. **reasoning_depth** — Multi-step analysis, not surface-level summaries? Uses causal language, quantified claims, explicit tradeoffs?
+   - 0.3 = surface restatement; 0.6 = some analysis with "because/therefore"; 0.9 = deep chains with evidence
+
+3. **actionability** — Concrete, implementable next steps with owners/timelines/metrics, not vague advice?
+   - 0.3 = "consider improving"; 0.6 = some specific actions; 0.9 = every recommendation has who/what/when
+
+4. **structure_compliance** — Matches requested format (sections, headings, JSON, lists) exactly?
+   - 0.3 = ignores format; 0.6 = roughly right; 0.9 = exact match
+
+5. **cognitive_scaffolding** — Uses the analytical framework from the context (root cause, SWOT, decision matrix, etc.)?
+   - 0.3 = ignores framework; 0.6 = mentions it; 0.9 = framework drives the analysis
+
+6. **groundedness** — Every factual claim traced to provided context? No invented statistics, vendors, or studies?
+   - 0.3 = invents freely; 0.6 = mostly grounded with a few unsourced claims; 0.9 = every claim traceable
+
+7. **register_fit** — Tone, vocabulary, and diction match the declared audience/genre? Free of AI boilerplate?
+   - 0.3 = generic AI tone, boilerplate-heavy; 0.6 = mostly appropriate; 0.9 = reads like a domain expert wrote it
+
+Output ONLY valid JSON:
+{{"instruction_following": 0.0, "reasoning_depth": 0.0, "actionability": 0.0, "structure_compliance": 0.0, "cognitive_scaffolding": 0.0, "groundedness": 0.0, "register_fit": 0.0, "evidence": {{"instruction_following": "...", "reasoning_depth": "...", "actionability": "...", "structure_compliance": "...", "cognitive_scaffolding": "...", "groundedness": "...", "register_fit": "..."}}, "strengths": ["..."], "weaknesses": ["..."]}}"""
+
+        api_key = kwargs.pop("api_key", None)
+        eval_ctx = Context(
+            guidance=(
+                "You are a strict, honest output quality evaluator. "
+                "Differentiate between outputs — never give identical scores to different texts. "
+                "Output ONLY valid JSON."
+            ),
+            directive=prompt,
         )
 
-        try:
-            api_key = kwargs.pop("api_key", None)
-            eval_ctx = Context(
-                guidance="You are a strict, honest output quality evaluator. Output ONLY valid JSON.",
-                directive=prompt,
-            )
-            response = eval_ctx.execute(
-                provider=self.provider,
-                model=self.model,
-                temperature=0.2,
-                api_key=api_key,
-            )
-            text = response.response.strip()
+        def _parse_llm_response(text: str) -> OutputQualityScore:
             if text.startswith("```"):
                 lines = text.split("\n")
                 text = "\n".join(lines[1:-1]) if len(lines) > 2 else text
                 text = text.replace("```json", "").replace("```", "").strip()
-
             data = json.loads(text)
             dims = {
                 OutputDimension.INSTRUCTION_FOLLOWING: float(data["instruction_following"]),
@@ -459,29 +629,53 @@ class OutputEvaluator:
                 OutputDimension.ACTIONABILITY: float(data["actionability"]),
                 OutputDimension.STRUCTURE_COMPLIANCE: float(data["structure_compliance"]),
                 OutputDimension.COGNITIVE_SCAFFOLDING: float(data["cognitive_scaffolding"]),
+                OutputDimension.GROUNDEDNESS: float(data.get("groundedness", 0.5)),
+                OutputDimension.REGISTER_FIT: float(data.get("register_fit", 0.5)),
             }
             ev_data = data.get("evidence", {})
-            evidence = {
-                OutputDimension.INSTRUCTION_FOLLOWING: ev_data.get("instruction_following", ""),
-                OutputDimension.REASONING_DEPTH: ev_data.get("reasoning_depth", ""),
-                OutputDimension.ACTIONABILITY: ev_data.get("actionability", ""),
-                OutputDimension.STRUCTURE_COMPLIANCE: ev_data.get("structure_compliance", ""),
-                OutputDimension.COGNITIVE_SCAFFOLDING: ev_data.get("cognitive_scaffolding", ""),
-            }
-            overall = sum(s * _DIMENSION_WEIGHTS[d] for d, s in dims.items())
+            evidence = {d: ev_data.get(d.value, "") for d in OutputDimension}
+            weights = self._custom_weights or _DIMENSION_WEIGHTS
+            overall = sum(s * weights.get(d, 0.0) for d, s in dims.items())
             return OutputQualityScore(
                 overall=max(0.0, min(1.0, overall)),
                 dimensions=dims,
                 evidence=evidence,
                 strengths=data.get("strengths", []),
                 weaknesses=data.get("weaknesses", []),
-                metadata={"mode": "llm", "model": self.model, "provider": self.provider},
             )
-        except Exception as e:
-            result = self._evaluate_heuristic(context, output)
-            result.metadata["llm_error"] = str(e)
-            result.metadata["mode"] = "heuristic_fallback"
-            return result
+
+        def _call_judge() -> str:
+            resp = eval_ctx.execute(
+                provider=self.provider,
+                model=self.model,
+                temperature=0.2,
+                api_key=api_key,
+            )
+            return resp.response.strip()
+
+        try:
+            score = _parse_llm_response(_call_judge())
+            score.metadata = {"mode": "llm", "model": self.model, "provider": self.provider}
+            return score
+        except Exception as first_err:
+            import time as _time
+
+            _time.sleep(2)
+            try:
+                score = _parse_llm_response(_call_judge())
+                score.metadata = {
+                    "mode": "llm_retry",
+                    "model": self.model,
+                    "provider": self.provider,
+                    "first_error": str(first_err),
+                }
+                return score
+            except Exception as retry_err:
+                result = self._evaluate_heuristic(context, output)
+                result.metadata["llm_error"] = str(retry_err)
+                result.metadata["llm_first_error"] = str(first_err)
+                result.metadata["mode"] = "heuristic_fallback"
+                return result
 
     def _evaluate_hybrid(
         self, context: Context, output: str, **kwargs: Any

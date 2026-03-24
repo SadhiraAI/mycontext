@@ -1,12 +1,12 @@
 ---
 sidebar_position: 2
 title: OutputEvaluator
-description: Evaluate LLM output quality against the context that produced it. Five dimensions measuring how well the response leverages the cognitive scaffolding.
+description: Evaluate LLM output quality against the context that produced it. Seven dimensions with configurable weights, distinct from QualityMetrics prompt-level scoring.
 ---
 
 # OutputEvaluator
 
-`OutputEvaluator` scores **LLM outputs** — not prompts. It evaluates how well a response leverages the cognitive framework provided by its context, measuring five dimensions distinct from `QualityMetrics`' prompt-level scoring.
+`OutputEvaluator` scores **LLM outputs** — not prompts. It evaluates how well a response fits the assembled context across **seven** dimensions (instruction following, reasoning depth, actionability, structure, scaffolding, groundedness, register). Weights are customizable for task-specific evaluation.
 
 ```python
 from mycontext.intelligence import OutputEvaluator
@@ -26,15 +26,19 @@ print(f"Output quality: {score.overall:.1%}")
 print(evaluator.report(score))
 ```
 
-## The Five Output Dimensions
+## The seven output dimensions (default weights)
 
-| Dimension | Weight | What it measures |
-|-----------|--------|-----------------|
-| Instruction Following | 25% | Did the output match the directive's action verbs and must-include terms? |
-| Reasoning Depth | 20% | Multi-step reasoning markers, numbered steps, structured analysis |
-| Actionability | 20% | Concrete, implementable recommendations with specific metrics |
-| Structure Compliance | 15% | Does the output match the requested format (JSON, lists, headers)? |
-| Cognitive Scaffolding | 20% | Does the output use the cognitive framework from the template? |
+| Dimension | Default weight | What it measures |
+|-----------|----------------|------------------|
+| Instruction Following | 20% | Directive action verbs, must-include terms, numbered instruction coverage |
+| Reasoning Depth | 15% | Multi-step markers, structure, quantified claims |
+| Actionability | 15% | Concrete recommendations, metrics, low hedge |
+| Structure Compliance | 10% | Requested format (JSON, lists, headers) vs delivery |
+| Cognitive Scaffolding | 15% | Use of cognitive frameworks implied by the context |
+| Groundedness | 15% | Stays within knowledge boundaries; low unsupported speculation |
+| Register Fit | 10% | Tone and formality match role/style in the context |
+
+Pass **`dimension_weights`** to the constructor to override (keys are snake_case strings matching `OutputDimension.value`, e.g. `instruction_following`). Values should be non-negative. The built-in defaults sum to **1.0**; custom maps are applied as-is (no renormalization), so if you override, prefer weights that sum to 1.0 to keep `overall` in the usual 0–1 range.
 
 ### QualityMetrics vs. OutputEvaluator
 
@@ -51,6 +55,7 @@ OutputEvaluator(
     mode: str = "heuristic",
     provider: str = "openai",
     model: str = "gpt-4o-mini",
+    dimension_weights: dict[str, float] | None = None,
 )
 ```
 
@@ -59,6 +64,26 @@ OutputEvaluator(
 | `mode` | `str` | `"heuristic"` | `"heuristic"`, `"llm"`, or `"hybrid"` |
 | `provider` | `str` | `"openai"` | LLM provider for LLM mode |
 | `model` | `str` | `"gpt-4o-mini"` | Model for LLM mode |
+| `dimension_weights` | `dict[str, float] \| None` | `None` | Per-dimension multipliers; keys like `instruction_following`, `reasoning_depth`, … |
+
+### Custom weights example
+
+```python
+# Emphasize instruction following and structure for a formatting-heavy task
+evaluator = OutputEvaluator(
+    mode="llm",
+    model="gpt-4o",
+    dimension_weights={
+        "instruction_following": 0.35,
+        "structure_compliance": 0.25,
+        "reasoning_depth": 0.10,
+        "actionability": 0.10,
+        "cognitive_scaffolding": 0.10,
+        "groundedness": 0.05,
+        "register_fit": 0.05,
+    },
+)
+```
 
 ## `evaluate(context, output)`
 
@@ -141,6 +166,11 @@ Compares what the context requested with what the output delivered:
 - If context requested JSON → checks for valid JSON in output
 - If context requested bullet lists → checks for list formatting
 - If context requested headers/sections → checks for `##` or `Section:` formatting
+
+### Groundedness and register fit
+
+- **Groundedness** — penalizes outputs that invent facts or drift from supplied knowledge when the context implies evidence-bound answers.
+- **Register fit** — whether tone and vocabulary match the stated role and style in the context.
 
 ### Cognitive Scaffolding
 
@@ -275,6 +305,8 @@ class OutputDimension(Enum):
     ACTIONABILITY = "actionability"
     STRUCTURE_COMPLIANCE = "structure_compliance"
     COGNITIVE_SCAFFOLDING = "cognitive_scaffolding"
+    GROUNDEDNESS = "groundedness"
+    REGISTER_FIT = "register_fit"
 ```
 
 ## API Reference
@@ -283,7 +315,7 @@ class OutputDimension(Enum):
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `__init__(mode, provider, model)` | — | Initialize |
+| `__init__(mode, provider, model, dimension_weights?)` | — | Initialize |
 | `evaluate(context, output, **kwargs)` | `OutputQualityScore` | Score an output |
 | `report(score)` | `str` | Human-readable report |
 

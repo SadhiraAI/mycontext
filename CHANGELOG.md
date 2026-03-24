@@ -6,6 +6,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.9.0] — 2026-03-24
+
+### Added
+
+- **`TaskContract`** (`mycontext.foundation.TaskContract`, also exported from `mycontext`) — L0 metadata model: `domain`, `audience`, `genre`, `grounding`, `metaphor`. Use it to declare task type and evidential rules in one place; it renders as the **L0 — TASK CONTRACT** table at the top of research-flow prompts when `research_flow=True`.
+- **`Context.task_contract`** — First-class field for L0. If unset, legacy `metadata["l0"]` dicts are still read for backward compatibility.
+- **`PromptArchitect.improve()` / `build()`** — Optional `user_message` and `task_contract` arguments so the rewriter sees the real user task and L0 dimensions; improves alignment between `output_contract` and expected format (e.g. markdown brief vs JSON).
+- **`PromptArchitect`** — `_GENRE_FORMAT_HINTS` and post-processing in `_json_to_context()` reduce genre/format mismatches when `task_contract.genre` is set.
+- **`OutputEvaluator`** — Optional `dimension_weights: dict[str, float] | None` in the constructor; keys are dimension value strings (e.g. `instruction_following`). Custom weights apply to heuristic scoring and to the weighted overall when the LLM judge returns per-dimension scores.
+
+### Changed
+
+- **`OutputEvaluator`** — Overall score in heuristic and LLM paths uses custom weights when provided; otherwise unchanged defaults.
+
+---
+
 ## [0.8.1] — 2026-03-20
 
 ### Changed
@@ -15,7 +31,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.9.0] — 2026-03-18 (planned)
+## [Unreleased] — Web app (planned; was 0.9.0 draft)
 
 ### Added
 

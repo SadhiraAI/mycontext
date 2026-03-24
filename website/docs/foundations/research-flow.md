@@ -18,6 +18,7 @@ The complete field-to-section mapping:
 
 | Section | Source field | Notes |
 |---------|-------------|-------|
+| **L0** | `Context.task_contract` or `metadata["l0"]` | Optional primacy block — domain, audience, genre, grounding, metaphor as a table. Omitted if empty. See [Task Contract](./task-contract). |
 | ① ROLE | `Guidance.role` + `persona_scope` | Identity and domain boundary |
 | ② GOAL | `Guidance.goal` | Rendered as "Your mission: X — accomplish this fully." |
 | ③ RULES | `Guidance.rules` | Numbered list, hard → easy ordering |
@@ -30,10 +31,13 @@ The complete field-to-section mapping:
 
 ```mermaid
 graph TD
-    R[1 ROLE] --> G[2 GOAL] --> RU[3 RULES] --> S[4 STYLE]
+    L0[L0 TASK CONTRACT] --> R[1 ROLE]
+    R --> G[2 GOAL] --> RU[3 RULES] --> S[4 STYLE]
     S --> RE[5 REASONING] --> EX[6 EXAMPLES] --> OF[7 OUTPUT FORMAT]
     OF --> GR[8 GUARD RAILS] --> T[9 TASK]
 ```
+
+When `task_contract` is unset and `metadata["l0"]` is absent, the L0 node is skipped and assembly starts at ROLE.
 
 The ordering is deliberate. Instructions that land at the start and end of a prompt are recalled most reliably. The task always arrives last so the LLM's attention is at its peak when it reads what it needs to actually do. Reasoning strategies sit just before the examples so they calibrate the model before it sees the demonstrations. Guard rails land just before the task so they are freshest in context when the model begins generating.
 
