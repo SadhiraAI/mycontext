@@ -1,4 +1,4 @@
-// v0.8.0
+// v0.10.0
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
@@ -104,8 +104,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     announcementBar: {
-      id: 'v0_7_0',
-      content: '<b>mycontext-ai v0.7.0</b> is live — output_format on all 87 templates, QueryPlanner for RAG, reworked CodeReviewer, and more. <a href="/docs/getting-started/installation">Get started →</a>',
+      id: 'v0_10_0',
+      content:
+        '<b>mycontext-ai v0.10.0</b> — <code>suggest_routes()</code> for multi-agent planning, smarter template integration (GENERIC_PROMPT fingerprints, <code>integration_rationale</code>), catalog <code>PRODUCES</code> hints, and <code>build_workflow_chain()</code> deprecation. <a href="/docs/getting-started/installation">Install →</a>',
       isCloseable: true,
     },
     navbar: {

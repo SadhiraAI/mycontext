@@ -111,13 +111,14 @@ All integration methods return an `IntegrationResult`:
 class IntegrationResult:
     question: str
     source_templates: list[str]      # Templates that were integrated
-    integrated_context: str          # Raw LLM integration output
+    integrated_context: str          # Human-readable fused prompt text (v0.10+: never a sentinel)
     role: str                        # Combined expert role
     rules: list[str]                 # Merged analytical rules (max 6)
     directive: str                   # Step-by-step integrated instructions
     output_requirements: list[str]   # Required output sections (5-7 max)
-    raw_llm_response: str            # Full LLM response (for debugging)
-    
+    raw_llm_response: str            # Same readable text as integrated_context when structured
+    integration_rationale: str       # Why the merge works (v0.10+)
+
     def to_context(self) -> Context  # Convert to executable Context
 ```
 
@@ -168,7 +169,7 @@ print(response.response)
 
 The integration process follows this structure:
 
-1. **Gather template capabilities** — extracts role, key rules, directive sections, and "when to use" notes from each template
+1. **Gather template capabilities** — uses each template’s **`GENERIC_PROMPT`** (concise methodology fingerprint) plus catalog descriptions and “when to use” notes (**v0.10+**; replaces brittle directive line heuristics). Default integration model is **`gpt-4o`**. Optional **`max_tokens`** / **`top_p`** pass through to the structured LLM call.
 2. **Build a fusion prompt** — tells the LLM: "merge the best of these templates for this specific question"
 3. **Parse the integrated output** — extracts ROLE, RULES, DIRECTIVE, and OUTPUT MUST INCLUDE sections
 4. **Returns structured result** — directly usable as a `Context`

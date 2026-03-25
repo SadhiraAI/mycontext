@@ -12,10 +12,11 @@ The Intelligence Layer sits above the core Context/Pattern API and adds automati
 from mycontext.intelligence import (
     transform,                  # Auto pattern selection → Context
     suggest_patterns,           # Recommend patterns for a question
+    suggest_routes,             # Multi-route agent pipelines (v0.10+)
     smart_execute,              # Auto-route + execute in one call
     smart_prompt,               # Auto-route + compose optimized prompt
     smart_generic_prompt,       # Zero-cost auto-route + compile
-    build_workflow_chain,       # LLM-driven multi-step chain
+    build_workflow_chain,       # Deprecated — prefer suggest_routes
     TemplateIntegratorAgent,    # Fuse multiple templates into one
     PromptComposer,             # Merge template prompts
     QualityMetrics,             # Measure context quality
@@ -32,10 +33,11 @@ from mycontext.intelligence import (
 |----------|-------------|-----------|
 | [`transform()`](./transform) | Analyze input → auto-select pattern → return Context | 0 |
 | [`suggest_patterns()`](./pattern-suggestion) | Suggest best patterns + chain order | 0 (keyword) or 1 (hybrid/llm) |
+| [`suggest_routes()`](./route-suggestion) | Multiple differentiated routes + agent steps (`receives` / `produces`) | 1 |
 | [`smart_execute()`](./smart-execute) | Route → execute → return response | 2 (assess + execute) |
 | [`smart_prompt()`](./smart-execute) | Route → compose optimized prompt | 2–4 |
 | [`smart_generic_prompt()`](./smart-execute) | Route → compile generic prompt | 1 (assess only) |
-| [`build_workflow_chain()`](./chain-orchestration) | Design + execute multi-step chain | 2+ |
+| [`build_workflow_chain()`](./chain-orchestration) | **Deprecated** — single-chain workflow result | 1+ (may delegate to `suggest_routes`) |
 | [`generate_context()`](./prompt-compilation) | LLM generates a full Context from role + goal | 1 |
 
 ## Architecture Overview
@@ -112,10 +114,16 @@ from mycontext.intelligence import (
     # Core functions
     transform,
     suggest_patterns,
+    suggest_routes,
     smart_execute,
     smart_prompt,
     smart_generic_prompt,
     build_workflow_chain,
+
+    # Route types (suggest_routes)
+    RouteAnalysis,
+    AnalysisRoute,
+    RouteStep,
 
     # Classes
     TransformationEngine,
@@ -172,7 +180,8 @@ These tools live in the Intelligence Layer and focus on improving the quality of
 | I want to see what patterns are recommended | `suggest_patterns()` |
 | I want a prompt string (not execution) | `smart_prompt()` or `smart_generic_prompt()` |
 | I want to control which pattern runs | `pattern.execute()` directly |
-| I want a multi-step workflow | `build_workflow_chain()` |
+| I want multiple analytical angles / agent pipelines | `suggest_routes()` |
+| I want a legacy single-chain plan | `build_workflow_chain()` (deprecated) |
 | I want to merge multiple templates | `TemplateIntegratorAgent` |
 | I have a raw prompt and want it upgraded | `PromptArchitect.improve()` |
 | I want to audit/rewrite template rules | `GuidanceOptimizer.optimize()` |
@@ -184,9 +193,10 @@ These tools live in the Intelligence Layer and focus on improving the quality of
 
 - [transform() →](./transform) — Auto-select pattern + return Context
 - [suggest_patterns() →](./pattern-suggestion) — Pattern recommendations
+- [suggest_routes() →](./route-suggestion) — Multi-route agent planning
 - [smart_execute() →](./smart-execute) — All-in-one execution
 - [Prompt Compilation →](./prompt-compilation) — PromptComposer
-- [Chain Orchestration →](./chain-orchestration) — build_workflow_chain
+- [Chain Orchestration →](./chain-orchestration) — `build_workflow_chain` (deprecated)
 - [Template Integrator →](./template-integrator) — Fuse multiple templates
 - [Async Execution →](./async-execution) — `aexecute`, concurrent patterns, FastAPI
 - [Token-Budget Assembly →](./token-budget) — `assemble_for_model`, accurate trimming

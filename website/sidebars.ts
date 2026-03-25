@@ -65,6 +65,7 @@ const sidebars: SidebarsConfig = {
         'intelligence/overview',
         'intelligence/transform',
         'intelligence/pattern-suggestion',
+        'intelligence/route-suggestion',
         'intelligence/smart-execute',
         'intelligence/prompt-compilation',
         'intelligence/three-tier-execution',

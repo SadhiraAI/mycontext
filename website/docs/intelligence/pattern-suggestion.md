@@ -8,6 +8,8 @@ description: Recommend the best cognitive patterns for any question. Three modes
 
 `suggest_patterns()` recommends the optimal cognitive patterns for a given question and suggests a workflow chain order. Three modes: keyword matching (zero LLM calls), LLM-powered selection, or hybrid.
 
+As of **v0.10.0**, modes **`llm`** and **`hybrid`** first call **`suggest_routes(max_routes=1)`** and map the best route into a `SuggestionResult`. If that fails, the legacy catalog-selection LLM path runs. For **multiple** differentiated routes and agent-level planning, use [`suggest_routes()`](./route-suggestion) directly.
+
 ```python
 from mycontext.intelligence import suggest_patterns
 

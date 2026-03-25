@@ -6,6 +6,12 @@ description: build_workflow_chain() uses an LLM to select, order, and generate p
 
 # Chain Orchestration
 
+:::warning Deprecated
+
+`build_workflow_chain()` is **deprecated** as of **mycontext-ai v0.10.0**. Prefer **[`suggest_routes()`](./route-suggestion)** for new code — it returns multiple differentiated routes with agent-level `receives` / `produces` metadata for multi-agent planning. The function still works and may delegate internally to `suggest_routes(max_routes=1)` when possible.
+
+:::
+
 `build_workflow_chain()` designs and returns a complete multi-pattern workflow: which patterns to use, in what order, with what parameters. The LLM acts as an architect, analyzing the question and building the optimal chain.
 
 ```python
