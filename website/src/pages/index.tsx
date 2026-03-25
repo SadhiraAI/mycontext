@@ -69,7 +69,7 @@ type FeatureItem = {
 
 const features: FeatureItem[] = [
   {
-    title: '87 Cognitive Patterns',
+    title: '88 Cognitive Patterns',
     icon: '🧠',
     description: (
       <>
@@ -170,7 +170,7 @@ function HeroSection() {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <div className={styles.heroBadge}>
-              Soft Launch · v0.6.0
+              Soft Launch · v0.10.0
             </div>
             <Heading as="h1" className={styles.heroTitle}>
               Context engineering<br />for LLMs
@@ -236,7 +236,7 @@ function IntelligenceSection() {
               selects the optimal cognitive pattern, builds the context, and executes — automatically.
             </p>
             <ul className={styles.showcaseList}>
-              <li>Auto-selects from 87 patterns via keyword, LLM, or hybrid matching</li>
+              <li>Auto-selects from 88 patterns via keyword, LLM, or hybrid matching</li>
               <li>Fuses multiple patterns when your question spans domains</li>
               <li>Builds multi-step workflow chains for complex analysis</li>
               <li>Routes to the optimal cost/quality tier</li>
@@ -306,8 +306,8 @@ function ComparisonSection() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Cognitive patterns</td><td className={styles.highlight}>87 research-backed</td><td>10–20 generic</td></tr>
-              <tr><td>Zero-cost generic prompts</td><td className={styles.highlight}>87 pre-authored</td><td>None</td></tr>
+              <tr><td>Cognitive patterns</td><td className={styles.highlight}>88 research-backed</td><td>10–20 generic</td></tr>
+              <tr><td>Zero-cost generic prompts</td><td className={styles.highlight}>88 pre-authored</td><td>None</td></tr>
               <tr><td>Prompt compilation</td><td className={styles.highlight}>3-tier pipeline</td><td>None</td></tr>
               <tr><td>Async-native execution</td><td className={styles.highlight}>aexecute() coroutine</td><td>Sync only or manual</td></tr>
               <tr><td>Token-budget assembly</td><td className={styles.highlight}>tiktoken-accurate</td><td>None or char-based</td></tr>
@@ -343,7 +343,7 @@ function WebAppSection() {
             <ul className={styles.showcaseList}>
               <li><strong>Context Studio</strong> — 9-step guided wizard to build structured prompts</li>
               <li><strong>Context Copilot</strong> — describe your goal in plain English, AI builds the context</li>
-              <li><strong>Cognitive Studio</strong> — browse and use all 87 cognitive patterns visually</li>
+              <li><strong>Cognitive Studio</strong> — browse and use all 88 cognitive patterns visually</li>
               <li><strong>Chain Composer</strong> — compose multi-pattern analysis pipelines</li>
               <li><strong>Quality Metrics</strong> — score contexts and outputs before you ship</li>
             </ul>
@@ -372,7 +372,7 @@ function CTASection() {
       <div className="container">
         <div className={styles.ctaInner}>
           <Heading as="h2">This is our soft launch. Context engineering is just getting started.</Heading>
-          <p>87 patterns today. Research-validated templates, agent memory, grounded RAG, and a lot more on the way.</p>
+          <p>88 patterns today. Research-validated templates, agent memory, grounded RAG, and a lot more on the way.</p>
           <div className={styles.ctaActions}>
             <Link className={styles.heroPrimary} to="/docs/getting-started/installation">
               Get Started
@@ -392,7 +392,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Context Engineering for LLMs"
-      description="Build structured contexts with 87 research-backed cognitive patterns. Export to any LLM. Measure quality. Prove it works.">
+      description="Build structured contexts with 88 research-backed cognitive patterns. Export to any LLM. Measure quality. Prove it works.">
       <HeroSection />
       <main>
         <WebAppSection />

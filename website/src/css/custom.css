@@ -211,18 +211,45 @@ div[class*='codeBlockContainer'] {
 }
 
 /* ── Announcement bar ────────────────────────────────────── */
+/* Docusaurus sets --docusaurus-announcement-bar-height: 30px on desktop — long HTML clips. */
+@media (min-width: 997px) {
+  :root {
+    --docusaurus-announcement-bar-height: auto;
+  }
+}
+
 div[class*='announcementBar'] {
-  background: var(--mc-gradient);
-  color: #ffffff;
+  background: var(--mc-gradient) !important;
+  color: #ffffff !important;
   font-family: var(--ifm-font-family-base);
   font-weight: 500;
   font-size: 0.9rem;
+  min-height: auto;
+  padding-block: 0.45rem;
+  align-items: center;
+}
+
+div[class*='announcementBarContent'] {
+  line-height: 1.5;
+  text-align: center;
+  padding-inline: 0.5rem;
+}
+
+/* Infima styles <code> for page body — on the gradient bar it must stay readable */
+div[class*='announcementBar'] code {
+  background: rgba(0, 0, 0, 0.28);
+  color: #ffffff;
+  border: none;
+  padding: 0.12em 0.4em;
+  font-size: 0.86em;
+  vertical-align: 0.05em;
 }
 
 div[class*='announcementBar'] a {
   color: #ffffff;
   text-decoration: underline;
   text-underline-offset: 2px;
+  font-weight: 600;
 }
 
 /* ── Scrollbar (dark mode) ───────────────────────────────── */
