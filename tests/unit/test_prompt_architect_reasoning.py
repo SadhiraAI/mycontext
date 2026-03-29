@@ -7,7 +7,6 @@ from mycontext.intelligence.prompt_architect import (
     PromptArchitect,
 )
 
-
 # ── normalization ──────────────────────────────────────────────────────────────
 
 def test_normalize_reasoning_strategies() -> None:
