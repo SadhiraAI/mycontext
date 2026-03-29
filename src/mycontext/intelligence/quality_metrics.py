@@ -292,6 +292,54 @@ class QualityMetrics:
                 issues.append(f"Missing essential components: {', '.join(missing)}")
                 penalty = max(penalty, per_missing * len(missing))
 
+        # Grounding protocol check — prompts >80 words that discuss factual
+        # topics should include grounding instructions to prevent hallucination.
+        if word_count > 80:
+            _grounding_signals = [
+                "grounded in", "source material", "provided material",
+                "do not invent", "do not fabricate", "not in packet",
+                "cite", "evidence", "based on the", "factual",
+                "only use", "stay within", "not found in the provided",
+                "must reference", "must trace", "supported by",
+                "provided data", "provided context",
+            ]
+            has_grounding = any(s in lower for s in _grounding_signals)
+            if not has_grounding:
+                issues.append(
+                    "No grounding protocol — add a rule requiring claims to trace "
+                    "to provided material (reduces hallucination)"
+                )
+
+        # Genre / domain declaration check — prompts that specify audience
+        # or task type benefit from explicitly naming the genre.
+        if word_count > 60:
+            _genre_signals = [
+                "blog", "brief", "tutorial", "proposal", "report",
+                "memo", "internal", "external", "guide", "walkthrough",
+                "genre", "mode:", "field:", "domain:", "audience:",
+            ]
+            has_genre = any(s in lower for s in _genre_signals)
+            if not has_genre:
+                issues.append(
+                    "No genre/domain declaration — explicitly name the output "
+                    "genre (blog, brief, tutorial, etc.) to anchor tone and register"
+                )
+
+        # Anti-boilerplate check — prompts should discourage generic AI filler.
+        if word_count > 80:
+            _anti_boilerplate_signals = [
+                "omit stock", "no boilerplate", "no filler",
+                "avoid generic", "no cliche", "no cliché",
+                "write as a", "practitioner", "not a generic ai",
+                "no preamble",
+            ]
+            has_anti_boilerplate = any(s in lower for s in _anti_boilerplate_signals)
+            if not has_anti_boilerplate:
+                issues.append(
+                    "No anti-boilerplate rule — add a guard rail suppressing "
+                    "generic AI phrases to improve register authenticity"
+                )
+
         return issues, min(0.70, penalty)
 
     # ── Heuristic evaluation ────────────────────────────────────────────

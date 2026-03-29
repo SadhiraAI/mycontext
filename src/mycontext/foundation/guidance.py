@@ -121,11 +121,11 @@ class Guidance(BaseModel):
             parts.append(f"Scope: {self.persona_scope}")
 
         if self.expertise:
-            expertise_text = ", ".join(self.expertise)
+            expertise_text = ", ".join(str(e) for e in self.expertise)
             parts.append(f"Your areas of expertise include: {expertise_text}.")
 
         if self.rules and include_rules:
-            rules_text = "\n".join(f"{i+1}. {rule}" for i, rule in enumerate(self.rules))
+            rules_text = "\n".join(f"{i+1}. {str(rule)}" for i, rule in enumerate(self.rules))
             parts.append(f"\nFollow these rules:\n{rules_text}")
 
         if self.style and include_style and provider != "gemini":

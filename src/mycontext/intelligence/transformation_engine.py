@@ -526,13 +526,63 @@ class TransformationEngine:
         else:
             inputs["input"] = input
 
-        # Add depth based on complexity
+        # Add depth based on complexity — map to each pattern's vocabulary
         if analysis.complexity == ComplexityLevel.SIMPLE:
-            inputs["depth"] = "quick"
+            engine_depth = "quick"
         elif analysis.complexity == ComplexityLevel.MODERATE:
-            inputs["depth"] = "standard"
+            engine_depth = "standard"
         else:
-            inputs["depth"] = "comprehensive"
+            engine_depth = "comprehensive"
+
+        # Per-pattern depth vocabularies (pattern -> light | medium | full)
+        _DEPTH_MAP: dict[str, dict[str, str]] = {
+            "quick": {
+                "question_analyzer": "brief",
+                "root_cause_analyzer": "quick",
+                "socratic_questioner": "basic",
+                "risk_assessor": "basic",
+                "intent_recognizer": "quick",
+                "decision_framework": "quick",
+                "comparative_analyzer": "basic",
+                "tradeoff_analyzer": "basic",
+                "causal_reasoner": "basic",
+                "problem_decomposer": "overview",
+                "analogical_reasoner": "quick",
+                "ambiguity_resolver": "quick",
+            },
+            "standard": {
+                "question_analyzer": "moderate",
+                "root_cause_analyzer": "standard",
+                "socratic_questioner": "detailed",
+                "risk_assessor": "detailed",
+                "intent_recognizer": "standard",
+                "decision_framework": "standard",
+                "comparative_analyzer": "detailed",
+                "tradeoff_analyzer": "detailed",
+                "causal_reasoner": "detailed",
+                "problem_decomposer": "detailed",
+                "analogical_reasoner": "detailed",
+                "ambiguity_resolver": "standard",
+            },
+            "comprehensive": {
+                "question_analyzer": "comprehensive",
+                "root_cause_analyzer": "thorough",
+                "socratic_questioner": "thorough",
+                "risk_assessor": "comprehensive",
+                "intent_recognizer": "comprehensive",
+                "decision_framework": "comprehensive",
+                "comparative_analyzer": "comprehensive",
+                "tradeoff_analyzer": "comprehensive",
+                "causal_reasoner": "thorough",
+                "problem_decomposer": "comprehensive",
+                "analogical_reasoner": "deep",
+                "ambiguity_resolver": "thorough",
+            },
+        }
+        by_pattern = _DEPTH_MAP.get(engine_depth, _DEPTH_MAP["standard"])
+        inputs["depth"] = by_pattern.get(
+            pattern.name, by_pattern.get("risk_assessor", "detailed")  # fallback
+        )
 
         return inputs
 

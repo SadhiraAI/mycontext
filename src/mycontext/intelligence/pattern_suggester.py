@@ -135,6 +135,35 @@ class SuggestionResult:
 
 
 
+def _try_suggest_routes(
+    question: str,
+    include_enterprise: bool,
+    provider: str,
+    temperature: float,
+    model: str | None,
+    **kwargs: Any,
+):
+    """Try to delegate to suggest_routes(); return None on any failure."""
+    try:
+        from .route_suggester import suggest_routes
+        return suggest_routes(
+            question=question,
+            max_routes=1,
+            include_enterprise=include_enterprise,
+            provider=provider,
+            temperature=temperature,
+            model=model,
+            **kwargs,
+        )
+    except Exception as exc:
+        logger.debug(
+            "suggest_patterns: suggest_routes delegation failed (%s), "
+            "falling back to _suggest_with_llm. Error: %s",
+            type(exc).__name__, exc,
+        )
+        return None
+
+
 def suggest_patterns(
     question: str,
     include_enterprise: bool = True,
@@ -174,7 +203,29 @@ def suggest_patterns(
         return keyword_result
 
     if mode in ("llm", "hybrid"):
+        # Primary path: delegate to suggest_routes() for richer intelligence
         kw_hints = [s.name for s in keyword_result.suggested_patterns]
+        route_result = _try_suggest_routes(
+            question, include_enterprise, llm_provider, temperature, model,
+            **llm_kwargs,
+        )
+        if route_result is not None and route_result.routes:
+            best = route_result.routes[0]
+            names = [s.template for s in best.steps]
+            reasons = {s.template: s.produces for s in best.steps}
+            integration = route_result.recommendation
+            if mode == "hybrid":
+                kw_reasons = {s.name: s.reason for s in keyword_result.suggested_patterns}
+                names = names + [n for n in kw_hints if n not in set(names)]
+                names = names[:max_patterns]
+                reasons = {**kw_reasons, **reasons}
+            return _names_to_result(
+                question, names, suggest_chain, max_patterns,
+                "llm" if mode == "llm" else "hybrid",
+                "", include_enterprise, reasons, integration,
+            )
+
+        # Fallback: original _suggest_with_llm if suggest_routes failed
         llm_selections, integration_note, llm_raw = _suggest_with_llm(
             question, llm_provider, temperature=temperature, model=model,
             keyword_hints=kw_hints if mode == "hybrid" else None,

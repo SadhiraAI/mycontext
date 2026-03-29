@@ -74,6 +74,8 @@ from .prompt_composer import (
     get_generic_prompt_for,
 )
 from .quality_metrics import QualityDimension, QualityMetrics, QualityScore
+from .route_suggester import suggest_routes
+from .schemas import AnalysisRoute, RouteAnalysis, RouteStep
 from .template_benchmark import (
     BenchmarkResult,
     CaseResult,
@@ -135,6 +137,11 @@ __all__ = [
     "OptimizedGuidance",
     "GuidanceAuditResult",
     "RuleAudit",
+    # Route suggestion
+    "suggest_routes",
+    "RouteAnalysis",
+    "AnalysisRoute",
+    "RouteStep",
     # Eval criteria
     "GEvalCriteria",
     "EVIDENCE_CITATION",

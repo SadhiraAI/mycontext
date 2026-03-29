@@ -35,6 +35,7 @@ class IntegrationResult:
     directive: str = ""
     output_requirements: list[str] = field(default_factory=list)
     raw_llm_response: str = ""
+    integration_rationale: str = ""
 
     def to_context(self):
         """Convert to a mycontext Context object for direct execution."""
@@ -305,46 +306,31 @@ class TemplateIntegratorAgent:
     @staticmethod
     @__import__("functools").lru_cache(maxsize=128)
     def _get_template_detail(name):
-        """Extract role, key rules, and directive structure from an actual template.
+        """Return a concise methodology fingerprint for a template.
 
-        Result is LRU-cached: template definitions are static and this function
-        is called on every suggest_and_integrate() call, often with the same
-        template names.  Caching eliminates repeated Pattern class instantiation
-        and build_context() calls for previously seen templates.
+        Uses the hand-authored GENERIC_PROMPT (200-600 chars) which is more
+        accurate and reliable than the previous heuristic line-filtering
+        approach.  Falls back to role + description when GENERIC_PROMPT is
+        unavailable.
+
+        Result is LRU-cached since template definitions are static.
         """
+        import re as _re
+
         try:
-            from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
             from .pattern_suggester import get_pattern_class
             klass = get_pattern_class(name, include_enterprise=True)
             if not klass:
                 return ""
-            reg = PATTERN_BUILD_CONTEXT_REGISTRY.get(name, ("input", {}))
-            primary_key, defaults = reg
-            params = dict(defaults)
-            params[primary_key] = "PLACEHOLDER"
-            ctx = klass().build_context(**params)
-            parts = []
-            if hasattr(ctx, 'guidance') and ctx.guidance:
-                g = ctx.guidance
-                if hasattr(g, 'role') and g.role:
-                    parts.append(f"Role: {g.role[:120]}")
-                if hasattr(g, 'rules') and g.rules:
-                    top_rules = g.rules[:3]
-                    parts.append("Key rules: " + "; ".join(
-                        r[:80] for r in top_rules
-                    ))
-            if hasattr(ctx, 'directive') and ctx.directive:
-                d = ctx.directive
-                content = d.content if hasattr(d, 'content') else str(d)
-                sections = [
-                    line.strip() for line in content.split('\n')
-                    if line.strip().startswith(('#', '##', '1.', '2.', '3.', '- **'))
-                ][:5]
-                if sections:
-                    parts.append("Directive sections: " + " | ".join(
-                        s.lstrip('#- *').strip()[:60] for s in sections
-                    ))
-            return " | ".join(parts)[:500] if parts else ""
+            instance = klass()
+            gp = getattr(instance, "GENERIC_PROMPT", "")
+            if gp:
+                clean = _re.sub(r"\{[^}]+\}", "[...]", gp).strip()
+                return clean[:800]
+            role = ""
+            if instance.guidance and hasattr(instance.guidance, "role"):
+                role = instance.guidance.role or ""
+            return f"Role: {role[:120]} | {instance.description}"[:500]
         except Exception as e:
             logger.warning(
                 "_get_template_detail: could not extract detail for template '%s'. "
@@ -360,7 +346,7 @@ class TemplateIntegratorAgent:
         # ── Try instructor-structured path ───────────────────────────────────
         from .schemas import IntegrationResponse, get_instructor_client
         instructor_client = get_instructor_client(None)
-        resolved_model = model or "gpt-4o-mini"
+        resolved_model = model or "gpt-4o"
 
         if instructor_client is not None:
             try:
@@ -371,15 +357,21 @@ class TemplateIntegratorAgent:
                     "Every element must be specific to the user question. "
                     "Respond with a JSON object matching the IntegrationResponse schema."
                 )
-                response = instructor_client.chat.completions.create(
-                    model=resolved_model,
-                    response_model=IntegrationResponse,
-                    messages=[
+                create_kw: dict = {
+                    "model": resolved_model,
+                    "response_model": IntegrationResponse,
+                    "messages": [
                         {"role": "system", "content": system_msg},
                         {"role": "user", "content": prompt},
                     ],
-                    max_retries=2,
-                )
+                    "max_retries": 2,
+                }
+                for _fwd in ("max_tokens", "temperature", "top_p"):
+                    if _fwd in kwargs:
+                        create_kw[_fwd] = kwargs[_fwd]
+                if temperature != 0:
+                    create_kw.setdefault("temperature", temperature)
+                response = instructor_client.chat.completions.create(**create_kw)
                 # Store parsed result so _parse_result can skip regex
                 self._last_structured = response
                 return f"[structured:{id(response)}]"  # sentinel — bypasses regex
@@ -432,15 +424,34 @@ class TemplateIntegratorAgent:
                 structured = None
 
         if structured is not None:
+            # Reconstruct readable text when raw is a sentinel from the
+            # instructor path (e.g. "[structured:140234567890]").
+            readable = raw
+            if raw.startswith("[structured:"):
+                parts = [f"ROLE: {structured.role}"]
+                if structured.rules:
+                    parts.append("RULES:\n" + "\n".join(f"- {r}" for r in structured.rules))
+                if structured.directive:
+                    parts.append(f"DIRECTIVE:\n{structured.directive}")
+                if structured.output_requirements:
+                    parts.append("OUTPUT MUST INCLUDE:\n" + "\n".join(
+                        f"- {r}" for r in structured.output_requirements
+                    ))
+                rationale = getattr(structured, "integration_rationale", "")
+                if rationale:
+                    parts.append(f"INTEGRATION RATIONALE:\n{rationale}")
+                readable = "\n\n".join(parts)
+
             return IntegrationResult(
                 question=question,
                 source_templates=names,
-                integrated_context=raw,
+                integrated_context=readable,
                 role=structured.role,
                 rules=structured.rules,
                 directive=structured.directive,
                 output_requirements=structured.output_requirements,
-                raw_llm_response=raw,
+                raw_llm_response=readable,
+                integration_rationale=getattr(structured, "integration_rationale", ""),
             )
 
         # ── Final fallback: original regex parser ────────────────────────────

@@ -112,11 +112,13 @@ def build_workflow_chain(
     model: str | None = None,
     **llm_kwargs: Any,
 ) -> WorkflowChainResult:
-    """
-    Use LLM to select, order, and generate chain_params for a workflow chain.
+    """Use LLM to select, order, and generate chain_params for a workflow chain.
 
-    When use_question_analyzer=True (default), runs the question_analyzer template first
-    to decompose the goal, then uses that output to inform pattern selection.
+    .. deprecated::
+        Use :func:`mycontext.intelligence.route_suggester.suggest_routes`
+        instead for richer, multi-route output with agent-level detail.
+        This function now delegates to ``suggest_routes(max_routes=1)``
+        and reformats the result for backward compatibility.
 
     Args:
         question: User's question or task description
@@ -131,6 +133,51 @@ def build_workflow_chain(
     Returns:
         WorkflowChainResult with chain, chain_params, and reasoning
     """
+    import warnings
+    warnings.warn(
+        "build_workflow_chain() is deprecated. Use suggest_routes() for richer, "
+        "multi-route output with agent-level detail.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
+    # Try delegating to suggest_routes
+    try:
+        from .route_suggester import suggest_routes
+        route_result = suggest_routes(
+            question=question,
+            max_routes=1,
+            include_enterprise=include_enterprise,
+            provider=provider,
+            temperature=temperature,
+            model=model,
+            **llm_kwargs,
+        )
+        if route_result.routes:
+            best = route_result.routes[0]
+            chain = [s.template for s in best.steps]
+            chain_params = {
+                s.template: s.params for s in best.steps
+            }
+            selection_reasoning = {
+                s.template: f"{s.agent_role}: {s.produces}"
+                for s in best.steps
+            }
+            return WorkflowChainResult(
+                chain=chain[:max_patterns] if max_patterns else chain,
+                chain_params=chain_params,
+                reasoning=route_result.recommendation,
+                selection_reasoning=selection_reasoning,
+                pattern_categories={
+                    s.template: NAME_TO_CATEGORY.get(s.template, "free")
+                    for s in best.steps
+                },
+                question_analysis={
+                    "decomposition": route_result.question_decomposition,
+                },
+            )
+    except Exception:
+        pass  # Fall through to original implementation
     from ..core import Context
     from ..foundation import Directive, Guidance
 

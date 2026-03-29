@@ -990,9 +990,9 @@ code{
           <line x1="385" y1="42" x2="385" y2="152" stroke="#5ba8a0" stroke-width="0.8" stroke-dasharray="3,3"/>
           <line x1="485" y1="42" x2="485" y2="152" stroke="#5ba8a0" stroke-width="0.8" stroke-dasharray="3,3"/>
           <text x="46"  y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">①②</text>
-          <text x="210" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">③④⑤⑥</text>
+          <text x="210" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">③④⑤</text>
           <text x="390" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">⑦⑧</text>
-          <text x="492" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">⑨</text>
+          <text x="492" y="157" font-family="JetBrains Mono,monospace" font-size="8" fill="#5ba8a0">⑧.5⑨</text>
         </svg>
       </div>
     </div>
@@ -1023,8 +1023,7 @@ code{
           <div class="arch-zone zone-middle">
             <div class="arch-zone-label">Middle</div>
             <div class="arch-sections">
-              <div class="arch-section"><span class="arch-num">⑤</span><span class="arch-name">REASONING</span><span class="arch-field">thinking_strategy</span><span class="arch-why">step_by_step / multiple_angles / verify</span></div>
-              <div class="arch-section"><span class="arch-num">⑥</span><span class="arch-name">EXAMPLES</span><span class="arch-field">examples[ ]</span><span class="arch-why">2–5 input→output demos</span></div>
+              <div class="arch-section"><span class="arch-num">⑤</span><span class="arch-name">EXAMPLES</span><span class="arch-field">examples[ ]</span><span class="arch-why">2–5 input→output demos</span></div>
             </div>
           </div>
           <div class="arch-connector">↓</div>
@@ -1039,6 +1038,7 @@ code{
           <div class="arch-zone zone-recency">
             <div class="arch-zone-label">Recency</div>
             <div class="arch-sections">
+              <div class="arch-section"><span class="arch-num">⑧.5</span><span class="arch-name">REASONING</span><span class="arch-field">analytical_approach</span><span class="arch-why">step_by_step / multiple_angles / verify — just before TASK</span></div>
               <div class="arch-section" style="border:1.5px solid #c0392b;background:rgba(192,57,43,0.08)">
                 <span class="arch-num" style="color:#c0392b">⑨</span>
                 <span class="arch-name">TASK</span>
@@ -1097,14 +1097,7 @@ code{
       <div class="compare-card strong"><span class="ctag">Separated</span><strong>Style:</strong> Formal, analytical, third-person. No hedging.<br><strong>Output format:</strong> Return ONLY a ranked bullet list. No preamble.</div>
     </div>
 
-    <h3>⑤ Reasoning Strategy — How the AI Thinks</h3>
-    <p>For multi-step or analytical tasks, specify the reasoning approach. Without it, the model may jump to conclusions. Common strategies: <code>step_by_step</code> (sequential), <code>multiple_angles</code> (consider alternatives), <code>verify</code> (check before concluding).</p>
-    <div class="compare-pair">
-      <div class="compare-card weak"><span class="ctag">Implicit</span>Analyze the data and identify anomalies.</div>
-      <div class="compare-card strong"><span class="ctag">Explicit</span>Reason step by step: (1) Identify each metric and its baseline. (2) Compute deviation. (3) Rank by magnitude. (4) State confidence before interpretation.</div>
-    </div>
-
-    <h3>⑥ Examples — Few-Shot Anchors</h3>
+    <h3>⑤ Examples — Few-Shot Anchors</h3>
     <p>2–5 input→output demos in the middle zone produce more stable calibration than examples at the start (Li et al., 2025). Place them after rules so the model understands constraints before seeing demos. More than 5 rarely improves quality.</p>
     <div class="callout">
       <strong>Example placement:</strong> Rules first, then examples. Each example should show the exact format you want — including structure, level of detail, and how edge cases are handled.
@@ -1127,6 +1120,13 @@ No markdown wrapper. No explanation outside the JSON.</pre>
 
     <h3>⑧ Guard Rails — What to Never Include</h3>
     <p>Use positive redirects, not bare negation. "Do not speculate" is weaker than "Base every claim on the data provided." Chapter 4 covers this fully — including the most common ineffective instruction on the internet.</p>
+
+    <h3>⑧.5 Reasoning Strategy — How the AI Thinks</h3>
+    <p>For multi-step or analytical tasks, specify the reasoning approach in the recency zone — just before the TASK. Placing it here maximises recall at generation time (Li et al., 2023). Common strategies: <code>step_by_step</code> (sequential), <code>multiple_angles</code> (consider alternatives), <code>verify</code> (check before concluding).</p>
+    <div class="compare-pair">
+      <div class="compare-card weak"><span class="ctag">Implicit</span>Analyze the data and identify anomalies.</div>
+      <div class="compare-card strong"><span class="ctag">Explicit</span>Reason step by step: (1) Identify each metric and its baseline. (2) Compute deviation. (3) Rank by magnitude. (4) State confidence before interpretation.</div>
+    </div>
 
     <h3>⑨ Task — The Trigger (Always Last)</h3>
     <p>The task must always be last. Placing it in the recency zone yields +9.7 BLEU (Li et al., 2023). Anything before it is context for it.</p>

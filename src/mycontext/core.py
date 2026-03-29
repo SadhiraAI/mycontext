@@ -5,11 +5,13 @@ This is where Context as Code™ comes to life.
 
 Research-backed prompt flow (when ``research_flow=True``):
 
-  PRIMACY ZONE    → ① Role  ② Goal          (Liu et al. 2023)
-  INSTRUCTIONS    → ③ Rules  ④ Style         (OpenAI guide)
-  MIDDLE          → ⑤ Reasoning  ⑥ Examples  (Li et al. 2025)
-  LATE            → ⑦ Output Format  ⑧ Guard Rails  (CO-STAR)
-  RECENCY ZONE    → ⑨ Task (ALWAYS LAST)     (Li et al. 2023)
+  PRIMACY ZONE    → ① Role  ② Goal                    (Liu et al. 2023)
+  INSTRUCTIONS    → ③ Rules  ④ Style                   (OpenAI guide)
+  MIDDLE          → ⑤ Examples                         (Li et al. 2025)
+  LATE            → ⑥ Knowledge  ⑦ Output Format  ⑧ Guard Rails  (CO-STAR)
+  RECENCY ZONE    → ⑧.5 Reasoning  ⑨ Task (ALWAYS LAST)  (Li et al. 2023)
+
+  Reasoning moved to recency zone so it is not lost in long-context middle sections.
 
 Provider-aware rendering (when ``provider_hint`` is set):
   - "anthropic" → XML delimiters, positive constraint reframe, docs-first ordering
@@ -251,8 +253,11 @@ class Context(BaseModel):
 
         When ``research_flow`` is True, uses the research-backed 9-section
         ordering with emphasis formatting:
-            Role → Goal → Rules → Style → Reasoning → Examples →
-            Output Format → Guard Rails → Task
+            Role → Goal → Rules → Style → Examples →
+            Output Format → Guard Rails → Reasoning → Task
+
+        Reasoning is placed in the recency zone (immediately before Task) for
+        stronger recall in long-context prompts (Li et al. 2023).
 
         When ``provider_hint`` is set, applies provider-specific rendering
         overrides on top of whichever flow is active.
@@ -463,15 +468,7 @@ class Context(BaseModel):
             # Gemini already received traits in the role block via render()
             sections.append(_wrap("STYLE", f"**Tone & voice:** {style}"))
 
-        # ⑤ ANALYTICAL AND REPORTING APPROACH (or REASONING APPROACH)
-        if self.analytical_approach:
-            sections.append(_wrap("ANALYTICAL AND REPORTING APPROACH", self.analytical_approach))
-        elif self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
-            label, injection = THINKING_STRATEGIES[self.thinking_strategy]
-            body = f"**Important — {injection}**"
-            sections.append(_wrap(f"REASONING APPROACH ({label})", body))
-
-        # ⑥ EXAMPLES (few-shot, middle zone)
+        # ⑤ EXAMPLES (few-shot, middle zone — calibrates format before output contract)
         if self.examples:
             pairs = []
             for i, ex in enumerate(self.examples, 1):
@@ -520,6 +517,15 @@ class Context(BaseModel):
             guard = self._render_guard_rails(self.constraints, provider=provider, use_xml=use_xml)
             if guard:
                 sections.append(guard)
+
+        # ⑧.5 REASONING APPROACH — recency zone, immediately before TASK
+        # Placed here (not at ⑤) so it is not lost in the middle for long-context prompts.
+        if self.analytical_approach:
+            sections.append(_wrap("ANALYTICAL AND REPORTING APPROACH", self.analytical_approach))
+        elif self.thinking_strategy and self.thinking_strategy in THINKING_STRATEGIES:
+            label, injection = THINKING_STRATEGIES[self.thinking_strategy]
+            body = f"**Important — {injection}**"
+            sections.append(_wrap(f"REASONING APPROACH ({label})", body))
 
         # ⑨ TASK (recency zone — ALWAYS LAST)
         if self.directive:

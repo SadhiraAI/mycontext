@@ -128,7 +128,77 @@ class IntegrationResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Schema 3: Context generator spec
+# Schema 3: Route suggestion response (suggest_routes)
+# ---------------------------------------------------------------------------
+
+class RouteStep(BaseModel):
+    """One agent/step in an analysis route's pipeline."""
+    template: str = Field(description="Template name from catalog (exact snake_case)")
+    agent_role: str = Field(description="Plain-English role, e.g. 'Question Decomposition Analyst'")
+    receives: str = Field(description="'user_input' or 'output from {previous_template}'")
+    produces: str = Field(description="What this step outputs, e.g. 'Prioritized sub-questions'")
+    params: dict[str, str] = Field(
+        default_factory=dict,
+        description="Suggested build_context params for this template",
+    )
+
+    @field_validator("template", mode="before")
+    @classmethod
+    def normalise_template(cls, v: str) -> str:
+        return str(v).strip().lower().replace("-", "_").replace(" ", "_")
+
+
+class AnalysisRoute(BaseModel):
+    """One differentiated analysis path through the template catalog."""
+    label: str = Field(description="Human-readable route name, e.g. 'Diagnostic Deep-Dive'")
+    dimension: str = Field(
+        description="Analytical dimension: diagnostic, predictive, strategic, risk, "
+                    "communication, evaluation, creative, ethical",
+    )
+    rationale: str = Field(description="Why this angle matters for the specific question")
+    steps: list[RouteStep] = Field(
+        description="Ordered agent steps (2-4 per route)",
+        min_length=1,
+        max_length=6,
+    )
+    final_output: str = Field(description="What the complete route delivers as a deliverable")
+
+
+class RouteAnalysis(BaseModel):
+    """Complete multi-route analysis of a question."""
+    question_decomposition: str = Field(
+        description="Analysis of the question's dimensions, stakeholders, timeframes, and scope",
+    )
+    routes: list[AnalysisRoute] = Field(
+        description="Differentiated analysis paths (2-6), ordered by relevance",
+        min_length=1,
+        max_length=6,
+    )
+    recommendation: str = Field(
+        description="Which route to start with and why",
+    )
+
+    @field_validator("routes", mode="after")
+    @classmethod
+    def validate_route_templates(cls, v: list[AnalysisRoute]) -> list[AnalysisRoute]:
+        from .pattern_catalog import VALID_PATTERN_NAMES
+        cleaned: list[AnalysisRoute] = []
+        for route in v:
+            valid_steps = [s for s in route.steps if s.template in VALID_PATTERN_NAMES]
+            if len(valid_steps) >= len(route.steps) * 0.5:
+                route.steps = valid_steps
+                cleaned.append(route)
+            else:
+                logger.warning(
+                    "RouteAnalysis: dropping route %r — >50%% of template names invalid: %s",
+                    route.label,
+                    [s.template for s in route.steps],
+                )
+        return cleaned if cleaned else v
+
+
+# ---------------------------------------------------------------------------
+# Schema 4: Context generator spec
 # ---------------------------------------------------------------------------
 
 class ExamplePair(BaseModel):

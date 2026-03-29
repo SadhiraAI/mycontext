@@ -418,7 +418,7 @@ class GuidanceOptimizer:
             hint_text = "\n".join(f"  - {h}" for h in hints)
             rules_block += (
                 f'\nRule {i}: "{ra.original}"\n'
-                f"Issues: {', '.join(ra.issues)}\n"
+                f"Issues: {', '.join(str(i) for i in ra.issues)}\n"
                 f"Rewriting principles:\n{hint_text}\n"
             )
 

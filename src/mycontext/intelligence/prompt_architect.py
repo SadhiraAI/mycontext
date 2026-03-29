@@ -7,12 +7,15 @@ Translates the prompt-engineering guidebook into a callable SDK tool:
   3. BUILD   — construct a full 9-section Context from a task description alone.
   4. IMPROVE — parse + score + rewrite weak sections + score again + diff.
 
-Research basis for the 9-section ordering (same as core.py research_flow):
-  PRIMACY ZONE    → ① Role  ② Goal          (Liu et al. 2023)
-  INSTRUCTIONS    → ③ Rules  ④ Style         (OpenAI guide)
-  MIDDLE          → ⑤ Reasoning strategies (task-fit; one or many)  ⑥ Examples  (Li et al. 2025)
-  LATE            → ⑦ Output Contract  ⑧ Guard Rails  (CO-STAR)
-  RECENCY ZONE    → ⑨ Task (ALWAYS LAST)     (Li et al. 2023)
+Research basis for assembly (``Context.research_flow=True`` — see ``core.py``):
+  PRIMACY ZONE    → ① Role  ② Goal                    (Liu et al. 2023)
+  INSTRUCTIONS    → ③ Rules  ④ Style                   (OpenAI guide)
+  MIDDLE          → ⑤ Examples                        (Li et al. 2025)
+  LATE            → ⑥ Knowledge  ⑦ Output  ⑧ Guard   (CO-STAR)
+  RECENCY ZONE    → ⑧.5 Reasoning  ⑨ Task (LAST)      (Li et al. 2023)
+
+  The rewriter JSON still lists fields in ``SECTION_NAMES`` order (role … task).
+  Reasoning strategies render just before YOUR TASK in the assembled string (0.10.1+).
 """
 
 from __future__ import annotations
@@ -23,7 +26,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..core import Context, ProviderHint
+from ..core import THINKING_STRATEGIES, Context, ProviderHint
 from ..foundation import Constraints, Directive, Guidance
 
 logger = logging.getLogger(__name__)
@@ -293,7 +296,7 @@ class PromptArchitect:
         "2-5 representative examples. Fewer than 2 = too much ambiguity; more than 5 = token waste.",
         "Examples must match the exact output format (JSON → JSON, bullets → bullets).",
         "Include at least one edge case or negative example showing what WRONG looks like.",
-        "Place after the reasoning-strategy rules (middle zone — calibration position).",
+        "In the assembled prompt, examples render in the middle zone (before OUTPUT FORMAT); match output_contract exactly.",
     ]
 
     _OUTPUT_CONTRACT_UPGRADE_HINTS = [
@@ -349,12 +352,24 @@ class PromptArchitect:
         model: str = "gpt-4o-mini",
         *,
         assembly_provider_hint: ProviderHint | None = None,
+        render_for: ProviderHint | None = None,
     ):
+        """
+        Args:
+            provider: LLM provider used for improve/build calls (openai / anthropic / gemini / …).
+                      Also determines the assembled prompt format unless overridden.
+            model: Model name passed to the LLM.
+            render_for: Target provider for the *output* prompt format — independent of
+                        which provider runs the LLM call. Pass ``render_for="anthropic"``
+                        to get XML-delimited output even when calling via OpenAI.
+                        Alias for ``assembly_provider_hint``.
+            assembly_provider_hint: Explicit override for output format (same as render_for;
+                                    render_for takes precedence if both are set).
+        """
         self.provider = provider
         self.model = model
-        # How assemble() formats headings/XML (openai / anthropic / gemini).
-        # None → inferred from *provider* (the LLM used for improve/build).
-        self._assembly_provider_hint = assembly_provider_hint
+        # render_for takes priority; falls back to assembly_provider_hint, then inferred from provider.
+        self._assembly_provider_hint = render_for or assembly_provider_hint
 
     def _resolve_assembly_provider_hint(self) -> ProviderHint | None:
         if self._assembly_provider_hint is not None:
@@ -394,6 +409,7 @@ class PromptArchitect:
         model: str | None = None,
         user_message: str | None = None,
         task_contract: Any | None = None,
+        reasoning_strategies: list[str] | None = None,
         **execute_kwargs: Any,
     ) -> ArchitectResult:
         """
@@ -405,6 +421,11 @@ class PromptArchitect:
             model: Override default model.
             user_message: The actual user message/task the model will receive.
             task_contract: Optional TaskContract (L0 metadata).
+            reasoning_strategies: Explicit list of strategy slugs or archetype names to
+                inject (e.g. ``["deliberative"]`` or ``["step_by_step", "verify"]``).
+                When supplied, overrides whatever reasoning strategy the LLM inferred from
+                the task description. Valid slugs: atomic ones from ``REASONING_STRATEGY_CHOICES``
+                and archetype names from ``REASONING_ARCHETYPES``.
 
         Returns:
             ArchitectResult with the built context and scores.
@@ -430,6 +451,11 @@ class PromptArchitect:
             task_contract=task_contract,
             **execute_kwargs,
         )
+
+        # Caller-supplied strategies override the LLM's inferred choice
+        if reasoning_strategies is not None:
+            built_json["reasoning_strategies"] = reasoning_strategies
+
         improved_ctx = self._json_to_context(built_json, task, task_contract=task_contract)
 
         after_score_obj = qm.evaluate(improved_ctx)
@@ -449,7 +475,7 @@ class PromptArchitect:
             before_issues=before_score_obj.issues,
             after_issues=after_score_obj.issues,
             resolved_issues=list(set(before_score_obj.issues) - set(after_score_obj.issues)),
-            metadata={"mode": "build", "model": model, "provider": provider},
+            metadata={"mode": "build", "model": model, "provider": provider, "target_provider": self._resolve_assembly_provider_hint() or "generic"},
         )
 
     def improve(
@@ -529,7 +555,7 @@ class PromptArchitect:
             before_issues=before_score_obj.issues,
             after_issues=after_score_obj.issues,
             resolved_issues=list(set(before_score_obj.issues) - set(after_score_obj.issues)),
-            metadata={"mode": "improve", "model": model, "provider": provider},
+            metadata={"mode": "improve", "model": model, "provider": provider, "target_provider": self._resolve_assembly_provider_hint() or "generic"},
         )
 
     # ── Heuristic parser ──────────────────────────────────────────────────────
@@ -806,17 +832,30 @@ class PromptArchitect:
             elif genre_hint and not output_contract:
                 output_contract = genre_hint
 
-        # Weave task-chosen reasoning into rules (first = highest attention in RULES)
-        full_rules = list(rules)
-        if len(strategies) == 1:
-            full_rules.insert(0, f"Reasoning strategy: {strategies[0]}")
-        elif len(strategies) > 1:
-            chain = " → ".join(strategies)
-            full_rules.insert(
-                0,
-                "Reasoning strategies (infer fit from goal/task; apply in order): "
-                + chain,
+        # ── Guard-rails rescue: move misplaced rules into rules list ──────────
+        # The LLM sometimes puts grounding directives ("Every claim must be…")
+        # into guard_rails instead of rules. Detect and relocate them so
+        # guard_rails only contains true Omit-style exclusions.
+        clean_guard_rails: list[str] = []
+        rescued_rules: list[str] = []
+        for item in guard_rails:
+            item_l = item.lower().strip()
+            is_omit = item_l.startswith("omit") or "hedging" in item_l or "stock phrase" in item_l
+            is_grounding = (
+                item_l.startswith("every ")
+                or item_l.startswith("all claims")
+                or "must be grounded" in item_l
+                or "not found in the provided" in item_l
             )
+            if is_omit:
+                clean_guard_rails.append(item)
+            elif is_grounding:
+                rescued_rules.append(item)
+            else:
+                clean_guard_rails.append(item)
+
+        # Rules stay clean — no reasoning injected here (reasoning gets its own section)
+        full_rules = list(rules) + rescued_rules
 
         guidance = Guidance(
             role=role,
@@ -825,22 +864,44 @@ class PromptArchitect:
             style=style,
         )
 
-        # Examples go in the directive as an injected block
-        examples_block = ""
-        raw_examples = data.get("examples") or []
-        if raw_examples:
-            ex_lines = "\n".join(
-                f"Example {i+1}: {ex}" for i, ex in enumerate(raw_examples)
-            )
-            examples_block = f"\n\n**EXAMPLES**\n{ex_lines}\n\n"
+        # ── Reasoning → dedicated section ⑧.5 (just before TASK) ─────────────
+        # Stored in analytical_approach which _assemble_research_flow now renders
+        # between GUARD RAILS and YOUR TASK (recency zone — better recall in long prompts).
+        reasoning_approach: str | None = None
+        if strategies:
+            if len(strategies) == 1:
+                s = strategies[0]
+                label, injection = THINKING_STRATEGIES.get(s, (s.replace("_", " ").title(), s))
+                reasoning_approach = f"**{label}** — {injection}"
+            else:
+                chain = " → ".join(strategies)
+                parts = [f"Apply in order: **{chain}**"]
+                for s in strategies:
+                    label, injection = THINKING_STRATEGIES.get(s, (s.replace("_", " ").title(), s))
+                    parts.append(f"  - **{label}**: {injection}")
+                reasoning_approach = "\n".join(parts)
 
-        directive = Directive(content=f"{examples_block}{task}")
+        # ── Examples → Context.examples (middle zone ⑤, not in directive) ────
+        # Supports both new {input, output} dicts and legacy plain strings.
+        raw_examples = data.get("examples") or []
+        ctx_examples: list[dict[str, str]] = []
+        for ex in raw_examples:
+            if isinstance(ex, dict) and "input" in ex and "output" in ex:
+                ctx_examples.append({"input": str(ex["input"]), "output": str(ex["output"])})
+            elif isinstance(ex, str) and ex.strip():
+                if " → " in ex:
+                    left, right = ex.split(" → ", 1)
+                    ctx_examples.append({"input": left.strip(), "output": right.strip()})
+                else:
+                    ctx_examples.append({"input": "Input", "output": ex.strip()})
+
+        directive = Directive(content=task)
 
         constraints = None
-        if output_contract or guard_rails:
+        if output_contract or clean_guard_rails:
             constraints = Constraints(
                 output_contract=output_contract or None,
-                must_not_include=guard_rails or None,
+                must_not_include=clean_guard_rails or None,
             )
 
         # Resolve TaskContract
@@ -855,6 +916,8 @@ class PromptArchitect:
             directive=directive,
             constraints=constraints,
             task_contract=resolved_tc,
+            examples=ctx_examples or None,
+            analytical_approach=reasoning_approach,
             research_flow=True,
             provider_hint=self._resolve_assembly_provider_hint(),
         )
@@ -943,11 +1006,14 @@ Return ONLY this JSON (fill every field — use null only if truly not applicabl
   "rules": ["binding-modal rule 1 (testable, one sentence)", "rule 2", "rule 3", "rule 4 — order critical-first"],
   "style": "formality + pace + audience. Add negative style constraints.",
   "reasoning_strategies": ["slug_from_task_1", "optional_second_slug"],
-  "examples": ["example matching output format", "edge-case or negative example — optional"],
+  "examples": [{{"input": "example user input or scenario", "output": "expected model output matching output_contract format exactly"}}, {{"input": "edge-case input", "output": "correct edge-case response"}}],
   "output_contract": "'Return ONLY …' + form + structure + exclusions",
-  "guard_rails": ["positive redirect + fallback phrase", "Omit hedging: probably, might, could be"],
+  "guard_rails": ["Omit hedging language: probably, might, could be", "Omit stock AI phrases: in today\u2019s rapidly evolving, delve into"],
   "task": "clearest imperative sentence — placed last (recency zone)"
 }}
+
+CRITICAL for guard_rails: use ONLY 'Omit X' exclusion statements. Grounding rules ('Every claim must be grounded…') and fallback phrases belong in rules[], NOT guard_rails.
+CRITICAL for examples: each example output MUST match the output_contract format exactly. If output_contract says '4-part structure', the example output must show the full 4-part answer — not a dict of field names.
 
 For reasoning_strategies: read the ORIGINAL PROMPT's goal and task. Pick one or more from:
   Atomic: {", ".join(REASONING_STRATEGY_CHOICES)}
@@ -1017,11 +1083,14 @@ Return ONLY this JSON (fill every field — use null only if truly not applicabl
   "rules": ["binding-modal rule 1 (testable, one sentence)", "rule 2", "rule 3", "rule 4 — order critical-first"],
   "style": "formality + pace + audience. Add negative style constraints.",
   "reasoning_strategies": ["slug_from_task_1", "optional_second_slug"],
-  "examples": ["example matching output format", "edge-case or negative example — optional"],
+  "examples": [{{"input": "example user input or scenario", "output": "expected model output matching output_contract format exactly"}}, {{"input": "edge-case input", "output": "correct edge-case response"}}],
   "output_contract": "'Return ONLY …' + form + structure + exclusions",
-  "guard_rails": ["positive redirect + fallback phrase", "Omit hedging: probably, might, could be"],
+  "guard_rails": ["Omit hedging language: probably, might, could be", "Omit stock AI phrases: in today\u2019s rapidly evolving, delve into"],
   "task": "clearest imperative sentence — placed last (recency zone)"
 }}
+
+CRITICAL for guard_rails: use ONLY 'Omit X' exclusion statements. Grounding rules ('Every claim must be grounded…') and fallback phrases belong in rules[], NOT guard_rails.
+CRITICAL for examples: each example output MUST match the output_contract format exactly. If output_contract says '4-part structure', the example output must show the full 4-part answer — not a dict of field names.
 
 For reasoning_strategies: infer from the TASK DESCRIPTION above. Pick one or more from:
   Atomic: {", ".join(REASONING_STRATEGY_CHOICES)}

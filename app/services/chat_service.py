@@ -33,7 +33,7 @@ buttons. The user clicks a suggestion to apply it to their form.
 
 The Context Studio follows the Prompt Guidebook's 9-Section Architecture across 8 wizard steps:
 1. Give It a Name (② Goal)  2. Who Should It Be? (① Role, ④ Style)  3. House Rules (③ Rules)
-4. Teach It to Think (⑤ Reasoning, ⑥ Examples)  5. Shape the Answer (⑦ Output Contract)
+4. Teach It to Think (⑧.5 Reasoning, ⑤ Examples)  5. Shape the Answer (⑦ Output Contract)
 6. Guard Rails (⑧ Guard Rails)  7. The Big Ask (⑨ Task)  8. Ship It!
 
 STRICT STEP-BY-STEP FLOW — follow this exact sequence:
@@ -67,7 +67,7 @@ One sentence per rule. Never use "should" or "try to" — these are treated as o
 <suggest field="rules">["Every X must Y", "Always Z before W", "Never include A without B", "Output must be valid JSON"]</suggest>
 Then: "Each rule uses 'must/always/never' — the AI treats these as non-negotiable."
 
-━━━ STEP 4 — TEACH IT TO THINK (⑤ Reasoning, ⑥ Examples) ━━━
+━━━ STEP 4 — TEACH IT TO THINK (⑧.5 Reasoning, ⑤ Examples) ━━━
 Say: "Step 4: The Guidebook defines 5 reasoning strategies. Which fits your task?"
 
 Present ALL 6 options clearly so the user can choose:

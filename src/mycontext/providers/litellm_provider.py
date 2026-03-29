@@ -31,6 +31,17 @@ DEFAULT_TIMEOUT = 120
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_RETRY_BACKOFF = 2.0
 
+# Passed through Context.execute(..., **kwargs) from PromptArchitect and similar;
+# must never be forwarded to provider APIs (OpenAI rejects unknown body fields).
+_EXECUTE_KWARGS_BLOCKLIST = frozenset(
+    {
+        "thinking_strategy",
+        "reasoning_strategies",
+        "user_message",
+        "task_contract",
+    }
+)
+
 
 def _litellm_model_name(provider: str, model: str) -> str:
     """Map (provider, model) to the litellm model string.
@@ -311,6 +322,9 @@ class LiteLLMProvider(BaseProvider):
 
         _tracer = get_tracer()
         api_key = kwargs.pop("api_key", self.api_key)
+        kwargs = {
+            k: v for k, v in kwargs.items() if k not in _EXECUTE_KWARGS_BLOCKLIST
+        }
 
         call_kwargs: dict[str, Any] = {
             "model": litellm_model,

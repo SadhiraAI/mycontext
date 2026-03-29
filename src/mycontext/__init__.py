@@ -6,7 +6,7 @@ Transform raw questions into perfect, portable contexts for any AI system.
 Context as Code™ - Research-backed cognitive patterns for systematic context engineering.
 """
 
-__version__ = "0.9.0"
+from .version import __version__
 
 # Core exports
 # Templates module (lazy loading)
@@ -45,6 +45,7 @@ from .skills import Skill, SkillRunner, SkillRunResult
 from .structure import Blueprint, Pattern
 
 __all__ = [
+    "__version__",
     # Core
     "Context",
     "THINKING_STRATEGIES",

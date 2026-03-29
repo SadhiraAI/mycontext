@@ -63,9 +63,9 @@ function ResearchDrawer({ open, onClose }) {
           <div className="ps-research-flow">
             <div className="ps-research-zone"><span className="ps-rz-label primacy">Primacy Zone</span> <span className="ps-rz-sections">Role → Goal</span> <span className="ps-rz-why">Strongest recall</span></div>
             <div className="ps-research-zone"><span className="ps-rz-label early">Early</span> <span className="ps-rz-sections">Rules → Style</span> <span className="ps-rz-why">Best instruction compliance</span></div>
-            <div className="ps-research-zone"><span className="ps-rz-label middle">Middle</span> <span className="ps-rz-sections">Reasoning → Examples</span> <span className="ps-rz-why">Demos stable here (+6 pts)</span></div>
+            <div className="ps-research-zone"><span className="ps-rz-label middle">Middle</span> <span className="ps-rz-sections">Examples</span> <span className="ps-rz-why">Demos stable here (+6 pts)</span></div>
             <div className="ps-research-zone"><span className="ps-rz-label late">Late</span> <span className="ps-rz-sections">Output Format → Guard Rails</span> <span className="ps-rz-why">Fresh before generating</span></div>
-            <div className="ps-research-zone"><span className="ps-rz-label recency">Recency Zone</span> <span className="ps-rz-sections">Task (always last)</span> <span className="ps-rz-why">+9.7 BLEU improvement</span></div>
+            <div className="ps-research-zone"><span className="ps-rz-label recency">Recency Zone</span> <span className="ps-rz-sections">Reasoning → Task</span> <span className="ps-rz-why">+9.7 BLEU improvement</span></div>
           </div>
 
           <div className="ps-research-article-cta">
@@ -102,7 +102,7 @@ const WIZARD_STEPS = [
   { title: "Give It a Name", short: "Name", guidebook: "② Goal" },                 // 1 — name, description, goal
   { title: "Who Should It Be?", short: "Who", guidebook: "① Role, ④ Style" },     // 2
   { title: "House Rules", short: "Rules", guidebook: "③ Rules" },                  // 3
-  { title: "Teach It to Think", short: "Think", guidebook: "⑤ Reasoning, ⑥ Examples" }, // 4
+  { title: "Teach It to Think", short: "Think", guidebook: "⑧.5 Reasoning, ⑤ Examples" }, // 4
   { title: "Shape the Answer", short: "Answer", guidebook: "⑦ Output Contract" }, // 5
   { title: "Guard Rails", short: "Guards", guidebook: "⑧ Guard Rails" },           // 6
   { title: "The Big Ask", short: "Ask", guidebook: "⑨ Task" },                     // 7
@@ -111,7 +111,7 @@ const WIZARD_STEPS = [
 
 const SECTION_LABELS = {
   role: "① Role", goal: "② Goal", rules: "③ Rules", style: "④ Style",
-  reasoning: "⑤ Reasoning", examples: "⑥ Examples",
+  examples: "⑤ Examples", reasoning: "⑧.5 Reasoning",
   output_contract: "⑦ Output Contract", guard_rails: "⑧ Guard Rails", task: "⑨ Task",
 };
 
@@ -992,14 +992,14 @@ export default function CustomTemplates() {
             </div>
           )}
 
-          {/* ── Step 4: Reasoning + Examples (⑤ Reasoning, ⑥ Examples from Guidebook) ── */}
+          {/* ── Step 4: Reasoning + Examples (⑧.5 Reasoning, ⑤ Examples from Guidebook) ── */}
           {step === 4 && (
             <div className="ps-panel fade-in">
               <h2>Teach It to Think</h2>
               <p className="ps-hint">The Guidebook defines <strong>five reasoning strategies</strong> — each controls <em>how</em> the AI approaches your task. Pick the one that fits, then optionally show examples of what "good" looks like.</p>
 
               <div className="ps-field ps-think-question">
-                <label className="ps-think-ask">How do you want the AI to think? <span className="ps-guidebook-tag">⑤ Reasoning Strategy</span></label>
+                <label className="ps-think-ask">How do you want the AI to think? <span className="ps-guidebook-tag">⑧.5 Reasoning Strategy</span></label>
                 <p className="ps-field-hint">Each strategy fundamentally changes the AI's reasoning path. The Guidebook says: pick the strategy that matches your task's complexity — and stick to one per prompt.</p>
 
                 <div className="ps-strategy-cards">
@@ -1036,7 +1036,7 @@ export default function CustomTemplates() {
               </div>
 
               <div className="ps-field ps-examples-section">
-                <label className="ps-think-ask">Show it what "good" looks like <span className="ps-guidebook-tag">⑥ Examples — Few-Shot Anchors</span></label>
+                <label className="ps-think-ask">Show it what "good" looks like <span className="ps-guidebook-tag">⑤ Examples — Few-Shot Anchors</span></label>
                 <p className="ps-field-hint">The Guidebook says: <strong>2–5 examples, representative of edge cases, matching the exact output format.</strong> Few-shot examples are the single strongest accuracy lever — they teach by demonstration, not instruction.</p>
 
                 {safeArray(form.examples).map((ex, idx) => (
@@ -1664,6 +1664,18 @@ export default function CustomTemplates() {
                     <span className="ps-improver-delta">+{Math.round((improveResult.score_delta || 0) * 100)}%</span>
                   </div>
 
+                  {improveResult.resolved_issues?.length > 0 && (
+                    <div className="ps-improver-resolved">
+                      <strong>✓ {improveResult.resolved_issues.length} issue{improveResult.resolved_issues.length !== 1 ? "s" : ""} resolved</strong>
+                      <ul>{improveResult.resolved_issues.map((iss, i) => <li key={i}>{iss}</li>)}</ul>
+                    </div>
+                  )}
+                  {improveResult.after_issues?.length > 0 && (
+                    <p className="ps-improver-hint">
+                      {improveResult.after_issues.length} issue{improveResult.after_issues.length !== 1 ? "s" : ""} remaining — see section diffs for details.
+                    </p>
+                  )}
+
                   {improveResult.diffs?.length > 0 && (
                     <details className="ps-improver-diffs">
                       <summary>Section-by-section changes ({improveResult.diffs.filter((d) => d.action !== "unchanged").length} changed)</summary>
@@ -1672,6 +1684,9 @@ export default function CustomTemplates() {
                           <div key={i} className={`ps-improver-diff ps-improver-diff--${d.action}`}>
                             <span className="ps-improver-diff-badge">{d.action.toUpperCase()}</span>
                             <span className="ps-improver-diff-section">{SECTION_LABELS[d.section] || d.section}</span>
+                            {d.before && d.action !== "unchanged" && (
+                              <p className="ps-improver-diff-before">{d.before}</p>
+                            )}
                             {d.after && <p className="ps-improver-diff-after">{d.after}</p>}
                             <p className="ps-improver-diff-rationale">{d.rationale}</p>
                           </div>

@@ -1,7 +1,7 @@
 [project]
 name = "mycontext-ai"
-version = "0.9.0"
-description = "Context engineering for LLMs — 87 cognitive patterns, prompt compilation, 3-tier execution, 13 export formats"
+version = "0.10.2"
+description = "Context engineering for LLMs — 88 cognitive patterns, prompt compilation, 3-tier execution, 13 export formats"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -22,7 +22,9 @@ classifiers = [
 dependencies = [
     "pydantic>=2.11.0",
     "pyyaml>=6.0.2",
-    "litellm>=1.55.0",  # Required for ctx.execute() — routes to OpenAI, Anthropic, Gemini, 100+ providers
+    # Pinned intentionally — do not upgrade LiteLLM in this repo unless explicitly decided (breaking/API drift risk).
+    # Exact pin — do not bump unless explicitly requested. Avoid compromised releases: 1.82.8, 1.87.x.
+    "litellm==1.82.1",  # Required for ctx.execute() — routes to OpenAI, Anthropic, Gemini, 100+ providers
     "pandas>=3.0.1",
 ]
 

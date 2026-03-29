@@ -6,6 +6,51 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.10.2] — 2026-03-28
+
+### Added
+
+- **`PromptArchitect.build(reasoning_strategies=...)`** — New parameter that lets callers pin the thinking strategy explicitly instead of relying on LLM inference. Accepts a list of atomic slugs (e.g. `["step_by_step", "verify"]`) or a named archetype (e.g. `["deliberative"]`). When supplied, the caller's value overrides whatever the LLM inferred from the task description. Valid atomic slugs: `step_by_step`, `multiple_angles`, `verify`, `explain_simply`, `creative`. Valid archetypes: `analytical`, `deliberative`, `explanatory`, `creative`, `high_stakes`.
+
+### Fixed
+
+- **`PromptArchitect.build()`** — Passing an unknown keyword argument (e.g. `THINKING_STRATEGIES=`) no longer silently flows into `ctx.execute()` with no effect; callers should use the new `reasoning_strategies=` parameter.
+
+---
+
+## [0.10.1] — 2026-03-28
+
+### Fixed
+
+- **`PromptArchitect`** — Reasoning strategies are no longer injected into the `RULES` section. They now render as a dedicated **`ANALYTICAL AND REPORTING APPROACH`** section placed immediately before `YOUR TASK` (recency zone) for stronger recall in long-context prompts (Li et al. 2023).
+- **`PromptArchitect`** — `examples` from the LLM JSON are now mapped to `Context.examples` as `{"input", "output"}` dicts, rendering as a proper `## EXAMPLES` section in the middle zone (⑤). They were previously baked as raw text into `Directive.content` (inside `YOUR TASK`), causing format/output-contract mismatches.
+- **`PromptArchitect`** — Guard-rails rescue: items that look like grounding rules (`"Every claim must be grounded…"`) are automatically moved from `guard_rails` into `rules` where they belong, so the `GUARD RAILS` section only contains true `Omit X` exclusions.
+- **`PromptArchitect`** — LLM JSON schema hints for `examples` updated to `{input, output}` dict format, and `guard_rails` hint tightened to `Omit X`-only statements with an explicit CRITICAL note.
+- **`Context._assemble_research_flow`** — Prompt section order updated: `⑤ Examples → ⑥ Knowledge → ⑦ Output Format → ⑧ Guard Rails → ⑧.5 Reasoning → ⑨ Task`. Reasoning was previously at ⑤ (middle zone) and got lost in long-context prompts.
+
+### Added
+
+- **`PromptArchitect(render_for=...)`** — New constructor parameter (alias for `assembly_provider_hint`) to set the target provider for output formatting independently of the LLM call provider. Example: `PromptArchitect(provider="openai", render_for="anthropic")` calls OpenAI but emits XML-delimited output for Anthropic consumption.
+- **`ArchitectResult.metadata["target_provider"]`** — Reports the resolved output format provider (`openai` / `anthropic` / `gemini` / `generic`) on every `build()` and `improve()` result.
+
+---
+
+## [0.10.0] — 2026-03-25
+
+### Added
+
+- **`suggest_routes()`** (`mycontext.intelligence.suggest_routes`) — LLM-powered multi-route analysis: decomposes a question into differentiated template pipelines with **agent-level steps** (`RouteStep`: `template`, `agent_role`, `receives`, `produces`, `params`). Use it to plan LangGraph / CrewAI-style multi-agent flows. Exported types: `RouteAnalysis`, `AnalysisRoute`, `RouteStep`.
+- **Catalog `output_type`** — Every entry in `ENRICHED_CATALOG` includes an `output_type` string; `ENRICHED_CATALOG_TEXT` now shows a **PRODUCES:** line per template for better LLM routing.
+
+### Changed
+
+- **`suggest_patterns(mode="llm"|"hybrid")`** — Tries `suggest_routes(max_routes=1)` first and maps the best route into `SuggestionResult`; falls back to the legacy `_suggest_with_llm` path on failure.
+- **`build_workflow_chain()`** — **Deprecated** (emits `DeprecationWarning`). Prefer `suggest_routes()`. When delegation succeeds, builds `WorkflowChainResult` from the first route’s steps.
+- **`TemplateIntegratorAgent`** — Default integration model is **`gpt-4o`** (was `gpt-4o-mini`). Template fingerprints use each pattern’s **`GENERIC_PROMPT`** instead of heuristic directive line extraction. Instructor path forwards **`max_tokens`**, **`temperature`**, **`top_p`** when provided.
+- **`IntegrationResult`** — New field **`integration_rationale`**. **`integrated_context`** / **`raw_llm_response`** are no longer sentinel strings on the instructor path; they contain reconstructed readable text.
+
+---
+
 ## [0.9.0] — 2026-03-24
 
 ### Added

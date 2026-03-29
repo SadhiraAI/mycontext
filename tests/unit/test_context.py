@@ -295,11 +295,11 @@ class TestResearchFlow:
         assert "## YOUR TASK" in assembled
 
     def test_research_flow_ordering(self):
-        """ROLE must come first, TASK must come last"""
+        """ROLE first, TASK last; reasoning immediately before TASK (recency zone)."""
         ctx = Context(
             guidance=Guidance(role="Expert", goal="Win", rules=["Rule1"]),
             directive=Directive(content="Do it"),
-            constraints=Constraints(must_include=["x"]),
+            constraints=Constraints(must_include=["x"], must_not_include=["y"]),
             thinking_strategy="verify",
             examples=[{"input": "a", "output": "b"}],
             research_flow=True,
@@ -309,14 +309,16 @@ class TestResearchFlow:
         role_pos = assembled.find("## ROLE")
         goal_pos = assembled.find("## GOAL")
         rules_pos = assembled.find("## RULES")
-        reasoning_pos = assembled.find("## REASONING")
         examples_pos = assembled.find("## EXAMPLES")
         guard_pos = assembled.find("## GUARD RAILS")
+        reasoning_pos = assembled.find("## REASONING")
         task_pos = assembled.find("## YOUR TASK")
 
         assert role_pos < goal_pos < rules_pos
-        assert rules_pos < reasoning_pos < examples_pos
-        assert examples_pos < guard_pos < task_pos
+        # Examples now at ⑤ (before output format / guard rails)
+        assert rules_pos < examples_pos < guard_pos
+        # Reasoning now at ⑧.5 — after guard rails, before task
+        assert guard_pos < reasoning_pos < task_pos
 
     def test_research_flow_emphasis(self):
         """Research flow should use bold/caps emphasis markers"""
