@@ -5,7 +5,6 @@ Creates compelling, ethical persuasive communication.
 Based on rhetoric, influence psychology, and argumentation theory.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class PersuasionFramework(Pattern):
     """
     Build persuasive arguments systematically.
-    
+
     Uses:
     - Classical rhetoric (ethos, pathos, logos)
     - Influence principles
     - Argument structure
     - Objection handling
-    
+
     Based on: Rhetoric and influence research
-    
+
     Example:
         >>> framework = PersuasionFramework()
         >>> context = framework.build_context(
         ...     goal="Convince leadership to adopt AI tools",
         ...     audience="C-suite executives"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class PersuasionFramework(Pattern):
                     "Connect emotionally (pathos)",
                     "Use logic (logos)",
                     "Address objections proactively",
-                    "Call to action clearly"
+                    "Call to action clearly",
                 ],
-                style="compelling, ethical, respectful"
+                style="compelling, ethical, respectful",
             ),
             directive_template="""Build persuasive argument:
 
@@ -213,19 +212,11 @@ Systematic persuasion framework:
     - Long-term: [Behavior change]
 
 **OUTPUT FORMAT**: Compelling, ethical persuasive framework.""",
-            input_schema={
-                "goal": str,
-                "context_section": str,
-                "audience": str
-            },
+            input_schema={"goal": str, "context_section": str, "audience": str},
             constraints=Constraints(
-                must_include=[
-                    "ethos_pathos_logos",
-                    "objection_handling",
-                    "call_to_action"
-                ],
-                style_guide="Be persuasive but ethical, compelling but respectful"
-            )
+                must_include=["ethos_pathos_logos", "objection_handling", "call_to_action"],
+                style_guide="Be persuasive but ethical, compelling but respectful",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -238,15 +229,12 @@ Systematic persuasion framework:
         goal: str = "",
         audience: str = "general audience",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            goal=goal,
-            audience=audience,
-            context_section=context_section,
-            **kwargs
+            goal=goal, audience=audience, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -255,12 +243,8 @@ Systematic persuasion framework:
         goal: str = "",
         audience: str = "general audience",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            goal=goal,
-            audience=audience,
-            context=context,
-            **kwargs
+            provider=provider, goal=goal, audience=audience, context=context, **kwargs
         )

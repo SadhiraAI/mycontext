@@ -81,7 +81,9 @@ def suggested_edits(result: SkillRunResult) -> list[str]:
         # Map common suggestion patterns to concrete edits
         lower = s.lower()
         if "output format" in lower or "specify" in lower and "format" in lower:
-            edits.append(f"Body: Add a line specifying output format, e.g. 'Always specify the output format (e.g. table, list, steps).' (from: {s})")
+            edits.append(
+                f"Body: Add a line specifying output format, e.g. 'Always specify the output format (e.g. table, list, steps).' (from: {s})"
+            )
         elif "step" in lower and ("add" in lower or "include" in lower):
             edits.append(f"Body: Consider adding an explicit step or bullet. Suggestion: {s}")
         elif "vague" in lower or "ambiguous" in lower:
@@ -199,12 +201,15 @@ def log_run(result: SkillRunResult, log_path: Path | None = None) -> None:
         log_path: Path to JSONL file. If None, uses cwd/skill_log.jsonl.
     """
     from datetime import datetime
+
     p = Path(log_path) if log_path is not None else Path.cwd() / _DEFAULT_LOG_NAME
     skill_id = result.skill.name if result.skill else result.metadata.get("skill_path") or "unknown"
     task_preview = ""
     if result.metadata.get("task"):
-        t = str(result.metadata["task"])[: _TASK_PREVIEW_LEN]
-        task_preview = t + ("..." if len(str(result.metadata.get("task", ""))) > _TASK_PREVIEW_LEN else "")
+        t = str(result.metadata["task"])[:_TASK_PREVIEW_LEN]
+        task_preview = t + (
+            "..." if len(str(result.metadata.get("task", ""))) > _TASK_PREVIEW_LEN else ""
+        )
     record = {
         "skill_id": skill_id,
         "task_preview": task_preview,

@@ -18,29 +18,29 @@ from mycontext import Constraints, Guidance, Pattern
 class ErrorDetectionFramework(Pattern):
     """
     Systematically detect errors, biases, and flaws in reasoning or work.
-    
+
     Implements:
     - Self-explanation (Chi et al. 1989)
     - Cognitive bias identification (Kahneman & Tversky)
     - Error taxonomy and detection strategies
-    
+
     Use Cases:
     - Code review (find bugs)
     - Argument analysis (find logical flaws)
     - Decision review (find biases)
     - Writing review (find errors)
     - Math/calculation checking
-    
+
     Example:
         >>> from mycontext.templates.enterprise.metacognition import ErrorDetectionFramework
-        >>> 
+        >>>
         >>> pattern = ErrorDetectionFramework()
         >>> result = pattern.execute(
         ...     provider="gemini",
         ...     work_to_check="My implementation of quicksort",
         ...     domain="programming"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -69,11 +69,7 @@ class ErrorDetectionFramework(Pattern):
             description="Systematically identify mistakes, biases, and reasoning flaws",
             version="1.0.0",
             tags=["metacognition", "enterprise", "error-detection", "debugging"],
-            metadata={
-                "category": "metacognition",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "metacognition", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Error Detection Specialist and Critical Thinking Expert",
                 rules=[
@@ -81,9 +77,9 @@ class ErrorDetectionFramework(Pattern):
                     "Check for domain-specific error types",
                     "Distinguish error types: conceptual, procedural, computational, logical",
                     "Identify cognitive biases (confirmation, anchoring, availability, etc.)",
-                    "Provide specific evidence for each error found"
+                    "Provide specific evidence for each error found",
                 ],
-                style="thorough, systematic, specific, constructive, bias-aware"
+                style="thorough, systematic, specific, constructive, bias-aware",
             ),
             directive_template="""**ERROR DETECTION ANALYSIS**
 
@@ -175,21 +171,18 @@ For each error:
                 "work_to_check": str,
                 "domain": str,
                 "error_types_section": str,
-                "error_type_checklist": str
+                "error_type_checklist": str,
             },
             constraints=Constraints(
                 must_include=[
                     "specific_errors_with_evidence",
                     "error_types",
                     "cognitive_biases",
-                    "prevention_strategies"
+                    "prevention_strategies",
                 ],
-                must_not_include=[
-                    "vague_criticisms",
-                    "errors_without_evidence"
-                ],
-                style_guide="Be specific with evidence. Distinguish error types. Explain WHY something is an error."
-            )
+                must_not_include=["vague_criticisms", "errors_without_evidence"],
+                style_guide="Be specific with evidence. Distinguish error types. Explain WHY something is an error.",
+            ),
         )
 
     def _get_error_checklist(self, domain: str) -> str:
@@ -209,7 +202,6 @@ For each error:
 - [ ] **API misuse**: Libraries used correctly?
 - [ ] **Security**: Input validation, SQL injection, XSS?
             """,
-
             "writing": """
 **Writing-Specific Errors:**
 - [ ] **Grammar**: Subject-verb agreement, tense consistency?
@@ -223,7 +215,6 @@ For each error:
 - [ ] **Redundancy**: Unnecessary repetition?
 - [ ] **Factual accuracy**: Are facts correct?
             """,
-
             "math": """
 **Mathematical Errors:**
 - [ ] **Arithmetic**: Calculations correct?
@@ -237,7 +228,6 @@ For each error:
 - [ ] **Boundary conditions**: Edge cases considered?
 - [ ] **Assumptions**: Stated and valid?
             """,
-
             "reasoning": """
 **Logical Reasoning Errors:**
 - [ ] **Invalid inference**: Conclusions follow from premises?
@@ -253,7 +243,9 @@ For each error:
             """,
         }
 
-        return checklists.get(domain.lower(), """
+        return checklists.get(
+            domain.lower(),
+            """
 **General Error Checklist:**
 - [ ] **Factual accuracy**: Are facts correct?
 - [ ] **Logical consistency**: Do parts contradict?
@@ -261,67 +253,61 @@ For each error:
 - [ ] **Clarity**: Is it understandable?
 - [ ] **Assumptions**: Are they valid?
 - [ ] **Evidence**: Claims supported?
-        """)
+        """,
+        )
 
-    def build_context(
-        self,
-        work_to_check="",
-        domain="",
-        known_error_types="",
-        **kwargs
-    ):
+    def build_context(self, work_to_check="", domain="", known_error_types="", **kwargs):
         """
         Build context for error detection.
-        
+
         Args:
             work_to_check: The work/reasoning to check for errors
             domain: Domain (e.g., "programming", "writing", "math", "reasoning")
             known_error_types: Optional specific error types to look for
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for use
         """
-        error_types_section = f"**SPECIFIC ERROR TYPES TO CHECK**: {known_error_types}" if known_error_types else ""
+        error_types_section = (
+            f"**SPECIFIC ERROR TYPES TO CHECK**: {known_error_types}" if known_error_types else ""
+        )
         error_type_checklist = self._get_error_checklist(domain)
 
-        kwargs.pop('error_types_section', None)
-        kwargs.pop('error_type_checklist', None)
+        kwargs.pop("error_types_section", None)
+        kwargs.pop("error_type_checklist", None)
 
         return super().build_context(
             work_to_check=work_to_check,
             domain=domain,
             error_types_section=error_types_section,
             error_type_checklist=error_type_checklist,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
-        self,
-        provider="gemini",
-        work_to_check="",
-        domain="",
-        known_error_types="",
-        **kwargs
+        self, provider="gemini", work_to_check="", domain="", known_error_types="", **kwargs
     ):
         """
         Execute error detection framework.
-        
+
         Args:
             provider: LLM provider
             work_to_check: Work to check for errors
             domain: Domain of the work
             known_error_types: Optional specific error types to check
             **kwargs: Additional provider options
-        
+
         Returns:
             ProviderResponse with error analysis
         """
-        error_types_section = f"**SPECIFIC ERROR TYPES TO CHECK**: {known_error_types}" if known_error_types else ""
+        error_types_section = (
+            f"**SPECIFIC ERROR TYPES TO CHECK**: {known_error_types}" if known_error_types else ""
+        )
         error_type_checklist = self._get_error_checklist(domain)
 
-        kwargs.pop('error_types_section', None)
-        kwargs.pop('error_type_checklist', None)
+        kwargs.pop("error_types_section", None)
+        kwargs.pop("error_type_checklist", None)
 
         return super().execute(
             provider=provider,
@@ -329,7 +315,7 @@ For each error:
             domain=domain,
             error_types_section=error_types_section,
             error_type_checklist=error_type_checklist,
-            **kwargs
+            **kwargs,
         )
 
 

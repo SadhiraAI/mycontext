@@ -117,9 +117,7 @@ class Skill:
         name = data.get("name")
         description = data.get("description")
         if not name or not description:
-            raise ValueError(
-                "SKILL.md frontmatter must include 'name' and 'description'"
-            )
+            raise ValueError("SKILL.md frontmatter must include 'name' and 'description'")
         # Optional standard fields
         license_val = data.get("license")
         compatibility = data.get("compatibility")

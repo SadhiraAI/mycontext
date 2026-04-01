@@ -17,29 +17,29 @@ from mycontext import Constraints, Guidance, Pattern
 class HistoricalContextMapper(Pattern):
     """
     Understand present situation through historical context.
-    
+
     Approach:
     - Identify historical parallels
     - Analyze what happened then
     - Extract lessons for now
     - Understand patterns across time
-    
+
     Use Cases:
     - Strategic decisions
     - Policy analysis
     - Crisis management
     - Understanding current events
-    
+
     Example:
         >>> from mycontext.templates.enterprise.temporal import HistoricalContextMapper
-        >>> 
+        >>>
         >>> pattern = HistoricalContextMapper()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     current_situation="Economic recession with high inflation",
         ...     question="What can history teach us about this situation?"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -66,11 +66,7 @@ class HistoricalContextMapper(Pattern):
             description="Understand present through historical patterns",
             version="1.0.0",
             tags=["temporal", "enterprise", "history", "context"],
-            metadata={
-                "category": "temporal",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "temporal", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Historian and Strategic Analyst",
                 rules=[
@@ -78,9 +74,9 @@ class HistoricalContextMapper(Pattern):
                     "Understand context differences (past ≠ present exactly)",
                     "Extract transferable lessons, not rigid rules",
                     "Consider multiple historical examples",
-                    "Note both similarities AND differences"
+                    "Note both similarities AND differences",
                 ],
-                style="analytical, contextual, nuanced, evidence-based"
+                style="analytical, contextual, nuanced, evidence-based",
             ),
             directive_template="""**HISTORICAL CONTEXT MAPPING**
 
@@ -325,40 +321,29 @@ class HistoricalContextMapper(Pattern):
 **Monitor** (early warning signs):
 1. [Indicator from history]
 2. [Pattern to watch for]""",
-            input_schema={
-                "current_situation": str,
-                "question": str
-            },
+            input_schema={"current_situation": str, "question": str},
             constraints=Constraints(
                 must_include=[
                     "historical_precedents",
                     "lessons_learned",
                     "similarities_and_differences",
-                    "transferable_insights"
+                    "transferable_insights",
                 ],
-                must_not_include=[
-                    "false_analogies",
-                    "historical_determinism"
-                ],
-                style_guide="Analytical and contextual. Multiple precedents. Note differences. Transferable lessons."
-            )
+                must_not_include=["false_analogies", "historical_determinism"],
+                style_guide="Analytical and contextual. Multiple precedents. Note differences. Transferable lessons.",
+            ),
         )
 
     def build_context(self, current_situation="", question="", **kwargs):
         """Build context for historical analysis."""
         return super().build_context(
-            current_situation=current_situation,
-            question=question,
-            **kwargs
+            current_situation=current_situation, question=question, **kwargs
         )
 
     def execute(self, provider="openai", current_situation="", question="", **kwargs):
         """Execute historical context mapping."""
         return super().execute(
-            provider=provider,
-            current_situation=current_situation,
-            question=question,
-            **kwargs
+            provider=provider, current_situation=current_situation, question=question, **kwargs
         )
 
 

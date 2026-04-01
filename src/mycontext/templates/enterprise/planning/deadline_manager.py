@@ -5,7 +5,6 @@ Systematic deadline management and schedule optimization.
 Based on time management and project scheduling principles.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,23 +12,23 @@ from mycontext.structure import Pattern
 class DeadlineManager(Pattern):
     """
     Manage deadlines and schedules systematically.
-    
+
     Optimizes:
     - Timeline feasibility
     - Resource allocation over time
     - Buffer management
     - Critical path scheduling
     - Deadline negotiation
-    
+
     Based on: Project management and time optimization
-    
+
     Example:
         >>> manager = DeadlineManager()
         >>> context = manager.build_context(
         ...     tasks=["Design", "Development", "Testing"],
         ...     deadline="3 months from now"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class DeadlineManager(Pattern):
                     "Include buffer time",
                     "Identify critical path",
                     "Plan for risks",
-                    "Communicate proactively"
+                    "Communicate proactively",
                 ],
-                style="pragmatic, organized, proactive"
+                style="pragmatic, organized, proactive",
             ),
             directive_template="""Manage deadlines for:
 
@@ -123,15 +122,11 @@ Deadline management:
    - Options: [How to close gap]
 
 **OUTPUT FORMAT**: Realistic schedule with risk management.""",
-            input_schema={
-                "tasks_section": str,
-                "deadline": str,
-                "context_section": str
-            },
+            input_schema={"tasks_section": str, "deadline": str, "context_section": str},
             constraints=Constraints(
                 must_include=["feasibility", "critical_path", "schedule"],
-                style_guide="Be realistic, not optimistic"
-            )
+                style_guide="Be realistic, not optimistic",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -144,15 +139,15 @@ Deadline management:
             return "1. [Define tasks]"
         if isinstance(tasks, str):
             items = [t.strip() for t in tasks.replace("\n", ",").split(",") if t.strip()]
-            return "\n".join(f"{i+1}. {task}" for i, task in enumerate(items))
-        return "\n".join(f"{i+1}. {task}" for i, task in enumerate(tasks))
+            return "\n".join(f"{i + 1}. {task}" for i, task in enumerate(items))
+        return "\n".join(f"{i + 1}. {task}" for i, task in enumerate(tasks))
 
     def build_context(
         self,
         tasks: list[str] | None = None,
         deadline: str = "",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         tasks_section = self._render_tasks_section(tasks)
         context_section = self._render_context_section(context)
@@ -161,7 +156,7 @@ Deadline management:
             tasks_section=tasks_section,
             deadline=deadline,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -170,12 +165,8 @@ Deadline management:
         tasks: list[str] | None = None,
         deadline: str = "",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            tasks=tasks,
-            deadline=deadline,
-            context=context,
-            **kwargs
+            provider=provider, tasks=tasks, deadline=deadline, context=context, **kwargs
         )

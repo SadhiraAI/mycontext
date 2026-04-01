@@ -159,8 +159,7 @@ class ArchitectResult:
         added = [d.section for d in self.diffs if d.action == "added"]
         strengthened = [d.section for d in self.diffs if d.action == "strengthened"]
         lines = [
-            f"Score: {self.before_score:.0%} → {self.after_score:.0%}  "
-            f"(+{self.score_delta:.0%})",
+            f"Score: {self.before_score:.0%} → {self.after_score:.0%}  (+{self.score_delta:.0%})",
         ]
         if added:
             lines.append(f"Added sections: {', '.join(added)}")
@@ -271,9 +270,7 @@ class PromptArchitect:
         "Read the user's GOAL and TASK. Choose reasoning strategy slugs that fit the *question*, not a default.",
         "Use ONE strategy when a single mode is enough; use MANY (ordered) when the task blends needs "
         "(e.g. step_by_step + verify for long multi-step work under accountability).",
-        "Atomic slugs (combine when appropriate): "
-        + ", ".join(REASONING_STRATEGY_CHOICES)
-        + ".",
+        "Atomic slugs (combine when appropriate): " + ", ".join(REASONING_STRATEGY_CHOICES) + ".",
         "  step_by_step — decomposition / CoT; early-step errors propagate.",
         "  multiple_angles — real trade-offs; compare options before choosing.",
         "  verify — self-check, high-stakes or low-review settings.",
@@ -289,7 +286,7 @@ class PromptArchitect:
         "  high_stakes — step_by_step + multiple_angles + verify: compliance, security, medical.",
         "Order matters: put the primary strategy first, then supporting passes (e.g. decompose → verify).",
         "Output them as a JSON array under reasoning_strategies (see schema). Legacy single string "
-        "\"reasoning\" is still accepted if exactly one slug applies.",
+        '"reasoning" is still accepted if exactly one slug applies.',
     ]
 
     _EXAMPLES_UPGRADE_HINTS = [
@@ -313,7 +310,7 @@ class PromptArchitect:
         "Add edge-case handling: missing data, ambiguous input, or out-of-scope requests.",
         "GROUNDING: Always include a rail requiring factual claims to trace to provided material. "
         "Without grounding, models invent plausible-sounding statistics, vendors, and studies.",
-        "ANTI-BOILERPLATE: Add 'Omit stock AI phrases: \"in today's rapidly evolving\", \"delve into\", \"tapestry of\", \"game-changer\", \"it's no wonder\". "
+        'ANTI-BOILERPLATE: Add \'Omit stock AI phrases: "in today\'s rapidly evolving", "delve into", "tapestry of", "game-changer", "it\'s no wonder". '
         "Write as a domain practitioner, not a generic AI assistant.'",
     ]
 
@@ -322,6 +319,36 @@ class PromptArchitect:
         "Be specific about the input: refer to exactly what data/material is provided.",
         "The final sentence must be the clearest, most direct imperative in the entire prompt.",
         "For long-context tasks (>1500 chars of data), add a REMINDER after the data restating the core instruction.",
+    ]
+
+    _VERBOSITY_UPGRADE_HINTS = [
+        "Match to task complexity: quick decisions → minimal, standard analysis → standard, deep research → detailed.",
+        "When in doubt, prefer 'standard'.",
+    ]
+
+    _COMMUNICATION_POSTURE_UPGRADE_HINTS = [
+        "Match to audience: experienced professionals → direct, learners → educational, brainstormers → collaborative.",
+        "When in doubt, prefer 'direct' — most users want answers, not hand-holding.",
+    ]
+
+    _ANSWER_FIRST_UPGRADE_HINTS = [
+        "True for decisions, recommendations, assessments, risk analysis — the user needs the bottom line first.",
+        "False for tutorials, step-by-step guides, explorations — the journey matters.",
+    ]
+
+    _FORBIDDEN_PHRASES_UPGRADE_HINTS = [
+        "Ban hedging ('it depends', 'it's worth noting that') for analytical/evaluative tasks.",
+        "Ban jargon when the audience is non-technical.",
+        "Always ban stock AI filler ('delve into', 'in today's rapidly evolving') — these overlap with guard_rails but target output, not prompt structure.",
+        "Return [] if no additional bans beyond guard_rails are needed.",
+    ]
+
+    _SELF_CHECK_UPGRADE_HINTS = [
+        "Write 2-3 verification questions specific to the failure modes of THIS task domain.",
+        "Each question must be testable against the output (not vague like 'is my answer good?').",
+        "For analytical tasks: check causation vs correlation, data vs extrapolation.",
+        "For creative tasks: check originality, duplication, diversity of ideas.",
+        "For evaluative tasks: check framing bias, missing stakeholders, sycophancy.",
     ]
 
     _HINTS: dict[str, list[str]] = {
@@ -334,6 +361,11 @@ class PromptArchitect:
         "output_contract": _OUTPUT_CONTRACT_UPGRADE_HINTS,
         "guard_rails": _GUARD_RAILS_UPGRADE_HINTS,
         "task": _TASK_UPGRADE_HINTS,
+        "verbosity": _VERBOSITY_UPGRADE_HINTS,
+        "communication_posture": _COMMUNICATION_POSTURE_UPGRADE_HINTS,
+        "answer_first": _ANSWER_FIRST_UPGRADE_HINTS,
+        "forbidden_phrases": _FORBIDDEN_PHRASES_UPGRADE_HINTS,
+        "self_check": _SELF_CHECK_UPGRADE_HINTS,
     }
 
     _GENRE_FORMAT_HINTS: dict[str, str] = {
@@ -446,7 +478,9 @@ class PromptArchitect:
 
         # LLM build
         built_json = self._llm_build(
-            task, provider, model,
+            task,
+            provider,
+            model,
             user_message=user_message,
             task_contract=task_contract,
             **execute_kwargs,
@@ -475,7 +509,12 @@ class PromptArchitect:
             before_issues=before_score_obj.issues,
             after_issues=after_score_obj.issues,
             resolved_issues=list(set(before_score_obj.issues) - set(after_score_obj.issues)),
-            metadata={"mode": "build", "model": model, "provider": provider, "target_provider": self._resolve_assembly_provider_hint() or "generic"},
+            metadata={
+                "mode": "build",
+                "model": model,
+                "provider": provider,
+                "target_provider": self._resolve_assembly_provider_hint() or "generic",
+            },
         )
 
     def improve(
@@ -528,13 +567,18 @@ class PromptArchitect:
 
         # Step 3 — LLM rewrite
         improved_json = self._llm_improve(
-            prompt, parsed, provider, model,
+            prompt,
+            parsed,
+            provider,
+            model,
             user_message=user_message,
             task_contract=task_contract,
             **execute_kwargs,
         )
         improved_ctx = self._json_to_context(
-            improved_json, parsed.task or prompt, task_contract=task_contract,
+            improved_json,
+            parsed.task or prompt,
+            task_contract=task_contract,
         )
 
         # Step 4 — Score improved
@@ -555,7 +599,12 @@ class PromptArchitect:
             before_issues=before_score_obj.issues,
             after_issues=after_score_obj.issues,
             resolved_issues=list(set(before_score_obj.issues) - set(after_score_obj.issues)),
-            metadata={"mode": "improve", "model": model, "provider": provider, "target_provider": self._resolve_assembly_provider_hint() or "generic"},
+            metadata={
+                "mode": "improve",
+                "model": model,
+                "provider": provider,
+                "target_provider": self._resolve_assembly_provider_hint() or "generic",
+            },
         )
 
     # ── Heuristic parser ──────────────────────────────────────────────────────
@@ -615,7 +664,7 @@ class PromptArchitect:
         # "act as X"
         m = re.search(r"act as ([^\n.!]+)", lower)
         if m:
-            return prompt[m.start(1):m.end(1)].strip()
+            return prompt[m.start(1) : m.end(1)].strip()
         # Role/Persona label
         for ln in lines[:5]:
             if re.match(r"^(role|persona)\s*[:：]", ln.lower()):
@@ -623,15 +672,29 @@ class PromptArchitect:
         return None
 
     def _extract_goal(self, prompt: str, lower: str, lines: list[str]) -> str | None:
-        m = re.search(r"(?:goal|objective|mission|your goal|your mission)\s*[:：]\s*([^\n]+)", lower)
+        m = re.search(
+            r"(?:goal|objective|mission|your goal|your mission)\s*[:：]\s*([^\n]+)", lower
+        )
         if m:
             start = m.start(1)
-            return prompt[start:start + len(m.group(1))].strip()
+            return prompt[start : start + len(m.group(1))].strip()
         # Standalone imperative sentence (capitalize first word is an action verb)
         action_verbs = (
-            "identify", "analyze", "produce", "generate", "determine",
-            "evaluate", "assess", "summarize", "classify", "detect",
-            "find", "recommend", "explain", "describe", "extract",
+            "identify",
+            "analyze",
+            "produce",
+            "generate",
+            "determine",
+            "evaluate",
+            "assess",
+            "summarize",
+            "classify",
+            "detect",
+            "find",
+            "recommend",
+            "explain",
+            "describe",
+            "extract",
         )
         for ln in lines[:8]:
             first = ln.split()[0].lower().rstrip(".,") if ln.split() else ""
@@ -696,11 +759,14 @@ class PromptArchitect:
         examples = []
         # Code fences labeled as examples
         for m in re.finditer(r"```[^\n]*\n(.*?)```", prompt, re.DOTALL):
-            if any(kw in lower[max(0, m.start() - 100):m.start()] for kw in ("example", "e.g.", "sample")):
+            if any(
+                kw in lower[max(0, m.start() - 100) : m.start()]
+                for kw in ("example", "e.g.", "sample")
+            ):
                 examples.append(m.group(0)[:300])
         # Inline "Example:" blocks
         for m in re.finditer(r"(?:example|e\.g\.)[^:]*:\s*([^\n]+)", lower):
-            examples.append(prompt[m.start(1):m.start(1) + len(m.group(1))].strip()[:200])
+            examples.append(prompt[m.start(1) : m.start(1) + len(m.group(1))].strip()[:200])
         return examples[:3]
 
     def _extract_output_contract(self, lower: str, lines: list[str]) -> str | None:
@@ -820,8 +886,11 @@ class PromptArchitect:
             if genre_hint and output_contract:
                 oc_lower = output_contract.lower()
                 is_prose_genre = genre_lower in (
-                    "internal brief", "blog post", "tutorial",
-                    "executive summary", "proposal",
+                    "internal brief",
+                    "blog post",
+                    "tutorial",
+                    "executive summary",
+                    "proposal",
                 )
                 if is_prose_genre and "json" in oc_lower and "no json" not in oc_lower:
                     logger.info(
@@ -897,11 +966,52 @@ class PromptArchitect:
 
         directive = Directive(content=task)
 
+        # ── Quality controls (auto-suggested by LLM) ─────────────────────────
+        verbosity = data.get("verbosity")
+        if verbosity and verbosity not in ("minimal", "standard", "detailed"):
+            verbosity = None
+        communication_posture = data.get("communication_posture")
+        if communication_posture and communication_posture not in (
+            "direct",
+            "collaborative",
+            "educational",
+        ):
+            communication_posture = None
+        answer_first = data.get("answer_first")
+        if not isinstance(answer_first, bool):
+            answer_first = None
+        forbidden_phrases = data.get("forbidden_phrases")
+        if not isinstance(forbidden_phrases, list):
+            forbidden_phrases = None
+        else:
+            forbidden_phrases = [str(p) for p in forbidden_phrases if p] or None
+        self_check = data.get("self_check")
+        if not isinstance(self_check, list):
+            self_check = None
+        else:
+            self_check = [str(c) for c in self_check if c] or None
+
+        has_constraints = any(
+            [
+                output_contract,
+                clean_guard_rails,
+                verbosity,
+                communication_posture,
+                answer_first is not None,
+                forbidden_phrases,
+                self_check,
+            ]
+        )
         constraints = None
-        if output_contract or clean_guard_rails:
+        if has_constraints:
             constraints = Constraints(
                 output_contract=output_contract or None,
                 must_not_include=clean_guard_rails or None,
+                verbosity=verbosity,
+                communication_posture=communication_posture,
+                answer_first=answer_first,
+                forbidden_phrases=forbidden_phrases,
+                self_check=self_check,
             )
 
         # Resolve TaskContract
@@ -990,7 +1100,7 @@ CRITICAL: The 'genre' MUST match the output_contract format. If genre is
 \"\"\"
 {user_msg_block}{tc_block}
 SECTIONS ALREADY PRESENT: {present_summary}
-SECTIONS MISSING OR WEAK: {', '.join(missing + weak_sections) or 'none'}
+SECTIONS MISSING OR WEAK: {", ".join(missing + weak_sections) or "none"}
 
 {hints_block}
 
@@ -1009,7 +1119,12 @@ Return ONLY this JSON (fill every field — use null only if truly not applicabl
   "examples": [{{"input": "example user input or scenario", "output": "expected model output matching output_contract format exactly"}}, {{"input": "edge-case input", "output": "correct edge-case response"}}],
   "output_contract": "'Return ONLY …' + form + structure + exclusions",
   "guard_rails": ["Omit hedging language: probably, might, could be", "Omit stock AI phrases: in today\u2019s rapidly evolving, delve into"],
-  "task": "clearest imperative sentence — placed last (recency zone)"
+  "task": "clearest imperative sentence — placed last (recency zone)",
+  "verbosity": "minimal | standard | detailed",
+  "communication_posture": "direct | collaborative | educational",
+  "answer_first": true or false,
+  "forbidden_phrases": ["domain-specific phrases to ban"],
+  "self_check": ["domain-specific verification question 1", "verification question 2"]
 }}
 
 CRITICAL for guard_rails: use ONLY 'Omit X' exclusion statements. Grounding rules ('Every claim must be grounded…') and fallback phrases belong in rules[], NOT guard_rails.
@@ -1020,7 +1135,22 @@ For reasoning_strategies: read the ORIGINAL PROMPT's goal and task. Pick one or 
   Archetypes: {", ".join(f"{k} ({'+'.join(v)})" for k, v in REASONING_ARCHETYPES.items())}
 Use [] or null only if no cognitive scaffold helps. Order = application order (primary first).
 You may use a named archetype slug (e.g. "analytical") which expands to its component strategies.
-Legacy single field "reasoning" with one slug is still accepted when exactly one applies."""
+Legacy single field "reasoning" with one slug is still accepted when exactly one applies.
+
+QUALITY CONTROLS — infer ALL of these from the ORIGINAL PROMPT:
+- verbosity: "minimal" for quick lookups, single-answer decisions, or yes/no tasks.
+  "standard" for most analysis, planning, or creative tasks.
+  "detailed" for research, deep investigation, or multi-factor analysis.
+- communication_posture: "direct" for experienced/professional audiences or when brevity matters.
+  "educational" for learning, tutorials, or when the user needs explanations.
+  "collaborative" for brainstorming, ideation, or open-ended exploration.
+- answer_first: true when the user needs a decision, bottom line, or recommendation up front.
+  false when the reasoning journey matters (tutorials, explorations, step-by-step).
+- forbidden_phrases: ban hedging ("it depends", "it's worth noting that") for analytical tasks.
+  Ban jargon for lay audiences. Always ban stock AI filler ("delve into", "in today's rapidly evolving").
+  Return [] if no additional bans beyond guard_rails.
+- self_check: 2-3 verification questions specific to THIS task's failure modes.
+  NEVER write generic checks like "Is my answer good?" — each must be testable."""
 
         return self._call_llm_for_json(system, user, provider, model, **kwargs)
 
@@ -1086,7 +1216,12 @@ Return ONLY this JSON (fill every field — use null only if truly not applicabl
   "examples": [{{"input": "example user input or scenario", "output": "expected model output matching output_contract format exactly"}}, {{"input": "edge-case input", "output": "correct edge-case response"}}],
   "output_contract": "'Return ONLY …' + form + structure + exclusions",
   "guard_rails": ["Omit hedging language: probably, might, could be", "Omit stock AI phrases: in today\u2019s rapidly evolving, delve into"],
-  "task": "clearest imperative sentence — placed last (recency zone)"
+  "task": "clearest imperative sentence — placed last (recency zone)",
+  "verbosity": "minimal | standard | detailed",
+  "communication_posture": "direct | collaborative | educational",
+  "answer_first": true or false,
+  "forbidden_phrases": ["domain-specific phrases to ban"],
+  "self_check": ["domain-specific verification question 1", "verification question 2"]
 }}
 
 CRITICAL for guard_rails: use ONLY 'Omit X' exclusion statements. Grounding rules ('Every claim must be grounded…') and fallback phrases belong in rules[], NOT guard_rails.
@@ -1097,7 +1232,25 @@ For reasoning_strategies: infer from the TASK DESCRIPTION above. Pick one or mor
   Archetypes: {", ".join(f"{k} ({'+'.join(v)})" for k, v in REASONING_ARCHETYPES.items())}
 Use [] or null if none apply. Order = application order.
 You may use a named archetype slug (e.g. "analytical") which expands to its component strategies.
-Legacy single "reasoning" slug is allowed when only one applies."""
+Legacy single "reasoning" slug is allowed when only one applies.
+
+QUALITY CONTROLS — infer ALL of these from the TASK DESCRIPTION:
+- verbosity: "minimal" for quick lookups, single-answer decisions, or yes/no tasks.
+  "standard" for most analysis, planning, or creative tasks.
+  "detailed" for research, deep investigation, or multi-factor analysis.
+- communication_posture: "direct" for experienced/professional audiences or when brevity matters.
+  "educational" for learning, tutorials, or when the user needs explanations.
+  "collaborative" for brainstorming, ideation, or open-ended exploration.
+- answer_first: true when the user needs a decision, bottom line, or recommendation up front.
+  false when the reasoning journey matters (tutorials, explorations, step-by-step).
+- forbidden_phrases: ban hedging ("it depends", "it's worth noting that") for analytical tasks.
+  Ban jargon for lay audiences. Always ban stock AI filler ("delve into", "in today's rapidly evolving").
+  Return [] if no additional bans beyond guard_rails.
+- self_check: 2-3 verification questions specific to THIS task's failure modes.
+  E.g. for data analysis: "Did I distinguish correlation from causation?"
+  For risk assessment: "Did I include risks the user may not want to hear?"
+  For creative tasks: "Are at least 30%% of ideas genuinely unconventional?"
+  NEVER write generic checks like "Is my answer good?" — each must be testable."""
 
         return self._call_llm_for_json(system, user, provider, model, **kwargs)
 
@@ -1217,7 +1370,8 @@ Legacy single "reasoning" slug is allowed when only one applies."""
                 weak.append("rules")
             else:
                 suggestive = sum(
-                    1 for r in parsed.rules
+                    1
+                    for r in parsed.rules
                     if any(w in r.lower() for w in ("should", "try to", "ideally", "consider"))
                 )
                 if suggestive > len(parsed.rules) // 2:

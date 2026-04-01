@@ -5,7 +5,6 @@ Breaks down complex concepts into simple, understandable explanations.
 Based on cognitive load theory and explanation science.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class SimplificationEngine(Pattern):
     """
     Simplify complex ideas for accessibility.
-    
+
     Techniques:
     - Progressive complexity reduction
     - Analogies and metaphors
     - Visual thinking
     - Plain language
-    
+
     Based on: Cognitive load and explanation research
-    
+
     Example:
         >>> engine = SimplificationEngine()
         >>> context = engine.build_context(
         ...     complex_topic="How quantum computing works",
         ...     audience="High school students"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -68,9 +67,9 @@ class SimplificationEngine(Pattern):
                     "Use familiar analogies",
                     "Avoid jargon unless necessary",
                     "Build up complexity gradually",
-                    "Test for understanding"
+                    "Test for understanding",
                 ],
-                style="clear, accessible, patient"
+                style="clear, accessible, patient",
             ),
             directive_template="""Simplify this complex topic:
 
@@ -203,19 +202,11 @@ Systematic simplification:
     [Relevance to audience]
 
 **OUTPUT FORMAT**: Clear, accessible explanation appropriate for audience.""",
-            input_schema={
-                "complex_topic": str,
-                "context_section": str,
-                "audience": str
-            },
+            input_schema={"complex_topic": str, "context_section": str, "audience": str},
             constraints=Constraints(
-                must_include=[
-                    "analogies",
-                    "progressive_explanation",
-                    "simplified_summary"
-                ],
-                style_guide="Be patient, clear, and encouraging. No condescension."
-            )
+                must_include=["analogies", "progressive_explanation", "simplified_summary"],
+                style_guide="Be patient, clear, and encouraging. No condescension.",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -228,7 +219,7 @@ Systematic simplification:
         complex_topic: str = "",
         audience: str = "general audience",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
@@ -236,7 +227,7 @@ Systematic simplification:
             complex_topic=complex_topic,
             audience=audience,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -245,12 +236,12 @@ Systematic simplification:
         complex_topic: str = "",
         audience: str = "general audience",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
             provider=provider,
             complex_topic=complex_topic,
             audience=audience,
             context=context,
-            **kwargs
+            **kwargs,
         )

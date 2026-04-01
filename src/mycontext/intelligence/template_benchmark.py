@@ -43,6 +43,7 @@ def _load_yaml(path):
     text = path.read_text(encoding="utf-8")
     try:
         import yaml
+
         return yaml.safe_load(text)
     except ImportError:
         return json.loads(text)
@@ -71,9 +72,7 @@ class TemplateBenchmark:
         self.eval_mode = eval_mode
         self.benchmarks_dir = benchmarks_dir or BENCHMARKS_DIR
         self.model = model
-        self._cai = ContextAmplificationIndex(
-            provider=provider, eval_mode=eval_mode, model=model
-        )
+        self._cai = ContextAmplificationIndex(provider=provider, eval_mode=eval_mode, model=model)
 
     def list_benchmarks(self):
         if not self.benchmarks_dir.exists():
@@ -88,16 +87,24 @@ class TemplateBenchmark:
         bench_file = self._find_bench_file(template_name)
         if not bench_file:
             return BenchmarkResult(
-                template_name=template_name, total_cases=0, passed=0,
-                failed=0, avg_score=0.0, avg_cai=0.0,
+                template_name=template_name,
+                total_cases=0,
+                passed=0,
+                failed=0,
+                avg_score=0.0,
+                avg_cai=0.0,
                 metadata={"error": "No benchmark file found for " + template_name},
             )
         spec = _load_yaml(bench_file)
         cases = spec.get("test_cases", [])
         if not cases:
             return BenchmarkResult(
-                template_name=template_name, total_cases=0, passed=0,
-                failed=0, avg_score=0.0, avg_cai=0.0,
+                template_name=template_name,
+                total_cases=0,
+                passed=0,
+                failed=0,
+                avg_score=0.0,
+                avg_cai=0.0,
                 metadata={"error": "No test cases in benchmark file"},
             )
 
@@ -141,14 +148,19 @@ class TemplateBenchmark:
 
         try:
             cai_result = self._cai.measure(
-                question=question, template_name=template_name, **kwargs,
+                question=question,
+                template_name=template_name,
+                **kwargs,
             )
             output = cai_result.templated_output
             score = cai_result.templated_score.overall
             cai_val = cai_result.cai_overall
         except Exception as e:
             return CaseResult(
-                question=question, passed=False, output_score=0.0, cai=0.0,
+                question=question,
+                passed=False,
+                output_score=0.0,
+                cai=0.0,
                 issues=["Execution error: " + str(e)],
             )
 
@@ -177,14 +189,31 @@ class TemplateBenchmark:
     def report(result):
         lines = [
             "Benchmark Report: " + result.template_name,
-            "=" * (19 + len(result.template_name)), "",
-            "Cases: " + str(result.total_cases) + "  |  Passed: " + str(result.passed) + "  |  Failed: " + str(result.failed),
+            "=" * (19 + len(result.template_name)),
+            "",
+            "Cases: "
+            + str(result.total_cases)
+            + "  |  Passed: "
+            + str(result.passed)
+            + "  |  Failed: "
+            + str(result.failed),
             "Avg Output Score: " + str(round(result.avg_score * 100, 1)) + "%",
-            "Avg CAI: " + str(round(result.avg_cai, 2)) + "x", "",
+            "Avg CAI: " + str(round(result.avg_cai, 2)) + "x",
+            "",
         ]
         for i, cr in enumerate(result.per_case, 1):
             status = "PASS" if cr.passed else "FAIL"
-            lines.append("  [" + status + "] Case " + str(i) + ": score=" + str(round(cr.output_score * 100, 1)) + "%, CAI=" + str(round(cr.cai, 2)) + "x")
+            lines.append(
+                "  ["
+                + status
+                + "] Case "
+                + str(i)
+                + ": score="
+                + str(round(cr.output_score * 100, 1))
+                + "%, CAI="
+                + str(round(cr.cai, 2))
+                + "x"
+            )
             lines.append("         Q: " + cr.question[:60] + "...")
             for iss in cr.issues:
                 lines.append("         ! " + iss)

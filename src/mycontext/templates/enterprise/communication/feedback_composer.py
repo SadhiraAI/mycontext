@@ -5,7 +5,6 @@ Creates actionable, constructive feedback using best practices.
 Based on feedback science and communication research.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class FeedbackComposer(Pattern):
     """
     Compose effective, constructive feedback.
-    
+
     Uses:
     - SBI (Situation-Behavior-Impact) model
     - Growth mindset language
     - Specific, actionable guidance
     - Balanced positive and constructive
-    
+
     Based on: Feedback science and communication research
-    
+
     Example:
         >>> composer = FeedbackComposer()
         >>> context = composer.build_context(
         ...     situation="Team member's presentation",
         ...     goal="Improve future presentations"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -66,9 +65,9 @@ class FeedbackComposer(Pattern):
                     "Focus on behavior, not person",
                     "Be actionable",
                     "Balance positive and constructive",
-                    "Maintain growth mindset"
+                    "Maintain growth mindset",
                 ],
-                style="supportive, specific, actionable"
+                style="supportive, specific, actionable",
             ),
             directive_template="""Compose feedback for:
 
@@ -115,15 +114,11 @@ Feedback composition:
    [Full feedback written in supportive, constructive tone]
 
 **OUTPUT FORMAT**: Balanced, actionable feedback message.""",
-            input_schema={
-                "situation": str,
-                "context_section": str,
-                "goal": str
-            },
+            input_schema={"situation": str, "context_section": str, "goal": str},
             constraints=Constraints(
                 must_include=["strengths", "growth_opportunities", "actions"],
-                style_guide="Be supportive and specific"
-            )
+                style_guide="Be supportive and specific",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -136,15 +131,12 @@ Feedback composition:
         situation: str = "",
         goal: str = "Support growth",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            situation=situation,
-            goal=goal,
-            context_section=context_section,
-            **kwargs
+            situation=situation, goal=goal, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -153,12 +145,8 @@ Feedback composition:
         situation: str = "",
         goal: str = "Support growth",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            situation=situation,
-            goal=goal,
-            context=context,
-            **kwargs
+            provider=provider, situation=situation, goal=goal, context=context, **kwargs
         )

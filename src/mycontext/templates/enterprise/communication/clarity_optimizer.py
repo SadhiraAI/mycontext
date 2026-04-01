@@ -5,7 +5,6 @@ Systematically improves clarity, reduces ambiguity, and enhances precision.
 Based on clarity research and technical writing best practices.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,23 +12,23 @@ from mycontext.structure import Pattern
 class ClarityOptimizer(Pattern):
     """
     Optimize text for maximum clarity.
-    
+
     Improves:
     - Precision of language
     - Removal of ambiguity
     - Sentence structure
     - Word choice
     - Logical flow
-    
+
     Based on: Technical writing and clarity research
-    
+
     Example:
         >>> optimizer = ClarityOptimizer()
         >>> context = optimizer.build_context(
         ...     text="Original unclear text",
         ...     goal="Make it crystal clear"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -67,9 +66,9 @@ class ClarityOptimizer(Pattern):
                     "Use precise language",
                     "Keep sentences short",
                     "Remove unnecessary words",
-                    "Ensure logical flow"
+                    "Ensure logical flow",
                 ],
-                style="clear, precise, direct"
+                style="clear, precise, direct",
             ),
             directive_template="""Optimize clarity of:
 
@@ -118,15 +117,10 @@ Clarity optimization:
    - Added [Z] precise terms
 
 **OUTPUT FORMAT**: Crystal-clear optimized text.""",
-            input_schema={
-                "text": str,
-                "context_section": str,
-                "goal": str
-            },
+            input_schema={"text": str, "context_section": str, "goal": str},
             constraints=Constraints(
-                must_include=["optimized_text", "improvements"],
-                style_guide="Be clear and direct"
-            )
+                must_include=["optimized_text", "improvements"], style_guide="Be clear and direct"
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -135,19 +129,12 @@ Clarity optimization:
         return ""
 
     def build_context(
-        self,
-        text: str = "",
-        goal: str = "Maximum clarity",
-        context: str | None = None,
-        **kwargs
+        self, text: str = "", goal: str = "Maximum clarity", context: str | None = None, **kwargs
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            text=text,
-            goal=goal,
-            context_section=context_section,
-            **kwargs
+            text=text, goal=goal, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -156,12 +143,6 @@ Clarity optimization:
         text: str = "",
         goal: str = "Maximum clarity",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
-        return super().execute(
-            provider=provider,
-            text=text,
-            goal=goal,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, text=text, goal=goal, context=context, **kwargs)

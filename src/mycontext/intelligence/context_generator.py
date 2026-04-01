@@ -145,13 +145,12 @@ def _parse_llm_json(text: str) -> dict[str, Any]:
     end = cleaned.rfind("}")
     if start != -1 and end != -1 and end > start:
         try:
-            return json.loads(cleaned[start: end + 1])
+            return json.loads(cleaned[start : end + 1])
         except json.JSONDecodeError:
             pass
 
     raise ValueError(
-        f"Could not extract valid JSON from LLM response. "
-        f"First 200 chars: {text[:200]!r}"
+        f"Could not extract valid JSON from LLM response. First 200 chars: {text[:200]!r}"
     )
 
 
@@ -298,6 +297,7 @@ def generate_context(
 
     # ── Attempt instructor-structured path ────────────────────────────────────
     from .schemas import ContextSpec, get_instructor_client
+
     instructor_client = get_instructor_client(None)
 
     if instructor_client is not None:
@@ -317,9 +317,11 @@ def generate_context(
             return GeneratedContext(context=context, generation_meta=spec)
         except Exception as exc:
             import logging as _logging
+
             _logging.getLogger(__name__).debug(
                 "generate_context: instructor path failed (%s), falling back. Error: %s",
-                type(exc).__name__, exc,
+                type(exc).__name__,
+                exc,
             )
 
     # ── Fallback: classic LLM call + Pydantic/JSON parse ─────────────────────

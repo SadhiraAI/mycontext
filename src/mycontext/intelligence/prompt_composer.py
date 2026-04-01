@@ -200,12 +200,8 @@ class PromptComposer:
                 metadata={"composition_mode": "passthrough"},
             )
 
-        numbered = "\n\n".join(
-            f"--- Component {i+1} ---\n{p}" for i, p in enumerate(prompts)
-        )
-        merge_prompt = _COMPOSE_TEMPLATE.format(
-            question=question, numbered_prompts=numbered
-        )
+        numbered = "\n\n".join(f"--- Component {i + 1} ---\n{p}" for i, p in enumerate(prompts))
+        merge_prompt = _COMPOSE_TEMPLATE.format(question=question, numbered_prompts=numbered)
 
         ctx = Context(
             guidance=Guidance(
@@ -227,7 +223,9 @@ class PromptComposer:
         except Exception as e:
             logger.warning(
                 "compose: LLM merge call failed (%s). Falling back to static concatenation. Error: %s",
-                type(e).__name__, e, exc_info=True,
+                type(e).__name__,
+                e,
+                exc_info=True,
             )
             merged = self._fallback_merge(prompts, question)
             return ComposedPrompt(
@@ -298,7 +296,10 @@ class PromptComposer:
                 logger.warning(
                     "compose_from_templates: failed to generate prompt for template '%s' "
                     "(refine=%s). Skipping. Error: %s",
-                    name, refine, e, exc_info=True,
+                    name,
+                    refine,
+                    e,
+                    exc_info=True,
                 )
                 return None
 
@@ -393,7 +394,9 @@ class PromptComposer:
                 logger.warning(
                     "compile_generic: failed to get generic prompt for template '%s'. "
                     "Skipping. Error: %s",
-                    actual_name, e, exc_info=True,
+                    actual_name,
+                    e,
+                    exc_info=True,
                 )
                 continue
 
@@ -419,9 +422,7 @@ class PromptComposer:
         )
 
     @staticmethod
-    def _static_merge(
-        prompts: list[str], question: str, template_names: list[str]
-    ) -> str:
+    def _static_merge(prompts: list[str], question: str, template_names: list[str]) -> str:
         """Merge generic prompts into one prompt — no LLM, pure string ops."""
         if len(prompts) == 1:
             return prompts[0]
@@ -501,6 +502,8 @@ def get_generic_prompt_for(
         logger.warning(
             "get_generic_prompt_for: generic_prompt() failed for template '%s'. "
             "Returning None. Error: %s",
-            template_name, e, exc_info=True,
+            template_name,
+            e,
+            exc_info=True,
         )
         return None

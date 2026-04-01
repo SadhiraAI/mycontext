@@ -63,16 +63,18 @@ _TRACE_ID_VAR: threading.local = threading.local()
 # Data model
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Span:
     """One unit of traced work."""
+
     name: str
     trace_id: str
     span_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
     parent_id: str | None = None
     started_at: float = field(default_factory=time.monotonic)
     ended_at: float | None = None
-    status: str = "ok"           # "ok" | "error"
+    status: str = "ok"  # "ok" | "error"
     attributes: dict[str, Any] = field(default_factory=dict)
     error: str | None = None
 
@@ -108,6 +110,7 @@ class Span:
 # ---------------------------------------------------------------------------
 # Tracer
 # ---------------------------------------------------------------------------
+
 
 class Tracer:
     """

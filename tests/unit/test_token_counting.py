@@ -10,7 +10,6 @@ Covers:
   - ContextValidator uses accurate counting (regression)
 """
 
-
 from mycontext.utils.tokens import (
     _encoding_for_model,
     count_tokens,
@@ -23,8 +22,8 @@ from mycontext.utils.tokens import (
 # Basic counting
 # ---------------------------------------------------------------------------
 
-class TestCountTokens:
 
+class TestCountTokens:
     def test_empty_string_returns_zero(self):
         assert count_tokens("") == 0
 
@@ -62,8 +61,8 @@ class TestCountTokens:
 # Model resolution
 # ---------------------------------------------------------------------------
 
-class TestModelResolution:
 
+class TestModelResolution:
     def test_gpt4o_resolves_to_o200k(self):
         assert _encoding_for_model("gpt-4o") == "o200k_base"
 
@@ -104,8 +103,8 @@ class TestModelResolution:
 # Fallback when tiktoken unavailable
 # ---------------------------------------------------------------------------
 
-class TestTiktokenFallback:
 
+class TestTiktokenFallback:
     def test_fallback_when_tiktoken_missing(self):
         """If tiktoken raises ImportError, falls back to word-count estimate."""
         import mycontext.utils.tokens as tokens_mod
@@ -114,9 +113,11 @@ class TestTiktokenFallback:
         original = tokens_mod._get_encoder
         try:
             tokens_mod._get_encoder.cache_clear()  # clear lru_cache
+
             # Monkeypatch the cached function to raise
             def raise_import(*a, **kw):
                 raise ImportError("No module named 'tiktoken'")
+
             tokens_mod._get_encoder = raise_import
 
             result = count_tokens("Hello world test")
@@ -134,8 +135,10 @@ class TestTiktokenFallback:
         original = tokens_mod._get_encoder
         try:
             tokens_mod._get_encoder.cache_clear()
+
             def raise_error(*a, **kw):
                 raise RuntimeError("encoding error")
+
             tokens_mod._get_encoder = raise_error
 
             with caplog.at_level(logging.WARNING, logger="mycontext.utils.tokens"):
@@ -151,8 +154,8 @@ class TestTiktokenFallback:
 # Helper functions
 # ---------------------------------------------------------------------------
 
-class TestFitsInWindow:
 
+class TestFitsInWindow:
     def test_short_text_fits(self):
         assert fits_in_window("Hello", model="gpt-4o", max_tokens=100) is True
 
@@ -168,7 +171,6 @@ class TestFitsInWindow:
 
 
 class TestTokenBudgetRemaining:
-
     def test_basic(self):
         assert token_budget_remaining(100, 1000) == 900
 
@@ -183,7 +185,6 @@ class TestTokenBudgetRemaining:
 
 
 class TestEstimateCostUsd:
-
     def test_returns_float(self):
         result = estimate_cost_usd(1000, model="gpt-4o")
         assert isinstance(result, float)
@@ -207,8 +208,8 @@ class TestEstimateCostUsd:
 # Integration: Blueprint.estimate_tokens uses accurate counting
 # ---------------------------------------------------------------------------
 
-class TestBlueprintEstimateTokensAccurate:
 
+class TestBlueprintEstimateTokensAccurate:
     def test_estimate_tokens_returns_int(self):
         from mycontext.foundation import Guidance
         from mycontext.structure import Blueprint
@@ -248,6 +249,7 @@ class TestBlueprintEstimateTokensAccurate:
 
     def test_empty_blueprint_returns_zero(self):
         from mycontext.structure import Blueprint
+
         bp = Blueprint(name="empty")
         assert bp.estimate_tokens() == 0
 
@@ -267,8 +269,8 @@ class TestBlueprintEstimateTokensAccurate:
 # Integration: ContextValidator uses accurate counting
 # ---------------------------------------------------------------------------
 
-class TestContextValidatorAccurateTokens:
 
+class TestContextValidatorAccurateTokens:
     def test_validate_context_returns_accurate_token_count(self):
         from mycontext.utils.validators import ContextValidator
 

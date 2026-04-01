@@ -18,29 +18,29 @@ from mycontext import Constraints, Guidance, Pattern
 class PatternRecognitionEngine(Pattern):
     """
     Identify recurring patterns and structures.
-    
+
     Pattern Types:
     - Structural patterns (how things are organized)
     - Behavioral patterns (how things act)
     - Temporal patterns (how things change over time)
     - Relational patterns (how things connect)
-    
+
     Use Cases:
     - Data analysis
     - System understanding
     - Trend identification
     - Insight generation
-    
+
     Example:
         >>> from mycontext.templates.enterprise.synthesis import PatternRecognitionEngine
-        >>> 
+        >>>
         >>> pattern = PatternRecognitionEngine()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     data="Customer churn data: 500 cases with demographics, usage, support tickets",
         ...     pattern_focus="Why customers leave"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -67,11 +67,7 @@ class PatternRecognitionEngine(Pattern):
             description="Identify recurring patterns across data and systems",
             version="1.0.0",
             tags=["synthesis", "enterprise", "patterns", "recognition"],
-            metadata={
-                "category": "synthesis",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "synthesis", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Pattern Recognition and Data Analysis Expert",
                 rules=[
@@ -79,9 +75,9 @@ class PatternRecognitionEngine(Pattern):
                     "Distinguish signal from noise",
                     "Quantify pattern strength and significance",
                     "Find both obvious and hidden patterns",
-                    "Explain why patterns occur"
+                    "Explain why patterns occur",
                 ],
-                style="analytical, systematic, insightful, quantitative"
+                style="analytical, systematic, insightful, quantitative",
             ),
             directive_template="""**PATTERN RECOGNITION ANALYSIS**
 
@@ -372,41 +368,26 @@ T3 ----[Patterns overlap]------
 **Most actionable pattern**: [Which has clearest implications]
 
 **Recommended next steps**: [What to do with these patterns]""",
-            input_schema={
-                "data": str,
-                "pattern_focus": str
-            },
+            input_schema={"data": str, "pattern_focus": str},
             constraints=Constraints(
                 must_include=[
                     "multiple_pattern_types",
                     "pattern_strength",
                     "hidden_patterns",
-                    "actionable_insights"
+                    "actionable_insights",
                 ],
-                must_not_include=[
-                    "pattern_overfitting",
-                    "seeing_patterns_in_noise"
-                ],
-                style_guide="Analytical and systematic. Multiple pattern types. Quantified strength. Actionable insights."
-            )
+                must_not_include=["pattern_overfitting", "seeing_patterns_in_noise"],
+                style_guide="Analytical and systematic. Multiple pattern types. Quantified strength. Actionable insights.",
+            ),
         )
 
     def build_context(self, data="", pattern_focus="", **kwargs):
         """Build context for pattern recognition."""
-        return super().build_context(
-            data=data,
-            pattern_focus=pattern_focus,
-            **kwargs
-        )
+        return super().build_context(data=data, pattern_focus=pattern_focus, **kwargs)
 
     def execute(self, provider="openai", data="", pattern_focus="", **kwargs):
         """Execute pattern recognition analysis."""
-        return super().execute(
-            provider=provider,
-            data=data,
-            pattern_focus=pattern_focus,
-            **kwargs
-        )
+        return super().execute(provider=provider, data=data, pattern_focus=pattern_focus, **kwargs)
 
 
 __all__ = ["PatternRecognitionEngine"]

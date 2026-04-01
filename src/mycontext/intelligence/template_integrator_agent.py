@@ -50,12 +50,10 @@ class IntegrationResult:
 
         return Context(
             guidance=Guidance(**gkw) if gkw else None,
-            directive=Directive(
-                content=self.directive or self.integrated_context
-            ),
-            constraints=Constraints(
-                must_include=self.output_requirements
-            ) if self.output_requirements else None,
+            directive=Directive(content=self.directive or self.integrated_context),
+            constraints=Constraints(must_include=self.output_requirements)
+            if self.output_requirements
+            else None,
             data={
                 "integration_metadata": {
                     "source_templates": self.source_templates,
@@ -67,34 +65,34 @@ class IntegrationResult:
 
 
 INTEGRATION_PROMPT_TEMPLATE = (
-    'You are the Template Integrator Agent.\n\n'
+    "You are the Template Integrator Agent.\n\n"
     'USER QUESTION: "{question}"\n\n'
-    'SELECTED TEMPLATES AND THEIR CAPABILITIES:\n{summaries}\n\n'
-    'YOUR PRIMARY GOAL: Create a context that will produce a COMPLETE, '
-    'HIGH-QUALITY answer to the user\'s question.\n\n'
-    'IMPORTANT CONSTRAINTS:\n'
-    '- Draw the BEST techniques from each template. You do NOT need to '
-    'include every section from every template.\n'
-    '- The output framework MUST be completable in a single LLM response. '
-    'Aim for 5-7 output sections maximum, not 10+.\n'
-    '- Every output section must directly address an aspect of the user\'s '
-    'question. Remove any section that doesn\'t serve the answer.\n'
-    '- Prioritize ANSWERING THE QUESTION over methodological completeness.\n\n'
-    'Respond in this EXACT format:\n\n'
-    'ROLE: [A combined expert role relevant to the user\'s question]\n\n'
-    'RULES:\n'
-    '- [Key analytical rule, max 6 rules]\n\n'
-    'DIRECTIVE:\n'
-    '[Step-by-step instructions that guide the LLM to answer the user\'s '
-    'question thoroughly. Incorporate the best techniques from the selected '
-    'templates but stay focused on the question.]\n\n'
-    'OUTPUT MUST INCLUDE:\n'
-    '- [Section that addresses aspect 1 of the question]\n'
-    '- [Section that addresses aspect 2 of the question]\n'
-    '- [5-7 sections max, each tied to a question aspect]\n'
-    '- ALWAYS end with a concrete Recommendations / Next Steps section\n\n'
-    'CONCISENESS: The final LLM output should be 3,500-4,500 characters. '
-    'Be thorough but concise — depth over breadth.'
+    "SELECTED TEMPLATES AND THEIR CAPABILITIES:\n{summaries}\n\n"
+    "YOUR PRIMARY GOAL: Create a context that will produce a COMPLETE, "
+    "HIGH-QUALITY answer to the user's question.\n\n"
+    "IMPORTANT CONSTRAINTS:\n"
+    "- Draw the BEST techniques from each template. You do NOT need to "
+    "include every section from every template.\n"
+    "- The output framework MUST be completable in a single LLM response. "
+    "Aim for 5-7 output sections maximum, not 10+.\n"
+    "- Every output section must directly address an aspect of the user's "
+    "question. Remove any section that doesn't serve the answer.\n"
+    "- Prioritize ANSWERING THE QUESTION over methodological completeness.\n\n"
+    "Respond in this EXACT format:\n\n"
+    "ROLE: [A combined expert role relevant to the user's question]\n\n"
+    "RULES:\n"
+    "- [Key analytical rule, max 6 rules]\n\n"
+    "DIRECTIVE:\n"
+    "[Step-by-step instructions that guide the LLM to answer the user's "
+    "question thoroughly. Incorporate the best techniques from the selected "
+    "templates but stay focused on the question.]\n\n"
+    "OUTPUT MUST INCLUDE:\n"
+    "- [Section that addresses aspect 1 of the question]\n"
+    "- [Section that addresses aspect 2 of the question]\n"
+    "- [5-7 sections max, each tied to a question aspect]\n"
+    "- ALWAYS end with a concrete Recommendations / Next Steps section\n\n"
+    "CONCISENESS: The final LLM output should be 3,500-4,500 characters. "
+    "Be thorough but concise — depth over breadth."
 )
 
 
@@ -150,9 +148,7 @@ class TemplateIntegratorAgent:
         self._validate(template_names)
         selection_reasoning = selection_reasoning or {}
         summaries = self._build_summaries(template_names, selection_reasoning)
-        prompt = INTEGRATION_PROMPT_TEMPLATE.format(
-            question=question, summaries=summaries
-        )
+        prompt = INTEGRATION_PROMPT_TEMPLATE.format(question=question, summaries=summaries)
         raw = self._call_llm(prompt, provider, temperature, model, **kwargs)
         return self._parse_result(question, template_names, raw)
 
@@ -189,10 +185,7 @@ class TemplateIntegratorAgent:
             llm_provider=provider,
             **kwargs,
         )
-        names = (
-            result.suggested_chain
-            or [s.name for s in result.suggested_patterns]
-        )
+        names = result.suggested_chain or [s.name for s in result.suggested_patterns]
         reasoning = {s.name: s.reason for s in result.suggested_patterns}
         return self.integrate(
             question=question,
@@ -241,10 +234,7 @@ class TemplateIntegratorAgent:
             llm_provider=provider,
             **kwargs,
         )
-        names = (
-            result.suggested_chain
-            or [s.name for s in result.suggested_patterns]
-        )
+        names = result.suggested_chain or [s.name for s in result.suggested_patterns]
 
         composer = PromptComposer(
             include_enterprise=self.include_enterprise,
@@ -268,18 +258,18 @@ class TemplateIntegratorAgent:
             raise ValueError("Unknown template(s): " + str(invalid))
 
         if not self.include_enterprise:
-            ent = [
-                t for t in template_names
-                if NAME_TO_CATEGORY.get(t) == "enterprise"
-            ]
+            ent = [t for t in template_names if NAME_TO_CATEGORY.get(t) == "enterprise"]
             if ent:
                 raise ValueError(
-                    "Enterprise license required for: " + str(ent)
-                    + ". " + ENTERPRISE_LICENSE_NOTE.strip()
+                    "Enterprise license required for: "
+                    + str(ent)
+                    + ". "
+                    + ENTERPRISE_LICENSE_NOTE.strip()
                 )
 
     def _build_summaries(self, names, reasoning):
         from .pattern_catalog import ENRICHED_CATALOG
+
         lines = []
         for name in names:
             cat = NAME_TO_CATEGORY.get(name, "free")
@@ -319,6 +309,7 @@ class TemplateIntegratorAgent:
 
         try:
             from .pattern_suggester import get_pattern_class
+
             klass = get_pattern_class(name, include_enterprise=True)
             if not klass:
                 return ""
@@ -335,7 +326,9 @@ class TemplateIntegratorAgent:
             logger.warning(
                 "_get_template_detail: could not extract detail for template '%s'. "
                 "Returning empty string. Error: %s",
-                name, e, exc_info=True,
+                name,
+                e,
+                exc_info=True,
             )
             return ""
 
@@ -345,6 +338,7 @@ class TemplateIntegratorAgent:
 
         # ── Try instructor-structured path ───────────────────────────────────
         from .schemas import IntegrationResponse, get_instructor_client
+
         instructor_client = get_instructor_client(None)
         resolved_model = model or "gpt-4o"
 
@@ -378,7 +372,8 @@ class TemplateIntegratorAgent:
             except Exception as exc:
                 logger.debug(
                     "_call_llm: instructor path failed (%s), falling back. Error: %s",
-                    type(exc).__name__, exc,
+                    type(exc).__name__,
+                    exc,
                 )
                 self._last_structured = None
 
@@ -395,8 +390,8 @@ class TemplateIntegratorAgent:
                     "Merge methodologies, do not just concatenate them.",
                     "Every element must be specific to the user question.",
                     "The result must be directly usable as an LLM prompt.",
-                    "Respond as JSON: {\"role\":\"...\",\"rules\":[...],\"directive\":\"...\","
-                    "\"output_requirements\":[...],\"integration_rationale\":\"...\"}",
+                    'Respond as JSON: {"role":"...","rules":[...],"directive":"...",'
+                    '"output_requirements":[...],"integration_rationale":"..."}',
                 ],
             ),
             directive=Directive(content=prompt),
@@ -434,9 +429,10 @@ class TemplateIntegratorAgent:
                 if structured.directive:
                     parts.append(f"DIRECTIVE:\n{structured.directive}")
                 if structured.output_requirements:
-                    parts.append("OUTPUT MUST INCLUDE:\n" + "\n".join(
-                        f"- {r}" for r in structured.output_requirements
-                    ))
+                    parts.append(
+                        "OUTPUT MUST INCLUDE:\n"
+                        + "\n".join(f"- {r}" for r in structured.output_requirements)
+                    )
                 rationale = getattr(structured, "integration_rationale", "")
                 if rationale:
                     parts.append(f"INTEGRATION RATIONALE:\n{rationale}")

@@ -18,28 +18,28 @@ from mycontext import Constraints, Guidance, Pattern
 class SelfRegulationFramework(Pattern):
     """
     Cyclical self-regulation: Plan → Monitor → Evaluate → Adjust.
-    
+
     Implements Zimmerman's (2002) three-phase model:
     1. FORETHOUGHT: Goal setting, strategic planning, motivation
     2. PERFORMANCE: Self-control, self-monitoring, strategy execution
     3. SELF-REFLECTION: Self-evaluation, causal attribution, adaptation
-    
+
     Use Cases:
     - Learning skills systematically
     - Performance improvement
     - Goal achievement
     - Skill development coaching
-    
+
     Example:
         >>> from mycontext.templates.enterprise.metacognition import SelfRegulationFramework
-        >>> 
+        >>>
         >>> framework = SelfRegulationFramework()
         >>> result = framework.execute(
         ...     provider="gemini",
         ...     goal="Master data structures",
         ...     current_phase="forethought"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -70,11 +70,7 @@ class SelfRegulationFramework(Pattern):
             description="Cyclical self-regulation: Plan → Monitor → Evaluate → Adjust",
             version="1.0.0",
             tags=["metacognition", "enterprise", "self-regulation", "goal-setting"],
-            metadata={
-                "category": "metacognition",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "metacognition", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Self-Regulated Learning Coach and Performance Scientist",
                 rules=[
@@ -82,9 +78,9 @@ class SelfRegulationFramework(Pattern):
                     "Integrate metacognition, motivation, and affect (MASRL 2024 model)",
                     "Focus on actionable strategies for each phase",
                     "Emphasize accurate causal attribution (not just luck/talent)",
-                    "Plan the NEXT cycle based on reflection results"
+                    "Plan the NEXT cycle based on reflection results",
                 ],
-                style="systematic, evidence-based, actionable, motivational, growth-oriented"
+                style="systematic, evidence-based, actionable, motivational, growth-oriented",
             ),
             directive_template="""**SELF-REGULATED LEARNING FRAMEWORK**
 
@@ -113,20 +109,13 @@ Each phase informs the next. Always plan the transition.""",
                 "current_phase": str,  # forethought | performance | self-reflection
                 "context_section": str,
                 "performance_section": str,
-                "phase_specific_directive": str
+                "phase_specific_directive": str,
             },
             constraints=Constraints(
-                must_include=[
-                    "specific_strategies",
-                    "next_phase_actions",
-                    "cyclical_connection"
-                ],
-                must_not_include=[
-                    "generic_advice",
-                    "attributions_to_luck_or_fixed_traits"
-                ],
-                style_guide="Use systematic framework with clear phase-specific actions and cyclical connections"
-            )
+                must_include=["specific_strategies", "next_phase_actions", "cyclical_connection"],
+                must_not_include=["generic_advice", "attributions_to_luck_or_fixed_traits"],
+                style_guide="Use systematic framework with clear phase-specific actions and cyclical connections",
+            ),
         )
 
     def _get_phase_directive(self, phase: str) -> str:
@@ -245,23 +234,18 @@ Each phase informs the next. Always plan the transition.""",
             return f"**ERROR**: Unknown phase '{phase}'. Must be 'forethought', 'performance', or 'self-reflection'."
 
     def build_context(
-        self,
-        goal="",
-        current_phase="forethought",
-        context="",
-        performance_data="",
-        **kwargs
+        self, goal="", current_phase="forethought", context="", performance_data="", **kwargs
     ):
         """
         Build context for self-regulation framework.
-        
+
         Args:
             goal: The learning or performance goal
             current_phase: "forethought" | "performance" | "self-reflection"
             context: Optional situational context
             performance_data: Performance results (for reflection phase)
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for use
         """
@@ -272,15 +256,17 @@ Each phase informs the next. Always plan the transition.""",
 
         # Format optional sections
         context_section = f"**CONTEXT**: {context}" if context else ""
-        performance_section = f"**PERFORMANCE DATA**: {performance_data}" if performance_data else ""
+        performance_section = (
+            f"**PERFORMANCE DATA**: {performance_data}" if performance_data else ""
+        )
 
         # Get phase-specific directive
         phase_specific_directive = self._get_phase_directive(current_phase)
 
         # Clean kwargs
-        kwargs.pop('context_section', None)
-        kwargs.pop('performance_section', None)
-        kwargs.pop('phase_specific_directive', None)
+        kwargs.pop("context_section", None)
+        kwargs.pop("performance_section", None)
+        kwargs.pop("phase_specific_directive", None)
 
         return super().build_context(
             goal=goal,
@@ -288,7 +274,7 @@ Each phase informs the next. Always plan the transition.""",
             context_section=context_section,
             performance_section=performance_section,
             phase_specific_directive=phase_specific_directive,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -298,11 +284,11 @@ Each phase informs the next. Always plan the transition.""",
         current_phase="forethought",
         context="",
         performance_data="",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute self-regulation framework.
-        
+
         Args:
             provider: LLM provider
             goal: The learning or performance goal
@@ -310,7 +296,7 @@ Each phase informs the next. Always plan the transition.""",
             context: Optional situational context
             performance_data: Performance results (for reflection phase)
             **kwargs: Additional provider options
-        
+
         Returns:
             ProviderResponse with phase-specific guidance
         """
@@ -321,15 +307,17 @@ Each phase informs the next. Always plan the transition.""",
 
         # Format optional sections
         context_section = f"**CONTEXT**: {context}" if context else ""
-        performance_section = f"**PERFORMANCE DATA**: {performance_data}" if performance_data else ""
+        performance_section = (
+            f"**PERFORMANCE DATA**: {performance_data}" if performance_data else ""
+        )
 
         # Get phase-specific directive
         phase_specific_directive = self._get_phase_directive(current_phase)
 
         # Clean kwargs
-        kwargs.pop('context_section', None)
-        kwargs.pop('performance_section', None)
-        kwargs.pop('phase_specific_directive', None)
+        kwargs.pop("context_section", None)
+        kwargs.pop("performance_section", None)
+        kwargs.pop("phase_specific_directive", None)
 
         return super().execute(
             provider=provider,
@@ -338,7 +326,7 @@ Each phase informs the next. Always plan the transition.""",
             context_section=context_section,
             performance_section=performance_section,
             phase_specific_directive=phase_specific_directive,
-            **kwargs
+            **kwargs,
         )
 
 

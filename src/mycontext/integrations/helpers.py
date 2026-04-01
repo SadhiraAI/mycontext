@@ -12,19 +12,19 @@ from ..core import Context
 class LangChainHelper:
     """
     Helper for LangChain integration.
-    
+
     Makes it easy to use mycontext contexts with LangChain.
-    
+
     Example:
         >>> from mycontext import Context
         >>> from mycontext.integrations import LangChainHelper
-        >>> 
+        >>>
         >>> context = Context(guidance="Expert analyst")
         >>> helper = LangChainHelper()
-        >>> 
+        >>>
         >>> # Get LangChain messages
         >>> messages = helper.to_messages(context)
-        >>> 
+        >>>
         >>> # Use with LangChain
         >>> from langchain_openai import ChatOpenAI
         >>> chat = ChatOpenAI()
@@ -89,16 +89,16 @@ class LangChainHelper:
 class LlamaIndexHelper:
     """
     Helper for LlamaIndex integration.
-    
+
     Makes it easy to use mycontext contexts with LlamaIndex.
-    
+
     Example:
         >>> from mycontext import Context
         >>> from mycontext.integrations import LlamaIndexHelper
-        >>> 
+        >>>
         >>> context = Context(guidance="Expert", directive="Analyze docs")
         >>> helper = LlamaIndexHelper()
-        >>> 
+        >>>
         >>> # Create query engine with context
         >>> from llama_index import VectorStoreIndex
         >>> index = VectorStoreIndex.from_documents(docs)
@@ -116,10 +116,7 @@ class LlamaIndexHelper:
         try:
             prompt_template = context.assemble()
 
-            return index.as_query_engine(
-                text_qa_template=prompt_template,
-                **kwargs
-            )
+            return index.as_query_engine(text_qa_template=prompt_template, **kwargs)
         except Exception as e:
             raise RuntimeError(
                 f"Failed to create query engine. Make sure LlamaIndex is installed: {e}"
@@ -131,10 +128,7 @@ class LlamaIndexHelper:
         try:
             system_prompt = context.assemble()
 
-            return index.as_chat_engine(
-                system_prompt=system_prompt,
-                **kwargs
-            )
+            return index.as_chat_engine(system_prompt=system_prompt, **kwargs)
         except Exception as e:
             raise RuntimeError(
                 f"Failed to create chat engine. Make sure LlamaIndex is installed: {e}"
@@ -144,16 +138,16 @@ class LlamaIndexHelper:
 class CrewAIHelper:
     """
     Helper for CrewAI integration.
-    
+
     Makes it easy to use mycontext contexts with CrewAI agents.
-    
+
     Example:
         >>> from mycontext import Context
         >>> from mycontext.integrations import CrewAIHelper
-        >>> 
+        >>>
         >>> context = Context(guidance="Expert researcher")
         >>> helper = CrewAIHelper()
-        >>> 
+        >>>
         >>> # Create CrewAI agent
         >>> agent = helper.create_agent(
         ...     context,
@@ -163,12 +157,7 @@ class CrewAIHelper:
     """
 
     @staticmethod
-    def create_agent(
-        context: Context,
-        name: str = "agent",
-        tools: list | None = None,
-        **kwargs
-    ):
+    def create_agent(context: Context, name: str = "agent", tools: list | None = None, **kwargs):
         """Create a CrewAI agent with mycontext context."""
         try:
             from crewai import Agent
@@ -176,17 +165,15 @@ class CrewAIHelper:
             crew_config = context.to_crewai()
 
             return Agent(
-                role=crew_config['role'],
-                goal=crew_config['goal'],
-                backstory=crew_config['backstory'],
+                role=crew_config["role"],
+                goal=crew_config["goal"],
+                backstory=crew_config["backstory"],
                 tools=tools or [],
-                verbose=crew_config.get('verbose', True),
-                **kwargs
+                verbose=crew_config.get("verbose", True),
+                **kwargs,
             )
         except ImportError:
-            raise ImportError(
-                "CrewAI is not installed. Install with: pip install crewai"
-            )
+            raise ImportError("CrewAI is not installed. Install with: pip install crewai")
 
     @staticmethod
     def create_task(
@@ -194,7 +181,7 @@ class CrewAIHelper:
         description: str | None = None,
         agent: Any | None = None,
         expected_output: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         """Create a CrewAI task with mycontext context."""
         try:
@@ -208,33 +195,28 @@ class CrewAIHelper:
             output = expected_output or kwargs.pop("expected_output", None)
             if output is None:
                 crew_config = context.to_crewai()
-                output = crew_config.get("expected_output", "A complete, actionable response addressing the task.")
+                output = crew_config.get(
+                    "expected_output", "A complete, actionable response addressing the task."
+                )
 
-            return Task(
-                description=task_description,
-                expected_output=output,
-                agent=agent,
-                **kwargs
-            )
+            return Task(description=task_description, expected_output=output, agent=agent, **kwargs)
         except ImportError:
-            raise ImportError(
-                "CrewAI is not installed. Install with: pip install crewai"
-            )
+            raise ImportError("CrewAI is not installed. Install with: pip install crewai")
 
 
 class AutoGenHelper:
     """
     Helper for Microsoft AutoGen integration.
-    
+
     Makes it easy to use mycontext contexts with AutoGen agents.
-    
+
     Example:
         >>> from mycontext import Context
         >>> from mycontext.integrations import AutoGenHelper
-        >>> 
+        >>>
         >>> context = Context(guidance="Expert coder")
         >>> helper = AutoGenHelper()
-        >>> 
+        >>>
         >>> # Create AutoGen agent
         >>> agent = helper.create_assistant(
         ...     context,
@@ -244,10 +226,7 @@ class AutoGenHelper:
 
     @staticmethod
     def create_assistant(
-        context: Context,
-        name: str = "assistant",
-        llm_config: dict | None = None,
-        **kwargs
+        context: Context, name: str = "assistant", llm_config: dict | None = None, **kwargs
     ):
         """Create an AutoGen assistant agent with mycontext context."""
         try:
@@ -257,48 +236,37 @@ class AutoGenHelper:
 
             return AssistantAgent(
                 name=name,
-                system_message=autogen_config['system_message'],
+                system_message=autogen_config["system_message"],
                 llm_config=llm_config or {},
-                **kwargs
+                **kwargs,
             )
         except ImportError:
-            raise ImportError(
-                "AutoGen is not installed. Install with: pip install pyautogen"
-            )
+            raise ImportError("AutoGen is not installed. Install with: pip install pyautogen")
 
     @staticmethod
-    def create_user_proxy(
-        name: str = "user",
-        **kwargs
-    ):
+    def create_user_proxy(name: str = "user", **kwargs):
         """Create an AutoGen user proxy agent."""
         try:
             from autogen import UserProxyAgent
 
-            return UserProxyAgent(
-                name=name,
-                human_input_mode="TERMINATE",
-                **kwargs
-            )
+            return UserProxyAgent(name=name, human_input_mode="TERMINATE", **kwargs)
         except ImportError:
-            raise ImportError(
-                "AutoGen is not installed. Install with: pip install pyautogen"
-            )
+            raise ImportError("AutoGen is not installed. Install with: pip install pyautogen")
 
 
 class DSPyHelper:
     """
     Helper for DSPy integration.
-    
+
     Makes it easy to use mycontext contexts with DSPy.
-    
+
     Example:
         >>> from mycontext import Context
         >>> from mycontext.integrations import DSPyHelper
-        >>> 
+        >>>
         >>> context = Context(guidance="Expert")
         >>> helper = DSPyHelper()
-        >>> 
+        >>>
         >>> # Get DSPy-compatible format
         >>> prompt = helper.to_prompt(context)
     """
@@ -311,25 +279,22 @@ class DSPyHelper:
     @staticmethod
     def to_signature(context: Context) -> dict[str, Any]:
         """Convert context to DSPy signature format."""
-        return {
-            "instructions": context.assemble(),
-            "context": context.to_dict()
-        }
+        return {"instructions": context.assemble(), "context": context.to_dict()}
 
 
 class SemanticKernelHelper:
     """
     Helper for Microsoft Semantic Kernel integration.
-    
+
     Makes it easy to use mycontext contexts with Semantic Kernel.
-    
+
     Example:
         >>> from mycontext import Context
         >>> from mycontext.integrations import SemanticKernelHelper
-        >>> 
+        >>>
         >>> context = Context(guidance="Expert")
         >>> helper = SemanticKernelHelper()
-        >>> 
+        >>>
         >>> # Create semantic function
         >>> func = helper.create_semantic_function(kernel, context)
     """
@@ -345,7 +310,7 @@ class SemanticKernelHelper:
         context,
         function_name: str = "mycontext_function",
         plugin_name: str = "mycontext",
-        **kwargs
+        **kwargs,
     ):
         """Create a Semantic Kernel function with mycontext context.
 
@@ -359,7 +324,7 @@ class SemanticKernelHelper:
                 function_name=function_name,
                 plugin_name=plugin_name,
                 prompt=prompt_template,
-                **kwargs
+                **kwargs,
             )
             kernel.add_function(plugin_name=plugin_name, function=fn)
             return fn
@@ -394,7 +359,7 @@ class GoogleADKHelper:
         model: str = "gemini-2.0-flash",
         description: str | None = None,
         tools: list | None = None,
-        **kwargs
+        **kwargs,
     ):
         """Create a Google ADK Agent with mycontext context as instruction."""
         try:
@@ -410,33 +375,31 @@ class GoogleADKHelper:
                 instruction=instruction,
                 description=desc,
                 tools=tools or [],
-                **kwargs
+                **kwargs,
             )
         except ImportError:
-            raise ImportError(
-                "Google ADK is not installed. Install with: pip install google-adk"
-            )
+            raise ImportError("Google ADK is not installed. Install with: pip install google-adk")
 
 
 # Convenience function to auto-detect and integrate
 def auto_integrate(context: Context, framework: str, **kwargs) -> Any:
     """
     Automatically integrate context with specified framework.
-    
+
     Args:
         context: mycontext Context object
         framework: Framework name ("langchain", "llamaindex", "crewai", "autogen", "dspy", "semantic_kernel")
         **kwargs: Framework-specific parameters
-    
+
     Returns:
         Framework-specific object
-    
+
     Example:
         >>> context = Context(guidance="Expert")
-        >>> 
+        >>>
         >>> # Auto-integrate with LangChain
         >>> messages = auto_integrate(context, "langchain")
-        >>> 
+        >>>
         >>> # Auto-integrate with CrewAI
         >>> agent = auto_integrate(context, "crewai", name="analyst", tools=tools)
     """

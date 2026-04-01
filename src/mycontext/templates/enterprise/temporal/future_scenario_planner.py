@@ -18,30 +18,30 @@ from mycontext import Constraints, Guidance, Pattern
 class FutureScenarioPlanner(Pattern):
     """
     Create multiple future scenarios for strategic planning.
-    
+
     Scenario Planning Process:
     1. Identify focal question
     2. Determine key forces and uncertainties
     3. Develop scenario logics
     4. Flesh out scenarios
     5. Identify implications and strategies
-    
+
     Use Cases:
     - Strategic planning
     - Risk management
     - Long-term forecasting
     - Contingency planning
-    
+
     Example:
         >>> from mycontext.templates.enterprise.temporal import FutureScenarioPlanner
-        >>> 
+        >>>
         >>> pattern = FutureScenarioPlanner()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     focal_question="How will AI transform our industry?\",
         ...     time_horizon=\"10 years\"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -69,11 +69,7 @@ class FutureScenarioPlanner(Pattern):
             description="Multi-horizon scenario planning for strategic decisions",
             version="1.0.0",
             tags=["temporal", "enterprise", "scenario-planning", "futures"],
-            metadata={
-                "category": "temporal",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "temporal", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Scenario Planning Expert and Strategic Futurist",
                 rules=[
@@ -81,9 +77,9 @@ class FutureScenarioPlanner(Pattern):
                     "Base scenarios on key uncertainties, not certainties",
                     "Make scenarios internally consistent and detailed",
                     "Avoid best/worst case only - create diverse futures",
-                    "Derive strategic implications for each scenario"
+                    "Derive strategic implications for each scenario",
                 ],
-                style="strategic, imaginative, rigorous, multi-perspective"
+                style="strategic, imaginative, rigorous, multi-perspective",
             ),
             directive_template="""**FUTURE SCENARIO PLANNING**
 
@@ -298,40 +294,39 @@ class FutureScenarioPlanner(Pattern):
                 "focal_question": str,
                 "time_horizon": str,
                 "current_situation": str,
-                "context_section": str
+                "context_section": str,
             },
             constraints=Constraints(
                 must_include=[
                     "multiple_scenarios",
                     "scenario_logics",
                     "early_warning_indicators",
-                    "robust_strategies"
+                    "robust_strategies",
                 ],
-                must_not_include=[
-                    "single_prediction",
-                    "best_worst_only"
-                ],
-                style_guide="Strategic and imaginative. 2-4 distinct scenarios. Implications for each. Robust strategies."
-            )
+                must_not_include=["single_prediction", "best_worst_only"],
+                style_guide="Strategic and imaginative. 2-4 distinct scenarios. Implications for each. Robust strategies.",
+            ),
         )
 
     def build_context(self, focal_question="", time_horizon="", current_situation="", **kwargs):
         """Build context for scenario planning."""
         context_section = ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().build_context(
             focal_question=focal_question,
             time_horizon=time_horizon,
             current_situation=current_situation,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
-    def execute(self, provider="openai", focal_question="", time_horizon="", current_situation="", **kwargs):
+    def execute(
+        self, provider="openai", focal_question="", time_horizon="", current_situation="", **kwargs
+    ):
         """Execute scenario planning."""
         context_section = ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().execute(
             provider=provider,
@@ -339,7 +334,7 @@ class FutureScenarioPlanner(Pattern):
             time_horizon=time_horizon,
             current_situation=current_situation,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
 

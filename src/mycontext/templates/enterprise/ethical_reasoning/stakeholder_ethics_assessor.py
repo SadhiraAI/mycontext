@@ -43,11 +43,19 @@ class StakeholderEthicsAssessor(Pattern):
             description="Assess ethical impact on ALL stakeholders",
             version="1.0.0",
             tags=["ethical-reasoning", "enterprise", "stakeholders"],
-            metadata={"category": "ethical_reasoning", "license": "enterprise", "tier": "enterprise"},
+            metadata={
+                "category": "ethical_reasoning",
+                "license": "enterprise",
+                "tier": "enterprise",
+            },
             guidance=Guidance(
                 role="Stakeholder Analysis Expert",
-                rules=["Identify ALL stakeholders including vulnerable", "Assess impact on each group", "Apply Rawls' veil of ignorance"],
-                style="inclusive, thorough, justice-focused"
+                rules=[
+                    "Identify ALL stakeholders including vulnerable",
+                    "Assess impact on each group",
+                    "Apply Rawls' veil of ignorance",
+                ],
+                style="inclusive, thorough, justice-focused",
             ),
             directive_template="""**STAKEHOLDER ETHICS ASSESSMENT**
 
@@ -75,14 +83,19 @@ If you didn't know which stakeholder you'd be, would you accept this decision?
 - Are vulnerable groups protected?
 - Is there meaningful consent?""",
             input_schema={"decision": str, "stakeholders": str},
-            constraints=Constraints(must_include=["vulnerable_groups", "power_analysis"], style_guide="Focus on fairness to all groups")
+            constraints=Constraints(
+                must_include=["vulnerable_groups", "power_analysis"],
+                style_guide="Focus on fairness to all groups",
+            ),
         )
 
     def build_context(self, decision="", stakeholders="", **kwargs):
         return super().build_context(decision=decision, stakeholders=stakeholders, **kwargs)
 
     def execute(self, provider="gemini", decision="", stakeholders="", **kwargs):
-        return super().execute(provider=provider, decision=decision, stakeholders=stakeholders, **kwargs)
+        return super().execute(
+            provider=provider, decision=decision, stakeholders=stakeholders, **kwargs
+        )
 
 
 __all__ = ["StakeholderEthicsAssessor"]

@@ -19,12 +19,35 @@ from .pattern_registry import get_pattern
 from .skill import Skill
 
 # Parameter names that typically receive "task" or skill body when not in params
-_PRIMARY_INPUT_KEYS = frozenset({
-    "options", "problem", "statement", "decision", "topic", "concept", "situation",
-    "input", "observation", "phenomenon", "challenge", "action", "conflict", "risk",
-    "system", "project", "process", "objective", "goal", "sources", "text", "message",
-    "complex_topic", "technical_text", "data_description",
-})
+_PRIMARY_INPUT_KEYS = frozenset(
+    {
+        "options",
+        "problem",
+        "statement",
+        "decision",
+        "topic",
+        "concept",
+        "situation",
+        "input",
+        "observation",
+        "phenomenon",
+        "challenge",
+        "action",
+        "conflict",
+        "risk",
+        "system",
+        "project",
+        "process",
+        "objective",
+        "goal",
+        "sources",
+        "text",
+        "message",
+        "complex_topic",
+        "technical_text",
+        "data_description",
+    }
+)
 
 
 def _fuse_pattern_context(skill: Skill, task: str | None, params: dict[str, Any]) -> Context:
@@ -127,7 +150,9 @@ class SkillRunner:
                     parts.append(f.read_text(encoding="utf-8", errors="replace"))
                 if parts:
                     knowledge = "\n\n---\n\n".join(parts)
-                    ctx.knowledge = (ctx.knowledge + "\n\n" + knowledge) if ctx.knowledge else knowledge
+                    ctx.knowledge = (
+                        (ctx.knowledge + "\n\n" + knowledge) if ctx.knowledge else knowledge
+                    )
         ctx.metadata["skill_name"] = skill.name
         ctx.metadata["skill_path"] = str(skill.path) if skill.path else None
         ctx.data["skill"] = skill.name

@@ -16,18 +16,18 @@ from ..foundation import Constraints, Directive, Guidance
 class Blueprint(BaseModel):
     """
     Multi-component context architecture for complex applications.
-    
+
     Blueprints orchestrate multiple components (guidance, knowledge,
     reasoning, etc.) into a cohesive, optimized context. They handle:
     - Component assembly and ordering
     - Token budget management
     - Automatic optimization
     - Context compilation
-    
+
     Example:
         ```python
         from mycontext.structure import Blueprint
-        
+
         blueprint = Blueprint(
             name="research_assistant",
             guidance=Guidance("Expert research assistant"),
@@ -38,10 +38,10 @@ class Blueprint(BaseModel):
             token_budget=4000,
             optimization="balanced"
         )
-        
+
         context = blueprint.build(query="Explain quantum computing")
         ```
-    
+
     Attributes:
         name: Blueprint name
         description: What this blueprint creates
@@ -52,90 +52,54 @@ class Blueprint(BaseModel):
         priority_order: Order of component priority for optimization
     """
 
-    name: str = Field(
-        ...,
-        description="Blueprint name",
-        min_length=1
-    )
+    name: str = Field(..., description="Blueprint name", min_length=1)
 
-    description: str | None = Field(
-        default=None,
-        description="What this blueprint creates"
-    )
+    description: str | None = Field(default=None, description="What this blueprint creates")
 
-    guidance: Guidance | None = Field(
-        default=None,
-        description="Primary guidance"
-    )
+    guidance: Guidance | None = Field(default=None, description="Primary guidance")
 
-    directive_template: str | None = Field(
-        default=None,
-        description="Template for directive"
-    )
+    directive_template: str | None = Field(default=None, description="Template for directive")
 
-    constraints: Constraints | None = Field(
-        default=None,
-        description="Default constraints"
-    )
+    constraints: Constraints | None = Field(default=None, description="Default constraints")
 
     components: list[Any] = Field(
-        default_factory=list,
-        description="Components to include (Session, Index, etc.)"
+        default_factory=list, description="Components to include (Session, Index, etc.)"
     )
 
-    token_budget: int = Field(
-        default=4000,
-        ge=100,
-        le=1000000,
-        description="Maximum token budget"
-    )
+    token_budget: int = Field(default=4000, ge=100, le=1000000, description="Maximum token budget")
 
-    optimization: str = Field(
-        default="balanced",
-        description="Optimization strategy"
-    )
+    optimization: str = Field(default="balanced", description="Optimization strategy")
 
     priority_order: list[str] = Field(
-        default_factory=lambda: [
-            "guidance",
-            "directive",
-            "constraints",
-            "knowledge",
-            "memory"
-        ],
-        description="Component priority order"
+        default_factory=lambda: ["guidance", "directive", "constraints", "knowledge", "memory"],
+        description="Component priority order",
     )
 
-    metadata: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata"
-    )
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
     def build(self, **inputs) -> Context:
         """
         Build a complete context from this blueprint.
-        
+
         This method:
         1. Assembles all components
         2. Applies token budget optimization
         3. Orders components by priority
         4. Creates final Context
-        
+
         Args:
             **inputs: Input values for building
-            
+
         Returns:
             Fully assembled Context
         """
         # Create base context
-        context = Context(
-            guidance=self.guidance,
-            constraints=self.constraints
-        )
+        context = Context(guidance=self.guidance, constraints=self.constraints)
 
         # Build directive from template if provided (safe formatting — no injection risk)
         if self.directive_template:
             from ..utils.template_safety import safe_format_template
+
             directive_content = safe_format_template(self.directive_template, **inputs)
             context.directive = Directive(content=directive_content)
 
@@ -152,9 +116,9 @@ class Blueprint(BaseModel):
         # that returns their context contribution
         knowledge_parts = []
         for component in self.components:
-            if hasattr(component, 'render'):
+            if hasattr(component, "render"):
                 knowledge_parts.append(component.render())
-            elif hasattr(component, 'to_string'):
+            elif hasattr(component, "to_string"):
                 knowledge_parts.append(component.to_string())
             elif isinstance(component, str):
                 knowledge_parts.append(component)
@@ -187,10 +151,10 @@ class Blueprint(BaseModel):
     def optimize(self, strategy: str = "balanced") -> "Blueprint":
         """
         Create an optimized version of this blueprint.
-        
+
         Args:
             strategy: Optimization strategy ('speed', 'quality', 'cost', 'balanced')
-            
+
         Returns:
             Optimized blueprint
         """
@@ -224,7 +188,7 @@ class Blueprint(BaseModel):
     def to_dict(self) -> dict[str, Any]:
         """
         Convert to dictionary.
-        
+
         Returns:
             Dictionary representation
         """
@@ -234,10 +198,10 @@ class Blueprint(BaseModel):
     def from_dict(cls, data: dict[str, Any]) -> "Blueprint":
         """
         Create from dictionary.
-        
+
         Args:
             data: Dictionary representation
-            
+
         Returns:
             Blueprint instance
         """
@@ -250,4 +214,3 @@ class Blueprint(BaseModel):
             f"components={len(self.components)}, "
             f"budget={self.token_budget})"
         )
-

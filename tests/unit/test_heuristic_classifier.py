@@ -24,8 +24,8 @@ from mycontext.intelligence.pattern_suggester import (
 # Direct heuristic tests
 # ---------------------------------------------------------------------------
 
-class TestHeuristicClassify:
 
+class TestHeuristicClassify:
     def test_pure_arithmetic_returns_raw(self):
         result = _heuristic_classify("2 + 2")
         assert result is not None
@@ -132,8 +132,8 @@ class TestHeuristicClassify:
 # assess_complexity integration — heuristic fast-path avoids LLM
 # ---------------------------------------------------------------------------
 
-class TestAssessComplexityHeuristicIntegration:
 
+class TestAssessComplexityHeuristicIntegration:
     def test_simple_question_skips_llm(self):
         """LLM should NOT be called for an obviously simple question."""
         with patch("litellm.completion") as mock_llm:
@@ -158,9 +158,7 @@ class TestAssessComplexityHeuristicIntegration:
             '{"complexity": "low", "domains": [], "reasoning_type": "explanatory", '
             '"recommendation": "raw", "best_template": "", "reasoning": "simple"}'
         )
-        mock_response.usage = MagicMock(
-            total_tokens=20, prompt_tokens=15, completion_tokens=5
-        )
+        mock_response.usage = MagicMock(total_tokens=20, prompt_tokens=15, completion_tokens=5)
 
         with patch("litellm.completion", return_value=mock_response) as mock_llm:
             with patch("litellm.completion_cost", return_value=0.0):
@@ -183,9 +181,7 @@ class TestAssessComplexityHeuristicIntegration:
             '"reasoning_type": "strategic", "recommendation": "integrated", '
             '"best_template": "", "reasoning": "multi-domain"}'
         )
-        mock_response.usage = MagicMock(
-            total_tokens=50, prompt_tokens=35, completion_tokens=15
-        )
+        mock_response.usage = MagicMock(total_tokens=50, prompt_tokens=35, completion_tokens=15)
 
         complex_q = (
             "What strategic roadmap should we prioritize to reduce customer churn "

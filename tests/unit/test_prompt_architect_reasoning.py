@@ -9,6 +9,7 @@ from mycontext.intelligence.prompt_architect import (
 
 # ── normalization ──────────────────────────────────────────────────────────────
 
+
 def test_normalize_reasoning_strategies() -> None:
     assert PromptArchitect._normalize_reasoning_strategies(None) == []
     assert PromptArchitect._normalize_reasoning_strategies("") == []
@@ -25,6 +26,7 @@ def test_reasoning_choices_tuple_documented() -> None:
 
 
 # ── reasoning NOT in RULES ─────────────────────────────────────────────────────
+
 
 def test_reasoning_not_injected_into_rules() -> None:
     arch = PromptArchitect()
@@ -63,7 +65,9 @@ def test_reasoning_stored_in_analytical_approach() -> None:
     }
     ctx = arch._json_to_context(data, "fallback")
     assert ctx.analytical_approach is not None
-    assert "step_by_step" in ctx.analytical_approach or "Chain of Thought" in ctx.analytical_approach
+    assert (
+        "step_by_step" in ctx.analytical_approach or "Chain of Thought" in ctx.analytical_approach
+    )
 
 
 def test_single_strategy_stored_in_analytical_approach() -> None:
@@ -80,10 +84,13 @@ def test_single_strategy_stored_in_analytical_approach() -> None:
     }
     ctx = arch._json_to_context(data, "fallback")
     assert ctx.analytical_approach is not None
-    assert "explain_simply" in ctx.analytical_approach or "Simplification" in ctx.analytical_approach
+    assert (
+        "explain_simply" in ctx.analytical_approach or "Simplification" in ctx.analytical_approach
+    )
 
 
 # ── reasoning renders AFTER GUARD RAILS, BEFORE YOUR TASK ─────────────────────
+
 
 def test_reasoning_renders_before_task_after_guard_rails() -> None:
     arch = PromptArchitect()
@@ -115,6 +122,7 @@ def test_reasoning_renders_before_task_after_guard_rails() -> None:
 
 # ── examples go to Context.examples, not Directive ────────────────────────────
 
+
 def test_examples_go_to_context_not_directive() -> None:
     arch = PromptArchitect()
     data = {
@@ -124,7 +132,10 @@ def test_examples_go_to_context_not_directive() -> None:
         "style": None,
         "reasoning_strategies": [],
         "examples": [
-            {"input": "Ticket: login fails", "output": "1) LOGIN ISSUES (1 sentence). 2) 15 occurrences. 3) Tickets 001, 002, 003 all report OAuth timeout. 4) Rotate OAuth credentials."},
+            {
+                "input": "Ticket: login fails",
+                "output": "1) LOGIN ISSUES (1 sentence). 2) 15 occurrences. 3) Tickets 001, 002, 003 all report OAuth timeout. 4) Rotate OAuth credentials.",
+            },
         ],
         "output_contract": "Return ONLY a 4-part structure",
         "guard_rails": [],
@@ -189,6 +200,7 @@ def test_legacy_string_examples_converted() -> None:
 
 # ── guard_rails rescue ─────────────────────────────────────────────────────────
 
+
 def test_guard_rails_rescue_grounding_rule() -> None:
     arch = PromptArchitect()
     data = {
@@ -216,6 +228,7 @@ def test_guard_rails_rescue_grounding_rule() -> None:
 
 
 # ── provider-specific format ───────────────────────────────────────────────────
+
 
 def test_render_for_anthropic_gives_xml() -> None:
     arch = PromptArchitect(provider="openai", render_for="anthropic")

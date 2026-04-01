@@ -6,6 +6,42 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.11.0] — 2026-03-31
+
+### Added
+
+- **Quality Controls on `Constraints`** — Five new optional fields auto-suggested by `PromptArchitect` and overridable by the user:
+  - `verbosity: "minimal" | "standard" | "detailed"` — output detail level, auto-inferred from task complexity
+  - `communication_posture: "direct" | "collaborative" | "educational"` — interaction tone, auto-inferred from audience
+  - `answer_first: bool` — when `True`, the LLM states its conclusion before supporting reasoning
+  - `forbidden_phrases: list[str]` — phrases the LLM must never use, extending the built-in anti-boilerplate list
+  - `self_check: list[str]` — domain-specific verification questions the LLM must confirm before finalizing
+  All five fields render into the prompt via `Constraints.render()` and are scored by `QualityMetrics` and `OutputEvaluator`.
+
+- **`PromptArchitect` auto-suggestion** — `build()` and `improve()` now instruct the LLM to infer all 5 quality control fields from the task description. The JSON schema, inference instructions, and per-section upgrade hints are updated. `_json_to_context()` parses and validates the new fields from the LLM response and populates `Constraints` accordingly.
+
+- **Template self-check defaults** — All 16 free templates now set domain-specific `self_check` defaults in `build_context()` via the new `Pattern._apply_default_self_check()` helper. User-provided values are never overwritten.
+
+- **Objectivity rules** — Six evaluative templates (RiskAssessor, ConflictResolver, HypothesisGenerator, ScenarioPlanner, DataAnalyzer, SocraticQuestioner) now include objectivity-enforcing rules in `Guidance.rules`.
+
+- **Few-shot examples** — Ten templates now include curated good-output examples in `Context.examples` for better LLM calibration.
+
+- **Fragment library** (`mycontext.fragments`) — New module with ~12 reusable quality-enhancing `Fragment` objects (`anti_fluff`, `answer_first_fragment`, `objectivity`, `self_check_analysis`, `structured_json`, `grounding_strict`, etc.). Each fragment can be applied to any `Context` to merge constraints and guidance rules. Designed for Blueprint composition.
+
+- **Web app quality controls** — `SmartExecutePanel` now exposes an "Output Style" section with verbosity dropdown, "Answer first" checkbox, and "Self-verify" checkbox. Values are sent as `quality` overrides to the API and applied to the LLM-generated context.
+
+### Changed
+
+- **`TransformationEngine.transform()`** — Auto-sets `verbosity` on the resulting `Context.constraints` based on the complexity assessment (`SIMPLE` → `minimal`, `MODERATE` → `standard`, `COMPLEX`/`HIGHLY_COMPLEX` → `detailed`) when not already set.
+
+- **`OutputEvaluator._score_register_fit()`** — Now checks user-defined `forbidden_phrases` from `context.constraints` and penalizes the score when found in the output.
+
+- **`QualityMetrics._detect_quality_issues()`** — Gives positive score credit when the assembled `Context` includes `self_check`, `verbosity`, or `forbidden_phrases`.
+
+- **`Pattern` base class** — Added `_apply_default_self_check(ctx, defaults)` static method for templates to set `self_check` defaults without overwriting user values.
+
+---
+
 ## [0.10.2] — 2026-03-28
 
 ### Added

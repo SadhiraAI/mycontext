@@ -1,6 +1,7 @@
 """
 Tests for Foundation classes (Directive, Guidance, Constraints)
 """
+
 import pytest
 
 from mycontext.foundation import Constraints, Directive, Guidance
@@ -53,18 +54,14 @@ class TestGuidance:
     def test_with_rules(self):
         """Test guidance with rules"""
         guidance = Guidance(
-            role="Code Reviewer",
-            rules=["Be thorough", "Focus on security", "Suggest improvements"]
+            role="Code Reviewer", rules=["Be thorough", "Focus on security", "Suggest improvements"]
         )
         assert len(guidance.rules) == 3
         assert "Be thorough" in guidance.rules
 
     def test_with_style(self):
         """Test guidance with communication style"""
-        guidance = Guidance(
-            role="Teacher",
-            style="patient, encouraging, uses examples"
-        )
+        guidance = Guidance(role="Teacher", style="patient, encouraging, uses examples")
         assert guidance.style == "patient, encouraging, uses examples"
 
     def test_render_simple(self):
@@ -75,10 +72,7 @@ class TestGuidance:
 
     def test_render_with_rules(self):
         """Test rendering guidance with rules"""
-        guidance = Guidance(
-            role="Analyst",
-            rules=["Be clear", "Use data"]
-        )
+        guidance = Guidance(role="Analyst", rules=["Be clear", "Use data"])
         rendered = guidance.render()
         assert "You are Analyst" in rendered
         assert "Follow these rules:" in rendered
@@ -87,20 +81,13 @@ class TestGuidance:
 
     def test_render_with_style(self):
         """Test rendering guidance with style"""
-        guidance = Guidance(
-            role="Assistant",
-            style="friendly and helpful"
-        )
+        guidance = Guidance(role="Assistant", style="friendly and helpful")
         rendered = guidance.render()
         assert "Communication style: friendly and helpful" in rendered
 
     def test_render_complete(self):
         """Test rendering guidance with all fields"""
-        guidance = Guidance(
-            role="Expert",
-            rules=["Rule 1", "Rule 2"],
-            style="professional"
-        )
+        guidance = Guidance(role="Expert", rules=["Rule 1", "Rule 2"], style="professional")
         rendered = guidance.render()
         assert "You are Expert" in rendered
         assert "Rule 1" in rendered
@@ -120,28 +107,20 @@ class TestConstraints:
 
     def test_must_include(self):
         """Test must_include constraints"""
-        constraints = Constraints(
-            must_include=["key metrics", "trends", "recommendations"]
-        )
+        constraints = Constraints(must_include=["key metrics", "trends", "recommendations"])
         assert len(constraints.must_include) == 3
         assert "key metrics" in constraints.must_include
 
     def test_must_not_include(self):
         """Test must_not_include constraints"""
-        constraints = Constraints(
-            must_not_include=["speculation", "personal opinions"]
-        )
+        constraints = Constraints(must_not_include=["speculation", "personal opinions"])
         assert len(constraints.must_not_include) == 2
         assert "speculation" in constraints.must_not_include
 
     def test_format_rules(self):
         """Test format_rules constraints"""
         constraints = Constraints(
-            format_rules=[
-                "Use bullet points",
-                "Maximum 500 words",
-                "Include citations"
-            ]
+            format_rules=["Use bullet points", "Maximum 500 words", "Include citations"]
         )
         assert len(constraints.format_rules) == 3
 
@@ -153,9 +132,7 @@ class TestConstraints:
 
     def test_render_must_include(self):
         """Test rendering must_include"""
-        constraints = Constraints(
-            must_include=["data", "examples"]
-        )
+        constraints = Constraints(must_include=["data", "examples"])
         rendered = constraints.render()
         assert "include" in rendered.lower()
         assert "data" in rendered
@@ -163,18 +140,14 @@ class TestConstraints:
 
     def test_render_must_not_include(self):
         """Test rendering must_not_include"""
-        constraints = Constraints(
-            must_not_include=["speculation"]
-        )
+        constraints = Constraints(must_not_include=["speculation"])
         rendered = constraints.render()
         assert "not" in rendered.lower()
         assert "speculation" in rendered
 
     def test_render_format_rules(self):
         """Test rendering format_rules"""
-        constraints = Constraints(
-            format_rules=["Use markdown", "Be concise"]
-        )
+        constraints = Constraints(format_rules=["Use markdown", "Be concise"])
         rendered = constraints.render()
         assert "format" in rendered.lower()
         assert "Use markdown" in rendered
@@ -183,9 +156,7 @@ class TestConstraints:
     def test_render_complete(self):
         """Test rendering all constraint types"""
         constraints = Constraints(
-            must_include=["metrics"],
-            must_not_include=["opinions"],
-            format_rules=["Bullet points"]
+            must_include=["metrics"], must_not_include=["opinions"], format_rules=["Bullet points"]
         )
         rendered = constraints.render()
         assert "metrics" in rendered
@@ -267,8 +238,7 @@ class TestFoundationIntegration:
         """Test that new fields integrate with existing ones"""
         guidance = Guidance(role="Analyst", goal="Find trends", rules=["Be precise"])
         constraints = Constraints(
-            must_include=["metrics"],
-            output_schema=[{"name": "trend", "type": "str"}]
+            must_include=["metrics"], output_schema=[{"name": "trend", "type": "str"}]
         )
         assert "Find trends" in guidance.render()
         assert "trend (str)" in constraints.render()

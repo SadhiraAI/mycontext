@@ -11,8 +11,4 @@ from .cross_domain_synthesizer import CrossDomainSynthesizer
 from .holistic_integrator import HolisticIntegrator
 from .pattern_recognition_engine import PatternRecognitionEngine
 
-__all__ = [
-    "CrossDomainSynthesizer",
-    "PatternRecognitionEngine",
-    "HolisticIntegrator"
-]
+__all__ = ["CrossDomainSynthesizer", "PatternRecognitionEngine", "HolisticIntegrator"]

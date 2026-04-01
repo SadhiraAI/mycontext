@@ -31,7 +31,7 @@ class JSONParser(OutputParser):
     def __init__(self, strict: bool = True):
         """
         Initialize JSON parser.
-        
+
         Args:
             strict: If True, raise error on parse failure
         """
@@ -40,15 +40,15 @@ class JSONParser(OutputParser):
     def parse(self, text: str) -> dict | list | None:
         """
         Extract and parse JSON from text.
-        
+
         Args:
             text: Text containing JSON
-            
+
         Returns:
             Parsed JSON (dict or list) or None if not found
         """
         # Try code blocks first
-        pattern = r'```(?:json)?\s*\n?(.*?)\n?```'
+        pattern = r"```(?:json)?\s*\n?(.*?)\n?```"
         matches = re.findall(pattern, text, re.DOTALL)
         if matches:
             try:
@@ -58,7 +58,7 @@ class JSONParser(OutputParser):
                     raise ValueError(f"Invalid JSON in code block: {e}")
 
         # Try finding raw JSON
-        json_pattern = r'(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\])'
+        json_pattern = r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\])"
         matches = re.findall(json_pattern, text, re.DOTALL)
 
         for match in sorted(matches, key=len, reverse=True):
@@ -94,7 +94,7 @@ class ListParser(OutputParser):
     def __init__(self, numbered: bool = True, bullet: bool = True):
         """
         Initialize list parser.
-        
+
         Args:
             numbered: Parse numbered lists (1. 2. 3.)
             bullet: Parse bullet lists (- * •)
@@ -105,10 +105,10 @@ class ListParser(OutputParser):
     def parse(self, text: str) -> list[str]:
         """
         Extract list items from text.
-        
+
         Args:
             text: Text containing lists
-            
+
         Returns:
             List of extracted items
         """
@@ -116,12 +116,12 @@ class ListParser(OutputParser):
 
         if self.numbered:
             # Match: 1. Item, 2. Item, etc.
-            pattern = r'^\s*\d+[\.)]\s+(.+)$'
+            pattern = r"^\s*\d+[\.)]\s+(.+)$"
             items.extend(re.findall(pattern, text, re.MULTILINE))
 
         if self.bullet:
             # Match: - Item, * Item, • Item
-            pattern = r'^\s*[-*•]\s+(.+)$'
+            pattern = r"^\s*[-*•]\s+(.+)$"
             items.extend(re.findall(pattern, text, re.MULTILINE))
 
         return [item.strip() for item in items if item.strip()]
@@ -152,7 +152,7 @@ class CodeBlockParser(OutputParser):
     def __init__(self, language: str | None = None):
         """
         Initialize code block parser.
-        
+
         Args:
             language: Specific language to extract (None = all)
         """
@@ -161,21 +161,21 @@ class CodeBlockParser(OutputParser):
     def parse(self, text: str) -> str | dict[str, str]:
         """
         Extract code blocks from markdown.
-        
+
         Args:
             text: Text containing code blocks
-            
+
         Returns:
             If language specified: single code string
             If language not specified: dict of {language: code}
         """
         if self.language:
-            pattern = f'```{self.language}\\s*\\n(.*?)\\n```'
+            pattern = f"```{self.language}\\s*\\n(.*?)\\n```"
             matches = re.findall(pattern, text, re.DOTALL | re.IGNORECASE)
             return matches[0] if matches else ""
         else:
             # Extract all code blocks with languages
-            pattern = r'```(\w+)?\s*\n(.*?)\n```'
+            pattern = r"```(\w+)?\s*\n(.*?)\n```"
             matches = re.findall(pattern, text, re.DOTALL)
 
             result = {}
@@ -205,10 +205,10 @@ class MarkdownParser(OutputParser):
     def parse(self, text: str) -> dict[str, Any]:
         """
         Parse markdown into structured format.
-        
+
         Args:
             text: Markdown text
-            
+
         Returns:
             Dict with sections, headers, lists, code blocks
         """
@@ -221,15 +221,11 @@ class MarkdownParser(OutputParser):
         }
 
         # Extract headers
-        header_pattern = r'^(#{1,6})\s+(.+)$'
+        header_pattern = r"^(#{1,6})\s+(.+)$"
         for match in re.finditer(header_pattern, text, re.MULTILINE):
             level = len(match.group(1))
             title = match.group(2).strip()
-            structure["headers"].append({
-                "level": level,
-                "title": title,
-                "position": match.start()
-            })
+            structure["headers"].append({"level": level, "title": title, "position": match.start()})
 
         # Extract lists
         list_parser = ListParser()
@@ -240,10 +236,9 @@ class MarkdownParser(OutputParser):
         structure["code_blocks"] = code_parser.parse(text)
 
         # Extract links
-        link_pattern = r'\[([^\]]+)\]\(([^\)]+)\)'
+        link_pattern = r"\[([^\]]+)\]\(([^\)]+)\)"
         structure["links"] = [
-            {"text": m.group(1), "url": m.group(2)}
-            for m in re.finditer(link_pattern, text)
+            {"text": m.group(1), "url": m.group(2)} for m in re.finditer(link_pattern, text)
         ]
 
         return structure
@@ -265,15 +260,15 @@ class XMLParser(OutputParser):
     def parse(self, text: str) -> ET.Element | None:
         """
         Extract and parse XML from text.
-        
+
         Args:
             text: Text containing XML
-            
+
         Returns:
             Parsed XML Element or None
         """
         # Try to find XML in code blocks
-        pattern = r'```(?:xml)?\s*\n?(.*?)\n?```'
+        pattern = r"```(?:xml)?\s*\n?(.*?)\n?```"
         matches = re.findall(pattern, text, re.DOTALL)
         if matches:
             try:
@@ -282,7 +277,7 @@ class XMLParser(OutputParser):
                 pass
 
         # Try to find raw XML
-        xml_pattern = r'<\?xml.*?\?>.*?</.*?>'
+        xml_pattern = r"<\?xml.*?\?>.*?</.*?>"
         matches = re.findall(xml_pattern, text, re.DOTALL)
         if matches:
             try:
@@ -307,6 +302,7 @@ Example:
 
 
 # Convenience functions
+
 
 def parse_json_response(text: str, strict: bool = True) -> dict | list | None:
     """Quick JSON parsing."""

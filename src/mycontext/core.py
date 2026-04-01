@@ -106,34 +106,24 @@ class Context(BaseModel):
         ```
     """
 
-    guidance: Guidance | None = Field(
-        default=None,
-        description="System-level behavioral guidance"
-    )
+    guidance: Guidance | None = Field(default=None, description="System-level behavioral guidance")
 
     directive: Directive | None = Field(
-        default=None,
-        description="Specific instruction for this interaction"
+        default=None, description="Specific instruction for this interaction"
     )
 
     constraints: Constraints | None = Field(
-        default=None,
-        description="Hard constraints and guardrails"
+        default=None, description="Hard constraints and guardrails"
     )
 
     knowledge: str | None = Field(
-        default=None,
-        description="Retrieved knowledge, documents, or memory context"
+        default=None, description="Retrieved knowledge, documents, or memory context"
     )
 
-    data: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional data and parameters"
-    )
+    data: dict[str, Any] = Field(default_factory=dict, description="Additional data and parameters")
 
     metadata: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Metadata about this context (tags, version, etc.)"
+        default_factory=dict, description="Metadata about this context (tags, version, etc.)"
     )
 
     # ── Research-flow extensions (all optional, backward-compatible) ──
@@ -192,7 +182,7 @@ class Context(BaseModel):
         self,
         guidance: str | Guidance | None = None,
         directive: str | Directive | None = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize a Context.
@@ -238,11 +228,14 @@ class Context(BaseModel):
         """
         from .skills import SkillRunner
         from .skills.skill import Skill
+
         if isinstance(skill_or_path, (Path, str)):
             skill = Skill.load(Path(skill_or_path))
         else:
             skill = skill_or_path
-        return SkillRunner().build_context(skill, task=task, include_references=include_references, **params)
+        return SkillRunner().build_context(
+            skill, task=task, include_references=include_references, **params
+        )
 
     def assemble(self) -> str:
         """
@@ -447,15 +440,20 @@ class Context(BaseModel):
         if goal:
             goal_clean = goal
             if goal_clean.lower().startswith("your mission:"):
-                goal_clean = goal_clean[len("your mission:"):].strip()
-            goal_clean = goal_clean.removesuffix("— accomplish this fully").removesuffix("— accomplish this fully.").strip().rstrip(".")
+                goal_clean = goal_clean[len("your mission:") :].strip()
+            goal_clean = (
+                goal_clean.removesuffix("— accomplish this fully")
+                .removesuffix("— accomplish this fully.")
+                .strip()
+                .rstrip(".")
+            )
             goal_body = f"**Your mission:** {goal_clean} — accomplish this fully."
             sections.append(_wrap("GOAL", goal_body))
 
         # ③ RULES (hard → easy, Zhang et al. 2025)
         rules = getattr(self.guidance, "rules", []) if self.guidance else []
         if rules:
-            items = "\n".join(f"  {i+1}. {str(r)}" for i, r in enumerate(rules))
+            items = "\n".join(f"  {i + 1}. {str(r)}" for i, r in enumerate(rules))
             rules_body = f"**You MUST follow these rules at all times:**\n{items}"
             sections.append(_wrap("RULES", rules_body))
 
@@ -495,7 +493,9 @@ class Context(BaseModel):
             sections.append(_wrap("KNOWLEDGE", self.knowledge))
 
         # ⑦ OUTPUT FORMAT
-        output_contract = getattr(self.constraints, "output_contract", None) if self.constraints else None
+        output_contract = (
+            getattr(self.constraints, "output_contract", None) if self.constraints else None
+        )
         schema = getattr(self.constraints, "output_schema", None) if self.constraints else None
 
         if output_contract or schema:
@@ -505,7 +505,9 @@ class Context(BaseModel):
             if schema:
                 fields = [f for f in schema if f.get("name")]
                 if fields:
-                    fmt_lines.append("**Return your response as a JSON object** with these required fields:\n")
+                    fmt_lines.append(
+                        "**Return your response as a JSON object** with these required fields:\n"
+                    )
                     for f in fields:
                         fmt_lines.append(f"- **`{f['name']}`** ({f.get('type', 'str')})")
                     skeleton = ", ".join('"' + f["name"] + '": ...' for f in fields)
@@ -542,7 +544,11 @@ class Context(BaseModel):
         assembled = "\n\n".join(s for s in sections if s)
 
         # OpenAI override: mirror instructions at end of long knowledge blocks
-        if provider == "openai" and self.knowledge and len(self.knowledge) > _OPENAI_MIRROR_THRESHOLD:
+        if (
+            provider == "openai"
+            and self.knowledge
+            and len(self.knowledge) > _OPENAI_MIRROR_THRESHOLD
+        ):
             mirror = self._build_instruction_mirror()
             if mirror:
                 assembled = assembled + "\n\n---\n\n" + mirror
@@ -698,6 +704,7 @@ class Context(BaseModel):
         """
         try:
             import tiktoken
+
             try:
                 enc = tiktoken.encoding_for_model(model)
             except KeyError:
@@ -761,7 +768,7 @@ class Context(BaseModel):
                 if role:
                     parts.append(f"Act as {role}.")
                 if rules:
-                    rules_text = " ".join(f"({i+1}) {r}" for i, r in enumerate(rules))
+                    rules_text = " ".join(f"({i + 1}) {r}" for i, r in enumerate(rules))
                     parts.append(f"Rules: {rules_text}")
             if self.directive:
                 content = getattr(self.directive, "content", "")
@@ -789,6 +796,7 @@ class Context(BaseModel):
 
         try:
             from .foundation import Directive, Guidance
+
             refine_ctx = self.__class__(
                 guidance=Guidance(
                     role="Expert prompt engineer specializing in cognitive reasoning frameworks",
@@ -970,6 +978,7 @@ class Context(BaseModel):
             ```
         """
         import json
+
         return json.dumps(self.to_dict(), indent=2)
 
     @classmethod
@@ -997,6 +1006,7 @@ class Context(BaseModel):
             Context instance
         """
         import json
+
         return cls.from_dict(json.loads(json_str))
 
     def to_llamaindex(self) -> dict[str, Any]:
@@ -1023,7 +1033,7 @@ class Context(BaseModel):
             "system_prompt": self.guidance.render() if self.guidance else "",
             "query_instruction": self.directive.render() if self.directive else "",
             "context_str": assembled,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     def to_crewai(self) -> dict[str, Any]:
@@ -1057,7 +1067,7 @@ class Context(BaseModel):
             "context": self.assemble(),
             "expected_output": expected_output,
             "tools": [],  # User provides tools
-            "verbose": True
+            "verbose": True,
         }
 
     def to_autogen(self) -> dict[str, Any]:
@@ -1106,9 +1116,7 @@ class Context(BaseModel):
         try:
             import yaml
         except ImportError as err:
-            raise ImportError(
-                "pyyaml is not installed. Install with: pip install pyyaml"
-            ) from err
+            raise ImportError("pyyaml is not installed. Install with: pip install pyyaml") from err
         return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
 
     def to_xml(self) -> str:
@@ -1166,7 +1174,9 @@ class Context(BaseModel):
             if self.constraints.max_length:
                 SubElement(constraints_elem, "max_length").text = str(self.constraints.max_length)
             if self.constraints.language:
-                SubElement(constraints_elem, "language").text = _safe_text(self.constraints.language)
+                SubElement(constraints_elem, "language").text = _safe_text(
+                    self.constraints.language
+                )
 
         if self.knowledge:
             SubElement(root, "knowledge").text = _safe_text(self.knowledge)
@@ -1207,11 +1217,7 @@ class Context(BaseModel):
         # Anthropic prefers structured system messages
         if self.guidance or self.directive or self.knowledge:
             system_content = self.assemble()
-            return {
-                "system": system_content,
-                "messages": messages,
-                "max_tokens": 4096
-            }
+            return {"system": system_content, "messages": messages, "max_tokens": 4096}
 
         return {"messages": messages, "max_tokens": 4096}
 
@@ -1234,11 +1240,7 @@ class Context(BaseModel):
             )
             ```
         """
-        return {
-            "messages": self.to_messages(),
-            "temperature": 0.7,
-            "max_tokens": 4096
-        }
+        return {"messages": self.to_messages(), "temperature": 0.7, "max_tokens": 4096}
 
     def to_google(self) -> dict[str, Any]:
         """
@@ -1258,10 +1260,7 @@ class Context(BaseModel):
         """
         return {
             "contents": self.assemble(),
-            "generation_config": {
-                "temperature": 0.7,
-                "max_output_tokens": 4096
-            }
+            "generation_config": {"temperature": 0.7, "max_output_tokens": 4096},
         }
 
     def __repr__(self) -> str:

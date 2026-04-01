@@ -30,10 +30,16 @@ Constraints(
     max_length: int | None = None,
     language: str | None = None,
     output_schema: list[dict] | None = None,
+    # Quality controls (auto-suggested by PromptArchitect) — new in 0.11.0
+    verbosity: "minimal" | "standard" | "detailed" | None = None,
+    communication_posture: "direct" | "collaborative" | "educational" | None = None,
+    answer_first: bool | None = None,
+    forbidden_phrases: list[str] | None = None,
+    self_check: list[str] | None = None,
 )
 ```
 
-All fields are optional. Use only what you need.
+All fields are optional. Use only what you need. The five quality control fields are auto-suggested by `PromptArchitect` when you use `build()` or `improve()` — you can override any of them.
 
 ## Fields
 
@@ -47,6 +53,11 @@ All fields are optional. Use only what you need.
 | `max_length` | `int \| None` | Maximum output length (tokens or chars — interpreted by the LLM) |
 | `language` | `str \| None` | Required output language (e.g., `"en"`, `"Spanish"`) |
 | `output_schema` | `list[dict] \| None` | Structured field schema for JSON responses — `[{"name": str, "type": str}]` |
+| `verbosity` | `"minimal" \| "standard" \| "detailed" \| None` | Output detail level. Auto-suggested by PromptArchitect based on task complexity |
+| `communication_posture` | `"direct" \| "collaborative" \| "educational" \| None` | Interaction tone. Auto-suggested based on audience |
+| `answer_first` | `bool \| None` | When `True`, LLM states conclusion before reasoning. Auto-suggested: `True` for decisions, `False` for tutorials |
+| `forbidden_phrases` | `list[str] \| None` | Phrases the LLM must never use. Extends the built-in anti-boilerplate list |
+| `self_check` | `list[str] \| None` | Domain-specific verification questions the LLM must confirm before finalizing |
 
 ### `output_contract` — explicit response shape
 
@@ -152,6 +163,84 @@ In the assembled `Context` with `research_flow=True`:
 - `output_contract` renders in **section ⑦ OUTPUT FORMAT** — just before guard rails
 - `style_guide` renders in **section ④ STYLE** — alongside `Guidance.style`
 - `must_not_include` and `must_include` render in **section ⑧ GUARD RAILS**
+
+## Quality Controls (New in 0.11.0)
+
+Five fields that control *how* the LLM communicates its response. When you use `PromptArchitect.build()` or `improve()`, these are auto-inferred from the task description. You can also set them manually.
+
+### `verbosity` — output detail level
+
+```python
+Constraints(verbosity="minimal")   # Quick lookups, yes/no decisions
+Constraints(verbosity="standard")  # Most analysis and planning tasks
+Constraints(verbosity="detailed")  # Deep research, multi-factor analysis
+```
+
+Renders as a conciseness or thoroughness instruction in the prompt. Also auto-set by `TransformationEngine.transform()` based on complexity assessment.
+
+### `communication_posture` — interaction tone
+
+```python
+Constraints(communication_posture="direct")        # Experienced audiences, brevity
+Constraints(communication_posture="collaborative")  # Brainstorming, ideation
+Constraints(communication_posture="educational")    # Tutorials, explanations
+```
+
+### `answer_first` — conclusion ordering
+
+```python
+Constraints(answer_first=True)   # State conclusion, then reasoning
+Constraints(answer_first=False)  # Reasoning journey first, then conclusion
+```
+
+`True` for decisions, recommendations, and analysis tasks. `False` for tutorials, explorations, and step-by-step walkthroughs.
+
+### `forbidden_phrases` — anti-boilerplate
+
+```python
+Constraints(
+    forbidden_phrases=["it depends", "delve into", "it's worth noting that"],
+)
+```
+
+Extends the built-in anti-boilerplate system. `OutputEvaluator` checks these alongside its default banned phrase list and penalizes the score when found.
+
+### `self_check` — domain-specific verification
+
+```python
+Constraints(
+    self_check=[
+        "Did I distinguish correlation from causation?",
+        "Did I include risks the user may not want to hear?",
+        "Are at least 30% of ideas genuinely unconventional?",
+    ],
+)
+```
+
+Renders as a `SELF-VERIFICATION` block in the prompt. Every template ships with domain-specific defaults — for example, `DataAnalyzer` defaults to checks about statistical rigor and data gaps.
+
+### Auto-suggestion via PromptArchitect
+
+When you use `PromptArchitect`, all five fields are inferred from the task:
+
+```python
+from mycontext.intelligence import PromptArchitect
+
+arch = PromptArchitect(provider="openai")
+result = arch.build("Analyze customer churn and identify at-risk segments")
+
+# Inspect what was auto-suggested
+ctx = result.improved_context
+print(ctx.constraints.verbosity)             # "detailed"
+print(ctx.constraints.communication_posture) # "direct"
+print(ctx.constraints.answer_first)          # True
+print(ctx.constraints.forbidden_phrases)     # ["it depends", ...]
+print(ctx.constraints.self_check)            # ["Did I distinguish correlation...", ...]
+
+# Override before execution
+ctx.constraints.verbosity = "minimal"
+response = ctx.execute(provider="openai")
+```
 
 ## Common Patterns
 
@@ -335,6 +424,11 @@ print(crew["expected_output"])
 | `output_schema` | `list[dict] \| None` | JSON field schema — `[{"name": str, "type": str}]`. |
 | `max_length` | `int \| None` | Maximum length (1 or higher). |
 | `language` | `str \| None` | Required response language. |
+| `verbosity` | `"minimal" \| "standard" \| "detailed" \| None` | Output detail level — auto-suggested by PromptArchitect. |
+| `communication_posture` | `"direct" \| "collaborative" \| "educational" \| None` | Interaction tone — auto-suggested by PromptArchitect. |
+| `answer_first` | `bool \| None` | Conclusion-first ordering — auto-suggested by PromptArchitect. |
+| `forbidden_phrases` | `list[str] \| None` | Banned phrases — checked by `OutputEvaluator`. |
+| `self_check` | `list[str] \| None` | Domain-specific verification questions — renders as SELF-VERIFICATION block. |
 | `render(provider="generic")` | `str` | Produces the formatted constraints block. `provider` adjusts `must_not_include` phrasing. |
 
 ---

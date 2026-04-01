@@ -16,6 +16,7 @@ print()
 
 test_results = {"passed": 0, "failed": 0, "errors": []}
 
+
 def test(name, func):
     """Run a test and track results."""
     try:
@@ -30,9 +31,11 @@ def test(name, func):
         print(f"   Error: {str(e)[:200]}")
         return False
 
+
 print("=" * 80)
 print("SCENARIO 1: Data Science Workflow")
 print("=" * 80)
+
 
 def test_data_science_workflow():
     """
@@ -47,7 +50,7 @@ def test_data_science_workflow():
     context = analyzer.build_context(
         data_description="Customer churn data (10K records, 25 features)",
         analysis_goals=["Identify churn drivers", "Predict at-risk customers"],
-        domain="SaaS business"
+        domain="SaaS business",
     )
 
     # Step 2: Evaluate quality
@@ -63,11 +66,13 @@ def test_data_science_workflow():
     assert all([json_format, markdown, messages])
     print("   Complete workflow: analysis -> quality check -> multi-format export")
 
+
 test("Data science workflow", test_data_science_workflow)
 
 print("\n" + "=" * 80)
 print("SCENARIO 2: Business Decision Making")
 print("=" * 80)
+
 
 def test_business_decision():
     """
@@ -83,7 +88,7 @@ def test_business_decision():
         decision="Select cloud infrastructure provider",
         options=["AWS", "Google Cloud", "Azure"],
         criteria=["Cost", "Performance", "Ease of use", "Team expertise"],
-        constraints=["Must support Kubernetes", "Budget: $50K/month"]
+        constraints=["Must support Kubernetes", "Budget: $50K/month"],
     )
 
     # Verify quality
@@ -98,11 +103,13 @@ def test_business_decision():
     assert len(markdown) > 500
     print("   Complete workflow: decision framework -> quality check -> team export")
 
+
 test("Business decision workflow", test_business_decision)
 
 print("\n" + "=" * 80)
 print("SCENARIO 3: Automatic Pattern Selection")
 print("=" * 80)
+
 
 def test_auto_pattern_selection():
     """
@@ -117,7 +124,7 @@ def test_auto_pattern_selection():
         "What causes high latency in distributed systems?",
         "Should we refactor or rewrite the legacy code?",
         "How do microservices compare to monoliths?",
-        "The API response time has increased"
+        "The API response time has increased",
     ]
 
     for question in test_cases:
@@ -128,11 +135,13 @@ def test_auto_pattern_selection():
 
     print(f"   Auto-selected patterns for {len(test_cases)} diverse questions")
 
+
 test("Automatic pattern selection", test_auto_pattern_selection)
 
 print("\n" + "=" * 80)
 print("SCENARIO 4: Creative Content Generation")
 print("=" * 80)
+
 
 def test_creative_workflow():
     """
@@ -147,31 +156,31 @@ def test_creative_workflow():
     ig = IdeaGenerator()
     ideas = ig.build_context(
         challenge="Launch new AI-powered product",
-        constraints=["B2B SaaS audience", "Budget: $100K"]
+        constraints=["B2B SaaS audience", "Budget: $100K"],
     )
 
     # Phase 2: Brainstorm specifics
     br = Brainstormer()
     details = br.build_context(
-        topic="Product launch campaign channels",
-        constraints=["Digital-first", "3-month timeline"]
+        topic="Product launch campaign channels", constraints=["Digital-first", "3-month timeline"]
     )
 
     # Phase 3: Build narrative
     nb = NarrativeBuilder()
     story = nb.build_context(
-        topic="AI transforms business productivity",
-        audience="Mid-market CTOs"
+        topic="AI transforms business productivity", audience="Mid-market CTOs"
     )
 
     assert all([ideas, details, story])
     print("   Complete workflow: ideas -> brainstorm -> narrative")
+
 
 test("Creative content workflow", test_creative_workflow)
 
 print("\n" + "=" * 80)
 print("SCENARIO 5: Technical Code Review")
 print("=" * 80)
+
 
 def test_code_review_workflow():
     """
@@ -183,13 +192,13 @@ def test_code_review_workflow():
 
     # Code reviewers work differently - they use execute() not build_context()
     # So let's just create a manual review context
-    code = '''
+    code = """
 def calculate_total(items):
     total = 0
     for item in items:
         total += item['price'] * item['quantity']
     return total
-'''
+"""
 
     context = Context(
         guidance=Guidance(
@@ -197,10 +206,10 @@ def calculate_total(items):
             rules=[
                 "Identify concrete, actionable issues",
                 "Prioritize security vulnerabilities",
-                "Provide specific code examples for fixes"
-            ]
+                "Provide specific code examples for fixes",
+            ],
         ),
-        directive=f"Review this Python code for security and performance:\n{code}"
+        directive=f"Review this Python code for security and performance:\n{code}",
     )
 
     # Ensure comprehensive review
@@ -208,14 +217,17 @@ def calculate_total(items):
     score = metrics.evaluate(context)
 
     from mycontext.intelligence import QualityDimension
+
     assert score.dimensions[QualityDimension.COMPLETENESS] > 0.3
     print("   Complete workflow: manual code review context -> quality validation")
+
 
 test("Code review workflow", test_code_review_workflow)
 
 print("\n" + "=" * 80)
 print("SCENARIO 6: Risk Assessment & Mitigation")
 print("=" * 80)
+
 
 def test_risk_workflow():
     """
@@ -233,14 +245,13 @@ def test_risk_workflow():
     risks = ra.build_context(
         decision="Migrating 100TB production database to new platform",
         context="Zero downtime required, 1000+ concurrent users",
-        depth="comprehensive"
+        depth="comprehensive",
     )
 
     # Phase 2: Mitigation strategies
     rm = RiskMitigator()
     mitigation = rm.build_context(
-        risk="Data loss during migration",
-        context="Cannot pause operations"
+        risk="Data loss during migration", context="Cannot pause operations"
     )
 
     # Phase 3: Impact assessment
@@ -248,17 +259,19 @@ def test_risk_workflow():
     impact = ia.build_context(
         action="Database migration to new platform",
         context="Enterprise-wide deployment",
-        depth="comprehensive"
+        depth="comprehensive",
     )
 
     assert all([risks, mitigation, impact])
     print("   Complete workflow: risk assessment -> mitigation -> impact analysis")
+
 
 test("Risk management workflow", test_risk_workflow)
 
 print("\n" + "=" * 80)
 print("SCENARIO 7: Multi-Format Export Chain")
 print("=" * 80)
+
 
 def test_export_chain():
     """
@@ -268,10 +281,7 @@ def test_export_chain():
     from mycontext.templates.free.analysis import QuestionAnalyzer
 
     qa = QuestionAnalyzer()
-    context = qa.build_context(
-        question="How to optimize database queries?",
-        depth="comprehensive"
-    )
+    context = qa.build_context(question="How to optimize database queries?", depth="comprehensive")
 
     # Export to all formats
     exports = {
@@ -295,11 +305,13 @@ def test_export_chain():
 
     print(f"   Exported to {len(exports)} different formats successfully")
 
+
 test("Multi-format export chain", test_export_chain)
 
 print("\n" + "=" * 80)
 print("SCENARIO 8: Quality Improvement Iteration")
 print("=" * 80)
+
 
 def test_quality_iteration():
     """
@@ -317,11 +329,8 @@ def test_quality_iteration():
 
     # Version 2: Enhanced
     v2 = Context(
-        guidance=Guidance(
-            role="Expert Data Engineer",
-            rules=["Focus on scalability"]
-        ),
-        directive="Optimize pipeline"
+        guidance=Guidance(role="Expert Data Engineer", rules=["Focus on scalability"]),
+        directive="Optimize pipeline",
     )
     score2 = metrics.evaluate(v2)
 
@@ -332,26 +341,30 @@ def test_quality_iteration():
             rules=[
                 "Focus on scalability and performance",
                 "Consider cost optimization",
-                "Ensure data quality"
+                "Ensure data quality",
             ],
-            knowledge=["Apache Spark", "Kafka", "AWS"]
+            knowledge=["Apache Spark", "Kafka", "AWS"],
         ),
         directive=Directive(
             content="Optimize data pipeline to handle 10M events/day with <100ms latency",
-            priority=10
-        )
+            priority=10,
+        ),
     )
     score3 = metrics.evaluate(v3)
 
     # Verify progressive improvement
     assert score3.overall > score2.overall > score1.overall
-    print(f"   Quality progression: {score1.overall:.2f} -> {score2.overall:.2f} -> {score3.overall:.2f}")
+    print(
+        f"   Quality progression: {score1.overall:.2f} -> {score2.overall:.2f} -> {score3.overall:.2f}"
+    )
+
 
 test("Quality improvement iteration", test_quality_iteration)
 
 print("\n" + "=" * 80)
 print("SCENARIO 9: Complex Problem Decomposition")
 print("=" * 80)
+
 
 def test_problem_decomposition():
     """
@@ -368,31 +381,33 @@ def test_problem_decomposition():
     pd = ProblemDecomposer()
     breakdown = pd.build_context(
         problem="Build real-time analytics dashboard for 1M+ users",
-        context=["Global user base", "Sub-second latency required"]
+        context=["Global user base", "Sub-second latency required"],
     )
 
     # Step 2: Map dependencies
     dm = DependencyMapper()
     deps = dm.build_context(
         system="Analytics dashboard",
-        components=["Data ingestion", "Processing", "Storage", "Visualization"]
+        components=["Data ingestion", "Processing", "Storage", "Visualization"],
     )
 
     # Step 3: Optimize constraints
     co = ConstraintOptimizer()
     optimized = co.build_context(
         problem="Dashboard performance",
-        constraints=["Budget: $10K/month", "Latency: <1s", "Availability: 99.9%"]
+        constraints=["Budget: $10K/month", "Latency: <1s", "Availability: 99.9%"],
     )
 
     assert all([breakdown, deps, optimized])
     print("   Complete workflow: decompose -> map deps -> optimize")
+
 
 test("Complex problem decomposition", test_problem_decomposition)
 
 print("\n" + "=" * 80)
 print("SCENARIO 10: End-to-End Production Pipeline")
 print("=" * 80)
+
 
 def test_production_pipeline():
     """
@@ -407,7 +422,7 @@ def test_production_pipeline():
     context = qa.build_context(
         question="How do we scale our authentication system?",
         depth="comprehensive",
-        domain="Backend architecture"
+        domain="Backend architecture",
     )
 
     # Step 2: Quality check
@@ -432,6 +447,7 @@ def test_production_pipeline():
     assert len(report) > 100
 
     print("   Full pipeline: analyze -> quality check -> optimize -> export -> report")
+
 
 test("End-to-end production pipeline", test_production_pipeline)
 

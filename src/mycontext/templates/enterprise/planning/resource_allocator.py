@@ -5,7 +5,6 @@ Systematic resource allocation using optimization frameworks.
 Based on resource management and allocation optimization.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class ResourceAllocator(Pattern):
     """
     Allocate resources optimally across competing needs.
-    
+
     Optimizes:
     - Budget allocation
     - Time allocation
     - People allocation
     - Asset distribution
-    
+
     Based on: Resource allocation optimization theory
-    
+
     Example:
         >>> allocator = ResourceAllocator()
         >>> context = allocator.build_context(
         ...     resources={"budget": 100000, "people": 5},
         ...     needs=["Feature A", "Feature B", "Feature C"]
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class ResourceAllocator(Pattern):
                     "Consider constraints",
                     "Balance short and long-term",
                     "Account for dependencies",
-                    "Enable measurement"
+                    "Enable measurement",
                 ],
-                style="analytical, strategic, pragmatic"
+                style="analytical, strategic, pragmatic",
             ),
             directive_template="""Allocate resources optimally:
 
@@ -118,12 +117,12 @@ Resource allocation optimization:
                 "resources_section": str,
                 "needs_section": str,
                 "context_section": str,
-                "goal": str
+                "goal": str,
             },
             constraints=Constraints(
                 must_include=["allocation_table", "roi_analysis"],
-                style_guide="Be objective and data-driven"
-            )
+                style_guide="Be objective and data-driven",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -145,8 +144,8 @@ Resource allocation optimization:
             return "1. [Define needs]"
         if isinstance(needs, str):
             parts = [t.strip() for t in needs.replace("\n", ",").split(",") if t.strip()]
-            return "\n".join(f"{i+1}. {need}" for i, need in enumerate(parts))
-        return "\n".join(f"{i+1}. {need}" for i, need in enumerate(needs))
+            return "\n".join(f"{i + 1}. {need}" for i, need in enumerate(parts))
+        return "\n".join(f"{i + 1}. {need}" for i, need in enumerate(needs))
 
     def build_context(
         self,
@@ -154,7 +153,7 @@ Resource allocation optimization:
         needs: list[str] | None = None,
         goal: str = "Maximize ROI",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         resources_section = self._render_resources_section(resources)
         needs_section = self._render_needs_section(needs)
@@ -165,7 +164,7 @@ Resource allocation optimization:
             needs_section=needs_section,
             goal=goal,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -175,7 +174,7 @@ Resource allocation optimization:
         needs: list[str] | None = None,
         goal: str = "Maximize ROI",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
             provider=provider,
@@ -183,5 +182,5 @@ Resource allocation optimization:
             needs=needs,
             goal=goal,
             context=context,
-            **kwargs
+            **kwargs,
         )

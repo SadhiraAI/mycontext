@@ -5,7 +5,6 @@ Creates cohesive syntheses from diverse information sources.
 Based on synthesis methodology and information integration.
 """
 
-
 from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
 from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
@@ -14,22 +13,22 @@ from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_d
 class SynthesisBuilder(Pattern):
     """
     Build comprehensive syntheses.
-    
+
     Synthesizes:
     - Multiple sources
     - Diverse perspectives
     - Complementary insights
     - Unified understanding
-    
+
     Based on: Synthesis methodology and knowledge integration
-    
+
     Example:
         >>> builder = SynthesisBuilder()
         >>> context = builder.build_context(
         ...     sources=["Research paper A", "Industry report B", "Expert interview C"],
         ...     goal="Unified view of AI trends"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -70,9 +69,9 @@ class SynthesisBuilder(Pattern):
                     "Find complementary insights",
                     "Resolve contradictions",
                     "Build coherent narrative",
-                    "Add meta-insights"
+                    "Add meta-insights",
                 ],
-                style="integrative, insightful, comprehensive"
+                style="integrative, insightful, comprehensive",
             ),
             directive_template="""Synthesize information from:
 
@@ -136,15 +135,11 @@ Synthesis process:
    - Limitations: [What's not captured]
 
 **OUTPUT FORMAT**: Coherent synthesis with integrated understanding.""",
-            input_schema={
-                "sources_section": str,
-                "goal": str,
-                "context_section": str
-            },
+            input_schema={"sources_section": str, "goal": str, "context_section": str},
             constraints=Constraints(
                 must_include=["themes", "synthesis_narrative", "meta_insights"],
-                style_guide="Be integrative and insightful"
-            )
+                style_guide="Be integrative and insightful",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -154,7 +149,7 @@ Synthesis process:
 
     def _render_sources_section(self, sources: list[str] | None) -> str:
         if sources:
-            return "\n".join(f"{i+1}. {source}" for i, source in enumerate(sources))
+            return "\n".join(f"{i + 1}. {source}" for i, source in enumerate(sources))
         return "1. [Define sources]"
 
     def build_context(
@@ -194,6 +189,27 @@ Synthesis process:
         if fmt and ctx.directive:
             ctx.directive = Directive(content=ctx.directive.content + fmt)
             ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Does my synthesis contain insights not present in any single source?",
+                "Did I note contradictions between sources rather than silently favoring one?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Synthesize: Source A says remote work increases productivity; Source B says it decreases collaboration",
+                    "output": (
+                        "SYNTHESIS: Remote work increases individual output on focused tasks (Source A: 13% gain "
+                        "in a Stanford study) but reduces spontaneous cross-team collaboration (Source B: 20% fewer "
+                        "ad-hoc conversations per Slack data). These are not contradictory — they measure different things.\n"
+                        "EMERGENT INSIGHT: The net effect depends on the ratio of focused vs collaborative work "
+                        "in a role. Engineering (high focus) benefits more than product management (high collaboration).\n"
+                        "TENSION: Neither source accounts for hybrid models, which may capture both benefits."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -217,9 +233,16 @@ Synthesis process:
                 | ``"narrative"`` | ``"brief"`` | ``"table"`` | ``"json"``
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(

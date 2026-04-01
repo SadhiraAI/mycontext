@@ -5,9 +5,9 @@ Monitor thinking process and detect comprehension errors.
 Enables "thinking about thinking" - critical for learning and self-improvement.
 
 Research Foundation:
-- Flavell, J. H. (1979). Metacognition and cognitive monitoring: A new area of 
+- Flavell, J. H. (1979). Metacognition and cognitive monitoring: A new area of
   cognitive–developmental inquiry. American Psychologist, 34(10), 906-911.
-- Schraw, G., & Dennison, R. S. (1994). Assessing metacognitive awareness. 
+- Schraw, G., & Dennison, R. S. (1994). Assessing metacognitive awareness.
   Contemporary Educational Psychology, 19(4), 460-475.
 - Dunlosky, J., & Metcalfe, J. (2009). Metacognition. Sage Publications.
 
@@ -20,29 +20,29 @@ from mycontext import Constraints, Guidance, Pattern
 class MetacognitiveMonitor(Pattern):
     """
     Monitor thinking process and detect comprehension errors.
-    
+
     Enables systematic self-monitoring across 5 dimensions:
     1. Comprehension Check: Do I understand what I'm trying to achieve?
     2. Strategy Evaluation: Is my current approach working?
     3. Error Detection: Have I made mistakes or wrong assumptions?
     4. Progress Assessment: How much have I accomplished?
     5. Adjustment Planning: What should I do differently?
-    
+
     Use Cases:
     - Learning new skills or concepts
     - Debugging complex problems
     - Self-directed study
     - Performance improvement
     - Tutoring systems
-    
+
     Research Foundation:
     Flavell (1979) established that effective learners actively monitor their
     comprehension and adjust strategies. Schraw & Dennison (1994) identified
     key metacognitive processes that distinguish experts from novices.
-    
+
     Example:
         >>> from mycontext.templates.enterprise.metacognition import MetacognitiveMonitor
-        >>> 
+        >>>
         >>> monitor = MetacognitiveMonitor()
         >>> result = monitor.execute(
         ...     provider="gemini",
@@ -50,7 +50,7 @@ class MetacognitiveMonitor(Pattern):
         ...     current_approach="Reading tutorials",
         ...     progress_so_far="Completed 3 chapters"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -81,11 +81,7 @@ class MetacognitiveMonitor(Pattern):
             description="Monitor thinking process and detect comprehension errors",
             version="1.0.0",
             tags=["metacognition", "enterprise", "self-regulation", "learning"],
-            metadata={
-                "category": "metacognition",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "metacognition", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Metacognitive Coach and Learning Scientist",
                 rules=[
@@ -93,9 +89,9 @@ class MetacognitiveMonitor(Pattern):
                     "Be brutally honest about comprehension gaps and mistakes",
                     "Focus on metacognitive awareness (HOW you're thinking), not just task execution",
                     "Provide specific, actionable adjustments with clear reasoning",
-                    "Use evidence-based metacognitive frameworks (Flavell 1979, Schraw & Dennison 1994)"
+                    "Use evidence-based metacognitive frameworks (Flavell 1979, Schraw & Dennison 1994)",
                 ],
-                style="analytical, honest, constructive, evidence-based, systematic"
+                style="analytical, honest, constructive, evidence-based, systematic",
             ),
             directive_template="""**METACOGNITIVE MONITORING ANALYSIS**
 
@@ -206,7 +202,7 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
                 "task_description": str,
                 "current_approach": str,
                 "progress_so_far": str,
-                "challenges_section": str  # Will be auto-generated from challenges
+                "challenges_section": str,  # Will be auto-generated from challenges
             },
             constraints=Constraints(
                 must_include=[
@@ -214,14 +210,11 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
                     "strategy_assessment",
                     "errors_detected",
                     "progress_evaluation",
-                    "recommended_adjustments"
+                    "recommended_adjustments",
                 ],
-                must_not_include=[
-                    "vague_advice",
-                    "generic_encouragement"
-                ],
-                style_guide="Use structured format with clear sections, specific evidence, and actionable recommendations. Be brutally honest about gaps and mistakes."
-            )
+                must_not_include=["vague_advice", "generic_encouragement"],
+                style_guide="Use structured format with clear sections, specific evidence, and actionable recommendations. Be brutally honest about gaps and mistakes.",
+            ),
         )
 
     def _render_challenges_section(self, challenges):
@@ -230,17 +223,19 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
             return f"\n**CHALLENGES ENCOUNTERED**: {challenges}\n"
         return ""
 
-    def build_context(self, task_description="", current_approach="", progress_so_far="", challenges="", **kwargs):
+    def build_context(
+        self, task_description="", current_approach="", progress_so_far="", challenges="", **kwargs
+    ):
         """
         Build context for metacognitive monitoring (without executing).
-        
+
         Args:
             task_description: The cognitive task being performed
             current_approach: Current thinking/strategy being used
             progress_so_far: What has been accomplished/understood
             challenges: Optional difficulties or confusions (will be formatted)
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for export/use
         """
@@ -248,8 +243,8 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
         challenges_section = self._render_challenges_section(challenges)
 
         # Remove challenges from kwargs if present to avoid duplicate
-        kwargs.pop('challenges', None)
-        kwargs.pop('challenges_section', None)
+        kwargs.pop("challenges", None)
+        kwargs.pop("challenges_section", None)
 
         # Build context using parent's method with template variables
         return super().build_context(
@@ -257,13 +252,21 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
             current_approach=current_approach,
             progress_so_far=progress_so_far,
             challenges_section=challenges_section,
-            **kwargs
+            **kwargs,
         )
 
-    def execute(self, provider="gemini", task_description="", current_approach="", progress_so_far="", challenges="", **kwargs):
+    def execute(
+        self,
+        provider="gemini",
+        task_description="",
+        current_approach="",
+        progress_so_far="",
+        challenges="",
+        **kwargs,
+    ):
         """
         Execute metacognitive monitoring.
-        
+
         Args:
             provider: LLM provider to use ("gemini", "openai", "anthropic")
             task_description: The cognitive task being performed
@@ -271,7 +274,7 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
             progress_so_far: What has been accomplished/understood
             challenges: Optional difficulties or confusions
             **kwargs: Additional provider options (temperature, max_tokens, etc.)
-        
+
         Returns:
             ProviderResponse with the metacognitive analysis
         """
@@ -279,8 +282,8 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
         challenges_section = self._render_challenges_section(challenges)
 
         # Remove challenges from kwargs if present to avoid duplicate
-        kwargs.pop('challenges', None)
-        kwargs.pop('challenges_section', None)
+        kwargs.pop("challenges", None)
+        kwargs.pop("challenges_section", None)
 
         # Execute using parent's method
         return super().execute(
@@ -289,7 +292,7 @@ Conduct a systematic metacognitive analysis across all 5 dimensions:
             current_approach=current_approach,
             progress_so_far=progress_so_far,
             challenges_section=challenges_section,
-            **kwargs
+            **kwargs,
         )
 
 

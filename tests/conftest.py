@@ -1,6 +1,7 @@
 """
 Test configuration and fixtures
 """
+
 import os
 
 import pytest
@@ -28,19 +29,8 @@ def sample_context():
 def mock_openai_response():
     """Mock OpenAI API response"""
     return {
-        "choices": [
-            {
-                "message": {
-                    "role": "assistant",
-                    "content": "This is a test response."
-                }
-            }
-        ],
-        "usage": {
-            "prompt_tokens": 100,
-            "completion_tokens": 50,
-            "total_tokens": 150
-        }
+        "choices": [{"message": {"role": "assistant", "content": "This is a test response."}}],
+        "usage": {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150},
     }
 
 

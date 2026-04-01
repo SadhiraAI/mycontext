@@ -18,29 +18,29 @@ from mycontext import Constraints, Guidance, Pattern
 class HolisticIntegrator(Pattern):
     """
     Integrate multiple perspectives into coherent whole.
-    
+
     Integration Levels:
     - Data integration (combine information)
     - Conceptual integration (unify frameworks)
     - Perspective integration (multiple viewpoints)
     - System integration (see whole system)
-    
+
     Use Cases:
     - Strategic planning
     - Research synthesis
     - Decision-making
     - System understanding
-    
+
     Example:
         >>> from mycontext.templates.enterprise.synthesis import HolisticIntegrator
-        >>> 
+        >>>
         >>> pattern = HolisticIntegrator()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     topic="Company digital transformation",
         ...     perspectives="Technical, Business, Cultural, Customer"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -67,11 +67,7 @@ class HolisticIntegrator(Pattern):
             description="Integrate multiple perspectives into coherent whole",
             version="1.0.0",
             tags=["synthesis", "enterprise", "integration", "holistic"],
-            metadata={
-                "category": "synthesis",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "synthesis", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Holistic Systems Integrator",
                 rules=[
@@ -79,9 +75,9 @@ class HolisticIntegrator(Pattern):
                     "Find connections between disparate elements",
                     "Balance detail with big picture",
                     "Identify emergent properties of the whole",
-                    "Create coherent unified understanding"
+                    "Create coherent unified understanding",
                 ],
-                style="integrative, comprehensive, balanced, systems-oriented"
+                style="integrative, comprehensive, balanced, systems-oriented",
             ),
             directive_template="""**HOLISTIC INTEGRATION**
 
@@ -432,41 +428,26 @@ class HolisticIntegrator(Pattern):
 **Next steps**: [Immediate actions]
 
 **Long-term vision**: [Where holistic approach leads]""",
-            input_schema={
-                "topic": str,
-                "perspectives": str
-            },
+            input_schema={"topic": str, "perspectives": str},
             constraints=Constraints(
                 must_include=[
                     "multiple_perspectives",
                     "cross_perspective_connections",
                     "emergent_insights",
-                    "integrated_strategy"
+                    "integrated_strategy",
                 ],
-                must_not_include=[
-                    "single_perspective_bias",
-                    "superficial_integration"
-                ],
-                style_guide="Comprehensive and balanced. Multiple perspectives. Emergent insights. Coherent synthesis."
-            )
+                must_not_include=["single_perspective_bias", "superficial_integration"],
+                style_guide="Comprehensive and balanced. Multiple perspectives. Emergent insights. Coherent synthesis.",
+            ),
         )
 
     def build_context(self, topic="", perspectives="", **kwargs):
         """Build context for holistic integration."""
-        return super().build_context(
-            topic=topic,
-            perspectives=perspectives,
-            **kwargs
-        )
+        return super().build_context(topic=topic, perspectives=perspectives, **kwargs)
 
     def execute(self, provider="openai", topic="", perspectives="", **kwargs):
         """Execute holistic integration."""
-        return super().execute(
-            provider=provider,
-            topic=topic,
-            perspectives=perspectives,
-            **kwargs
-        )
+        return super().execute(provider=provider, topic=topic, perspectives=perspectives, **kwargs)
 
 
 __all__ = ["HolisticIntegrator"]

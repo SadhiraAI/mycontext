@@ -88,7 +88,7 @@ class OptimizedGuidance:
     optimized_guidance: Guidance
 
     before_score: float  # rule_strength_score before
-    after_score: float   # rule_strength_score after
+    after_score: float  # rule_strength_score after
     score_delta: float
 
     audit: GuidanceAuditResult
@@ -109,15 +109,13 @@ class OptimizedGuidance:
         else:
             lines.append("\nWEAK RULES DETECTED:")
             for i, ra in enumerate(self.audit.weak_rules, 1):
-                lines.append(f"\n  [{i}] \"{ra.original}\"")
+                lines.append(f'\n  [{i}] "{ra.original}"')
                 for issue in ra.issues:
                     lines.append(f"      Issue: {_issue_label(issue)}")
                 if ra.rewritten:
-                    lines.append(f"      Fix:   \"{ra.rewritten}\"")
+                    lines.append(f'      Fix:   "{ra.rewritten}"')
 
-        lines.append(
-            f"\nRule strength score: {self.before_score:.0%} → {self.after_score:.0%}"
-        )
+        lines.append(f"\nRule strength score: {self.before_score:.0%} → {self.after_score:.0%}")
         lines.append("──────────────────────────────────────────────────────────")
         return "\n".join(lines)
 
@@ -261,8 +259,7 @@ class GuidanceOptimizer:
                 score_delta=0.0,
                 audit=audit,
                 rule_diffs=[
-                    RuleAudit(original=r, issues=[], action="kept")
-                    for r in (guidance.rules or [])
+                    RuleAudit(original=r, issues=[], action="kept") for r in (guidance.rules or [])
                 ],
                 metadata={"mode": "no_change", "reason": "no weak rules detected"},
             )
@@ -334,8 +331,12 @@ class GuidanceOptimizer:
                 binding_count += 1
 
         generic_roles = {
-            "assistant", "expert assistant", "helpful assistant",
-            "ai assistant", "analyst", "expert",
+            "assistant",
+            "expert assistant",
+            "helpful assistant",
+            "ai assistant",
+            "analyst",
+            "expert",
         }
         role_is_generic = guidance.role.lower().strip() in generic_roles
 
@@ -467,7 +468,8 @@ Return ONLY this JSON — keys are the original rules, values are the rewritten 
             return json.loads(raw)
         except Exception as exc:
             logger.warning(
-                "GuidanceOptimizer LLM rewrite failed: %s — returning originals", exc,
+                "GuidanceOptimizer LLM rewrite failed: %s — returning originals",
+                exc,
                 exc_info=True,
             )
             return {}

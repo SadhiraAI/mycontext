@@ -49,6 +49,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import instructor as _instructor
+
     _INSTRUCTOR_AVAILABLE = True
 except ImportError:
     _instructor = None  # type: ignore[assignment]
@@ -64,8 +65,10 @@ except ImportError:
 # Schema 1: Pattern suggestion response
 # ---------------------------------------------------------------------------
 
+
 class PatternSelection(BaseModel):
     """A single pattern selected by the LLM with its justification."""
+
     name: str = Field(description="Exact snake_case pattern name from the catalog")
     reason: str = Field(description="1-2 sentences explaining why this pattern is needed")
 
@@ -77,6 +80,7 @@ class PatternSelection(BaseModel):
 
 class PatternSuggestionResponse(BaseModel):
     """Structured output for _suggest_with_llm."""
+
     selections: list[PatternSelection] = Field(
         description="Ordered list of selected patterns (2-4, pipeline order)",
         min_length=1,
@@ -91,6 +95,7 @@ class PatternSuggestionResponse(BaseModel):
     @classmethod
     def validate_pattern_names(cls, v: list[PatternSelection]) -> list[PatternSelection]:
         from .pattern_catalog import VALID_PATTERN_NAMES
+
         valid = [s for s in v if s.name in VALID_PATTERN_NAMES]
         if not valid and v:
             # All names unknown — still return them so caller can decide
@@ -106,8 +111,10 @@ class PatternSuggestionResponse(BaseModel):
 # Schema 2: Template integration response
 # ---------------------------------------------------------------------------
 
+
 class IntegrationResponse(BaseModel):
     """Structured output for TemplateIntegratorAgent._parse_result."""
+
     role: str = Field(default="", description="Unified role for the integrated context")
     rules: list[str] = Field(
         default_factory=list,
@@ -131,8 +138,10 @@ class IntegrationResponse(BaseModel):
 # Schema 3: Route suggestion response (suggest_routes)
 # ---------------------------------------------------------------------------
 
+
 class RouteStep(BaseModel):
     """One agent/step in an analysis route's pipeline."""
+
     template: str = Field(description="Template name from catalog (exact snake_case)")
     agent_role: str = Field(description="Plain-English role, e.g. 'Question Decomposition Analyst'")
     receives: str = Field(description="'user_input' or 'output from {previous_template}'")
@@ -150,10 +159,11 @@ class RouteStep(BaseModel):
 
 class AnalysisRoute(BaseModel):
     """One differentiated analysis path through the template catalog."""
+
     label: str = Field(description="Human-readable route name, e.g. 'Diagnostic Deep-Dive'")
     dimension: str = Field(
         description="Analytical dimension: diagnostic, predictive, strategic, risk, "
-                    "communication, evaluation, creative, ethical",
+        "communication, evaluation, creative, ethical",
     )
     rationale: str = Field(description="Why this angle matters for the specific question")
     steps: list[RouteStep] = Field(
@@ -166,6 +176,7 @@ class AnalysisRoute(BaseModel):
 
 class RouteAnalysis(BaseModel):
     """Complete multi-route analysis of a question."""
+
     question_decomposition: str = Field(
         description="Analysis of the question's dimensions, stakeholders, timeframes, and scope",
     )
@@ -182,6 +193,7 @@ class RouteAnalysis(BaseModel):
     @classmethod
     def validate_route_templates(cls, v: list[AnalysisRoute]) -> list[AnalysisRoute]:
         from .pattern_catalog import VALID_PATTERN_NAMES
+
         cleaned: list[AnalysisRoute] = []
         for route in v:
             valid_steps = [s for s in route.steps if s.template in VALID_PATTERN_NAMES]
@@ -201,6 +213,7 @@ class RouteAnalysis(BaseModel):
 # Schema 4: Context generator spec
 # ---------------------------------------------------------------------------
 
+
 class ExamplePair(BaseModel):
     input: str
     output: str
@@ -213,6 +226,7 @@ class OutputField(BaseModel):
 
 class ContextSpec(BaseModel):
     """Structured output for generate_context (context_generator.py)."""
+
     rules: list[str] = Field(
         default_factory=list,
         description="3-5 concrete behavioral rules",
@@ -274,6 +288,7 @@ class ContextSpec(BaseModel):
 # Parsing helpers
 # ---------------------------------------------------------------------------
 
+
 def _extract_json_block(text: str) -> str:
     """Strip markdown fences and extract the outermost JSON object."""
     text = text.strip()
@@ -287,7 +302,7 @@ def _extract_json_block(text: str) -> str:
         pass
     start, end = text.find("{"), text.rfind("}")
     if start != -1 and end > start:
-        return text[start: end + 1]
+        return text[start : end + 1]
     return text
 
 
@@ -319,6 +334,7 @@ def get_instructor_client(provider_instance: Any) -> Any | None:
         return None
     try:
         import litellm
+
         client = _instructor.from_litellm(litellm.completion)
         return client
     except Exception as exc:

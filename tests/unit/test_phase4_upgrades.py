@@ -46,9 +46,11 @@ from mycontext.utils.tracing import Span, Tracer, get_tracer
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_provider():
     from mycontext.providers.litellm_provider import LiteLLMProvider
     from mycontext.utils.semantic_cache import reset_default_cache
+
     reset_default_cache()
     p = LiteLLMProvider.__new__(LiteLLMProvider)
     p._provider = "openai"
@@ -73,10 +75,11 @@ def _mock_litellm_response(text: str = "ok"):
 # Token-aware to_prompt() truncation
 # ---------------------------------------------------------------------------
 
-class TestTokenTrim:
 
+class TestTokenTrim:
     def test_short_text_passes_through_unchanged(self):
         from mycontext import Context
+
         ctx = Context("system")
         text = "Short text."
         result = Context._token_trim(text, max_tokens=1000, model="gpt-4o")
@@ -84,20 +87,24 @@ class TestTokenTrim:
 
     def test_long_text_is_trimmed(self):
         from mycontext import Context
+
         # 500 words × ~1.3 tokens ≈ 650 tokens; trim to 50
         long_text = " ".join([f"word{i}" for i in range(500)])
         result = Context._token_trim(long_text, max_tokens=50, model="gpt-4o")
         from mycontext.utils.tokens import count_tokens
+
         assert count_tokens(result, "gpt-4o") <= 50
 
     def test_trimmed_text_starts_from_beginning(self):
         from mycontext import Context
+
         text = "FIRST_WORD " + " ".join([f"filler{i}" for i in range(300)])
         result = Context._token_trim(text, max_tokens=5, model="gpt-4o")
         assert result.startswith("FIRST")
 
     def test_fallback_without_tiktoken(self):
         from mycontext import Context
+
         text = "A" * 5000
         with patch("tiktoken.encoding_for_model", side_effect=Exception("no tiktoken")):
             with patch("tiktoken.get_encoding", side_effect=Exception("no tiktoken")):
@@ -109,6 +116,7 @@ class TestTokenTrim:
         """Zero-cost mode should never truncate anything."""
         from mycontext import Context
         from mycontext.foundation import Directive, Guidance
+
         ctx = Context(
             guidance=Guidance(role="Helper"),
             directive=Directive(content="Do the task."),
@@ -143,6 +151,7 @@ class TestTokenTrim:
 
         # Verify that _token_trim is called via the method path
         from mycontext.utils.tokens import count_tokens
+
         assembled = ctx.assemble()
         trimmed = Context._token_trim(assembled, max_tokens=200, model="gpt-4o-mini")
         assert count_tokens(trimmed, "gpt-4o-mini") <= 200
@@ -152,32 +161,37 @@ class TestTokenTrim:
 # LRU-cache: get_pattern_class
 # ---------------------------------------------------------------------------
 
-class TestGetPatternClassCache:
 
+class TestGetPatternClassCache:
     def test_repeated_calls_return_same_object(self):
         from mycontext.intelligence.pattern_suggester import (
             get_pattern_class,
         )
+
         c1 = get_pattern_class("root_cause_analyzer", include_enterprise=True)
         c2 = get_pattern_class("root_cause_analyzer", include_enterprise=True)
         assert c1 is c2
 
     def test_cached_helper_returns_class(self):
         from mycontext.intelligence.pattern_suggester import _get_pattern_class_cached
+
         klass = _get_pattern_class_cached("root_cause_analyzer")
         assert klass is not None
 
     def test_unknown_pattern_returns_none(self):
         from mycontext.intelligence.pattern_suggester import get_pattern_class
+
         assert get_pattern_class("nonexistent_xyz") is None
 
     def test_enterprise_gated_pattern_returns_none_when_blocked(self):
         from mycontext.intelligence.pattern_catalog import NAME_TO_CATEGORY
         from mycontext.intelligence.pattern_suggester import get_pattern_class
+
         ent_names = [n for n, c in NAME_TO_CATEGORY.items() if c == "enterprise"]
         if not ent_names:
             pytest.skip("No enterprise patterns registered")
         import warnings
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             result = get_pattern_class(ent_names[0], include_enterprise=False)
@@ -186,6 +200,7 @@ class TestGetPatternClassCache:
 
     def test_cache_is_lru_cache_instance(self):
         from mycontext.intelligence.pattern_suggester import _get_pattern_class_cached
+
         assert hasattr(_get_pattern_class_cached, "cache_info")
 
 
@@ -193,10 +208,11 @@ class TestGetPatternClassCache:
 # LRU-cache: _get_template_detail
 # ---------------------------------------------------------------------------
 
-class TestGetTemplateDetailCache:
 
+class TestGetTemplateDetailCache:
     def test_repeated_calls_return_identical_results(self):
         from mycontext.intelligence.template_integrator_agent import TemplateIntegratorAgent
+
         r1 = TemplateIntegratorAgent._get_template_detail("root_cause_analyzer")
         r2 = TemplateIntegratorAgent._get_template_detail("root_cause_analyzer")
         assert r1 == r2
@@ -204,6 +220,7 @@ class TestGetTemplateDetailCache:
     def test_second_call_is_faster_than_first(self):
         """Cache hit should be sub-millisecond."""
         from mycontext.intelligence.template_integrator_agent import TemplateIntegratorAgent
+
         # Clear LRU cache to ensure cold start
         TemplateIntegratorAgent._get_template_detail.cache_clear()
 
@@ -222,10 +239,12 @@ class TestGetTemplateDetailCache:
 
     def test_cache_info_attribute_exists(self):
         from mycontext.intelligence.template_integrator_agent import TemplateIntegratorAgent
+
         assert hasattr(TemplateIntegratorAgent._get_template_detail, "cache_info")
 
     def test_unknown_template_returns_empty_string(self):
         from mycontext.intelligence.template_integrator_agent import TemplateIntegratorAgent
+
         result = TemplateIntegratorAgent._get_template_detail("totally_nonexistent_xyz")
         assert result == ""
 
@@ -234,8 +253,8 @@ class TestGetTemplateDetailCache:
 # ExecutionTrace: Span and Tracer
 # ---------------------------------------------------------------------------
 
-class TestSpan:
 
+class TestSpan:
     def test_span_fields_populated(self):
         s = Span(name="test_span", trace_id="abc123")
         assert s.name == "test_span"
@@ -273,7 +292,6 @@ class TestSpan:
 
 
 class TestTracer:
-
     def setup_method(self):
         self.tracer = Tracer(max_spans=50)
 
@@ -321,11 +339,13 @@ class TestTracer:
 
     def test_log_summary_no_spans_no_raise(self, caplog):
         import logging
+
         with caplog.at_level(logging.INFO):
             self.tracer.log_summary()  # should not raise
 
     def test_log_summary_logs_span_count(self, caplog):
         import logging
+
         with self.tracer.span("op1"):
             pass
         with self.tracer.span("op2"):
@@ -358,6 +378,7 @@ class TestTracer:
 
     def test_exporter_error_does_not_propagate(self):
         """A broken exporter must not crash the caller."""
+
         def bad_exporter(span):
             raise Exception("exporter crash")
 
@@ -401,11 +422,12 @@ class TestTracer:
 # LiteLLMProvider integration: span emitted on real call
 # ---------------------------------------------------------------------------
 
-class TestLiteLLMProviderTracing:
 
+class TestLiteLLMProviderTracing:
     def setup_method(self):
         from mycontext.utils.semantic_cache import reset_default_cache
         from mycontext.utils.tracing import get_tracer
+
         reset_default_cache()
         get_tracer().clear()
 

@@ -18,30 +18,30 @@ from mycontext import Constraints, Guidance, Pattern
 class SummativeEvaluator(Pattern):
     """
     Design summative evaluation of learning outcomes.
-    
+
     Key Principles:
     - Align with learning objectives
     - Measure what matters
     - Valid and reliable
     - Clear scoring criteria
     - Authentic when possible
-    
+
     Use Cases:
     - Final exams
     - Course-end projects
     - Certification tests
     - Performance assessments
-    
+
     Example:
         >>> from mycontext.templates.enterprise.evaluation import SummativeEvaluator
-        >>> 
+        >>>
         >>> pattern = SummativeEvaluator()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     course_title="Introduction to Data Science",
         ...     learning_outcomes="Apply statistical methods, visualize data, build models"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -74,11 +74,7 @@ class SummativeEvaluator(Pattern):
             description="Design final evaluation of learning outcomes",
             version="1.0.0",
             tags=["evaluation", "enterprise", "summative", "final-assessment"],
-            metadata={
-                "category": "evaluation",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "evaluation", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Summative Assessment Design Expert",
                 rules=[
@@ -86,9 +82,9 @@ class SummativeEvaluator(Pattern):
                     "Use appropriate cognitive levels (Bloom's taxonomy)",
                     "Ensure validity (measures what it claims)",
                     "Ensure reliability (consistent results)",
-                    "Make scoring objective and fair"
+                    "Make scoring objective and fair",
                 ],
-                style="rigorous, comprehensive, fair, objective"
+                style="rigorous, comprehensive, fair, objective",
             ),
             directive_template="""**SUMMATIVE EVALUATION DESIGN**
 
@@ -363,34 +359,31 @@ class SummativeEvaluator(Pattern):
                 "learning_outcomes": str,
                 "outcome_1": str,
                 "outcome_2": str,
-                "outcome_3": str
+                "outcome_3": str,
             },
             constraints=Constraints(
                 must_include=[
                     "alignment_with_outcomes",
                     "blooms_taxonomy",
                     "scoring_rubric",
-                    "validity_reliability"
+                    "validity_reliability",
                 ],
-                must_not_include=[
-                    "misaligned_assessment",
-                    "unclear_criteria"
-                ],
-                style_guide="Rigorous and comprehensive. Aligned with outcomes. Fair and valid. Clear scoring."
-            )
+                must_not_include=["misaligned_assessment", "unclear_criteria"],
+                style_guide="Rigorous and comprehensive. Aligned with outcomes. Fair and valid. Clear scoring.",
+            ),
         )
 
     def build_context(self, course_title="", learning_outcomes="", **kwargs):
         """Build context for summative evaluation design."""
         # Parse learning outcomes into individual outcomes
-        outcomes_list = [o.strip() for o in learning_outcomes.split(',')]
+        outcomes_list = [o.strip() for o in learning_outcomes.split(",")]
         outcome_1 = outcomes_list[0] if len(outcomes_list) > 0 else ""
         outcome_2 = outcomes_list[1] if len(outcomes_list) > 1 else ""
         outcome_3 = outcomes_list[2] if len(outcomes_list) > 2 else ""
 
-        kwargs.pop('outcome_1', None)
-        kwargs.pop('outcome_2', None)
-        kwargs.pop('outcome_3', None)
+        kwargs.pop("outcome_1", None)
+        kwargs.pop("outcome_2", None)
+        kwargs.pop("outcome_3", None)
 
         return super().build_context(
             course_title=course_title,
@@ -398,20 +391,20 @@ class SummativeEvaluator(Pattern):
             outcome_1=outcome_1,
             outcome_2=outcome_2,
             outcome_3=outcome_3,
-            **kwargs
+            **kwargs,
         )
 
     def execute(self, provider="openai", course_title="", learning_outcomes="", **kwargs):
         """Execute summative evaluation design."""
         # Parse learning outcomes
-        outcomes_list = [o.strip() for o in learning_outcomes.split(',')]
+        outcomes_list = [o.strip() for o in learning_outcomes.split(",")]
         outcome_1 = outcomes_list[0] if len(outcomes_list) > 0 else ""
         outcome_2 = outcomes_list[1] if len(outcomes_list) > 1 else ""
         outcome_3 = outcomes_list[2] if len(outcomes_list) > 2 else ""
 
-        kwargs.pop('outcome_1', None)
-        kwargs.pop('outcome_2', None)
-        kwargs.pop('outcome_3', None)
+        kwargs.pop("outcome_1", None)
+        kwargs.pop("outcome_2", None)
+        kwargs.pop("outcome_3", None)
 
         return super().execute(
             provider=provider,
@@ -420,7 +413,7 @@ class SummativeEvaluator(Pattern):
             outcome_1=outcome_1,
             outcome_2=outcome_2,
             outcome_3=outcome_3,
-            **kwargs
+            **kwargs,
         )
 
 

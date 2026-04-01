@@ -5,7 +5,6 @@ Systematic trend detection, analysis, and forecasting.
 Based on time series analysis and pattern recognition research.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class TrendIdentifier(Pattern):
     """
     Identify and analyze trends systematically.
-    
+
     Detects:
     - Directional trends (up/down/stable)
     - Cyclical patterns
     - Emerging trends
     - Trend strength and sustainability
-    
+
     Based on: Time series analysis and trend detection
-    
+
     Example:
         >>> identifier = TrendIdentifier()
         >>> context = identifier.build_context(
         ...     data_description="Monthly user engagement over 2 years",
         ...     domain="product analytics"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -68,9 +67,9 @@ class TrendIdentifier(Pattern):
                     "Quantify trend strength",
                     "Identify inflection points",
                     "Project trends cautiously",
-                    "Consider external factors"
+                    "Consider external factors",
                 ],
-                style="analytical, data-driven, cautious"
+                style="analytical, data-driven, cautious",
             ),
             directive_template="""Identify trends in:
 
@@ -258,17 +257,12 @@ Comprehensive trend analysis:
                 "data_description": str,
                 "context_section": str,
                 "domain": str,
-                "timeframe": str
+                "timeframe": str,
             },
             constraints=Constraints(
-                must_include=[
-                    "trend_direction",
-                    "quantification",
-                    "drivers",
-                    "projection"
-                ],
-                style_guide="Be analytical but not overconfident in projections"
-            )
+                must_include=["trend_direction", "quantification", "drivers", "projection"],
+                style_guide="Be analytical but not overconfident in projections",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -282,7 +276,7 @@ Comprehensive trend analysis:
         domain: str = "general",
         timeframe: str = "past year",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
@@ -291,7 +285,7 @@ Comprehensive trend analysis:
             domain=domain,
             timeframe=timeframe,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -301,7 +295,7 @@ Comprehensive trend analysis:
         domain: str = "general",
         timeframe: str = "past year",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
             provider=provider,
@@ -309,5 +303,5 @@ Comprehensive trend analysis:
             domain=domain,
             timeframe=timeframe,
             context=context,
-            **kwargs
+            **kwargs,
         )

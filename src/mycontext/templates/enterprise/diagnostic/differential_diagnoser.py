@@ -18,30 +18,30 @@ from mycontext import Constraints, Guidance, Pattern
 class DifferentialDiagnoser(Pattern):
     """
     Systematic evaluation of competing diagnostic hypotheses.
-    
+
     Process:
     1. Generate differential (list of possibilities)
     2. Rank by likelihood
     3. Test each hypothesis
     4. Narrow down to most likely
     5. Verify with evidence
-    
+
     Use Cases:
     - Technical troubleshooting
     - Business problem diagnosis
     - Medical diagnosis
     - System debugging
-    
+
     Example:
         >>> from mycontext.templates.enterprise.diagnostic import DifferentialDiagnoser
-        >>> 
+        >>>
         >>> pattern = DifferentialDiagnoser()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     presenting_problem="Website response time increased 10x",
         ...     observed_data="Affects all users, started 3 days ago, no code changes"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -68,11 +68,7 @@ class DifferentialDiagnoser(Pattern):
             description="Medical-style differential diagnosis for any domain",
             version="1.0.0",
             tags=["diagnostic", "enterprise", "differential", "troubleshooting"],
-            metadata={
-                "category": "diagnostic",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "diagnostic", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Diagnostic Reasoning Expert",
                 rules=[
@@ -80,9 +76,9 @@ class DifferentialDiagnoser(Pattern):
                     "Use evidence to rank likelihood",
                     "Test most likely hypotheses first",
                     "Consider zebras but look for horses (common before rare)",
-                    "Verify diagnosis with confirmatory evidence"
+                    "Verify diagnosis with confirmatory evidence",
                 ],
-                style="systematic, evidence-based, methodical, thorough"
+                style="systematic, evidence-based, methodical, thorough",
             ),
             directive_template="""**DIFFERENTIAL DIAGNOSIS**
 
@@ -317,49 +313,44 @@ class DifferentialDiagnoser(Pattern):
 - Gather more data
 
 **Success criteria**: [How to know diagnosis was correct]""",
-            input_schema={
-                "presenting_problem": str,
-                "observed_data": str,
-                "domain_section": str
-            },
+            input_schema={"presenting_problem": str, "observed_data": str, "domain_section": str},
             constraints=Constraints(
                 must_include=[
                     "comprehensive_differential",
                     "hypothesis_ranking",
                     "discriminating_tests",
-                    "primary_diagnosis"
+                    "primary_diagnosis",
                 ],
-                must_not_include=[
-                    "premature_closure",
-                    "single_hypothesis"
-                ],
-                style_guide="Systematic and evidence-based. Multiple hypotheses. Test and verify. Medical-style rigor."
-            )
+                must_not_include=["premature_closure", "single_hypothesis"],
+                style_guide="Systematic and evidence-based. Multiple hypotheses. Test and verify. Medical-style rigor.",
+            ),
         )
 
     def build_context(self, presenting_problem="", observed_data="", domain="", **kwargs):
         """Build context for differential diagnosis."""
         domain_section = f"**DOMAIN**: {domain}" if domain else ""
-        kwargs.pop('domain_section', None)
+        kwargs.pop("domain_section", None)
 
         return super().build_context(
             presenting_problem=presenting_problem,
             observed_data=observed_data,
             domain_section=domain_section,
-            **kwargs
+            **kwargs,
         )
 
-    def execute(self, provider="openai", presenting_problem="", observed_data="", domain="", **kwargs):
+    def execute(
+        self, provider="openai", presenting_problem="", observed_data="", domain="", **kwargs
+    ):
         """Execute differential diagnosis."""
         domain_section = f"**DOMAIN**: {domain}" if domain else ""
-        kwargs.pop('domain_section', None)
+        kwargs.pop("domain_section", None)
 
         return super().execute(
             provider=provider,
             presenting_problem=presenting_problem,
             observed_data=observed_data,
             domain_section=domain_section,
-            **kwargs
+            **kwargs,
         )
 
 

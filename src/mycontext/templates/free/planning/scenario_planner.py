@@ -157,6 +157,7 @@ def _build_directive(mode: str) -> str:
 # Template class
 # ---------------------------------------------------------------------------
 
+
 class ScenarioPlanner(Pattern):
     """
     Plan for multiple possible futures using scenario planning methodology.
@@ -212,6 +213,7 @@ class ScenarioPlanner(Pattern):
             guidance=Guidance(
                 role="Expert Strategic Planner and Scenario Planning Specialist",
                 rules=[
+                    "If the user's framing artificially narrows the scenario space, challenge it before proceeding.",
                     "Create genuinely different scenarios — not just better/worse versions",
                     "Focus on high-uncertainty, high-impact drivers",
                     "Identify robust strategies that work across multiple scenarios",
@@ -268,9 +270,7 @@ class ScenarioPlanner(Pattern):
                 | ``"operational"`` (3 sections — response playbook only)
         """
         if mode not in VALID_MODES:
-            raise ValueError(
-                f"Invalid mode {mode!r}. Choose from: {sorted(VALID_MODES)}"
-            )
+            raise ValueError(f"Invalid mode {mode!r}. Choose from: {sorted(VALID_MODES)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -290,7 +290,8 @@ class ScenarioPlanner(Pattern):
             directive=Directive(content=directive_content),
             constraints=self.constraints,
             data={
-                "situation": situation, "time_horizon": time_horizon,
+                "situation": situation,
+                "time_horizon": time_horizon,
                 "context_section": context_section,
                 "focus_areas_section": focus_areas_section,
             },
@@ -298,6 +299,27 @@ class ScenarioPlanner(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["mode"] = mode
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Do any two scenarios lead to the same decision? If so, they are not distinct.",
+                "Have I included a scenario the user clearly has not considered?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "What happens if our main supplier goes bankrupt in the next 6 months?",
+                    "output": (
+                        "SCENARIO A (Gradual decline): Supplier quality degrades over 3 months before formal bankruptcy. "
+                        "Signal: late deliveries, QC complaints. Action: begin dual-sourcing now.\n"
+                        "SCENARIO B (Sudden shutdown): No warning, inventory stops overnight. "
+                        "Signal: none. Action: maintain 6-week safety stock for critical components.\n"
+                        "SCENARIO C (Acquisition): Supplier is acquired by a competitor who deprioritizes your account. "
+                        "Signal: M&A rumors, new account manager. Action: secure contractual volume guarantees."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -323,9 +345,16 @@ class ScenarioPlanner(Pattern):
             **kwargs: Provider parameters
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(

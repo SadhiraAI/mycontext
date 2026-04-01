@@ -23,6 +23,7 @@ from mycontext.utils.template_safety import safe_format_template
 # Unit tests for safe_format_template
 # ---------------------------------------------------------------------------
 
+
 class TestSafeFormatNormalUsage:
     """Regression tests — existing templates must continue to work."""
 
@@ -90,6 +91,7 @@ Rules:
 # Attack vector tests
 # ---------------------------------------------------------------------------
 
+
 class TestTemplateInjectionBlocked:
     """Every known attack vector must be rejected before formatting."""
 
@@ -129,11 +131,15 @@ class TestTemplateInjectionBlocked:
         assert "environ" in result
         # But no actual dict or module appears (would raise if evaluated)
         # Most importantly: no KeyError or unexpected expansion
-        assert "{" not in result.replace("{{", "").replace("}}", "")  # all braces are escaped in output
+        assert "{" not in result.replace("{{", "").replace(
+            "}}", ""
+        )  # all braces are escaped in output
 
     def test_nested_braces_in_value_escaped(self):
         value_with_braces = "use {this} pattern"
-        result = safe_format_template("Instructions: {instructions}", instructions=value_with_braces)
+        result = safe_format_template(
+            "Instructions: {instructions}", instructions=value_with_braces
+        )
         # The inner braces must appear as literal text, not trigger format
         assert "{this}" in result
 
@@ -169,6 +175,7 @@ class TestTemplateInjectionBlocked:
 # ---------------------------------------------------------------------------
 # Integration tests — Pattern and Blueprint still work after fix
 # ---------------------------------------------------------------------------
+
 
 class TestPatternBuildContextSafe:
     """Pattern.build_context must work correctly after the injection fix."""
@@ -246,6 +253,7 @@ class TestPatternBuildContextSafe:
         """
         try:
             from mycontext.templates.free.specialized.synthesis_builder import SynthesisBuilder
+
             p = SynthesisBuilder()
             ctx = p.build_context(question="How does transformer attention work?")
             assert ctx is not None
@@ -296,8 +304,8 @@ class TestBlueprintBuildSafe:
 # Edge cases
 # ---------------------------------------------------------------------------
 
-class TestSafeFormatEdgeCases:
 
+class TestSafeFormatEdgeCases:
     def test_empty_template(self):
         result = safe_format_template("")
         assert result == ""

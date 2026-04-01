@@ -37,6 +37,7 @@ def __getattr__(name: str) -> Any:
     """Lazy import LiteLLMProvider to avoid requiring litellm at import time."""
     if name == "LiteLLMProvider":
         from .litellm_provider import LiteLLMProvider
+
         return LiteLLMProvider
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
@@ -53,11 +54,7 @@ def register_provider(name: str, provider_class: type[BaseProvider]) -> None:
     _PROVIDER_REGISTRY[name] = provider_class
 
 
-def get_provider(
-    name: str,
-    api_key: str | None = None,
-    **kwargs: Any
-) -> BaseProvider:
+def get_provider(name: str, api_key: str | None = None, **kwargs: Any) -> BaseProvider:
     """Get a provider instance by name.
 
     Supported built-in providers: ``"mock"``, ``"openai"``, ``"anthropic"``,
@@ -82,6 +79,7 @@ def get_provider(
 
     if provider_name in _DEFAULT_MODELS:
         from .litellm_provider import LiteLLMProvider
+
         kw = dict(kwargs)
         resolved_model = kw.pop("model", _DEFAULT_MODELS[provider_name])
         provider = LiteLLMProvider(

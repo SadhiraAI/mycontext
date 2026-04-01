@@ -18,28 +18,28 @@ from mycontext import Constraints, Guidance, Pattern
 class DiagnosticRootCauseAnalyzer(Pattern):
     """
     Systematic root cause analysis for problems.
-    
+
     Methods:
     - Five Whys (iterative questioning)
     - Ishikawa/Fishbone diagram (categories of causes)
     - Fault tree analysis (logical breakdown)
-    
+
     Use Cases:
     - Problem-solving
     - Incident analysis
     - Quality improvement
     - Debugging (technical and organizational)
-    
+
     Example:
         >>> from mycontext.templates.enterprise.diagnostic import RootCauseAnalyzer
-        >>> 
+        >>>
         >>> pattern = RootCauseAnalyzer()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     problem="Production line defect rate increased 300%",
         ...     symptoms="High rejection rate, customer complaints"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -66,11 +66,7 @@ class DiagnosticRootCauseAnalyzer(Pattern):
             description="Systematic root cause analysis using Five Whys and Ishikawa",
             version="1.0.0",
             tags=["diagnostic", "enterprise", "root-cause", "troubleshooting"],
-            metadata={
-                "category": "diagnostic",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "diagnostic", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Root Cause Analysis Expert",
                 rules=[
@@ -78,9 +74,9 @@ class DiagnosticRootCauseAnalyzer(Pattern):
                     "Ask 'Why?' repeatedly until reaching root cause",
                     "Consider multiple causal categories (Ishikawa: Man, Machine, Material, Method, Environment)",
                     "Find actionable root causes (that can be addressed)",
-                    "Verify root cause with evidence"
+                    "Verify root cause with evidence",
                 ],
-                style="systematic, thorough, evidence-based, actionable"
+                style="systematic, thorough, evidence-based, actionable",
             ),
             directive_template="""**ROOT CAUSE ANALYSIS**
 
@@ -360,41 +356,26 @@ class DiagnosticRootCauseAnalyzer(Pattern):
 - Lessons learned: [What we discovered]
 
 **Purpose**: Build organizational memory, avoid repeating analysis""",
-            input_schema={
-                "problem": str,
-                "symptoms": str
-            },
+            input_schema={"problem": str, "symptoms": str},
             constraints=Constraints(
                 must_include=[
                     "five_whys",
                     "ishikawa_categories",
                     "root_cause_verification",
-                    "corrective_actions"
+                    "corrective_actions",
                 ],
-                must_not_include=[
-                    "symptom_treating",
-                    "unverified_causes"
-                ],
-                style_guide="Systematic and thorough. Distinguish symptoms from root causes. Multiple methods. Actionable solutions."
-            )
+                must_not_include=["symptom_treating", "unverified_causes"],
+                style_guide="Systematic and thorough. Distinguish symptoms from root causes. Multiple methods. Actionable solutions.",
+            ),
         )
 
     def build_context(self, problem="", symptoms="", **kwargs):
         """Build context for root cause analysis."""
-        return super().build_context(
-            problem=problem,
-            symptoms=symptoms,
-            **kwargs
-        )
+        return super().build_context(problem=problem, symptoms=symptoms, **kwargs)
 
     def execute(self, provider="openai", problem="", symptoms="", **kwargs):
         """Execute root cause analysis."""
-        return super().execute(
-            provider=provider,
-            problem=problem,
-            symptoms=symptoms,
-            **kwargs
-        )
+        return super().execute(provider=provider, problem=problem, symptoms=symptoms, **kwargs)
 
 
 RootCauseAnalyzer = DiagnosticRootCauseAnalyzer

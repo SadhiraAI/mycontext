@@ -18,29 +18,29 @@ from mycontext import Constraints, Guidance, Pattern
 class RubricDesigner(Pattern):
     """
     Design clear, objective assessment rubrics.
-    
+
     Rubric Components:
     1. Criteria: What aspects are being assessed?
     2. Performance levels: How many levels (3-5 typically)?
     3. Descriptors: What does each level look like?
     4. Scoring: How are points assigned?
-    
+
     Use Cases:
     - Educational assessment
     - Performance evaluation
     - Project grading
     - Peer review frameworks
-    
+
     Example:
         >>> from mycontext.templates.enterprise.evaluation import RubricDesigner
-        >>> 
+        >>>
         >>> pattern = RubricDesigner()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     assessment_task="Research paper on climate change",
         ...     learning_objectives="Synthesize sources, critical analysis, clear writing"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -71,11 +71,7 @@ class RubricDesigner(Pattern):
             description="Create clear, objective assessment rubrics",
             version="1.0.0",
             tags=["evaluation", "enterprise", "rubric", "assessment"],
-            metadata={
-                "category": "evaluation",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "evaluation", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Assessment Design Expert and Rubric Specialist",
                 rules=[
@@ -83,9 +79,9 @@ class RubricDesigner(Pattern):
                     "Use clear, observable, measurable descriptors",
                     "Align criteria with learning objectives",
                     "Provide 3-5 performance levels",
-                    "Make descriptors distinct and specific"
+                    "Make descriptors distinct and specific",
                 ],
-                style="clear, objective, specific, actionable"
+                style="clear, objective, specific, actionable",
             ),
             directive_template="""**RUBRIC DESIGN**
 
@@ -279,46 +275,52 @@ class RubricDesigner(Pattern):
             input_schema={
                 "assessment_task": str,
                 "learning_objectives": str,
-                "rubric_type_section": str
+                "rubric_type_section": str,
             },
             constraints=Constraints(
                 must_include=[
                     "clear_criteria",
                     "performance_levels",
                     "specific_descriptors",
-                    "scoring_guide"
+                    "scoring_guide",
                 ],
-                must_not_include=[
-                    "vague_descriptors",
-                    "subjective_terms"
-                ],
-                style_guide="Clear, specific, observable descriptors. Aligned with objectives. 3-5 performance levels."
-            )
+                must_not_include=["vague_descriptors", "subjective_terms"],
+                style_guide="Clear, specific, observable descriptors. Aligned with objectives. 3-5 performance levels.",
+            ),
         )
 
-    def build_context(self, assessment_task="", learning_objectives="", rubric_type="analytic", **kwargs):
+    def build_context(
+        self, assessment_task="", learning_objectives="", rubric_type="analytic", **kwargs
+    ):
         """Build context for rubric design."""
         rubric_type_section = f"**RUBRIC TYPE**: {rubric_type.capitalize()}" if rubric_type else ""
-        kwargs.pop('rubric_type_section', None)
+        kwargs.pop("rubric_type_section", None)
 
         return super().build_context(
             assessment_task=assessment_task,
             learning_objectives=learning_objectives,
             rubric_type_section=rubric_type_section,
-            **kwargs
+            **kwargs,
         )
 
-    def execute(self, provider="openai", assessment_task="", learning_objectives="", rubric_type="analytic", **kwargs):
+    def execute(
+        self,
+        provider="openai",
+        assessment_task="",
+        learning_objectives="",
+        rubric_type="analytic",
+        **kwargs,
+    ):
         """Execute rubric design."""
         rubric_type_section = f"**RUBRIC TYPE**: {rubric_type.capitalize()}" if rubric_type else ""
-        kwargs.pop('rubric_type_section', None)
+        kwargs.pop("rubric_type_section", None)
 
         return super().execute(
             provider=provider,
             assessment_task=assessment_task,
             learning_objectives=learning_objectives,
             rubric_type_section=rubric_type_section,
-            **kwargs
+            **kwargs,
         )
 
 

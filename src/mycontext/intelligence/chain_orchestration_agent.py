@@ -34,11 +34,9 @@ class _DynamicBuildContextRegistry:
                 get_pattern_build_params,
                 get_pattern_registry,
             )
+
             registry = get_pattern_registry()
-            self._cache = {
-                name: get_pattern_build_params(name)
-                for name in registry
-            }
+            self._cache = {name: get_pattern_build_params(name) for name in registry}
         return self._cache
 
     def __getitem__(self, key: str) -> tuple:
@@ -76,10 +74,16 @@ class WorkflowChainResult:
     chain: list[str]
     chain_params: dict[str, dict[str, Any]]
     reasoning: str = ""
-    selection_reasoning: dict[str, str] = field(default_factory=dict)  # pattern_name -> why chosen, how it relates
-    pattern_categories: dict[str, str] = field(default_factory=dict)  # pattern_name -> "free"|"enterprise"
+    selection_reasoning: dict[str, str] = field(
+        default_factory=dict
+    )  # pattern_name -> why chosen, how it relates
+    pattern_categories: dict[str, str] = field(
+        default_factory=dict
+    )  # pattern_name -> "free"|"enterprise"
     question_analysis: dict[str, Any] | None = None  # facets, key_concerns, decomposition
-    template_decomposition: str | None = None  # raw output from question_analyzer template (when used)
+    template_decomposition: str | None = (
+        None  # raw output from question_analyzer template (when used)
+    )
     llm_raw: str | None = None
 
     def to_chain_params_tuple_format(self) -> dict[str, tuple]:
@@ -134,6 +138,7 @@ def build_workflow_chain(
         WorkflowChainResult with chain, chain_params, and reasoning
     """
     import warnings
+
     warnings.warn(
         "build_workflow_chain() is deprecated. Use suggest_routes() for richer, "
         "multi-route output with agent-level detail.",
@@ -144,6 +149,7 @@ def build_workflow_chain(
     # Try delegating to suggest_routes
     try:
         from .route_suggester import suggest_routes
+
         route_result = suggest_routes(
             question=question,
             max_routes=1,
@@ -156,21 +162,15 @@ def build_workflow_chain(
         if route_result.routes:
             best = route_result.routes[0]
             chain = [s.template for s in best.steps]
-            chain_params = {
-                s.template: s.params for s in best.steps
-            }
-            selection_reasoning = {
-                s.template: f"{s.agent_role}: {s.produces}"
-                for s in best.steps
-            }
+            chain_params = {s.template: s.params for s in best.steps}
+            selection_reasoning = {s.template: f"{s.agent_role}: {s.produces}" for s in best.steps}
             return WorkflowChainResult(
                 chain=chain[:max_patterns] if max_patterns else chain,
                 chain_params=chain_params,
                 reasoning=route_result.recommendation,
                 selection_reasoning=selection_reasoning,
                 pattern_categories={
-                    s.template: NAME_TO_CATEGORY.get(s.template, "free")
-                    for s in best.steps
+                    s.template: NAME_TO_CATEGORY.get(s.template, "free") for s in best.steps
                 },
                 question_analysis={
                     "decomposition": route_result.question_decomposition,
@@ -209,11 +209,11 @@ Use exact pattern names from the catalog.
 
     pre_analysis_block = ""
     if template_decomposition:
-        pre_analysis_block = f'''## Pre-analysis of the user goal (from question_analyzer template):
+        pre_analysis_block = f"""## Pre-analysis of the user goal (from question_analyzer template):
 
 {template_decomposition}
 
-**Use this analysis above** to inform your pattern selection. The template has decomposed the question - identify the core domains, reasoning requirements, and map them to the most relevant patterns.\n\n'''
+**Use this analysis above** to inform your pattern selection. The template has decomposed the question - identify the core domains, reasoning requirements, and map them to the most relevant patterns.\n\n"""
     else:
         pre_analysis_block = """**Step 1** - Analyze the question: what domains does it span (business, technical, ethical, legal, etc.)? What type of reasoning is needed (diagnostic, comparative, strategic, creative)?
 **Step 2** - Select ONLY the patterns that directly address the question's core requirements. Fewer, better-matched patterns beat many tangentially related ones.\n\n"""
@@ -282,6 +282,7 @@ Respond with ONLY valid JSON. No markdown, no explanation outside JSON."""
         raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
 
     import json
+
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as e:
@@ -342,11 +343,12 @@ Respond with ONLY valid JSON. No markdown, no explanation outside JSON."""
         if facets:
             reasoning_parts.append("Facets: " + ", ".join(facets[:6]))
     if selection_reasoning:
-        reasoning_parts.append(
-            f"Selected {len(chain)} patterns: "
-            + " → ".join(chain[:8])
-        )
-    reasoning_text = ". ".join(reasoning_parts) if reasoning_parts else f"Selected {len(chain)} patterns for this task."
+        reasoning_parts.append(f"Selected {len(chain)} patterns: " + " → ".join(chain[:8]))
+    reasoning_text = (
+        ". ".join(reasoning_parts)
+        if reasoning_parts
+        else f"Selected {len(chain)} patterns for this task."
+    )
 
     return WorkflowChainResult(
         chain=chain,

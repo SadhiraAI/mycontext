@@ -102,6 +102,7 @@ def _build_directive(output_mode: str) -> str:
 # Template class
 # ---------------------------------------------------------------------------
 
+
 class StepByStepReasoner(Pattern):
     """
     Guide systematic problem-solving through clear, logical steps.
@@ -230,13 +231,10 @@ class StepByStepReasoner(Pattern):
         """
         if output_mode not in VALID_OUTPUT_MODES:
             raise ValueError(
-                f"Invalid output_mode {output_mode!r}. "
-                f"Choose from: {sorted(VALID_OUTPUT_MODES)}"
+                f"Invalid output_mode {output_mode!r}. Choose from: {sorted(VALID_OUTPUT_MODES)}"
             )
         if output_mode == "check_only" and not proposed_answer:
-            raise ValueError(
-                "output_mode='check_only' requires a proposed_answer to verify."
-            )
+            raise ValueError("output_mode='check_only' requires a proposed_answer to verify.")
 
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
@@ -263,6 +261,27 @@ class StepByStepReasoner(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["output_mode"] = output_mode
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Does each step logically follow from the previous?",
+                "Is any step a leap of logic that skips intermediate reasoning?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "If a store has 3-for-2 deals and I buy 7 items at $10 each, what do I pay?",
+                    "output": (
+                        "Step 1: Group items into sets of 3. 7 items = 2 full sets of 3 + 1 remaining item.\n"
+                        "Step 2: Each set of 3, I pay for 2. Cost per set: 2 × $10 = $20.\n"
+                        "Step 3: 2 sets × $20 = $40.\n"
+                        "Step 4: The remaining 1 item is at full price: $10.\n"
+                        "Step 5: Total = $40 + $10 = $50.\n"
+                        "Verification: Without the deal, 7 × $10 = $70. Discount = $20 (2 free items). $70 − $20 = $50. ✓"
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -294,9 +313,15 @@ class StepByStepReasoner(Pattern):
             ProviderResponse with the solution
         """
         provider_params = {
-            "model", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         provider_kwargs["temperature"] = temperature

@@ -57,6 +57,7 @@ def _make_mock_provider(response_text: str) -> MagicMock:
 
 # ── _parse_llm_json ───────────────────────────────────────────────────────────
 
+
 class TestParseLlmJson:
     def test_bare_json(self):
         text = '{"rules": ["rule one"], "style": "professional"}'
@@ -78,12 +79,13 @@ class TestParseLlmJson:
             _parse_llm_json("This is not JSON at all.")
 
     def test_json_fence_no_language_tag(self):
-        text = "```\n{\"style\": \"direct\"}\n```"
+        text = '```\n{"style": "direct"}\n```'
         result = _parse_llm_json(text)
         assert result["style"] == "direct"
 
 
 # ── _spec_to_context ──────────────────────────────────────────────────────────
+
 
 class TestSpecToContext:
     def test_produces_context_with_research_flow(self):
@@ -133,7 +135,9 @@ class TestSpecToContext:
         assert ctx.thinking_strategy == "verify"
 
     def test_thinking_strategy_invalid_becomes_none(self):
-        ctx = _spec_to_context("r", "g", None, {**VALID_SPEC, "thinking_strategy": "made_up_strategy"})
+        ctx = _spec_to_context(
+            "r", "g", None, {**VALID_SPEC, "thinking_strategy": "made_up_strategy"}
+        )
         assert ctx.thinking_strategy is None
 
     def test_examples_populated(self):
@@ -157,7 +161,10 @@ class TestSpecToContext:
         assert ctx.examples is None
 
     def test_malformed_examples_skipped(self):
-        spec = {**VALID_SPEC, "examples": [{"input": "x"}, {"output": "y"}, {"input": "a", "output": "b"}]}
+        spec = {
+            **VALID_SPEC,
+            "examples": [{"input": "x"}, {"output": "y"}, {"input": "a", "output": "b"}],
+        }
         ctx = _spec_to_context("r", "g", None, spec)
         # Only the complete example {"input": "a", "output": "b"} should survive
         assert ctx.examples == [{"input": "a", "output": "b"}]
@@ -252,5 +259,6 @@ class TestGenerateContext:
         """generate_context is importable from the top-level mycontext package."""
         mock_get_provider.return_value = self._mock_generate(VALID_SPEC)
         import mycontext
+
         result = mycontext.generate_context(role="Analyst", goal="Detect fraud")
         assert isinstance(result, GeneratedContext)

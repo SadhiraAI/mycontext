@@ -18,28 +18,28 @@ from mycontext import Constraints, Guidance, Pattern
 class SpacedRepetitionOptimizer(Pattern):
     """
     Optimize review timing based on forgetting curves.
-    
+
     Implements:
     - Ebbinghaus forgetting curve
     - SuperMemo SM-2 algorithm principles
     - Retrieval practice effects
-    
+
     Use Cases:
     - Flashcard systems (Anki, Quizlet)
     - Language learning apps
     - Medical education
     - Skill retention programs
-    
+
     Example:
         >>> from mycontext.templates.enterprise.learning import SpacedRepetitionOptimizer
-        >>> 
+        >>>
         >>> pattern = SpacedRepetitionOptimizer()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     learning_material="Spanish vocabulary: 50 new words",
         ...     initial_mastery="Just learned today"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -71,11 +71,7 @@ class SpacedRepetitionOptimizer(Pattern):
             description="Optimize review timing based on forgetting curves",
             version="1.0.0",
             tags=["learning", "enterprise", "spaced-repetition", "memory"],
-            metadata={
-                "category": "learning",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "learning", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Memory Science Expert and Learning Optimizer",
                 rules=[
@@ -83,9 +79,9 @@ class SpacedRepetitionOptimizer(Pattern):
                     "Space reviews at optimal intervals (not too early, not too late)",
                     "Account for difficulty and retrieval success",
                     "Emphasize retrieval practice over re-reading",
-                    "Adjust intervals based on performance"
+                    "Adjust intervals based on performance",
                 ],
-                style="scientific, precise, adaptive, evidence-based"
+                style="scientific, precise, adaptive, evidence-based",
             ),
             directive_template="""**SPACED REPETITION SCHEDULE**
 
@@ -249,46 +245,60 @@ Prepare retrieval practice questions: [List 5-10 questions]""",
             input_schema={
                 "learning_material": str,
                 "initial_mastery": str,
-                "performance_section": str
+                "performance_section": str,
             },
             constraints=Constraints(
                 must_include=[
                     "forgetting_curve",
                     "review_schedule",
                     "retrieval_practice",
-                    "performance_adjustments"
+                    "performance_adjustments",
                 ],
-                must_not_include=[
-                    "passive_review",
-                    "cramming"
-                ],
-                style_guide="Scientific, precise intervals. Emphasize active retrieval over re-reading."
-            )
+                must_not_include=["passive_review", "cramming"],
+                style_guide="Scientific, precise intervals. Emphasize active retrieval over re-reading.",
+            ),
         )
 
-    def build_context(self, learning_material="", initial_mastery="", previous_performance="", **kwargs):
+    def build_context(
+        self, learning_material="", initial_mastery="", previous_performance="", **kwargs
+    ):
         """Build context for spaced repetition optimization."""
-        performance_section = f"**PREVIOUS REVIEW PERFORMANCE**: {previous_performance}" if previous_performance else ""
-        kwargs.pop('performance_section', None)
+        performance_section = (
+            f"**PREVIOUS REVIEW PERFORMANCE**: {previous_performance}"
+            if previous_performance
+            else ""
+        )
+        kwargs.pop("performance_section", None)
 
         return super().build_context(
             learning_material=learning_material,
             initial_mastery=initial_mastery,
             performance_section=performance_section,
-            **kwargs
+            **kwargs,
         )
 
-    def execute(self, provider="openai", learning_material="", initial_mastery="", previous_performance="", **kwargs):
+    def execute(
+        self,
+        provider="openai",
+        learning_material="",
+        initial_mastery="",
+        previous_performance="",
+        **kwargs,
+    ):
         """Execute spaced repetition schedule optimization."""
-        performance_section = f"**PREVIOUS REVIEW PERFORMANCE**: {previous_performance}" if previous_performance else ""
-        kwargs.pop('performance_section', None)
+        performance_section = (
+            f"**PREVIOUS REVIEW PERFORMANCE**: {previous_performance}"
+            if previous_performance
+            else ""
+        )
+        kwargs.pop("performance_section", None)
 
         return super().execute(
             provider=provider,
             learning_material=learning_material,
             initial_mastery=initial_mastery,
             performance_section=performance_section,
-            **kwargs
+            **kwargs,
         )
 
 

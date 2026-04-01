@@ -173,3 +173,56 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+
+.smart-exec-quality-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.3rem;
+}
+
+.smart-exec-quality-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem 0;
+}
+
+.smart-exec-quality-btn:hover {
+  color: var(--accent);
+}
+
+.smart-exec-quality {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.3rem;
+}
+
+.smart-exec-quality-field {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.smart-exec-quality-field select {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.smart-exec-quality-check {
+  cursor: pointer;
+}
+
+.smart-exec-quality-check input[type="checkbox"] {
+  accent-color: var(--accent);
+}

@@ -5,7 +5,6 @@ Guidance defines the role, personality, and behavioral rules for the LLM.
 It's the "how" and "who" of context engineering.
 """
 
-
 from pydantic import BaseModel, Field
 
 
@@ -113,8 +112,13 @@ class Guidance(BaseModel):
         if self.goal and include_goal:
             goal_text = self.goal
             if goal_text.lower().startswith("your mission:"):
-                goal_text = goal_text[len("your mission:"):].strip()
-            goal_text = goal_text.removesuffix("— accomplish this fully").removesuffix("— accomplish this fully.").strip().rstrip(".")
+                goal_text = goal_text[len("your mission:") :].strip()
+            goal_text = (
+                goal_text.removesuffix("— accomplish this fully")
+                .removesuffix("— accomplish this fully.")
+                .strip()
+                .rstrip(".")
+            )
             parts.append(f"Your mission: {goal_text} — accomplish this fully.")
 
         if self.persona_scope:
@@ -125,7 +129,7 @@ class Guidance(BaseModel):
             parts.append(f"Your areas of expertise include: {expertise_text}.")
 
         if self.rules and include_rules:
-            rules_text = "\n".join(f"{i+1}. {str(rule)}" for i, rule in enumerate(self.rules))
+            rules_text = "\n".join(f"{i + 1}. {str(rule)}" for i, rule in enumerate(self.rules))
             parts.append(f"\nFollow these rules:\n{rules_text}")
 
         if self.style and include_style and provider != "gemini":
@@ -141,6 +145,7 @@ class Guidance(BaseModel):
         Falls back to the raw style string if no delimiters found.
         """
         import re
+
         segments = re.split(r"[,;]+", style)
         traits = [s.strip().lower() for s in segments if s.strip()]
         if len(traits) > 1:

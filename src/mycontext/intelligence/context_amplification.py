@@ -147,7 +147,9 @@ class ContextAmplificationIndex:
 
         single_name = chain[0]
         single_output = self._execute_template(question, single_name, **exec_kwargs)
-        single_ctx = self._build_template_context(question, single_name) or Context(directive=question)
+        single_ctx = self._build_template_context(question, single_name) or Context(
+            directive=question
+        )
 
         chain_output = self._execute_chain(question, chain, **exec_kwargs)
         chain_ctx = Context(
@@ -182,8 +184,11 @@ class ContextAmplificationIndex:
             cai_dimensions={d: round(v, 3) for d, v in cai_dims.items()},
             verdict=_verdict(cai_overall),
             metadata={
-                "provider": self.provider, "eval_mode": self.eval_mode,
-                "comparison": "chain_vs_single", "chain": chain, "single": single_name,
+                "provider": self.provider,
+                "eval_mode": self.eval_mode,
+                "comparison": "chain_vs_single",
+                "chain": chain,
+                "single": single_name,
             },
         )
 
@@ -208,10 +213,13 @@ class ContextAmplificationIndex:
     def _execute_chain(self, question, chain, **kwargs):
         try:
             from .template_integrator_agent import TemplateIntegratorAgent
+
             agent = TemplateIntegratorAgent(include_enterprise=True)
             result = agent.integrate(
-                question=question, template_names=chain,
-                provider=self.provider, **kwargs,
+                question=question,
+                template_names=chain,
+                provider=self.provider,
+                **kwargs,
             )
             return result.integrated_context
         except Exception:
@@ -221,6 +229,7 @@ class ContextAmplificationIndex:
         try:
             from .chain_orchestration_agent import PATTERN_BUILD_CONTEXT_REGISTRY
             from .pattern_suggester import get_pattern_class
+
             klass = get_pattern_class(template_name, include_enterprise=True)
             if not klass:
                 return None
@@ -235,19 +244,33 @@ class ContextAmplificationIndex:
     def report(self, result):
         lines = [
             "Context Amplification Index (CAI) Report",
-            "=" * 41, "",
+            "=" * 41,
+            "",
             "Question: " + result.question[:80] + "...",
             "Template: " + result.template_name,
             "CAI Overall: " + str(round(result.cai_overall, 2)) + "x  (" + result.verdict + ")",
-            "", "Per-Dimension CAI:",
+            "",
+            "Per-Dimension CAI:",
         ]
         for dim in OutputDimension:
             val = result.cai_dimensions.get(dim, 0)
             label = dim.value.replace("_", " ").title()
             raw = result.raw_score.dimensions.get(dim, 0)
             tmpl = result.templated_score.dimensions.get(dim, 0)
-            lines.append("  " + label + ": " + str(round(val, 2)) + "x  (raw=" + str(round(raw * 100, 1)) + "% -> templated=" + str(round(tmpl * 100, 1)) + "%)")
+            lines.append(
+                "  "
+                + label
+                + ": "
+                + str(round(val, 2))
+                + "x  (raw="
+                + str(round(raw * 100, 1))
+                + "% -> templated="
+                + str(round(tmpl * 100, 1))
+                + "%)"
+            )
         lines.append("")
         lines.append("Raw Overall:      " + str(round(result.raw_score.overall * 100, 1)) + "%")
-        lines.append("Templated Overall: " + str(round(result.templated_score.overall * 100, 1)) + "%")
+        lines.append(
+            "Templated Overall: " + str(round(result.templated_score.overall * 100, 1)) + "%"
+        )
         return "\n".join(lines)

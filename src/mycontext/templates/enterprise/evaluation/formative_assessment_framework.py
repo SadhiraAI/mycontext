@@ -18,30 +18,30 @@ from mycontext import Constraints, Guidance, Pattern
 class FormativeAssessmentFramework(Pattern):
     """
     Design formative assessment for ongoing learning.
-    
+
     Five Key Strategies (Black & Wiliam):
     1. Clarify learning intentions and success criteria
     2. Engineer effective classroom discussions
     3. Provide feedback that moves learning forward
     4. Activate students as learning resources for each other
     5. Activate students as owners of their own learning
-    
+
     Use Cases:
     - Classroom assessment
     - Online learning platforms
     - Tutoring systems
     - Self-paced learning
-    
+
     Example:
         >>> from mycontext.templates.enterprise.evaluation import FormativeAssessmentFramework
-        >>> 
+        >>>
         >>> pattern = FormativeAssessmentFramework()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     learning_unit="Quadratic equations module",
         ...     learning_goal="Solve quadratic equations using multiple methods"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -73,11 +73,7 @@ class FormativeAssessmentFramework(Pattern):
             description="Design ongoing assessment for learning",
             version="1.0.0",
             tags=["evaluation", "enterprise", "formative", "assessment"],
-            metadata={
-                "category": "evaluation",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "evaluation", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Formative Assessment Expert",
                 rules=[
@@ -85,9 +81,9 @@ class FormativeAssessmentFramework(Pattern):
                     "Provide actionable feedback that guides improvement",
                     "Make success criteria transparent",
                     "Use assessment to adjust instruction",
-                    "Involve learners in self-assessment"
+                    "Involve learners in self-assessment",
                 ],
-                style="developmental, actionable, learner-centered, continuous"
+                style="developmental, actionable, learner-centered, continuous",
             ),
             directive_template="""**FORMATIVE ASSESSMENT FRAMEWORK**
 
@@ -316,40 +312,29 @@ class FormativeAssessmentFramework(Pattern):
 ❌ Feedback is too late to be useful
 ❌ Learners don't understand criteria
 ❌ No adjustments made based on data""",
-            input_schema={
-                "learning_unit": str,
-                "learning_goal": str
-            },
+            input_schema={"learning_unit": str, "learning_goal": str},
             constraints=Constraints(
                 must_include=[
                     "five_strategies",
                     "success_criteria",
                     "actionable_feedback",
-                    "self_assessment"
+                    "self_assessment",
                 ],
-                must_not_include=[
-                    "summative_only",
-                    "late_feedback"
-                ],
-                style_guide="Developmental and continuous. Assessment FOR learning. Specific, actionable guidance."
-            )
+                must_not_include=["summative_only", "late_feedback"],
+                style_guide="Developmental and continuous. Assessment FOR learning. Specific, actionable guidance.",
+            ),
         )
 
     def build_context(self, learning_unit="", learning_goal="", **kwargs):
         """Build context for formative assessment design."""
         return super().build_context(
-            learning_unit=learning_unit,
-            learning_goal=learning_goal,
-            **kwargs
+            learning_unit=learning_unit, learning_goal=learning_goal, **kwargs
         )
 
     def execute(self, provider="openai", learning_unit="", learning_goal="", **kwargs):
         """Execute formative assessment framework design."""
         return super().execute(
-            provider=provider,
-            learning_unit=learning_unit,
-            learning_goal=learning_goal,
-            **kwargs
+            provider=provider, learning_unit=learning_unit, learning_goal=learning_goal, **kwargs
         )
 
 

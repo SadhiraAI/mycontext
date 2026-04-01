@@ -35,17 +35,40 @@ from mycontext.utils.optimizers import RedundancyRemover, TokenOptimizer
 # Helper
 # ---------------------------------------------------------------------------
 
+
 def _unique_sentences(n: int) -> list[str]:
     """Return n genuinely unique sentences (no word overlap)."""
     vocab = [
-        "alpha bravo", "charlie delta", "echo foxtrot", "golf hotel",
-        "india juliet", "kilo lima", "mike november", "oscar papa",
-        "quebec romeo", "sierra tango", "uniform victor", "whiskey xray",
-        "yankee zulu", "phoenix mercury", "neptune saturn", "jupiter mars",
-        "copper silver", "bronze tungsten", "silicon carbon", "hydrogen helium",
-        "nitrogen oxygen", "argon krypton", "xenon radon", "lithium sodium",
-        "potassium calcium", "magnesium iron", "cobalt nickel", "zinc manganese",
-        "chromium vanadium", "titanium zirconium",
+        "alpha bravo",
+        "charlie delta",
+        "echo foxtrot",
+        "golf hotel",
+        "india juliet",
+        "kilo lima",
+        "mike november",
+        "oscar papa",
+        "quebec romeo",
+        "sierra tango",
+        "uniform victor",
+        "whiskey xray",
+        "yankee zulu",
+        "phoenix mercury",
+        "neptune saturn",
+        "jupiter mars",
+        "copper silver",
+        "bronze tungsten",
+        "silicon carbon",
+        "hydrogen helium",
+        "nitrogen oxygen",
+        "argon krypton",
+        "xenon radon",
+        "lithium sodium",
+        "potassium calcium",
+        "magnesium iron",
+        "cobalt nickel",
+        "zinc manganese",
+        "chromium vanadium",
+        "titanium zirconium",
     ]
     # Cycle the vocab list to generate as many sentences as needed
     result = []
@@ -59,6 +82,7 @@ def _unique_sentences(n: int) -> list[str]:
 # ---------------------------------------------------------------------------
 # RedundancyRemover — naive path
 # ---------------------------------------------------------------------------
+
 
 class TestRedundancyRemoverNaive:
     """Test the O(n²) naive path, forcing it regardless of datasketch availability."""
@@ -75,7 +99,7 @@ class TestRedundancyRemoverNaive:
     def test_near_duplicate_removed(self):
         sentences = [
             "The quick brown fox jumps over the lazy dog",
-            "The quick brown fox leaps over the lazy dog",   # high Jaccard
+            "The quick brown fox leaps over the lazy dog",  # high Jaccard
             "Completely different sentence about space exploration",
         ]
         result = self._call_naive(sentences, threshold=0.7)
@@ -114,8 +138,8 @@ class TestRedundancyRemoverNaive:
 # RedundancyRemover — LSH path (only if datasketch installed)
 # ---------------------------------------------------------------------------
 
-class TestRedundancyRemoverLSH:
 
+class TestRedundancyRemoverLSH:
     @pytest.fixture(autouse=True)
     def require_datasketch(self):
         try:
@@ -125,6 +149,7 @@ class TestRedundancyRemoverLSH:
 
     def _call_lsh(self, sentences: list[str], threshold: float = 0.8) -> str:
         from mycontext.utils.optimizers import RedundancyRemover
+
         return RedundancyRemover._remove_similar_lsh(sentences, threshold)
 
     def test_identical_sentences_deduplicated(self):
@@ -142,9 +167,13 @@ class TestRedundancyRemoverLSH:
 
     def test_lsh_faster_than_naive_on_large_input(self):
         """LSH should be measurably faster on 150+ sentences."""
-        sentences = _unique_sentences(150) + [
-            "This is a repeated sentence about nothing",
-        ] * 30
+        sentences = (
+            _unique_sentences(150)
+            + [
+                "This is a repeated sentence about nothing",
+            ]
+            * 30
+        )
 
         start_naive = time.monotonic()
         RedundancyRemover._remove_similar_naive(sentences, threshold=0.8)
@@ -165,8 +194,8 @@ class TestRedundancyRemoverLSH:
 # remove_similar_sentences public API (uses whichever backend is available)
 # ---------------------------------------------------------------------------
 
-class TestRemoveSimilarSentencesPublicAPI:
 
+class TestRemoveSimilarSentencesPublicAPI:
     def test_public_method_returns_string(self):
         text = "Alpha is great. Alpha is great. Beta is different."
         result = RedundancyRemover.remove_similar_sentences(text)
@@ -201,7 +230,9 @@ class TestRemoveSimilarSentencesPublicAPI:
         try:
             opt_module._DATASKETCH_AVAILABLE = False
             with patch.object(
-                RedundancyRemover, "_remove_similar_naive", wraps=RedundancyRemover._remove_similar_naive
+                RedundancyRemover,
+                "_remove_similar_naive",
+                wraps=RedundancyRemover._remove_similar_naive,
             ) as mock_naive:
                 RedundancyRemover.remove_similar_sentences("Hello world. Goodbye planet.")
                 mock_naive.assert_called_once()
@@ -213,8 +244,8 @@ class TestRemoveSimilarSentencesPublicAPI:
 # TokenOptimizer.count_tokens forwarding
 # ---------------------------------------------------------------------------
 
-class TestTokenOptimizerForwarding:
 
+class TestTokenOptimizerForwarding:
     def test_count_tokens_returns_integer(self):
         optimizer = TokenOptimizer(model="gpt-4o")
         assert isinstance(optimizer.count_tokens("Hello world"), int)
@@ -249,20 +280,23 @@ class TestTokenOptimizerForwarding:
 # TransformationEngine lazy singleton
 # ---------------------------------------------------------------------------
 
-class TestTransformationEngineLazySingleton:
 
+class TestTransformationEngineLazySingleton:
     def setup_method(self):
         """Clear the module-level cache before each test."""
         from mycontext.intelligence import transformation_engine as te
+
         te._PATTERN_REGISTRY_CACHE.clear()
 
     def teardown_method(self):
         """Clear cache after tests to avoid cross-test pollution."""
         from mycontext.intelligence import transformation_engine as te
+
         te._PATTERN_REGISTRY_CACHE.clear()
 
     def test_first_instantiation_builds_registry(self):
         from mycontext.intelligence.transformation_engine import TransformationEngine
+
         engine = TransformationEngine(include_enterprise=False)
         assert len(engine._pattern_registry) > 0
 
@@ -291,13 +325,11 @@ class TestTransformationEngineLazySingleton:
         assert False in te._PATTERN_REGISTRY_CACHE
         assert True in te._PATTERN_REGISTRY_CACHE
         # Enterprise registry should have at least as many patterns as free
-        assert (
-            len(te._PATTERN_REGISTRY_CACHE[True])
-            >= len(te._PATTERN_REGISTRY_CACHE[False])
-        )
+        assert len(te._PATTERN_REGISTRY_CACHE[True]) >= len(te._PATTERN_REGISTRY_CACHE[False])
 
     def test_registry_contains_expected_free_patterns(self):
         from mycontext.intelligence.transformation_engine import TransformationEngine
+
         engine = TransformationEngine(include_enterprise=False)
         expected = {"question_analyzer", "step_by_step_reasoner", "risk_assessor"}
         for name in expected:

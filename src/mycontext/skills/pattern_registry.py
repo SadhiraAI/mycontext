@@ -34,11 +34,7 @@ def _build_registry() -> dict[str, type[Pattern]]:
     for pkg in (free_pkg, ent_pkg) if ent_pkg else (free_pkg,):
         for attr_name in dir(pkg):
             cls = getattr(pkg, attr_name)
-            if (
-                isinstance(cls, type)
-                and issubclass(cls, PatternBase)
-                and cls is not PatternBase
-            ):
+            if isinstance(cls, type) and issubclass(cls, PatternBase) and cls is not PatternBase:
                 try:
                     instance = cls()
                     pattern_name = getattr(instance, "name", None)
@@ -83,9 +79,7 @@ def get_pattern(name: str) -> Pattern:
     registry = get_pattern_registry()
     if name not in registry:
         available = ", ".join(sorted(registry.keys())[:10])
-        raise KeyError(
-            f"Unknown pattern: {name!r}. Known patterns include: {available}..."
-        )
+        raise KeyError(f"Unknown pattern: {name!r}. Known patterns include: {available}...")
     return registry[name]()
 
 
@@ -109,7 +103,8 @@ def get_pattern_build_params(name: str) -> tuple:
         return ("input", {})
 
     params = [
-        p for p in sig.parameters.values()
+        p
+        for p in sig.parameters.values()
         if p.name not in ("self", "kwargs")
         and p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
     ]

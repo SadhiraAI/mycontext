@@ -34,7 +34,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             task_description="Learn Python programming basics",
             current_approach="Reading tutorials and practicing exercises",
-            progress_so_far="Completed Chapters 1-3, understand variables and loops"
+            progress_so_far="Completed Chapters 1-3, understand variables and loops",
         )
 
         # Verify context structure
@@ -44,7 +44,10 @@ class TestMetacognitionPatterns:
         assert context.constraints is not None
 
         # Verify metacognitive content in guidance
-        assert "Metacognitive" in context.guidance.role or "metacognitive" in " ".join(context.guidance.rules).lower()
+        assert (
+            "Metacognitive" in context.guidance.role
+            or "metacognitive" in " ".join(context.guidance.rules).lower()
+        )
         assert len(context.guidance.rules) >= 3
 
         # Verify directive contains the 5 dimensions
@@ -74,7 +77,7 @@ class TestMetacognitionPatterns:
             task_description="Debug a complex algorithm",
             current_approach="Using print statements to trace execution",
             progress_so_far="Identified the issue is in the loop logic",
-            challenges="Confused about why the loop terminates early"
+            challenges="Confused about why the loop terminates early",
         )
 
         # Verify challenges are included in directive
@@ -89,7 +92,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             task_description="Write a research paper on machine learning",
             current_approach="Literature review followed by experimentation",
-            progress_so_far="Completed literature review, starting experiments"
+            progress_so_far="Completed literature review, starting experiments",
         )
 
         # Measure quality using heuristic mode (fast)
@@ -100,9 +103,15 @@ class TestMetacognitionPatterns:
         assert score.overall >= 0.75, f"Quality too low: {score.overall} (issues: {score.issues})"
 
         # Check individual dimensions (from dimensions dict)
-        assert score.dimensions[QualityDimension.CLARITY] >= 0.7, f"Clarity too low: {score.dimensions[QualityDimension.CLARITY]}"
-        assert score.dimensions[QualityDimension.COMPLETENESS] >= 0.7, f"Completeness too low: {score.dimensions[QualityDimension.COMPLETENESS]}"
-        assert score.dimensions[QualityDimension.STRUCTURE] >= 0.7, f"Structure too low: {score.dimensions[QualityDimension.STRUCTURE]}"
+        assert score.dimensions[QualityDimension.CLARITY] >= 0.7, (
+            f"Clarity too low: {score.dimensions[QualityDimension.CLARITY]}"
+        )
+        assert score.dimensions[QualityDimension.COMPLETENESS] >= 0.7, (
+            f"Completeness too low: {score.dimensions[QualityDimension.COMPLETENESS]}"
+        )
+        assert score.dimensions[QualityDimension.STRUCTURE] >= 0.7, (
+            f"Structure too low: {score.dimensions[QualityDimension.STRUCTURE]}"
+        )
 
         print(f"\n[OK] MetacognitiveMonitor Quality Score: {score.overall:.2f}")
         print(f"   - Clarity: {score.dimensions[QualityDimension.CLARITY]:.2f}")
@@ -128,7 +137,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             task_description="Learn data structures",
             current_approach="Solving practice problems",
-            progress_so_far="Completed arrays and linked lists"
+            progress_so_far="Completed arrays and linked lists",
         )
 
         # Verify directive has all 5 sections with clear structure
@@ -146,8 +155,7 @@ class TestMetacognitionPatterns:
         pattern = SelfRegulationFramework()
 
         context = pattern.build_context(
-            goal="Master data structures and algorithms",
-            current_phase="forethought"
+            goal="Master data structures and algorithms", current_phase="forethought"
         )
 
         assert isinstance(context, Context)
@@ -165,10 +173,7 @@ class TestMetacognitionPatterns:
         """Test SelfRegulationFramework in performance phase."""
         pattern = SelfRegulationFramework()
 
-        context = pattern.build_context(
-            goal="Master data structures",
-            current_phase="performance"
-        )
+        context = pattern.build_context(goal="Master data structures", current_phase="performance")
 
         directive_text = context.directive.content
         assert "PERFORMANCE PHASE" in directive_text
@@ -183,7 +188,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             goal="Master data structures",
             current_phase="self-reflection",
-            performance_data="Completed 80% of exercises, struggled with graphs"
+            performance_data="Completed 80% of exercises, struggled with graphs",
         )
 
         directive_text = context.directive.content
@@ -200,7 +205,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             goal="Learn machine learning",
             current_phase="forethought",
-            context="Starting from basic Python knowledge"
+            context="Starting from basic Python knowledge",
         )
 
         metrics = QualityMetrics(mode="heuristic")
@@ -215,7 +220,7 @@ class TestMetacognitionPatterns:
 
         context = pattern.build_context(
             task_type="problem-solving",
-            task_characteristics="Complex, multi-step, unfamiliar algorithm"
+            task_characteristics="Complex, multi-step, unfamiliar algorithm",
         )
 
         assert isinstance(context, Context)
@@ -234,7 +239,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             task_type="learning",
             task_characteristics="New conceptual material, moderate complexity",
-            learner_characteristics="Beginner, visual learner"
+            learner_characteristics="Beginner, visual learner",
         )
 
         metrics = QualityMetrics(mode="heuristic")
@@ -250,7 +255,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             experience_description="Product launch that missed targets",
             outcome="Sold 5k units instead of expected 10k",
-            initial_expectations="Expected 10k units based on market research"
+            initial_expectations="Expected 10k units based on market research",
         )
 
         assert isinstance(context, Context)
@@ -270,7 +275,7 @@ class TestMetacognitionPatterns:
         context = pattern.build_context(
             experience_description="Failed algorithm implementation",
             outcome="Performance was 10x slower than expected",
-            initial_expectations="O(n log n) but got O(n^2)"
+            initial_expectations="O(n log n) but got O(n^2)",
         )
 
         metrics = QualityMetrics(mode="heuristic")
@@ -284,8 +289,7 @@ class TestMetacognitionPatterns:
         pattern = ErrorDetectionFramework()
 
         context = pattern.build_context(
-            work_to_check="def quicksort(arr): return sorted(arr)",
-            domain="programming"
+            work_to_check="def quicksort(arr): return sorted(arr)", domain="programming"
         )
 
         assert isinstance(context, Context)
@@ -302,7 +306,7 @@ class TestMetacognitionPatterns:
 
         context = pattern.build_context(
             work_to_check="All swans are white because I've only seen white swans",
-            domain="reasoning"
+            domain="reasoning",
         )
 
         metrics = QualityMetrics(mode="heuristic")
@@ -321,7 +325,7 @@ class TestEthicalReasoningPatterns:
 
         context = pattern.build_context(
             decision="Deploy facial recognition in public spaces",
-            stakeholders="Citizens, law enforcement, privacy advocates"
+            stakeholders="Citizens, law enforcement, privacy advocates",
         )
 
         assert isinstance(context, Context)
@@ -343,7 +347,7 @@ class TestEthicalReasoningPatterns:
 
         context = pattern.build_context(
             decision="Mandatory COVID-19 vaccination policy",
-            stakeholders="Employees, public health officials, individual rights advocates"
+            stakeholders="Employees, public health officials, individual rights advocates",
         )
 
         metrics = QualityMetrics(mode="heuristic")

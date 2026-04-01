@@ -12,19 +12,19 @@ from mycontext import Guidance, Pattern
 class ComparativeAnalyzer(Pattern):
     """
     Systematic comparison template for evaluating multiple options.
-    
+
     Provides structured analysis across multiple dimensions:
     - Criteria-based evaluation
     - Pros and cons analysis
     - Side-by-side comparison
     - Context-aware recommendations
-    
+
     Based on: Multi-criteria decision analysis frameworks
-    
+
     Example:
         ```python
         from mycontext.templates.enterprise.decision import ComparativeAnalyzer
-        
+
         analyzer = ComparativeAnalyzer()
         context = analyzer.build_context(
             options=["Option A", "Option B", "Option C"],
@@ -32,7 +32,7 @@ class ComparativeAnalyzer(Pattern):
             depth="comprehensive"
         )
         ```
-    
+
     Input Schema:
         - options (str or list): Options to compare (comma-separated or list)
         - criteria (str, optional): Comparison criteria
@@ -74,9 +74,9 @@ class ComparativeAnalyzer(Pattern):
                     "Identify trade-offs explicitly",
                     "Provide evidence-based assessments",
                     "Consider context and constraints",
-                    "Be clear about uncertainties and assumptions"
+                    "Be clear about uncertainties and assumptions",
                 ],
-                style="analytical, balanced, systematic"
+                style="analytical, balanced, systematic",
             ),
             directive_template="""Conduct a systematic comparison of these options:
 
@@ -123,15 +123,15 @@ Be specific, evidence-based, and actionable.""",
                 "options_formatted": str,
                 "context_section": str,
                 "criteria_section": str,
-                "depth": str
-            }
+                "depth": str,
+            },
         )
 
     def _format_options(self, options) -> str:
         """Format options for template"""
         if isinstance(options, str):
             # If comma-separated string, split it
-            options = [opt.strip() for opt in options.split(',')]
+            options = [opt.strip() for opt in options.split(",")]
 
         formatted = "OPTIONS TO COMPARE:\n"
         for i, opt in enumerate(options, 1):
@@ -151,23 +151,18 @@ Be specific, evidence-based, and actionable.""",
         return f"COMPARISON CRITERIA:\n{criteria}\n"
 
     def build_context(
-        self,
-        options,
-        criteria: str = "",
-        context: str = "",
-        depth: str = "detailed",
-        **kwargs
+        self, options, criteria: str = "", context: str = "", depth: str = "detailed", **kwargs
     ):
         """
         Build a context for comparative analysis.
-        
+
         Args:
             options: List of options or comma-separated string
             criteria: Comparison criteria (comma-separated)
             context: Optional additional context
             depth: Level of analysis
             **kwargs: Additional parameters
-            
+
         Returns:
             Context configured for comparison
         """
@@ -176,31 +171,31 @@ Be specific, evidence-based, and actionable.""",
         criteria_section = self._render_criteria_section(criteria or "")
 
         # Clean up kwargs
-        kwargs.pop('context', None)
-        kwargs.pop('context_section', None)
-        kwargs.pop('criteria_section', None)
-        kwargs.pop('options_formatted', None)
+        kwargs.pop("context", None)
+        kwargs.pop("context_section", None)
+        kwargs.pop("criteria_section", None)
+        kwargs.pop("options_formatted", None)
 
         return super().build_context(
             options_formatted=options_formatted,
             context_section=context_section,
             criteria_section=criteria_section,
             depth=depth,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
         self,
         provider: str = "openai",
-        options = None,
+        options=None,
         criteria: str = "",
         context: str = "",
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute comparative analysis directly.
-        
+
         Args:
             provider: LLM provider to use
             options: Options to compare
@@ -208,7 +203,7 @@ Be specific, evidence-based, and actionable.""",
             context: Additional context
             depth: Analysis depth
             **kwargs: Provider parameters
-            
+
         Returns:
             Provider response with comparative analysis
         """
@@ -218,19 +213,28 @@ Be specific, evidence-based, and actionable.""",
 
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
-                               'frequency_penalty', 'presence_penalty', 'stop',
-                               'user', 'api_key', 'base_url'}
+        provider_param_names = {
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
+        }
 
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
 
         # Clean up
-        kwargs.pop('context', None)
-        kwargs.pop('context_section', None)
-        kwargs.pop('criteria_section', None)
-        kwargs.pop('options_formatted', None)
+        kwargs.pop("context", None)
+        kwargs.pop("context_section", None)
+        kwargs.pop("criteria_section", None)
+        kwargs.pop("options_formatted", None)
 
         return super().execute(
             provider=provider,
@@ -238,5 +242,5 @@ Be specific, evidence-based, and actionable.""",
             context_section=context_section,
             criteria_section=criteria_section,
             depth=depth,
-            **provider_params
+            **provider_params,
         )

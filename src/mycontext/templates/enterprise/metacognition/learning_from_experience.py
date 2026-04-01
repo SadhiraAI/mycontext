@@ -18,22 +18,22 @@ from mycontext import Constraints, Guidance, Pattern
 class LearningFromExperience(Pattern):
     """
     Systematic reflection to extract transferable lessons from experience.
-    
+
     Implements:
     - Kolb's Experiential Learning Cycle (1984)
     - Schön's Reflective Practice (1983)
     - US Army After Action Review methodology
-    
+
     Use Cases:
     - Post-project retrospectives
     - Learning from mistakes
     - Capturing best practices
     - Skill improvement
     - Team learning
-    
+
     Example:
         >>> from mycontext.templates.enterprise.metacognition import LearningFromExperience
-        >>> 
+        >>>
         >>> pattern = LearningFromExperience()
         >>> result = pattern.execute(
         ...     provider="gemini",
@@ -41,7 +41,7 @@ class LearningFromExperience(Pattern):
         ...     outcome="50% below sales target",
         ...     initial_expectations="Expected 10k units, sold 5k"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -71,11 +71,7 @@ class LearningFromExperience(Pattern):
             description="Extract transferable lessons from successes and failures",
             version="1.0.0",
             tags=["metacognition", "enterprise", "reflection", "learning"],
-            metadata={
-                "category": "metacognition",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "metacognition", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Reflective Practice Coach and Experiential Learning Expert",
                 rules=[
@@ -83,9 +79,9 @@ class LearningFromExperience(Pattern):
                     "Extract TRANSFERABLE lessons, not just specific facts",
                     "Distinguish context-specific from generalizable insights",
                     "Focus on actionable improvements for future",
-                    "Balance success analysis with failure analysis"
+                    "Balance success analysis with failure analysis",
                 ],
-                style="reflective, analytical, constructive, future-focused, honest"
+                style="reflective, analytical, constructive, future-focused, honest",
             ),
             directive_template="""**LEARNING FROM EXPERIENCE**
 
@@ -223,54 +219,45 @@ class LearningFromExperience(Pattern):
                 "experience_description": str,
                 "outcome": str,
                 "initial_expectations": str,
-                "context_section": str
+                "context_section": str,
             },
             constraints=Constraints(
                 must_include=[
                     "transferable_lessons",
                     "abstract_principles",
                     "future_actions",
-                    "success_and_failure_analysis"
+                    "success_and_failure_analysis",
                 ],
-                must_not_include=[
-                    "blame_assignment",
-                    "only_specific_facts",
-                    "vague_generalities"
-                ],
-                style_guide="Balance honest analysis with constructive future focus. Extract generalizable principles, not just specifics."
-            )
+                must_not_include=["blame_assignment", "only_specific_facts", "vague_generalities"],
+                style_guide="Balance honest analysis with constructive future focus. Extract generalizable principles, not just specifics.",
+            ),
         )
 
     def build_context(
-        self,
-        experience_description="",
-        outcome="",
-        initial_expectations="",
-        context="",
-        **kwargs
+        self, experience_description="", outcome="", initial_expectations="", context="", **kwargs
     ):
         """
         Build context for learning from experience.
-        
+
         Args:
             experience_description: What happened (the experience to learn from)
             outcome: Result - was it success or failure? What was achieved?
             initial_expectations: What was supposed to happen?
             context: Optional situational factors
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for use
         """
         context_section = f"**CONTEXTUAL FACTORS**: {context}" if context else ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().build_context(
             experience_description=experience_description,
             outcome=outcome,
             initial_expectations=initial_expectations,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -280,11 +267,11 @@ class LearningFromExperience(Pattern):
         outcome="",
         initial_expectations="",
         context="",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute learning from experience reflection.
-        
+
         Args:
             provider: LLM provider
             experience_description: What happened
@@ -292,12 +279,12 @@ class LearningFromExperience(Pattern):
             initial_expectations: What was supposed to happen
             context: Optional situational factors
             **kwargs: Additional provider options
-        
+
         Returns:
             ProviderResponse with reflection and lessons learned
         """
         context_section = f"**CONTEXTUAL FACTORS**: {context}" if context else ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().execute(
             provider=provider,
@@ -305,7 +292,7 @@ class LearningFromExperience(Pattern):
             outcome=outcome,
             initial_expectations=initial_expectations,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
 

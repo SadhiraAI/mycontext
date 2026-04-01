@@ -18,30 +18,30 @@ from mycontext import Constraints, Guidance, Pattern
 class SelfAssessmentGuide(Pattern):
     """
     Help learners evaluate their own work.
-    
+
     Self-Assessment Benefits:
     - Develops metacognitive awareness
     - Promotes ownership of learning
     - Improves self-regulation
     - Builds evaluative judgment
     - Prepares for lifelong learning
-    
+
     Use Cases:
     - Portfolio assessment
     - Reflective practice
     - Goal-setting systems
     - Learning journals
-    
+
     Example:
         >>> from mycontext.templates.enterprise.evaluation import SelfAssessmentGuide
-        >>> 
+        >>>
         >>> pattern = SelfAssessmentGuide()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     work_to_assess="Final project: Mobile app prototype",
         ...     success_criteria="Functional UI, meets requirements, clean code"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -73,11 +73,7 @@ class SelfAssessmentGuide(Pattern):
             description="Help learners evaluate their own work",
             version="1.0.0",
             tags=["evaluation", "enterprise", "self-assessment", "metacognition"],
-            metadata={
-                "category": "evaluation",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "evaluation", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Self-Assessment and Metacognition Expert",
                 rules=[
@@ -85,9 +81,9 @@ class SelfAssessmentGuide(Pattern):
                     "Guide honest, evidence-based self-assessment",
                     "Promote growth mindset (mistakes are learning opportunities)",
                     "Link self-assessment to goal-setting and improvement",
-                    "Develop evaluative judgment skills"
+                    "Develop evaluative judgment skills",
                 ],
-                style="reflective, honest, growth-oriented, structured"
+                style="reflective, honest, growth-oriented, structured",
             ),
             directive_template="""**SELF-ASSESSMENT GUIDE**
 
@@ -403,51 +399,48 @@ class SelfAssessmentGuide(Pattern):
 ---
 
 **Remember**: The goal isn't perfection - it's continuous improvement. Every assessment is a learning opportunity.""",
-            input_schema={
-                "work_to_assess": str,
-                "success_criteria": str,
-                "detailed_criteria": str
-            },
+            input_schema={"work_to_assess": str, "success_criteria": str, "detailed_criteria": str},
             constraints=Constraints(
                 must_include=[
                     "evidence_based_evaluation",
                     "metacognitive_reflection",
                     "goal_setting",
-                    "growth_mindset"
+                    "growth_mindset",
                 ],
-                must_not_include=[
-                    "vague_self_praise",
-                    "harsh_self_criticism"
-                ],
-                style_guide="Reflective and honest. Evidence-based. Growth-oriented. Link to improvement goals."
-            )
+                must_not_include=["vague_self_praise", "harsh_self_criticism"],
+                style_guide="Reflective and honest. Evidence-based. Growth-oriented. Link to improvement goals.",
+            ),
         )
 
     def build_context(self, work_to_assess="", success_criteria="", **kwargs):
         """Build context for self-assessment guide."""
-        newline = '\n- '
-        detailed_criteria = f"- {success_criteria.replace(',', newline)}" if success_criteria else ""
-        kwargs.pop('detailed_criteria', None)
+        newline = "\n- "
+        detailed_criteria = (
+            f"- {success_criteria.replace(',', newline)}" if success_criteria else ""
+        )
+        kwargs.pop("detailed_criteria", None)
 
         return super().build_context(
             work_to_assess=work_to_assess,
             success_criteria=success_criteria,
             detailed_criteria=detailed_criteria,
-            **kwargs
+            **kwargs,
         )
 
     def execute(self, provider="openai", work_to_assess="", success_criteria="", **kwargs):
         """Execute self-assessment guide creation."""
-        newline = '\n- '
-        detailed_criteria = f"- {success_criteria.replace(',', newline)}" if success_criteria else ""
-        kwargs.pop('detailed_criteria', None)
+        newline = "\n- "
+        detailed_criteria = (
+            f"- {success_criteria.replace(',', newline)}" if success_criteria else ""
+        )
+        kwargs.pop("detailed_criteria", None)
 
         return super().execute(
             provider=provider,
             work_to_assess=work_to_assess,
             success_criteria=success_criteria,
             detailed_criteria=detailed_criteria,
-            **kwargs
+            **kwargs,
         )
 
 

@@ -1,6 +1,7 @@
 """
 Tests for Blueprint class
 """
+
 from mycontext.foundation import Guidance
 from mycontext.structure import Blueprint
 
@@ -13,7 +14,7 @@ class TestBlueprintCreation:
         blueprint = Blueprint(
             name="test_blueprint",
             description="A test blueprint",
-            guidance=Guidance(role="Test Assistant")
+            guidance=Guidance(role="Test Assistant"),
         )
         assert blueprint.name == "test_blueprint"
         assert blueprint.guidance.role == "Test Assistant"
@@ -21,18 +22,12 @@ class TestBlueprintCreation:
 
     def test_with_custom_budget(self):
         """Test blueprint with custom token budget"""
-        blueprint = Blueprint(
-            name="test",
-            token_budget=8000
-        )
+        blueprint = Blueprint(name="test", token_budget=8000)
         assert blueprint.token_budget == 8000
 
     def test_with_components(self):
         """Test blueprint with components"""
-        blueprint = Blueprint(
-            name="test",
-            components=["Component 1", "Component 2"]
-        )
+        blueprint = Blueprint(name="test", components=["Component 1", "Component 2"])
         assert len(blueprint.components) == 2
 
 
@@ -41,10 +36,7 @@ class TestBlueprintBuild:
 
     def test_build_basic(self):
         """Test building basic context from blueprint"""
-        blueprint = Blueprint(
-            name="test",
-            guidance=Guidance(role="Expert")
-        )
+        blueprint = Blueprint(name="test", guidance=Guidance(role="Expert"))
         context = blueprint.build()
 
         assert context.guidance.role == "Expert"
@@ -52,10 +44,7 @@ class TestBlueprintBuild:
 
     def test_build_with_directive_template(self):
         """Test building with directive template"""
-        blueprint = Blueprint(
-            name="test",
-            directive_template="Analyze: {topic}"
-        )
+        blueprint = Blueprint(name="test", directive_template="Analyze: {topic}")
         context = blueprint.build(topic="AI")
 
         assert context.directive is not None
@@ -63,17 +52,12 @@ class TestBlueprintBuild:
 
     def test_build_with_components(self):
         """Test that components are assembled into knowledge"""
+
         class MockComponent:
             def render(self):
                 return "Mock component output"
 
-        blueprint = Blueprint(
-            name="test",
-            components=[
-                MockComponent(),
-                "String component"
-            ]
-        )
+        blueprint = Blueprint(name="test", components=[MockComponent(), "String component"])
         context = blueprint.build()
 
         assert context.knowledge is not None
@@ -82,11 +66,7 @@ class TestBlueprintBuild:
 
     def test_build_metadata(self):
         """Test that metadata is set correctly"""
-        blueprint = Blueprint(
-            name="test_bp",
-            token_budget=5000,
-            optimization="quality"
-        )
+        blueprint = Blueprint(name="test_bp", token_budget=5000, optimization="quality")
         context = blueprint.build()
 
         assert context.metadata["blueprint"] == "test_bp"
@@ -99,10 +79,7 @@ class TestBlueprintOptimization:
 
     def test_optimize_speed(self):
         """Test speed optimization strategy"""
-        blueprint = Blueprint(
-            name="test",
-            token_budget=4000
-        )
+        blueprint = Blueprint(name="test", token_budget=4000)
         optimized = blueprint.optimize("speed")
 
         assert optimized.optimization == "speed"
@@ -111,10 +88,7 @@ class TestBlueprintOptimization:
 
     def test_optimize_quality(self):
         """Test quality optimization strategy"""
-        blueprint = Blueprint(
-            name="test",
-            token_budget=4000
-        )
+        blueprint = Blueprint(name="test", token_budget=4000)
         optimized = blueprint.optimize("quality")
 
         assert optimized.optimization == "quality"
@@ -124,10 +98,7 @@ class TestBlueprintOptimization:
 
     def test_optimize_cost(self):
         """Test cost optimization strategy"""
-        blueprint = Blueprint(
-            name="test",
-            token_budget=4000
-        )
+        blueprint = Blueprint(name="test", token_budget=4000)
         optimized = blueprint.optimize("cost")
 
         assert optimized.optimization == "cost"
@@ -135,10 +106,7 @@ class TestBlueprintOptimization:
 
     def test_optimize_balanced(self):
         """Test balanced optimization (default)"""
-        blueprint = Blueprint(
-            name="test",
-            token_budget=4000
-        )
+        blueprint = Blueprint(name="test", token_budget=4000)
         optimized = blueprint.optimize("balanced")
 
         assert optimized.optimization == "balanced"
@@ -146,11 +114,7 @@ class TestBlueprintOptimization:
 
     def test_optimization_doesnt_modify_original(self):
         """Test that optimization creates a copy"""
-        original = Blueprint(
-            name="test",
-            token_budget=4000,
-            optimization="balanced"
-        )
+        original = Blueprint(name="test", token_budget=4000, optimization="balanced")
         optimized = original.optimize("speed")
 
         # Original should be unchanged
@@ -167,11 +131,7 @@ class TestBlueprintSerialization:
 
     def test_to_dict(self):
         """Test converting blueprint to dictionary"""
-        blueprint = Blueprint(
-            name="test",
-            description="Test blueprint",
-            token_budget=5000
-        )
+        blueprint = Blueprint(name="test", description="Test blueprint", token_budget=5000)
         data = blueprint.to_dict()
 
         assert isinstance(data, dict)
@@ -185,7 +145,7 @@ class TestBlueprintSerialization:
             "name": "test",
             "description": "Test blueprint",
             "token_budget": 6000,
-            "optimization": "quality"
+            "optimization": "quality",
         }
         blueprint = Blueprint.from_dict(data)
 
@@ -207,11 +167,7 @@ class TestBlueprintTokenEstimation:
     def test_estimate_with_guidance(self):
         """Test estimating tokens with guidance"""
         blueprint = Blueprint(
-            name="test",
-            guidance=Guidance(
-                role="Expert Analyst",
-                rules=["Rule 1", "Rule 2"]
-            )
+            name="test", guidance=Guidance(role="Expert Analyst", rules=["Rule 1", "Rule 2"])
         )
         estimate = blueprint.estimate_tokens()
         assert estimate > 0
@@ -219,8 +175,7 @@ class TestBlueprintTokenEstimation:
     def test_estimate_with_template(self):
         """Test estimating tokens with directive template"""
         blueprint = Blueprint(
-            name="test",
-            directive_template="This is a longer directive template with more words"
+            name="test", directive_template="This is a longer directive template with more words"
         )
         estimate = blueprint.estimate_tokens()
         assert estimate > 0
@@ -231,11 +186,7 @@ class TestBlueprintRepresentation:
 
     def test_repr(self):
         """Test __repr__"""
-        blueprint = Blueprint(
-            name="test_bp",
-            components=["c1", "c2"],
-            token_budget=5000
-        )
+        blueprint = Blueprint(name="test_bp", components=["c1", "c2"], token_budget=5000)
         repr_str = repr(blueprint)
 
         assert "Blueprint" in repr_str

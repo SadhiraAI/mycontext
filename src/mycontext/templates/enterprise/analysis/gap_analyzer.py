@@ -5,7 +5,6 @@ Systematic gap identification and closure planning.
 Based on gap analysis methodologies and strategic planning.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,23 +12,23 @@ from mycontext.structure import Pattern
 class GapAnalyzer(Pattern):
     """
     Identify and analyze gaps systematically.
-    
+
     Identifies:
     - Current vs. desired state gaps
     - Capability gaps
     - Knowledge gaps
     - Resource gaps
     - Performance gaps
-    
+
     Based on: Gap analysis and needs assessment
-    
+
     Example:
         >>> analyzer = GapAnalyzer()
         >>> context = analyzer.build_context(
         ...     current_state="Current team capabilities",
         ...     desired_state="World-class AI engineering team"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class GapAnalyzer(Pattern):
                     "Quantify gaps where possible",
                     "Prioritize critical gaps",
                     "Provide actionable bridge plans",
-                    "Consider root causes of gaps"
+                    "Consider root causes of gaps",
                 ],
-                style="analytical, systematic, solution-focused"
+                style="analytical, systematic, solution-focused",
             ),
             directive_template="""Analyze gaps between states:
 
@@ -277,17 +276,17 @@ Comprehensive gap analysis:
                 "current_state": str,
                 "desired_state": str,
                 "context_section": str,
-                "focus_area": str
+                "focus_area": str,
             },
             constraints=Constraints(
                 must_include=[
                     "quantified_gaps",
                     "prioritization",
                     "bridge_strategies",
-                    "phased_plan"
+                    "phased_plan",
                 ],
-                style_guide="Be realistic about effort, specific about actions"
-            )
+                style_guide="Be realistic about effort, specific about actions",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -301,7 +300,7 @@ Comprehensive gap analysis:
         desired_state: str = "",
         focus_area: str = "general",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
@@ -310,7 +309,7 @@ Comprehensive gap analysis:
             desired_state=desired_state,
             focus_area=focus_area,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -320,7 +319,7 @@ Comprehensive gap analysis:
         desired_state: str = "",
         focus_area: str = "general",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
             provider=provider,
@@ -328,5 +327,5 @@ Comprehensive gap analysis:
             desired_state=desired_state,
             focus_area=focus_area,
             context=context,
-            **kwargs
+            **kwargs,
         )

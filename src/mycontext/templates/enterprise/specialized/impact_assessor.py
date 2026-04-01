@@ -5,7 +5,6 @@ Systematic impact assessment across multiple dimensions.
 Based on impact assessment methodologies and evaluation frameworks.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,23 +12,23 @@ from mycontext.structure import Pattern
 class ImpactAssessor(Pattern):
     """
     Assess impact systematically across dimensions.
-    
+
     Evaluates:
     - Short and long-term impact
     - Direct and indirect effects
     - Positive and negative consequences
     - Stakeholder impact
     - Risk and opportunity
-    
+
     Based on: Impact assessment and evaluation frameworks
-    
+
     Example:
         >>> assessor = ImpactAssessor()
         >>> context = assessor.build_context(
         ...     action="Implement 4-day work week",
         ...     context="50-person startup"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class ImpactAssessor(Pattern):
                     "Include direct and indirect effects",
                     "Assess both positive and negative",
                     "Quantify where possible",
-                    "Consider timeline"
+                    "Consider timeline",
                 ],
-                style="comprehensive, balanced, thorough"
+                style="comprehensive, balanced, thorough",
             ),
             directive_template="""Assess impact of:
 
@@ -115,14 +114,11 @@ Impact assessment:
    - Recommendation: [Proceed/Modify/Reject]
 
 **OUTPUT FORMAT**: Comprehensive multi-dimensional impact assessment.""",
-            input_schema={
-                "action": str,
-                "context_section": str
-            },
+            input_schema={"action": str, "context_section": str},
             constraints=Constraints(
                 must_include=["direct_indirect", "stakeholders", "timeline"],
-                style_guide="Be thorough and balanced"
-            )
+                style_guide="Be thorough and balanced",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -130,30 +126,12 @@ Impact assessment:
             return f"\n**CONTEXT**: {context}\n"
         return ""
 
-    def build_context(
-        self,
-        action: str = "",
-        context: str | None = None,
-        **kwargs
-    ):
+    def build_context(self, action: str = "", context: str | None = None, **kwargs):
         context_section = self._render_context_section(context)
 
-        return super().build_context(
-            action=action,
-            context_section=context_section,
-            **kwargs
-        )
+        return super().build_context(action=action, context_section=context_section, **kwargs)
 
     def execute(
-        self,
-        provider: str = "openai",
-        action: str = "",
-        context: str | None = None,
-        **kwargs
+        self, provider: str = "openai", action: str = "", context: str | None = None, **kwargs
     ):
-        return super().execute(
-            provider=provider,
-            action=action,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, action=action, context=context, **kwargs)

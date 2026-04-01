@@ -17,28 +17,28 @@ from mycontext import Constraints, Guidance, Pattern
 class CognitiveStrategySelector(Pattern):
     """
     Select optimal cognitive strategy based on task characteristics.
-    
+
     Implements strategic knowledge from Pressley & Harris (2006):
     - Declarative: What strategies exist?
     - Procedural: How to execute each strategy?
     - Conditional: WHEN and WHY to use each strategy?
-    
+
     Use Cases:
     - Learning strategy selection
     - Problem-solving approach selection
     - Reading comprehension strategy choice
     - Study technique optimization
-    
+
     Example:
         >>> from mycontext.templates.enterprise.metacognition import CognitiveStrategySelector
-        >>> 
+        >>>
         >>> selector = CognitiveStrategySelector()
         >>> result = selector.execute(
         ...     provider="gemini",
         ...     task_type="problem-solving",
         ...     task_characteristics="Complex, multi-step, unfamiliar domain"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -68,11 +68,7 @@ class CognitiveStrategySelector(Pattern):
             description="Select optimal cognitive strategy based on task characteristics",
             version="1.0.0",
             tags=["metacognition", "enterprise", "strategy-selection", "learning"],
-            metadata={
-                "category": "metacognition",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "metacognition", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Cognitive Strategy Expert and Learning Scientist",
                 rules=[
@@ -80,9 +76,9 @@ class CognitiveStrategySelector(Pattern):
                     "Provide declarative, procedural, AND conditional knowledge",
                     "Consider learner characteristics (prior knowledge, skills, preferences)",
                     "Recommend primary strategy with alternatives",
-                    "Explain WHY each strategy is appropriate (or not) for this task"
+                    "Explain WHY each strategy is appropriate (or not) for this task",
                 ],
-                style="analytical, evidence-based, practical, educational, clear"
+                style="analytical, evidence-based, practical, educational, clear",
             ),
             directive_template="""**COGNITIVE STRATEGY SELECTION**
 
@@ -158,21 +154,18 @@ For each relevant strategy, evaluate fit:
                 "task_characteristics": str,
                 "learner_section": str,
                 "available_section": str,
-                "strategy_catalog": str
+                "strategy_catalog": str,
             },
             constraints=Constraints(
                 must_include=[
                     "conditional_knowledge",
                     "procedural_knowledge",
                     "strategy_rationale",
-                    "alternatives"
+                    "alternatives",
                 ],
-                must_not_include=[
-                    "generic_advice",
-                    "strategies_without_rationale"
-                ],
-                style_guide="Provide specific, justified strategy recommendations with clear conditional knowledge"
-            )
+                must_not_include=["generic_advice", "strategies_without_rationale"],
+                style_guide="Provide specific, justified strategy recommendations with clear conditional knowledge",
+            ),
         )
 
     def _get_strategy_catalog(self, task_type: str) -> str:
@@ -189,7 +182,6 @@ For each relevant strategy, evaluate fit:
 - **Algorithm**: Step-by-step procedure (if known)
 - **Heuristic**: Rule of thumb for common cases
             """,
-
             "learning": """
 **Learning Strategies:**
 - **Elaboration**: Connect new to existing knowledge
@@ -201,7 +193,6 @@ For each relevant strategy, evaluate fit:
 - **Self-explanation**: Explain concepts in own words
 - **Concept mapping**: Visual knowledge organization
             """,
-
             "reading": """
 **Reading Comprehension Strategies:**
 - **Previewing**: Survey text before reading
@@ -212,7 +203,6 @@ For each relevant strategy, evaluate fit:
 - **Visualizing**: Create mental images
 - **Monitoring**: Track comprehension continuously
             """,
-
             "decision-making": """
 **Decision-Making Strategies:**
 - **Systematic comparison**: Pros/cons analysis
@@ -222,7 +212,6 @@ For each relevant strategy, evaluate fit:
 - **Intuitive judgment**: Pattern recognition (if experienced)
 - **Decision matrix**: Formal scoring
             """,
-
             "writing": """
 **Writing Strategies:**
 - **Planning**: Outline before writing
@@ -234,7 +223,9 @@ For each relevant strategy, evaluate fit:
             """,
         }
 
-        return catalogs.get(task_type, """
+        return catalogs.get(
+            task_type,
+            """
 **General Cognitive Strategies:**
 - **Analysis**: Break down into components
 - **Synthesis**: Combine elements into whole
@@ -242,7 +233,8 @@ For each relevant strategy, evaluate fit:
 - **Application**: Use knowledge in new situations
 - **Comprehension**: Understand meaning
 - **Memorization**: Encode and retrieve
-        """)
+        """,
+        )
 
     def build_context(
         self,
@@ -250,32 +242,40 @@ For each relevant strategy, evaluate fit:
         task_characteristics="",
         learner_characteristics="",
         available_strategies="",
-        **kwargs
+        **kwargs,
     ):
         """
         Build context for strategy selection.
-        
+
         Args:
             task_type: Type of task (e.g., "problem-solving", "learning", "reading")
             task_characteristics: Key features of the task
             learner_characteristics: Optional learner traits (prior knowledge, skills)
             available_strategies: Optional list of strategies under consideration
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for use
         """
         # Format optional sections
-        learner_section = f"**LEARNER CHARACTERISTICS**: {learner_characteristics}" if learner_characteristics else ""
-        available_section = f"**STRATEGIES UNDER CONSIDERATION**: {available_strategies}" if available_strategies else ""
+        learner_section = (
+            f"**LEARNER CHARACTERISTICS**: {learner_characteristics}"
+            if learner_characteristics
+            else ""
+        )
+        available_section = (
+            f"**STRATEGIES UNDER CONSIDERATION**: {available_strategies}"
+            if available_strategies
+            else ""
+        )
 
         # Get strategy catalog for this task type
         strategy_catalog = self._get_strategy_catalog(task_type.lower())
 
         # Clean kwargs
-        kwargs.pop('learner_section', None)
-        kwargs.pop('available_section', None)
-        kwargs.pop('strategy_catalog', None)
+        kwargs.pop("learner_section", None)
+        kwargs.pop("available_section", None)
+        kwargs.pop("strategy_catalog", None)
 
         return super().build_context(
             task_type=task_type,
@@ -283,7 +283,7 @@ For each relevant strategy, evaluate fit:
             learner_section=learner_section,
             available_section=available_section,
             strategy_catalog=strategy_catalog,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -293,11 +293,11 @@ For each relevant strategy, evaluate fit:
         task_characteristics="",
         learner_characteristics="",
         available_strategies="",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute cognitive strategy selection.
-        
+
         Args:
             provider: LLM provider
             task_type: Type of task
@@ -305,17 +305,25 @@ For each relevant strategy, evaluate fit:
             learner_characteristics: Optional learner traits
             available_strategies: Optional strategies to consider
             **kwargs: Additional provider options
-        
+
         Returns:
             ProviderResponse with strategy recommendation
         """
-        learner_section = f"**LEARNER CHARACTERISTICS**: {learner_characteristics}" if learner_characteristics else ""
-        available_section = f"**STRATEGIES UNDER CONSIDERATION**: {available_strategies}" if available_strategies else ""
+        learner_section = (
+            f"**LEARNER CHARACTERISTICS**: {learner_characteristics}"
+            if learner_characteristics
+            else ""
+        )
+        available_section = (
+            f"**STRATEGIES UNDER CONSIDERATION**: {available_strategies}"
+            if available_strategies
+            else ""
+        )
         strategy_catalog = self._get_strategy_catalog(task_type.lower())
 
-        kwargs.pop('learner_section', None)
-        kwargs.pop('available_section', None)
-        kwargs.pop('strategy_catalog', None)
+        kwargs.pop("learner_section", None)
+        kwargs.pop("available_section", None)
+        kwargs.pop("strategy_catalog", None)
 
         return super().execute(
             provider=provider,
@@ -324,7 +332,7 @@ For each relevant strategy, evaluate fit:
             learner_section=learner_section,
             available_section=available_section,
             strategy_catalog=strategy_catalog,
-            **kwargs
+            **kwargs,
         )
 
 

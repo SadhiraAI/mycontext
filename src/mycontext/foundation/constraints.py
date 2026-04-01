@@ -5,6 +5,9 @@ Constraints define hard limits and boundaries for LLM behavior.
 They are the "must not" and "must" rules that cannot be violated.
 """
 
+from __future__ import annotations
+
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -37,6 +40,11 @@ class Constraints(BaseModel):
         max_length: Maximum output length
         language: Required output language
         output_schema: Structured field schema for JSON responses
+        verbosity: Output detail level — auto-suggested by PromptArchitect, user-overridable
+        communication_posture: Interaction tone — auto-suggested by PromptArchitect
+        forbidden_phrases: Phrases the LLM must never use in output
+        answer_first: Whether to lead with the conclusion before reasoning
+        self_check: Domain-specific verification questions the LLM applies before responding
     """
 
     must_include: list[str] | None = Field(
@@ -86,6 +94,48 @@ class Constraints(BaseModel):
         description="Structured output schema — list of {'name': str, 'type': str} field definitions",
     )
 
+    verbosity: Literal["minimal", "standard", "detailed"] | None = Field(
+        default=None,
+        description=(
+            "Output detail level. 'minimal' for quick decisions, "
+            "'standard' for most tasks, 'detailed' for deep analysis. "
+            "Auto-suggested by PromptArchitect based on task context."
+        ),
+    )
+
+    communication_posture: Literal["direct", "collaborative", "educational"] | None = Field(
+        default=None,
+        description=(
+            "Interaction tone. 'direct' for experienced audiences, "
+            "'collaborative' for brainstorming, 'educational' for learning. "
+            "Auto-suggested by PromptArchitect based on task context."
+        ),
+    )
+
+    forbidden_phrases: list[str] | None = Field(
+        default=None,
+        description=(
+            "Phrases the LLM must never use in its response. "
+            "Auto-suggested by PromptArchitect; extends the built-in anti-boilerplate list."
+        ),
+    )
+
+    answer_first: bool | None = Field(
+        default=None,
+        description=(
+            "When True, the LLM states its conclusion/answer before supporting reasoning. "
+            "Auto-suggested by PromptArchitect: True for decisions/analysis, False for tutorials."
+        ),
+    )
+
+    self_check: list[str] | None = Field(
+        default=None,
+        description=(
+            "Domain-specific verification questions the LLM must check before finalizing. "
+            "Auto-suggested by PromptArchitect based on task failure modes."
+        ),
+    )
+
     def render(self, provider: str = "generic") -> str:
         """
         Render constraints as formatted text.
@@ -130,6 +180,45 @@ class Constraints(BaseModel):
         if self.language:
             parts.append(f"Language: {self.language}")
 
+        # --- Quality controls (auto-suggested by PromptArchitect) ---
+
+        if self.verbosity == "minimal":
+            parts.append(
+                "Be concise. Lead with the essential answer. "
+                "Omit preamble, filler, and restatements of the question."
+            )
+        elif self.verbosity == "detailed":
+            parts.append(
+                "Provide thorough analysis with supporting evidence, "
+                "examples, and alternative perspectives where relevant."
+            )
+
+        if self.communication_posture == "direct":
+            parts.append("Respond directly. Skip meta-commentary about your process.")
+        elif self.communication_posture == "collaborative":
+            parts.append(
+                "Use a collaborative tone. Propose options, invite refinement, "
+                "and frame suggestions as starting points."
+            )
+        elif self.communication_posture == "educational":
+            parts.append(
+                "Explain your reasoning. Define terms that may be unfamiliar. "
+                "Use analogies where they aid understanding."
+            )
+
+        if self.answer_first is True:
+            parts.append(
+                "State your conclusion or answer first, then provide supporting reasoning."
+            )
+
+        if self.forbidden_phrases:
+            phrase_list = ", ".join(f'"{p}"' for p in self.forbidden_phrases)
+            parts.append(f"Do NOT use these phrases in your response: {phrase_list}")
+
+        if self.self_check:
+            checks = "\n".join(f"  - {c}" for c in self.self_check)
+            parts.append(f"SELF-VERIFICATION — before finalizing, confirm:\n{checks}")
+
         return "\n\n".join(parts)
 
     @staticmethod
@@ -140,9 +229,7 @@ class Constraints(BaseModel):
         - openai / generic: direct imperative — "Exclude: X"
         """
         if provider in ("anthropic", "gemini"):
-            lines = "\n".join(
-                f"  - Omit {item}." for item in items
-            )
+            lines = "\n".join(f"  - Omit {item}." for item in items)
             return f"Exclude the following (use alternatives where needed):\n{lines}"
         else:
             lines = "\n".join(f"  - {item}" for item in items)
@@ -150,9 +237,11 @@ class Constraints(BaseModel):
 
     def __repr__(self) -> str:
         """String representation"""
-        rules_count = sum([
-            len(self.must_include or []),
-            len(self.must_not_include or []),
-            len(self.format_rules or []),
-        ])
+        rules_count = sum(
+            [
+                len(self.must_include or []),
+                len(self.must_not_include or []),
+                len(self.format_rules or []),
+            ]
+        )
         return f"Constraints({rules_count} rules)"

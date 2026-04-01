@@ -5,7 +5,6 @@ Comprehensive SWOT analysis with actionable strategic insights.
 Based on strategic management and business analysis frameworks.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,23 +12,23 @@ from mycontext.structure import Pattern
 class SWOTAnalyzer(Pattern):
     """
     Conduct comprehensive SWOT analysis.
-    
+
     Analyzes:
     - Internal Strengths
     - Internal Weaknesses
     - External Opportunities
     - External Threats
     - Strategic implications
-    
+
     Based on: Strategic management frameworks
-    
+
     Example:
         >>> analyzer = SWOTAnalyzer()
         >>> context = analyzer.build_context(
         ...     subject="Our AI startup",
         ...     context="Entering B2B SaaS market"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class SWOTAnalyzer(Pattern):
                     "Be honest about weaknesses",
                     "Identify actionable opportunities",
                     "Assess realistic threats",
-                    "Provide strategic recommendations"
+                    "Provide strategic recommendations",
                 ],
-                style="analytical, balanced, strategic"
+                style="analytical, balanced, strategic",
             ),
             directive_template="""Conduct SWOT analysis for:
 
@@ -204,18 +203,15 @@ Comprehensive SWOT analysis:
    **Recommended Focus**: [Where to concentrate efforts]
 
 **OUTPUT FORMAT**: Structured SWOT with strategic recommendations.""",
-            input_schema={
-                "subject": str,
-                "context_section": str
-            },
+            input_schema={"subject": str, "context_section": str},
             constraints=Constraints(
                 must_include=[
                     "all_four_swot_quadrants",
                     "strategic_recommendations",
-                    "priority_actions"
+                    "priority_actions",
                 ],
-                style_guide="Be balanced, honest, and strategic"
-            )
+                style_guide="Be balanced, honest, and strategic",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -223,30 +219,12 @@ Comprehensive SWOT analysis:
             return f"\n**CONTEXT**: {context}\n"
         return ""
 
-    def build_context(
-        self,
-        subject: str = "",
-        context: str | None = None,
-        **kwargs
-    ):
+    def build_context(self, subject: str = "", context: str | None = None, **kwargs):
         context_section = self._render_context_section(context)
 
-        return super().build_context(
-            subject=subject,
-            context_section=context_section,
-            **kwargs
-        )
+        return super().build_context(subject=subject, context_section=context_section, **kwargs)
 
     def execute(
-        self,
-        provider: str = "openai",
-        subject: str = "",
-        context: str | None = None,
-        **kwargs
+        self, provider: str = "openai", subject: str = "", context: str | None = None, **kwargs
     ):
-        return super().execute(
-            provider=provider,
-            subject=subject,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, subject=subject, context=context, **kwargs)

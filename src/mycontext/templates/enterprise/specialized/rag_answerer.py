@@ -44,7 +44,7 @@ _TASK_INSTRUCTIONS = {
         "After drafting, verify: (1) every claim is supported by the context, "
         "(2) no specific names or numbers were missed, (3) citations are accurate. "
         "If the context does not contain enough information, say: "
-        "\"I cannot find enough information in the provided context to answer this.\" "
+        '"I cannot find enough information in the provided context to answer this." '
         "Do not guess or use external knowledge."
     ),
     "summarize": (
@@ -130,7 +130,7 @@ class RagAnswerer(Pattern):
         "For lists/comparisons: enumerate every item. "
         "After drafting, verify all claims are supported and no specifics were missed. "
         "If the context lacks the answer, say "
-        "\"I cannot find enough information in the provided context.\" "
+        '"I cannot find enough information in the provided context." '
         "Do not guess or hallucinate."
     )
 
@@ -189,9 +189,7 @@ class RagAnswerer(Pattern):
         from mycontext.utils.template_safety import safe_format_template
 
         if task not in self.VALID_TASKS:
-            raise ValueError(
-                f"Invalid task {task!r}. Choose from: {sorted(self.VALID_TASKS)}"
-            )
+            raise ValueError(f"Invalid task {task!r}. Choose from: {sorted(self.VALID_TASKS)}")
 
         instructions = _TASK_INSTRUCTIONS[task]
         directive_content = safe_format_template(

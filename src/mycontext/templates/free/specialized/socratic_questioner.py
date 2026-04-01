@@ -123,6 +123,7 @@ def _build_directive(depth: str) -> str:
 # Template class
 # ---------------------------------------------------------------------------
 
+
 class SocraticQuestioner(Pattern):
     """
     Socratic questioning for deep inquiry and assumption examination.
@@ -176,6 +177,7 @@ class SocraticQuestioner(Pattern):
             guidance=Guidance(
                 role="Socratic Philosopher and Critical Thinking Expert",
                 rules=[
+                    "Ask questions the user has not considered, not just ones that confirm their direction.",
                     "Ask probing questions rather than making statements",
                     "Question underlying assumptions systematically",
                     "Explore implications and consequences",
@@ -220,9 +222,7 @@ class SocraticQuestioner(Pattern):
             Context configured for Socratic questioning
         """
         if depth not in VALID_DEPTHS:
-            raise ValueError(
-                f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}"
-            )
+            raise ValueError(f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -241,6 +241,13 @@ class SocraticQuestioner(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["depth"] = depth
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Do my questions open new thinking or just confirm what the user already believes?",
+                "Did I challenge the strongest version of the argument, not a straw man?",
+            ],
+        )
         return ctx
 
     def execute(
@@ -266,9 +273,16 @@ class SocraticQuestioner(Pattern):
             Provider response with Socratic questions and insights
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(statement=statement, context=context, depth=depth)

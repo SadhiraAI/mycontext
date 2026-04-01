@@ -1,6 +1,7 @@
 """
 Tests for the core Context class
 """
+
 from mycontext import Context
 from mycontext.foundation import Constraints, Directive, Guidance
 
@@ -26,9 +27,7 @@ class TestContextCreation:
     def test_with_guidance_object(self):
         """Test creating context with Guidance object"""
         guidance = Guidance(
-            role="Expert Analyst",
-            rules=["Be thorough", "Use examples"],
-            style="professional"
+            role="Expert Analyst", rules=["Be thorough", "Use examples"], style="professional"
         )
         context = Context(guidance=guidance)
         assert context.guidance.role == "Expert Analyst"
@@ -50,10 +49,7 @@ class TestContextCreation:
 
     def test_with_knowledge(self):
         """Test creating context with knowledge field"""
-        context = Context(
-            guidance="Expert",
-            knowledge="Retrieved information from documents"
-        )
+        context = Context(guidance="Expert", knowledge="Retrieved information from documents")
         assert context.knowledge == "Retrieved information from documents"
 
     def test_full_context(self):
@@ -61,12 +57,9 @@ class TestContextCreation:
         context = Context(
             guidance=Guidance(role="Expert"),
             directive=Directive(content="Analyze"),
-            constraints=Constraints(
-                must_include=["key points"],
-                must_not_include=["speculation"]
-            ),
+            constraints=Constraints(must_include=["key points"], must_not_include=["speculation"]),
             knowledge="Background information",
-            data={"source": "test"}
+            data={"source": "test"},
         )
         assert context.guidance.role == "Expert"
         assert context.directive.content == "Analyze"
@@ -99,9 +92,7 @@ class TestContextAssembly:
     def test_knowledge_in_assembly(self):
         """Test that knowledge is included in assembly"""
         context = Context(
-            guidance="Expert",
-            knowledge="Here is some knowledge",
-            directive="Analyze"
+            guidance="Expert", knowledge="Here is some knowledge", directive="Analyze"
         )
         assembled = context.assemble()
         assert "Here is some knowledge" in assembled
@@ -113,7 +104,7 @@ class TestContextAssembly:
             guidance=Guidance(role="Expert"),
             constraints=Constraints(must_include=["data"]),
             knowledge="Background info",
-            directive=Directive(content="Analyze")
+            directive=Directive(content="Analyze"),
         )
         assembled = context.assemble()
 
@@ -135,10 +126,7 @@ class TestContextExport:
 
     def test_to_dict(self):
         """Test converting context to dictionary"""
-        context = Context(
-            guidance="Expert",
-            knowledge="Some knowledge"
-        )
+        context = Context(guidance="Expert", knowledge="Some knowledge")
         data = context.to_dict()
         assert isinstance(data, dict)
         assert "guidance" in data
@@ -165,10 +153,7 @@ class TestContextExport:
 
     def test_to_messages_without_user(self):
         """Test exporting to OpenAI messages format without user message"""
-        context = Context(
-            guidance="Expert",
-            directive="Analyze"
-        )
+        context = Context(guidance="Expert", directive="Analyze")
         messages = context.to_messages()
 
         assert len(messages) == 1
@@ -188,10 +173,7 @@ class TestContextExport:
 
     def test_to_messages_includes_knowledge(self):
         """Test that to_messages includes knowledge in system message"""
-        context = Context(
-            guidance="Expert",
-            knowledge="Retrieved knowledge from documents"
-        )
+        context = Context(guidance="Expert", knowledge="Retrieved knowledge from documents")
         messages = context.to_messages()
 
         assert len(messages) == 1
@@ -199,11 +181,7 @@ class TestContextExport:
 
     def test_to_langchain(self):
         """Test exporting to LangChain format"""
-        context = Context(
-            guidance="Expert",
-            knowledge="Background info",
-            directive="Analyze"
-        )
+        context = Context(guidance="Expert", knowledge="Background info", directive="Analyze")
         lc_format = context.to_langchain()
 
         assert isinstance(lc_format, dict)
@@ -215,17 +193,10 @@ class TestContextExport:
     def test_to_markdown(self):
         """Test exporting to markdown format"""
         context = Context(
-            guidance=Guidance(
-                role="Expert Analyst",
-                rules=["Be thorough"],
-                style="professional"
-            ),
+            guidance=Guidance(role="Expert Analyst", rules=["Be thorough"], style="professional"),
             directive=Directive(content="Analyze data"),
-            constraints=Constraints(
-                must_include=["metrics"],
-                must_not_include=["speculation"]
-            ),
-            knowledge="Background information"
+            constraints=Constraints(must_include=["metrics"], must_not_include=["speculation"]),
+            knowledge="Background information",
         )
         markdown = context.to_markdown()
 
@@ -251,7 +222,7 @@ class TestResearchFlow:
         ctx = Context(
             guidance=Guidance(role="Expert"),
             constraints=Constraints(must_include=["data"]),
-            directive=Directive(content="Analyze")
+            directive=Directive(content="Analyze"),
         )
         assembled = ctx.assemble()
         assert "You are Expert" in assembled
@@ -439,9 +410,7 @@ class TestResearchFlow:
     def test_new_fields_in_to_markdown(self):
         ctx = Context(
             guidance=Guidance(role="Expert", goal="Find bugs"),
-            constraints=Constraints(
-                output_schema=[{"name": "bug", "type": "str"}]
-            ),
+            constraints=Constraints(output_schema=[{"name": "bug", "type": "str"}]),
             thinking_strategy="step_by_step",
             examples=[{"input": "code", "output": "bug report"}],
         )

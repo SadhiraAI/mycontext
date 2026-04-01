@@ -113,8 +113,12 @@ def _build_directive(depth: str) -> str:
         },
         "standard": {
             "sections": [
-                problem_def, symptom_cause, _five_whys(3), _contributing(4),
-                _root_cause_statement(5), _prevention(6),
+                problem_def,
+                symptom_cause,
+                _five_whys(3),
+                _contributing(4),
+                _root_cause_statement(5),
+                _prevention(6),
             ],
             "instruction": (
                 "Conduct a thorough investigation. "
@@ -125,8 +129,16 @@ def _build_directive(depth: str) -> str:
         },
         "thorough": {
             "sections": [
-                problem_def, symptom_cause, _five_whys(3), ishikawa, _contributing(5),
-                verification, systemic, _root_cause_statement(8), _prevention(9), lessons,
+                problem_def,
+                symptom_cause,
+                _five_whys(3),
+                ishikawa,
+                _contributing(5),
+                verification,
+                systemic,
+                _root_cause_statement(8),
+                _prevention(9),
+                lessons,
             ],
             "instruction": (
                 "Conduct a comprehensive root cause investigation using all frameworks: "
@@ -153,6 +165,7 @@ def _build_directive(depth: str) -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class RootCauseAnalyzer(Pattern):
     """
@@ -265,9 +278,7 @@ class RootCauseAnalyzer(Pattern):
             Context object ready for export/use
         """
         if depth not in VALID_DEPTHS:
-            raise ValueError(
-                f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}"
-            )
+            raise ValueError(f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}")
         from mycontext.core import Context
         from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
         from mycontext.utils.template_safety import safe_format_template
@@ -297,6 +308,27 @@ class RootCauseAnalyzer(Pattern):
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["depth"] = depth
         ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Am I stopping at symptoms or reaching actual root causes?",
+                "Did I consider systemic/structural causes, not just proximate ones?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Customer support tickets doubled last month",
+                    "output": (
+                        "SYMPTOM: 2x support volume.\n"
+                        "PROXIMATE CAUSE: New onboarding flow confuses users at step 3 (68% of tickets reference it).\n"
+                        "STRUCTURAL CAUSE: No usability testing was done before the flow shipped — "
+                        "the team's release process skips user validation for 'minor' changes.\n"
+                        "ROOT: The definition of 'minor change' is subjective and has no checklist criteria, "
+                        "so UX review is routinely skipped for changes that affect user-facing flows."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -324,12 +356,20 @@ class RootCauseAnalyzer(Pattern):
             ProviderResponse with the analysis
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         from mycontext.utils.format_directives import is_machine_format
+
         if is_machine_format(output_format) and "temperature" not in provider_kwargs:
             provider_kwargs["temperature"] = 0.0
         ctx = self.build_context(

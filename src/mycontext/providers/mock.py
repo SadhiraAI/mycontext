@@ -10,18 +10,18 @@ from .base import BaseProvider, ProviderResponse
 class MockProvider(BaseProvider):
     """
     Mock provider for testing.
-    
+
     Returns canned responses without making real API calls.
     """
 
     def generate(self, context: "Context", **kwargs) -> ProviderResponse:
         """
         Generate a mock response.
-        
+
         Args:
             context: Context to execute
             **kwargs: Additional parameters
-            
+
         Returns:
             Mock response
         """
@@ -34,16 +34,16 @@ class MockProvider(BaseProvider):
             tokens_used=100,
             cost_usd=0.001,
             latency_ms=50,
-            model="mock-model-v1"
+            model="mock-model-v1",
         )
 
     def estimate_cost(self, tokens: int) -> float:
         """
         Estimate cost (mock).
-        
+
         Args:
             tokens: Token count
-            
+
         Returns:
             Mock cost
         """

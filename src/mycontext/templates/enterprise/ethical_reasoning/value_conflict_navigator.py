@@ -44,11 +44,19 @@ class ValueConflictNavigator(Pattern):
             description="Resolve competing values",
             version="1.0.0",
             tags=["ethical-reasoning", "enterprise", "values"],
-            metadata={"category": "ethical_reasoning", "license": "enterprise", "tier": "enterprise"},
+            metadata={
+                "category": "ethical_reasoning",
+                "license": "enterprise",
+                "tier": "enterprise",
+            },
             guidance=Guidance(
                 role="Value Systems Expert",
-                rules=["Identify core values in conflict", "Assess relative priority in context", "Find synthesis when possible"],
-                style="balanced, context-aware"
+                rules=[
+                    "Identify core values in conflict",
+                    "Assess relative priority in context",
+                    "Find synthesis when possible",
+                ],
+                style="balanced, context-aware",
             ),
             directive_template="""**VALUE CONFLICT RESOLUTION**
 
@@ -78,15 +86,38 @@ Can both values be partially honored?
 
 ### 5. RECOMMENDATION
 [Balance or priority with reasoning]""",
-            input_schema={"situation": str, "competing_values": str, "value_a": str, "value_b": str},
-            constraints=Constraints(must_include=["context_specific_reasoning"], style_guide="Acknowledge both values' importance")
+            input_schema={
+                "situation": str,
+                "competing_values": str,
+                "value_a": str,
+                "value_b": str,
+            },
+            constraints=Constraints(
+                must_include=["context_specific_reasoning"],
+                style_guide="Acknowledge both values' importance",
+            ),
         )
 
     def build_context(self, situation="", competing_values="", value_a="", value_b="", **kwargs):
-        return super().build_context(situation=situation, competing_values=competing_values, value_a=value_a, value_b=value_b, **kwargs)
+        return super().build_context(
+            situation=situation,
+            competing_values=competing_values,
+            value_a=value_a,
+            value_b=value_b,
+            **kwargs,
+        )
 
-    def execute(self, provider="gemini", situation="", competing_values="", value_a="", value_b="", **kwargs):
-        return super().execute(provider=provider, situation=situation, competing_values=competing_values, value_a=value_a, value_b=value_b, **kwargs)
+    def execute(
+        self, provider="gemini", situation="", competing_values="", value_a="", value_b="", **kwargs
+    ):
+        return super().execute(
+            provider=provider,
+            situation=situation,
+            competing_values=competing_values,
+            value_a=value_a,
+            value_b=value_b,
+            **kwargs,
+        )
 
 
 __all__ = ["ValueConflictNavigator"]

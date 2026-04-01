@@ -12,19 +12,19 @@ from mycontext import Guidance, Pattern
 class TradeoffAnalyzer(Pattern):
     """
     Tradeoff analysis template for examining competing priorities.
-    
+
     Analyzes situations where:
     - Multiple objectives conflict
     - Resources are constrained
     - Choices have opportunity costs
     - Optimization requires balance
-    
+
     Based on: Multi-objective optimization and decision theory
-    
+
     Example:
         ```python
         from mycontext.templates.enterprise.decision import TradeoffAnalyzer
-        
+
         analyzer = TradeoffAnalyzer()
         context = analyzer.build_context(
             situation="Choosing between speed, quality, and cost",
@@ -32,7 +32,7 @@ class TradeoffAnalyzer(Pattern):
             depth="comprehensive"
         )
         ```
-    
+
     Input Schema:
         - situation (str): The decision situation with tradeoffs
         - objectives (str, optional): Competing objectives
@@ -75,9 +75,9 @@ class TradeoffAnalyzer(Pattern):
                     "Explore Pareto optimal solutions",
                     "Consider different stakeholder priorities",
                     "Be realistic about what can be optimized simultaneously",
-                    "Propose balanced compromises"
+                    "Propose balanced compromises",
                 ],
-                style="analytical, balanced, pragmatic"
+                style="analytical, balanced, pragmatic",
             ),
             directive_template="""Analyze the tradeoffs in this situation:
 
@@ -170,8 +170,8 @@ Use specific examples, quantify where possible, and be realistic about limits.""
                 "situation": str,
                 "objectives_section": str,
                 "context_section": str,
-                "depth": str
-            }
+                "depth": str,
+            },
         )
 
     def _render_objectives_section(self, objectives: str) -> str:
@@ -192,18 +192,18 @@ Use specific examples, quantify where possible, and be realistic about limits.""
         objectives: str = "",
         context: str = "",
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Build a context for tradeoff analysis.
-        
+
         Args:
             situation: The decision situation with tradeoffs
             objectives: Competing objectives (comma-separated)
             context: Optional additional context
             depth: Analysis depth
             **kwargs: Additional parameters
-            
+
         Returns:
             Context configured for tradeoff analysis
         """
@@ -211,16 +211,16 @@ Use specific examples, quantify where possible, and be realistic about limits.""
         context_section = self._render_context_section(context or "")
 
         # Clean up kwargs
-        kwargs.pop('context', None)
-        kwargs.pop('context_section', None)
-        kwargs.pop('objectives_section', None)
+        kwargs.pop("context", None)
+        kwargs.pop("context_section", None)
+        kwargs.pop("objectives_section", None)
 
         return super().build_context(
             situation=situation,
             objectives_section=objectives_section,
             context_section=context_section,
             depth=depth,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -230,11 +230,11 @@ Use specific examples, quantify where possible, and be realistic about limits.""
         objectives: str = "",
         context: str = "",
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute tradeoff analysis directly.
-        
+
         Args:
             provider: LLM provider to use
             situation: The situation to analyze
@@ -242,7 +242,7 @@ Use specific examples, quantify where possible, and be realistic about limits.""
             context: Additional context
             depth: Analysis depth
             **kwargs: Provider parameters
-            
+
         Returns:
             Provider response with tradeoff analysis
         """
@@ -251,18 +251,27 @@ Use specific examples, quantify where possible, and be realistic about limits.""
 
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
-                               'frequency_penalty', 'presence_penalty', 'stop',
-                               'user', 'api_key', 'base_url'}
+        provider_param_names = {
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
+        }
 
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
 
         # Clean up
-        kwargs.pop('context', None)
-        kwargs.pop('context_section', None)
-        kwargs.pop('objectives_section', None)
+        kwargs.pop("context", None)
+        kwargs.pop("context_section", None)
+        kwargs.pop("objectives_section", None)
 
         return super().execute(
             provider=provider,
@@ -270,5 +279,5 @@ Use specific examples, quantify where possible, and be realistic about limits.""
             objectives_section=objectives_section,
             context_section=context_section,
             depth=depth,
-            **provider_params
+            **provider_params,
         )

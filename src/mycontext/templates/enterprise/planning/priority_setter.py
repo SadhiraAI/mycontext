@@ -5,7 +5,6 @@ Helps prioritize tasks, features, or initiatives using multiple frameworks.
 Based on prioritization methodologies (Eisenhower, RICE, MoSCoW, etc.)
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class PrioritySetter(Pattern):
     """
     Systematic prioritization across multiple frameworks.
-    
+
     Methods:
     - Eisenhower Matrix (Urgent/Important)
     - RICE Score (Reach, Impact, Confidence, Effort)
     - MoSCoW (Must, Should, Could, Won't)
     - Value vs Effort
-    
+
     Based on: Prioritization frameworks and decision theory
-    
+
     Example:
         >>> setter = PrioritySetter()
         >>> context = setter.build_context(
         ...     items=["Feature A", "Bug fix B", "Tech debt C"],
         ...     context="Product roadmap planning"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -68,9 +67,9 @@ class PrioritySetter(Pattern):
                     "Be objective about effort and impact",
                     "Consider dependencies",
                     "Balance quick wins with long-term value",
-                    "Provide clear rationale for priorities"
+                    "Provide clear rationale for priorities",
                 ],
-                style="systematic, objective, pragmatic"
+                style="systematic, objective, pragmatic",
             ),
             directive_template="""Prioritize these items:
 
@@ -219,19 +218,11 @@ Comprehensive prioritization:
     - Cut [W] to focus on: [Priority]
 
 **OUTPUT FORMAT**: Clear priority ranking with multi-framework justification.""",
-            input_schema={
-                "items_section": str,
-                "context_section": str,
-                "goal": str
-            },
+            input_schema={"items_section": str, "context_section": str, "goal": str},
             constraints=Constraints(
-                must_include=[
-                    "multiple_frameworks",
-                    "final_ranking",
-                    "execution_plan"
-                ],
-                style_guide="Be systematic and objective, not arbitrary"
-            )
+                must_include=["multiple_frameworks", "final_ranking", "execution_plan"],
+                style_guide="Be systematic and objective, not arbitrary",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -244,24 +235,21 @@ Comprehensive prioritization:
             return "1. [Items to prioritize]"
         if isinstance(items, str):
             parts = [t.strip() for t in items.replace("\n", ",").split(",") if t.strip()]
-            return "\n".join(f"{i+1}. {item}" for i, item in enumerate(parts))
-        return "\n".join(f"{i+1}. {item}" for i, item in enumerate(items))
+            return "\n".join(f"{i + 1}. {item}" for i, item in enumerate(parts))
+        return "\n".join(f"{i + 1}. {item}" for i, item in enumerate(items))
 
     def build_context(
         self,
         items: list[str] | None = None,
         goal: str = "Optimize resource allocation",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         items_section = self._render_items_section(items)
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            items_section=items_section,
-            goal=goal,
-            context_section=context_section,
-            **kwargs
+            items_section=items_section, goal=goal, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -270,12 +258,6 @@ Comprehensive prioritization:
         items: list[str] | None = None,
         goal: str = "Optimize resource allocation",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
-        return super().execute(
-            provider=provider,
-            items=items,
-            goal=goal,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, items=items, goal=goal, context=context, **kwargs)

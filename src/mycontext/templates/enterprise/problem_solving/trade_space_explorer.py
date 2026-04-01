@@ -7,29 +7,28 @@ Based on systems engineering and design space exploration.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class TradeSpaceExplorer(Pattern):
     """
     Explore trade space systematically.
-    
+
     Investigates:
     - Solution alternatives
     - Design space
     - Parameter trade-offs
     - Feasible regions
-    
+
     Based on: Systems engineering and design optimization
-    
+
     Example:
         >>> explorer = TradeSpaceExplorer()
         >>> context = explorer.build_context(
         ...     problem="Design optimal database architecture",
         ...     parameters=["Performance", "Cost", "Scalability"]
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class TradeSpaceExplorer(Pattern):
                     "Identify feasible regions",
                     "Explore extremes and middle ground",
                     "Find sweet spots",
-                    "Document trade-offs"
+                    "Document trade-offs",
                 ],
-                style="exploratory, systematic, comprehensive"
+                style="exploratory, systematic, comprehensive",
             ),
             directive_template="""Explore trade space for:
 
@@ -127,15 +126,11 @@ Trade space exploration:
    - Surprising findings: [Unexpected results]
 
 **OUTPUT FORMAT**: Comprehensive design space analysis.""",
-            input_schema={
-                "problem": str,
-                "parameters": str,
-                "context_section": str
-            },
+            input_schema={"problem": str, "parameters": str, "context_section": str},
             constraints=Constraints(
                 must_include=["extremes", "feasible_region", "sweet_spots"],
-                style_guide="Be exploratory and thorough"
-            )
+                style_guide="Be exploratory and thorough",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -144,19 +139,12 @@ Trade space exploration:
         return ""
 
     def build_context(
-        self,
-        problem: str = "",
-        parameters: str = "",
-        context: str | None = None,
-        **kwargs
+        self, problem: str = "", parameters: str = "", context: str | None = None, **kwargs
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            problem=problem,
-            parameters=parameters,
-            context_section=context_section,
-            **kwargs
+            problem=problem, parameters=parameters, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -165,12 +153,8 @@ Trade space exploration:
         problem: str = "",
         parameters: str = "",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            problem=problem,
-            parameters=parameters,
-            context=context,
-            **kwargs
+            provider=provider, problem=problem, parameters=parameters, context=context, **kwargs
         )

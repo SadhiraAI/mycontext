@@ -18,28 +18,28 @@ from mycontext import Constraints, Guidance, Pattern
 class CognitiveLoadManager(Pattern):
     """
     Optimize cognitive load for effective learning.
-    
+
     Three Types of Cognitive Load:
     1. Intrinsic: Inherent difficulty of material
     2. Extraneous: Unnecessary cognitive burden (reduce this!)
     3. Germane: Effort toward schema construction (increase this!)
-    
+
     Use Cases:
     - Instructional design
     - Educational content creation
     - Training program design
     - Learning interface design
-    
+
     Example:
         >>> from mycontext.templates.enterprise.learning import CognitiveLoadManager
-        >>> 
+        >>>
         >>> pattern = CognitiveLoadManager()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     learning_material="Quantum mechanics course module",
         ...     learner_background="Undergraduate physics students"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -70,11 +70,7 @@ class CognitiveLoadManager(Pattern):
             description="Manage cognitive load for optimal learning",
             version="1.0.0",
             tags=["learning", "enterprise", "cognitive-load", "instructional-design"],
-            metadata={
-                "category": "learning",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "learning", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Cognitive Load Expert and Instructional Designer",
                 rules=[
@@ -82,9 +78,9 @@ class CognitiveLoadManager(Pattern):
                     "Reduce extraneous load (unnecessary complexity)",
                     "Optimize intrinsic load (appropriate difficulty)",
                     "Increase germane load (schema-building effort)",
-                    "Stay within working memory limits (7±2 chunks)"
+                    "Stay within working memory limits (7±2 chunks)",
                 ],
-                style="analytical, precise, learner-centered, evidence-based"
+                style="analytical, precise, learner-centered, evidence-based",
             ),
             directive_template="""**COGNITIVE LOAD ANALYSIS**
 
@@ -297,31 +293,23 @@ Before presenting material, ensure:
 - Steady progress
 - Able to explain concepts
 - Applying knowledge""",
-            input_schema={
-                "learning_material": str,
-                "learner_background": str
-            },
+            input_schema={"learning_material": str, "learner_background": str},
             constraints=Constraints(
                 must_include=[
                     "three_load_types",
                     "extraneous_reduction",
                     "germane_increase",
-                    "chunking_strategy"
+                    "chunking_strategy",
                 ],
-                must_not_include=[
-                    "cognitive_overload",
-                    "poor_organization"
-                ],
-                style_guide="Analytical and precise. Focus on load optimization. Evidence-based principles."
-            )
+                must_not_include=["cognitive_overload", "poor_organization"],
+                style_guide="Analytical and precise. Focus on load optimization. Evidence-based principles.",
+            ),
         )
 
     def build_context(self, learning_material="", learner_background="", **kwargs):
         """Build context for cognitive load management."""
         return super().build_context(
-            learning_material=learning_material,
-            learner_background=learner_background,
-            **kwargs
+            learning_material=learning_material, learner_background=learner_background, **kwargs
         )
 
     def execute(self, provider="openai", learning_material="", learner_background="", **kwargs):
@@ -330,7 +318,7 @@ Before presenting material, ensure:
             provider=provider,
             learning_material=learning_material,
             learner_background=learner_background,
-            **kwargs
+            **kwargs,
         )
 
 

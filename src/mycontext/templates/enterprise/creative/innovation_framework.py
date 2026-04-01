@@ -5,7 +5,6 @@ Structured innovation process using proven frameworks.
 Based on innovation theory and design thinking.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class InnovationFramework(Pattern):
     """
     Apply systematic innovation framework.
-    
+
     Uses:
     - Design thinking
     - Jobs-to-be-done
     - Blue ocean strategy
     - Innovation pipeline
-    
+
     Based on: Innovation theory and design thinking
-    
+
     Example:
         >>> framework = InnovationFramework()
         >>> context = framework.build_context(
         ...     challenge="Disrupt traditional banking",
         ...     context="Fintech startup"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class InnovationFramework(Pattern):
                     "Challenge assumptions",
                     "Think beyond incremental",
                     "Prototype and test",
-                    "Iterate rapidly"
+                    "Iterate rapidly",
                 ],
-                style="creative, systematic, user-focused"
+                style="creative, systematic, user-focused",
             ),
             directive_template="""Apply innovation framework to:
 
@@ -119,14 +118,11 @@ Innovation process:
    - Phase 3: [Optimization]
 
 **OUTPUT FORMAT**: Systematic innovation plan from empathy to execution.""",
-            input_schema={
-                "challenge": str,
-                "context_section": str
-            },
+            input_schema={"challenge": str, "context_section": str},
             constraints=Constraints(
                 must_include=["user_needs", "ideas", "prototype_plan"],
-                style_guide="Be creative but systematic"
-            )
+                style_guide="Be creative but systematic",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -134,30 +130,12 @@ Innovation process:
             return f"\n**CONTEXT**: {context}\n"
         return ""
 
-    def build_context(
-        self,
-        challenge: str = "",
-        context: str | None = None,
-        **kwargs
-    ):
+    def build_context(self, challenge: str = "", context: str | None = None, **kwargs):
         context_section = self._render_context_section(context)
 
-        return super().build_context(
-            challenge=challenge,
-            context_section=context_section,
-            **kwargs
-        )
+        return super().build_context(challenge=challenge, context_section=context_section, **kwargs)
 
     def execute(
-        self,
-        provider: str = "openai",
-        challenge: str = "",
-        context: str | None = None,
-        **kwargs
+        self, provider: str = "openai", challenge: str = "", context: str | None = None, **kwargs
     ):
-        return super().execute(
-            provider=provider,
-            challenge=challenge,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, challenge=challenge, context=context, **kwargs)

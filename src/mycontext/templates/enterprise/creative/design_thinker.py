@@ -5,7 +5,6 @@ Structured design thinking process for human-centered innovation.
 Based on Stanford d.school design thinking framework.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,23 +12,23 @@ from mycontext.structure import Pattern
 class DesignThinker(Pattern):
     """
     Apply design thinking methodology.
-    
+
     Process:
     - Empathize with users
     - Define problem
     - Ideate solutions
     - Prototype
     - Test and iterate
-    
+
     Based on: Design thinking (d.school framework)
-    
+
     Example:
         >>> thinker = DesignThinker()
         >>> context = thinker.build_context(
         ...     challenge="Improve healthcare patient experience",
         ...     users="Hospital patients"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -70,9 +69,9 @@ class DesignThinker(Pattern):
                     "Focus on human needs",
                     "Embrace ambiguity",
                     "Prototype to learn",
-                    "Iterate based on feedback"
+                    "Iterate based on feedback",
                 ],
-                style="empathetic, creative, iterative"
+                style="empathetic, creative, iterative",
             ),
             directive_template="""Apply design thinking to:
 
@@ -127,15 +126,11 @@ Design thinking process:
    [Description of iterated solution based on learning]
 
 **OUTPUT FORMAT**: Human-centered design process with learning loops.""",
-            input_schema={
-                "challenge": str,
-                "users": str,
-                "context_section": str
-            },
+            input_schema={"challenge": str, "users": str, "context_section": str},
             constraints=Constraints(
                 must_include=["empathy", "prototype", "learnings"],
-                style_guide="Be user-focused and iterative"
-            )
+                style_guide="Be user-focused and iterative",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -144,19 +139,12 @@ Design thinking process:
         return ""
 
     def build_context(
-        self,
-        challenge: str = "",
-        users: str = "",
-        context: str | None = None,
-        **kwargs
+        self, challenge: str = "", users: str = "", context: str | None = None, **kwargs
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            challenge=challenge,
-            users=users,
-            context_section=context_section,
-            **kwargs
+            challenge=challenge, users=users, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -165,12 +153,8 @@ Design thinking process:
         challenge: str = "",
         users: str = "",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            challenge=challenge,
-            users=users,
-            context=context,
-            **kwargs
+            provider=provider, challenge=challenge, users=users, context=context, **kwargs
         )

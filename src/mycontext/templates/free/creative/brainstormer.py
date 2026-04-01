@@ -144,7 +144,11 @@ def _build_directive(mode: str) -> str:
 
     if mode == "focused":
         sections_list = [
-            s["framing"], s["rapid"], _reverse(3), _clustering(4), _top_ideas(5),
+            s["framing"],
+            s["rapid"],
+            _reverse(3),
+            _clustering(4),
+            _top_ideas(5),
         ]
         instruction = (
             "Run a lean, high-signal brainstorm. Frame the challenge, generate "
@@ -162,9 +166,20 @@ def _build_directive(mode: str) -> str:
         total = "2 sections (reverse brainstorm only)"
     else:
         sections_list = [
-            s["framing"], s["rules"], s["rapid"], s["build_on"], _reverse(5),
-            s["random_stimulus"], s["role_play"], s["constraint_removal"], s["category"],
-            _clustering(10), _voting(11), _top_ideas(12), _dark_horses(13), _next_steps(14),
+            s["framing"],
+            s["rules"],
+            s["rapid"],
+            s["build_on"],
+            _reverse(5),
+            s["random_stimulus"],
+            s["role_play"],
+            s["constraint_removal"],
+            s["category"],
+            _clustering(10),
+            _voting(11),
+            _top_ideas(12),
+            _dark_horses(13),
+            _next_steps(14),
         ]
         instruction = (
             "Facilitate a comprehensive divergent brainstorming session. "
@@ -191,6 +206,7 @@ def _build_directive(mode: str) -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class Brainstormer(Pattern):
     """
@@ -311,9 +327,7 @@ class Brainstormer(Pattern):
                 | ``"focused"`` (5 sections) | ``"reverse"`` (2 sections)
         """
         if mode not in VALID_MODES:
-            raise ValueError(
-                f"Invalid mode {mode!r}. Choose from: {sorted(VALID_MODES)}"
-            )
+            raise ValueError(f"Invalid mode {mode!r}. Choose from: {sorted(VALID_MODES)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -333,7 +347,8 @@ class Brainstormer(Pattern):
             directive=Directive(content=directive_content),
             constraints=self.constraints,
             data={
-                "topic": topic, "goal": goal,
+                "topic": topic,
+                "goal": goal,
                 "context_section": context_section,
                 "constraints_section": constraints_section,
             },
@@ -341,6 +356,25 @@ class Brainstormer(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["mode"] = mode
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Are at least 30% of ideas genuinely unconventional?",
+                "Do any two ideas essentially duplicate each other?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Ideas for reducing employee turnover at a mid-size tech company",
+                    "output": (
+                        "1. 'Stay interviews' quarterly — ask why people stay, not just exit interviews when they leave\n"
+                        "2. Internal gig marketplace — let employees try other teams for 2-week rotations before they quit to explore\n"
+                        "3. Transparent comp bands published internally — eliminates the #1 reason people interview elsewhere\n"
+                        "Dark horse: Offer a $5K 'quit bonus' at the 90-day mark — those who stay are genuinely committed"
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -366,13 +400,23 @@ class Brainstormer(Pattern):
             **kwargs: Provider parameters (model, temperature, max_tokens, etc.)
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(
-            topic=topic, goal=goal, context=context,
-            constraints=constraints, mode=mode,
+            topic=topic,
+            goal=goal,
+            context=context,
+            constraints=constraints,
+            mode=mode,
         )
         return ctx.execute(provider=provider, **provider_kwargs)

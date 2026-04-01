@@ -5,7 +5,6 @@ Systematic anomaly detection and investigation.
 Based on statistical analysis and pattern recognition.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class AnomalyDetector(Pattern):
     """
     Detect and analyze anomalies.
-    
+
     Identifies:
     - Statistical outliers
     - Pattern breaks
     - Unexpected events
     - System anomalies
-    
+
     Based on: Anomaly detection and statistical analysis
-    
+
     Example:
         >>> detector = AnomalyDetector()
         >>> context = detector.build_context(
         ...     data="Server response times over past week",
         ...     baseline="Average 200ms"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -67,9 +66,9 @@ class AnomalyDetector(Pattern):
                     "Quantify deviation",
                     "Investigate causes",
                     "Distinguish signal from noise",
-                    "Recommend action"
+                    "Recommend action",
                 ],
-                style="analytical, methodical, inquisitive"
+                style="analytical, methodical, inquisitive",
             ),
             directive_template="""Detect anomalies in:
 
@@ -126,15 +125,11 @@ Anomaly detection:
    - Prevention: [How to avoid future]
 
 **OUTPUT FORMAT**: Clear anomaly analysis with actionable next steps.""",
-            input_schema={
-                "data": str,
-                "baseline": str,
-                "context_section": str
-            },
+            input_schema={"data": str, "baseline": str, "context_section": str},
             constraints=Constraints(
                 must_include=["anomalies", "causes", "recommendations"],
-                style_guide="Be specific and evidence-based"
-            )
+                style_guide="Be specific and evidence-based",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -143,19 +138,12 @@ Anomaly detection:
         return ""
 
     def build_context(
-        self,
-        data: str = "",
-        baseline: str = "",
-        context: str | None = None,
-        **kwargs
+        self, data: str = "", baseline: str = "", context: str | None = None, **kwargs
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            data=data,
-            baseline=baseline,
-            context_section=context_section,
-            **kwargs
+            data=data, baseline=baseline, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -164,12 +152,8 @@ Anomaly detection:
         data: str = "",
         baseline: str = "",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            data=data,
-            baseline=baseline,
-            context=context,
-            **kwargs
+            provider=provider, data=data, baseline=baseline, context=context, **kwargs
         )

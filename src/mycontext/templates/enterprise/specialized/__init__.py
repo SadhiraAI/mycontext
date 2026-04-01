@@ -1,4 +1,5 @@
 """Specialized Patterns (Enterprise) - Content, ambiguity, risk mitigation, impact, concepts, RAG, memory, query planning"""
+
 from .ambiguity_resolver import AmbiguityResolver
 from .concept_explainer import ConceptExplainer
 from .content_outliner import ContentOutliner

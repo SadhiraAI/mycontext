@@ -5,25 +5,30 @@ Patterns are like functions in traditional programming - reusable,
 composable units that encapsulate context engineering best practices.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import yaml
 from pydantic import BaseModel, Field
 
 from ..foundation import Constraints, Directive, Guidance
 
+if TYPE_CHECKING:
+    from ..core import Context
+
 
 class Pattern(BaseModel):
     """
     A reusable context template that encapsulates best practices.
-    
+
     Patterns are the "functions" of context engineering. They define:
     - The structure of a context
     - Expected inputs and outputs
     - Default guidance and constraints
     - Optimization strategies
-    
+
     Example:
         ```python
         # Define a pattern
@@ -44,7 +49,7 @@ class Pattern(BaseModel):
                 "suggestions": list
             }
         )
-        
+
         # Use the pattern
         result = code_review.execute(
             code=my_code,
@@ -52,7 +57,7 @@ class Pattern(BaseModel):
             focus_areas=["security", "performance"]
         )
         ```
-    
+
     Attributes:
         name: Pattern name/identifier
         description: What this pattern does
@@ -65,56 +70,31 @@ class Pattern(BaseModel):
         version: Pattern version
     """
 
-    name: str = Field(
-        ...,
-        description="Pattern name/identifier",
-        min_length=1
-    )
+    name: str = Field(..., description="Pattern name/identifier", min_length=1)
 
-    description: str | None = Field(
-        default=None,
-        description="What this pattern does"
-    )
+    description: str | None = Field(default=None, description="What this pattern does")
 
-    guidance: Guidance | None = Field(
-        default=None,
-        description="Default guidance for this pattern"
-    )
+    guidance: Guidance | None = Field(default=None, description="Default guidance for this pattern")
 
     directive_template: str | None = Field(
-        default=None,
-        description="Template for directive (supports variables)"
+        default=None, description="Template for directive (supports variables)"
     )
 
-    constraints: Constraints | None = Field(
-        default=None,
-        description="Default constraints"
-    )
+    constraints: Constraints | None = Field(default=None, description="Default constraints")
 
     input_schema: dict[str, type] = Field(
-        default_factory=dict,
-        description="Expected input structure"
+        default_factory=dict, description="Expected input structure"
     )
 
     output_schema: dict[str, type] = Field(
-        default_factory=dict,
-        description="Expected output structure"
+        default_factory=dict, description="Expected output structure"
     )
 
-    tags: list[str] = Field(
-        default_factory=list,
-        description="Categorization tags"
-    )
+    tags: list[str] = Field(default_factory=list, description="Categorization tags")
 
-    version: str = Field(
-        default="1.0.0",
-        description="Pattern version"
-    )
+    version: str = Field(default="1.0.0", description="Pattern version")
 
-    metadata: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata"
-    )
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
     GENERIC_PROMPT: ClassVar[str | None] = None
 
@@ -145,24 +125,38 @@ class Pattern(BaseModel):
                 filled = filled.replace(placeholder, str(value))
 
         import re
+
         filled = re.sub(r"\{context_section\}", "", filled)
         filled = re.sub(r"\n{3,}", "\n\n", filled).strip()
         return filled
 
-    def build_context(self, output_format: str = "structured", **inputs) -> "Context":
+    @staticmethod
+    def _apply_default_self_check(ctx: Context, defaults: list[str]) -> None:
+        """Set default self_check on a Context's constraints if not already set.
+
+        If the Context has no constraints, creates one with just self_check.
+        If constraints exist but self_check is None, sets the defaults.
+        If self_check is already set (user-provided), leaves it untouched.
+        """
+        if ctx.constraints is None:
+            ctx.constraints = Constraints(self_check=defaults)
+        elif ctx.constraints.self_check is None:
+            ctx.constraints = ctx.constraints.model_copy(update={"self_check": defaults})
+
+    def build_context(self, output_format: str = "structured", **inputs) -> Context:
         """
         Build a Context from this pattern with the given inputs.
-        
+
         Args:
             output_format: Controls presentation style of the LLM response.
                 Human formats: "structured" (default), "narrative", "brief",
                 "actionable", "slides", "email", "qa", "checklist".
                 Machine formats: "json", "table".
             **inputs: Input values matching input_schema
-            
+
         Returns:
             Context instance ready to execute
-            
+
         Raises:
             ValueError: If required inputs are missing or output_format is invalid
         """
@@ -182,6 +176,7 @@ class Pattern(BaseModel):
         directive = None
         if self.directive_template:
             from ..utils.template_safety import safe_format_template
+
             directive_content = safe_format_template(self.directive_template, **inputs)
             fmt = get_format_directive(output_format)
             if fmt:
@@ -190,10 +185,7 @@ class Pattern(BaseModel):
 
         # Create context
         context = Context(
-            guidance=self.guidance,
-            directive=directive,
-            constraints=self.constraints,
-            data=inputs
+            guidance=self.guidance, directive=directive, constraints=self.constraints, data=inputs
         )
 
         context.metadata["pattern"] = self.name
@@ -202,10 +194,16 @@ class Pattern(BaseModel):
 
         return context
 
-    def execute(self, provider: str = "openai", mode: str = "full", output_format: str = "structured", **inputs) -> Any:
+    def execute(
+        self,
+        provider: str = "openai",
+        mode: str = "full",
+        output_format: str = "structured",
+        **inputs,
+    ) -> Any:
         """
         Execute this pattern directly.
-        
+
         Args:
             provider: LLM provider to use
             mode: "full" for the rich template, "generic" for the concise prompt
@@ -214,7 +212,7 @@ class Pattern(BaseModel):
                 "actionable", "slides", "email", "qa", "checklist".
                 Machine formats: "json", "table".
             **inputs: Input values (template inputs + provider kwargs like 'model')
-            
+
         Returns:
             Execution result
         """
@@ -223,8 +221,18 @@ class Pattern(BaseModel):
         template_inputs = {}
         provider_kwargs = {}
 
-        provider_params = {'model', 'temperature', 'max_tokens', 'top_p', 'frequency_penalty',
-                          'presence_penalty', 'stop', 'user', 'api_key', 'base_url'}
+        provider_params = {
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
+        }
 
         for key, value in inputs.items():
             if key in provider_params:
@@ -239,6 +247,7 @@ class Pattern(BaseModel):
         if mode == "generic":
             from ..core import Context
             from ..utils.format_directives import get_format_directive
+
             prompt_text = self.generic_prompt(**template_inputs)
             fmt = get_format_directive(output_format)
             if fmt:
@@ -253,10 +262,10 @@ class Pattern(BaseModel):
     def _validate_inputs(self, inputs: dict[str, Any]) -> None:
         """
         Validate inputs against schema.
-        
+
         Args:
             inputs: Input values to validate
-            
+
         Raises:
             ValueError: If validation fails
         """
@@ -273,17 +282,17 @@ class Pattern(BaseModel):
                 )
 
     @classmethod
-    def load(cls, name: str, library_path: Path | None = None) -> "Pattern":
+    def load(cls, name: str, library_path: Path | None = None) -> Pattern:
         """
         Load a pattern from the pattern library.
-        
+
         Args:
             name: Pattern name
             library_path: Path to pattern library (default: built-in)
-            
+
         Returns:
             Pattern instance
-            
+
         Raises:
             FileNotFoundError: If pattern not found
         """
@@ -304,30 +313,30 @@ class Pattern(BaseModel):
     def save(self, path: Path) -> None:
         """
         Save pattern to file.
-        
+
         Args:
             path: Where to save the pattern
         """
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             yaml.dump(self.model_dump(), f, default_flow_style=False)
 
     def to_dict(self) -> dict[str, Any]:
         """
         Convert to dictionary.
-        
+
         Returns:
             Dictionary representation
         """
         return self.model_dump()
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Pattern":
+    def from_dict(cls, data: dict[str, Any]) -> Pattern:
         """
         Create from dictionary.
-        
+
         Args:
             data: Dictionary representation
-            
+
         Returns:
             Pattern instance
         """
@@ -336,4 +345,3 @@ class Pattern(BaseModel):
     def __repr__(self) -> str:
         """String representation"""
         return f"Pattern(name='{self.name}', version={self.version})"
-

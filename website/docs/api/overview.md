@@ -166,10 +166,18 @@ Constraints(
     max_length: int | None = None,
     language: str | None = None,
     output_schema: list[dict] | None = None,
+    # Quality controls (auto-suggested by PromptArchitect) — new in 0.11.0
+    verbosity: "minimal" | "standard" | "detailed" | None = None,
+    communication_posture: "direct" | "collaborative" | "educational" | None = None,
+    answer_first: bool | None = None,
+    forbidden_phrases: list[str] | None = None,
+    self_check: list[str] | None = None,
 )
 ```
 
 `output_schema` takes a list of `{"name": str, "type": str}` dicts. In `research_flow=True` mode, this generates a dedicated `## OUTPUT FORMAT` section with a JSON skeleton.
+
+The five quality control fields (`verbosity`, `communication_posture`, `answer_first`, `forbidden_phrases`, `self_check`) are auto-suggested by `PromptArchitect.build()` and `improve()` and can be overridden by the user. See [Constraints → Quality Controls](../foundations/constraints#quality-controls-new-in-0110).
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -515,6 +523,40 @@ result.quality_score   # QualityScore
 result.execution_result  # ProviderResponse | None
 result.gated           # bool
 ```
+
+---
+
+## Fragments — `mycontext.fragments`
+
+Reusable quality-enhancing building blocks for Blueprint composition. Each fragment can be applied to any `Context` to merge constraints and guidance rules.
+
+```python
+from mycontext.fragments import (
+    anti_fluff,              # Sets verbosity="minimal", bans filler phrases
+    answer_first_fragment,   # Sets answer_first=True
+    objectivity,             # Adds objectivity rules to guidance
+    self_check_analysis,     # Adds analysis-focused self-check questions
+    self_check_creative,     # Adds creative-focused self-check questions
+    self_check_risk,         # Adds risk-focused self-check questions
+    structured_json,         # Sets output_contract for JSON output
+    grounding_strict,        # Adds strict grounding rules
+    educational_posture,     # Sets communication_posture="educational"
+    collaborative_posture,   # Sets communication_posture="collaborative"
+    hedging_ban,             # Bans hedging phrases
+    executive_brevity,       # Sets verbosity="minimal", answer_first=True, direct posture
+)
+
+# Apply to any Context
+ctx = some_template.build_context(...)
+anti_fluff.apply(ctx)
+objectivity.apply(ctx)
+```
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `fragment.apply(ctx)` | `None` | Merge fragment settings into Context in-place |
+| `fragment.constraints()` | `Constraints \| None` | Get the fragment's Constraints object |
+| `fragment.guidance_rules()` | `list[str]` | Get the fragment's guidance rules |
 
 ---
 

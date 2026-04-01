@@ -19,6 +19,7 @@ from mycontext.knowledge import (
 # Session Tests
 # ============================================================================
 
+
 def test_session_creation():
     """Test creating a session"""
     session = Session()
@@ -175,6 +176,7 @@ def test_session_len():
 # Message Tests
 # ============================================================================
 
+
 def test_message_creation():
     """Test creating a message"""
     msg = Message(role="user", content="Hello")
@@ -197,6 +199,7 @@ def test_message_render():
 # ============================================================================
 # FileArchive Tests
 # ============================================================================
+
 
 def test_file_archive_creation(tmp_path):
     """Test creating a file archive"""
@@ -311,6 +314,7 @@ def test_file_archive_stats(tmp_path):
 # ============================================================================
 # MemoryArchive Tests
 # ============================================================================
+
 
 def test_memory_archive_creation():
     """Test creating a memory archive"""

@@ -43,11 +43,19 @@ class ConsequentialistAnalyzer(Pattern):
             description="Evaluate long-term ethical consequences",
             version="1.0.0",
             tags=["ethical-reasoning", "enterprise", "consequences"],
-            metadata={"category": "ethical_reasoning", "license": "enterprise", "tier": "enterprise"},
+            metadata={
+                "category": "ethical_reasoning",
+                "license": "enterprise",
+                "tier": "enterprise",
+            },
             guidance=Guidance(
                 role="Consequentialist Ethics Expert",
-                rules=["Analyze consequences across time horizons", "Consider second-order effects", "Assess probability and magnitude"],
-                style="rigorous, forward-looking"
+                rules=[
+                    "Analyze consequences across time horizons",
+                    "Consider second-order effects",
+                    "Assess probability and magnitude",
+                ],
+                style="rigorous, forward-looking",
             ),
             directive_template="""**CONSEQUENTIALIST ANALYSIS**
 
@@ -78,7 +86,10 @@ Expected value calculation for key outcomes
 ### RECOMMENDATION
 Net consequentialist assessment: [Positive/Negative/Uncertain]""",
             input_schema={"action": str, "scope": str},
-            constraints=Constraints(must_include=["time_horizons", "second_order_effects"], style_guide="Consider long-term impacts")
+            constraints=Constraints(
+                must_include=["time_horizons", "second_order_effects"],
+                style_guide="Consider long-term impacts",
+            ),
         )
 
     def build_context(self, action="", scope="", **kwargs):

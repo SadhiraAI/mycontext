@@ -91,7 +91,15 @@ def _build_directive(depth: str) -> str:
             ),
         },
         "comprehensive": {
-            "section_keys": ["type", "core_task", "components", "prerequisites", "assumptions", "complexity", "strategy"],
+            "section_keys": [
+                "type",
+                "core_task",
+                "components",
+                "prerequisites",
+                "assumptions",
+                "complexity",
+                "strategy",
+            ],
             "restatement_n": 8,
             "instruction": (
                 "Provide a complete analysis across all dimensions. "
@@ -126,6 +134,7 @@ def _build_directive(depth: str) -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class QuestionAnalyzer(Pattern):
     """
@@ -231,9 +240,7 @@ class QuestionAnalyzer(Pattern):
             Context object ready for export/use
         """
         if depth not in VALID_DEPTHS:
-            raise ValueError(
-                f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}"
-            )
+            raise ValueError(f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -252,6 +259,13 @@ class QuestionAnalyzer(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["depth"] = depth
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Did I answer what was actually asked, or what I assumed was asked?",
+                "Did I identify unstated assumptions in the question?",
+            ],
+        )
         return ctx
 
     def execute(
@@ -277,9 +291,16 @@ class QuestionAnalyzer(Pattern):
             ProviderResponse with the analysis
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(question=question, context=context, depth=depth)

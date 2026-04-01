@@ -21,11 +21,8 @@ print("STRESS TEST SUITE - mycontext SDK")
 print("=" * 80)
 print()
 
-test_results = {
-    "passed": 0,
-    "failed": 0,
-    "errors": []
-}
+test_results = {"passed": 0, "failed": 0, "errors": []}
+
 
 def test(name, func):
     """Run a test and track results."""
@@ -43,9 +40,11 @@ def test(name, func):
         print(f"   Error: {str(e)[:150]}")
         return False
 
+
 print("=" * 80)
 print("TEST 1: INSTANTIATE ALL 50 PATTERNS")
 print("=" * 80)
+
 
 def test_all_50_patterns():
     from mycontext.templates.enterprise.analysis import (
@@ -124,35 +123,68 @@ def test_all_50_patterns():
     )
 
     patterns = [
-        QuestionAnalyzer(), DataAnalyzer(), TrendIdentifier(),
-        GapAnalyzer(), SWOTAnalyzer(), AnomalyDetector(),
-        StepByStepReasoner(), AnalogicalReasoner(), CausalReasoner(),
-        RootCauseAnalyzer(), HypothesisGenerator(),
-        DecisionFramework(), ComparativeAnalyzer(), TradeoffAnalyzer(),
-        MultiObjectiveOptimizer(), CostBenefitAnalyzer(),
-        IdeaGenerator(), Brainstormer(), InnovationFramework(),
-        DesignThinker(), MetaphorGenerator(),
-        SimplificationEngine(), ClarityOptimizer(), AudienceAdapter(),
-        PersuasionFramework(), NarrativeBuilder(), TechnicalTranslator(),
+        QuestionAnalyzer(),
+        DataAnalyzer(),
+        TrendIdentifier(),
+        GapAnalyzer(),
+        SWOTAnalyzer(),
+        AnomalyDetector(),
+        StepByStepReasoner(),
+        AnalogicalReasoner(),
+        CausalReasoner(),
+        RootCauseAnalyzer(),
+        HypothesisGenerator(),
+        DecisionFramework(),
+        ComparativeAnalyzer(),
+        TradeoffAnalyzer(),
+        MultiObjectiveOptimizer(),
+        CostBenefitAnalyzer(),
+        IdeaGenerator(),
+        Brainstormer(),
+        InnovationFramework(),
+        DesignThinker(),
+        MetaphorGenerator(),
+        SimplificationEngine(),
+        ClarityOptimizer(),
+        AudienceAdapter(),
+        PersuasionFramework(),
+        NarrativeBuilder(),
+        TechnicalTranslator(),
         FeedbackComposer(),
-        ScenarioPlanner(), StakeholderMapper(), PrioritySetter(),
-        DeadlineManager(), ResourceAllocator(),
-        ProblemDecomposer(), BottleneckIdentifier(), ConstraintOptimizer(),
-        DependencyMapper(), EfficiencyAnalyzer(), TradeSpaceExplorer(),
-        CodeReviewer(), ContentOutliner(), SocraticQuestioner(),
-        IntentRecognizer(), AmbiguityResolver(), RiskAssessor(),
-        RiskMitigator(), ImpactAssessor(), ConflictResolver(),
-        ConceptExplainer(), SynthesisBuilder()
+        ScenarioPlanner(),
+        StakeholderMapper(),
+        PrioritySetter(),
+        DeadlineManager(),
+        ResourceAllocator(),
+        ProblemDecomposer(),
+        BottleneckIdentifier(),
+        ConstraintOptimizer(),
+        DependencyMapper(),
+        EfficiencyAnalyzer(),
+        TradeSpaceExplorer(),
+        CodeReviewer(),
+        ContentOutliner(),
+        SocraticQuestioner(),
+        IntentRecognizer(),
+        AmbiguityResolver(),
+        RiskAssessor(),
+        RiskMitigator(),
+        ImpactAssessor(),
+        ConflictResolver(),
+        ConceptExplainer(),
+        SynthesisBuilder(),
     ]
 
     print(f"   Instantiated {len(patterns)} patterns")
     assert len(patterns) == 50
+
 
 test("Instantiate all 50 patterns", test_all_50_patterns)
 
 print("\n" + "=" * 80)
 print("TEST 2: EXECUTE MULTIPLE PATTERNS SEQUENTIALLY")
 print("=" * 80)
+
 
 def test_sequential_execution():
     from mycontext.templates.enterprise.creative import IdeaGenerator
@@ -173,11 +205,13 @@ def test_sequential_execution():
 
     assert all([c1, c2, c3, c4])
 
+
 test("Sequential pattern execution", test_sequential_execution)
 
 print("\n" + "=" * 80)
 print("TEST 3: TRANSFORMATION ENGINE WITH VARIOUS INPUTS")
 print("=" * 80)
+
 
 def test_transformation_various_inputs():
     from mycontext.intelligence import TransformationEngine
@@ -194,7 +228,7 @@ def test_transformation_various_inputs():
         "Plan a product launch strategy",
         "What are the risks of this project?",
         "Simplify quantum physics concepts",
-        "Create a narrative about innovation"
+        "Create a narrative about innovation",
     ]
 
     for input_text in inputs:
@@ -203,11 +237,13 @@ def test_transformation_various_inputs():
         assert analysis is not None
         assert len(analysis.recommended_patterns) > 0
 
+
 test("Transform 10 different input types", test_transformation_various_inputs)
 
 print("\n" + "=" * 80)
 print("TEST 4: LARGE CONTEXT ASSEMBLY")
 print("=" * 80)
+
 
 def test_large_context():
     from mycontext import Constraints, Context, Directive, Guidance
@@ -224,21 +260,21 @@ def test_large_context():
                 "Document architectural decisions",
                 "Consider cost implications",
                 "Think about monitoring and observability",
-                "Plan for disaster recovery"
+                "Plan for disaster recovery",
             ],
             knowledge=[
                 "Expert in cloud architecture (AWS, Azure, GCP)",
                 "Deep understanding of microservices",
                 "Proficient in multiple programming languages",
                 "Experienced in distributed systems",
-                "Familiar with DevOps practices"
-            ]
+                "Familiar with DevOps practices",
+            ],
         ),
         directive=Directive(
-            content="Design a scalable e-commerce platform that can handle 1M+ users, " +
-                   "with real-time inventory, personalized recommendations, " +
-                   "payment processing, and multi-region support",
-            priority=10
+            content="Design a scalable e-commerce platform that can handle 1M+ users, "
+            + "with real-time inventory, personalized recommendations, "
+            + "payment processing, and multi-region support",
+            priority=10,
         ),
         constraints=Constraints(
             must_include=[
@@ -246,25 +282,27 @@ def test_large_context():
                 "API architecture",
                 "Caching strategy",
                 "Security measures",
-                "Performance optimization"
+                "Performance optimization",
             ],
             must_not_include=[
                 "Vendor lock-in",
                 "Single points of failure",
-                "Unencrypted data transmission"
-            ]
-        )
+                "Unencrypted data transmission",
+            ],
+        ),
     )
 
     assembled = context.assemble()
     assert assembled is not None
     assert len(assembled) > 500  # Should be a substantial context
 
+
 test("Large context assembly", test_large_context)
 
 print("\n" + "=" * 80)
 print("TEST 5: ALL EXPORT FORMATS WITH REAL CONTEXT")
 print("=" * 80)
+
 
 def test_all_exports():
     import json
@@ -273,12 +311,9 @@ def test_all_exports():
 
     context = Context(
         guidance=Guidance(
-            role="Expert Data Scientist",
-            rules=["Use statistical rigor", "Visualize insights"]
+            role="Expert Data Scientist", rules=["Use statistical rigor", "Visualize insights"]
         ),
-        directive=Directive(
-            content="Analyze sales trends and predict Q4 revenue"
-        )
+        directive=Directive(content="Analyze sales trends and predict Q4 revenue"),
     )
 
     # Test all export methods
@@ -303,11 +338,13 @@ def test_all_exports():
 
     print(f"   Validated {len(exports)} export formats")
 
+
 test("All 13 export formats", test_all_exports)
 
 print("\n" + "=" * 80)
 print("TEST 6: QUALITY METRICS COMPARISON")
 print("=" * 80)
+
 
 def test_quality_comparison():
     from mycontext import Context
@@ -319,7 +356,7 @@ def test_quality_comparison():
     # Detailed context
     context2 = Context(
         guidance="Expert with specific knowledge",
-        directive="Clear, specific directive with details"
+        directive="Clear, specific directive with details",
     )
 
     metrics = QualityMetrics()
@@ -329,11 +366,13 @@ def test_quality_comparison():
     # More detailed context should score higher
     assert score2.overall > score1.overall
 
+
 test("Quality metrics comparison", test_quality_comparison)
 
 print("\n" + "=" * 80)
 print("TEST 7: PATTERN PARAMETER VARIATIONS")
 print("=" * 80)
+
 
 def test_parameter_variations():
     from mycontext.templates.free.analysis import QuestionAnalyzer
@@ -348,18 +387,20 @@ def test_parameter_variations():
         question="What is machine learning?",
         depth="comprehensive",
         context_needed="Technical explanation for beginners",
-        domain="AI/ML"
+        domain="AI/ML",
     )
 
     assert c1 is not None
     assert c2 is not None
     assert len(c2.directive.content) > len(c1.directive.content)
 
+
 test("Pattern parameter variations", test_parameter_variations)
 
 print("\n" + "=" * 80)
 print("TEST 8: TRANSFORMATION ENGINE INPUT ANALYSIS DETAILS")
 print("=" * 80)
+
 
 def test_analysis_details():
     from mycontext.intelligence import TransformationEngine
@@ -370,7 +411,7 @@ def test_analysis_details():
         "How does blockchain work?",
         "Should we migrate to microservices?",
         "Compare SQL vs NoSQL databases",
-        "The application is experiencing high latency"
+        "The application is experiencing high latency",
     ]
 
     for input_text in test_cases:
@@ -381,14 +422,18 @@ def test_analysis_details():
         assert len(analysis.recommended_patterns) > 0
         assert 0.0 <= analysis.confidence <= 1.0
 
-        print(f"   '{input_text[:30]}...' -> {analysis.input_type.value}, " +
-              f"{len(analysis.recommended_patterns)} patterns")
+        print(
+            f"   '{input_text[:30]}...' -> {analysis.input_type.value}, "
+            + f"{len(analysis.recommended_patterns)} patterns"
+        )
+
 
 test("Input analysis details", test_analysis_details)
 
 print("\n" + "=" * 80)
 print("TEST 9: INTEGRATION HELPERS WITH REAL CONTEXT")
 print("=" * 80)
+
 
 def test_integration_real_context():
     from mycontext import Context, Guidance
@@ -402,10 +447,9 @@ def test_integration_real_context():
 
     context = Context(
         guidance=Guidance(
-            role="Expert Financial Advisor",
-            rules=["Provide data-driven recommendations"]
+            role="Expert Financial Advisor", rules=["Provide data-driven recommendations"]
         ),
-        directive="Analyze portfolio risk and suggest rebalancing"
+        directive="Analyze portfolio risk and suggest rebalancing",
     )
 
     # Test helpers that work without external packages
@@ -415,39 +459,47 @@ def test_integration_real_context():
         lc = LangChainHelper.to_messages(context)
         assert lc is not None
         helpers_tested += 1
-    except: pass
+    except:
+        pass
 
     try:
         li = LlamaIndexHelper.to_prompt(context)
         assert li is not None
         helpers_tested += 1
-    except: pass
+    except:
+        pass
 
     try:
         auto = AutoGenHelper.create_assistant(context)
         assert auto is not None
         helpers_tested += 1
-    except: pass
+    except:
+        pass
 
     try:
         dspy = DSPyHelper.to_prompt(context)
         assert dspy is not None
         helpers_tested += 1
-    except: pass
+    except:
+        pass
 
     try:
         sk = SemanticKernelHelper.to_prompt_template(context)
         assert sk is not None
         helpers_tested += 1
-    except: pass
+    except:
+        pass
 
     print(f"   Validated {helpers_tested} integration helpers (graceful degradation)")
     assert helpers_tested >= 3  # At least 3 should work
+
+
 test("Integration helpers with real context", test_integration_real_context)
 
 print("\n" + "=" * 80)
 print("TEST 10: ERROR HANDLING")
 print("=" * 80)
+
 
 def test_error_handling():
     from mycontext import Context
@@ -468,11 +520,13 @@ def test_error_handling():
     except Exception as e:
         print(f"   Empty question handling: {e}")
 
+
 test("Error handling with edge cases", test_error_handling)
 
 print("\n" + "=" * 80)
 print("TEST 11: MEMORY AND PERFORMANCE")
 print("=" * 80)
+
 
 def test_performance():
     from mycontext.templates.free.analysis import QuestionAnalyzer
@@ -490,11 +544,13 @@ def test_performance():
 
     assert elapsed < 10.0  # Should complete in under 10 seconds
 
+
 test("Performance: 100 pattern executions", test_performance)
 
 print("\n" + "=" * 80)
 print("TEST 12: CONTEXT CHAINING")
 print("=" * 80)
+
 
 def test_context_chaining():
     from mycontext import Constraints, Context
@@ -504,25 +560,22 @@ def test_context_chaining():
     context1 = Context(guidance="Analyst")
 
     # Enhance it
-    context2 = Context(
-        guidance=context1.guidance,
-        directive="Analyze data"
-    )
+    context2 = Context(guidance=context1.guidance, directive="Analyze data")
 
     # Further enhance with proper Constraints object
     context3 = Context(
         guidance=context2.guidance,
         directive=context2.directive,
         constraints=Constraints(
-            must_include=["Complete in 1 hour"],
-            must_not_include=["Skip validation"]
-        )
+            must_include=["Complete in 1 hour"], must_not_include=["Skip validation"]
+        ),
     )
 
     # Each should be valid
     metrics = QualityMetrics()
     score3 = metrics.evaluate(context3)
     assert score3.overall > 0
+
 
 test("Context chaining and enhancement", test_context_chaining)
 

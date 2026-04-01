@@ -18,30 +18,30 @@ from mycontext import Constraints, Guidance, Pattern
 class ConceptualChangeAnalyzer(Pattern):
     """
     Help learners revise misconceptions and build accurate mental models.
-    
+
     Conceptual Change Process:
     1. Identify current conception (often flawed)
     2. Create dissatisfaction with current conception
     3. Present intelligible alternative
     4. Show plausibility of new conception
     5. Demonstrate fruitfulness (utility)
-    
+
     Use Cases:
     - Science education (physics, biology misconceptions)
     - Mathematics (procedural vs conceptual understanding)
     - Medical education (clinical reasoning)
     - Technical training
-    
+
     Example:
         >>> from mycontext.templates.enterprise.learning import ConceptualChangeAnalyzer
-        >>> 
+        >>>
         >>> pattern = ConceptualChangeAnalyzer()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     topic="Newton's laws of motion",
         ...     current_understanding="Objects need continuous force to stay in motion"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -74,11 +74,7 @@ class ConceptualChangeAnalyzer(Pattern):
             description="Help learners revise misconceptions and build accurate models",
             version="1.0.0",
             tags=["learning", "enterprise", "misconceptions", "conceptual-change"],
-            metadata={
-                "category": "learning",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "learning", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Conceptual Change Expert and Science Educator",
                 rules=[
@@ -86,9 +82,9 @@ class ConceptualChangeAnalyzer(Pattern):
                     "Create cognitive conflict to motivate change",
                     "Present intelligible, plausible, and fruitful alternatives",
                     "Use Posner's conceptual change conditions",
-                    "Address resistance to change (misconceptions are persistent)"
+                    "Address resistance to change (misconceptions are persistent)",
                 ],
-                style="diagnostic, empathetic, constructive, evidence-based"
+                style="diagnostic, empathetic, constructive, evidence-based",
             ),
             directive_template="""**CONCEPTUAL CHANGE ANALYSIS**
 
@@ -298,40 +294,29 @@ class ConceptualChangeAnalyzer(Pattern):
 2. Introduce correct conception: [Clear explanation]
 3. Practice with: [3-5 problems requiring new model]
 4. Check understanding: [Assessment questions]""",
-            input_schema={
-                "topic": str,
-                "current_understanding": str
-            },
+            input_schema={"topic": str, "current_understanding": str},
             constraints=Constraints(
                 must_include=[
                     "misconception_diagnosis",
                     "cognitive_conflict",
                     "plausible_alternative",
-                    "fruitfulness"
+                    "fruitfulness",
                 ],
-                must_not_include=[
-                    "simply_telling_correct_answer",
-                    "ignoring_misconception"
-                ],
-                style_guide="Diagnostic and constructive. Create cognitive conflict, then guide change. Use Posner's framework."
-            )
+                must_not_include=["simply_telling_correct_answer", "ignoring_misconception"],
+                style_guide="Diagnostic and constructive. Create cognitive conflict, then guide change. Use Posner's framework.",
+            ),
         )
 
     def build_context(self, topic="", current_understanding="", **kwargs):
         """Build context for conceptual change analysis."""
         return super().build_context(
-            topic=topic,
-            current_understanding=current_understanding,
-            **kwargs
+            topic=topic, current_understanding=current_understanding, **kwargs
         )
 
     def execute(self, provider="openai", topic="", current_understanding="", **kwargs):
         """Execute conceptual change analysis."""
         return super().execute(
-            provider=provider,
-            topic=topic,
-            current_understanding=current_understanding,
-            **kwargs
+            provider=provider, topic=topic, current_understanding=current_understanding, **kwargs
         )
 
 

@@ -82,7 +82,8 @@ class OutputEvaluator:
         self._custom_weights: dict[OutputDimension, float] | None = None
         if dimension_weights:
             self._custom_weights = {
-                OutputDimension(k): v for k, v in dimension_weights.items()
+                OutputDimension(k): v
+                for k, v in dimension_weights.items()
                 if k in {d.value for d in OutputDimension}
             }
 
@@ -100,9 +101,7 @@ class OutputEvaluator:
 
     # -- Heuristic evaluation -------------------------------------------------
 
-    def _evaluate_heuristic(
-        self, context: Context, output: str
-    ) -> OutputQualityScore:
+    def _evaluate_heuristic(self, context: Context, output: str) -> OutputQualityScore:
         assembled = context.assemble()
         words = output.split()
         word_count = len(words)
@@ -136,7 +135,7 @@ class OutputEvaluator:
         dims[OutputDimension.GROUNDEDNESS] = gr_score
         evidence[OutputDimension.GROUNDEDNESS] = gr_ev
 
-        rf_score, rf_ev = self._score_register_fit(assembled, output)
+        rf_score, rf_ev = self._score_register_fit(assembled, output, context.constraints)
         dims[OutputDimension.REGISTER_FIT] = rf_score
         evidence[OutputDimension.REGISTER_FIT] = rf_ev
 
@@ -166,9 +165,7 @@ class OutputEvaluator:
 
     # -- Dimension scorers ----------------------------------------------------
 
-    def _score_instruction_following(
-        self, assembled: str, output: str
-    ) -> tuple:
+    def _score_instruction_following(self, assembled: str, output: str) -> tuple:
         lower_ctx = assembled.lower()
         lower_out = output.lower()
 
@@ -218,7 +215,8 @@ class OutputEvaluator:
         numbered_items = re.findall(r"(?:^|\n)\s*\d+[\.\)]\s+(.+)", assembled, re.MULTILINE)
         if len(numbered_items) >= 2:
             covered = sum(
-                1 for item in numbered_items
+                1
+                for item in numbered_items
                 if any(word in lower_out for word in item.lower().split() if len(word) > 4)
             )
             coverage = covered / len(numbered_items)
@@ -233,11 +231,26 @@ class OutputEvaluator:
     def _score_reasoning_depth(self, output: str) -> tuple:
         lower = output.lower()
         markers = [
-            "because", "therefore", "consequently", "given that",
-            "this implies", "as a result", "due to", "which means",
-            "leads to", "root cause", "contributing factor", "since",
-            "however", "on the other hand", "conversely", "although",
-            "furthermore", "moreover", "in contrast", "nevertheless",
+            "because",
+            "therefore",
+            "consequently",
+            "given that",
+            "this implies",
+            "as a result",
+            "due to",
+            "which means",
+            "leads to",
+            "root cause",
+            "contributing factor",
+            "since",
+            "however",
+            "on the other hand",
+            "conversely",
+            "although",
+            "furthermore",
+            "moreover",
+            "in contrast",
+            "nevertheless",
         ]
         found = [m for m in markers if m in lower]
         marker_count = len(found)
@@ -248,20 +261,26 @@ class OutputEvaluator:
 
         # Quantified claims — specific numbers/metrics are the strongest signal of
         # concrete reasoning ("declined 23% YoY" vs "declined significantly")
-        quantified = len(re.findall(
-            r"\b\d+(?:\.\d+)?(?:\s*%|x|\s+(?:percent|times|fold|days?|weeks?|months?|years?|hours?))\b"
-            r"|\b(?:Q[1-4]|FY|H[12])\s*\d{4}\b"
-            r"|\$\s*\d",
-            output, re.IGNORECASE,
-        ))
+        quantified = len(
+            re.findall(
+                r"\b\d+(?:\.\d+)?(?:\s*%|x|\s+(?:percent|times|fold|days?|weeks?|months?|years?|hours?))\b"
+                r"|\b(?:Q[1-4]|FY|H[12])\s*\d{4}\b"
+                r"|\$\s*\d",
+                output,
+                re.IGNORECASE,
+            )
+        )
 
         # Evidence citation — explicit "Evidence:" labels in the output signal that
         # findings are backed by data, not asserted. Counts both markdown bold
         # ("**Evidence**:") and plain bullet forms ("- Evidence:").
-        evidence_citations = len(re.findall(
-            r"(?:^|\n)\s*[-*]?\s*\*{0,2}evidence\*{0,2}\s*:",
-            output, re.IGNORECASE | re.MULTILINE,
-        ))
+        evidence_citations = len(
+            re.findall(
+                r"(?:^|\n)\s*[-*]?\s*\*{0,2}evidence\*{0,2}\s*:",
+                output,
+                re.IGNORECASE | re.MULTILINE,
+            )
+        )
 
         depth_signals = (
             marker_count
@@ -285,26 +304,41 @@ class OutputEvaluator:
     def _score_actionability(self, output: str) -> tuple:
         lower = output.lower()
         action_phrases = [
-            "should", "recommend", "action", "implement", "next step",
-            "solution", "mitigat", "address", "resolv", "ensur",
-            "consider", "adopt", "integrat", "establish", "deploy",
-            "prioritiz", "allocat", "schedul", "assign", "track",
+            "should",
+            "recommend",
+            "action",
+            "implement",
+            "next step",
+            "solution",
+            "mitigat",
+            "address",
+            "resolv",
+            "ensur",
+            "consider",
+            "adopt",
+            "integrat",
+            "establish",
+            "deploy",
+            "prioritiz",
+            "allocat",
+            "schedul",
+            "assign",
+            "track",
         ]
         found = [p for p in action_phrases if p in lower]
 
-        numbered_actions = len(re.findall(
-            r"\n\s*\d+[\.\)]\s.*(?:should|recommend|implement|action)", lower
-        ))
-        bullet_actions = len(re.findall(
-            r"\n\s*[-*]\s.*(?:should|recommend|implement|action)", lower
-        ))
-        specifics = len(re.findall(
-            r"\d+%|\$\d|\d+ (?:days?|weeks?|hours?|months?)", lower
-        ))
+        numbered_actions = len(
+            re.findall(r"\n\s*\d+[\.\)]\s.*(?:should|recommend|implement|action)", lower)
+        )
+        bullet_actions = len(
+            re.findall(r"\n\s*[-*]\s.*(?:should|recommend|implement|action)", lower)
+        )
+        specifics = len(re.findall(r"\d+%|\$\d|\d+ (?:days?|weeks?|hours?|months?)", lower))
 
         score = min(
             1.0,
-            0.10 + len(found) * 0.06
+            0.10
+            + len(found) * 0.06
             + (numbered_actions + bullet_actions) * 0.08
             + specifics * 0.05,
         )
@@ -316,11 +350,17 @@ class OutputEvaluator:
         # Reward outputs that explicitly flag unanswerable questions rather than
         # speculating — this is a sign of analytical rigour, not vagueness.
         _GAP_HONEST = [
-            "cannot be answered", "can't be answered",
-            "data is not available", "data is not provided",
-            "not available in the data", "not provided in the data",
-            "would need", "attribution data", "baseline is not",
-            "insufficient data", "data does not include",
+            "cannot be answered",
+            "can't be answered",
+            "data is not available",
+            "data is not provided",
+            "not available in the data",
+            "not provided in the data",
+            "would need",
+            "attribution data",
+            "baseline is not",
+            "insufficient data",
+            "data does not include",
         ]
         gap_hits = sum(1 for g in _GAP_HONEST if g in lower)
         if gap_hits >= 1:
@@ -330,10 +370,16 @@ class OutputEvaluator:
         # Vague/hedge penalty — outputs that never commit to an answer score poorly.
         # Only penalise genuine vagueness, not gap-honest refusals (handled above).
         _OUTPUT_HEDGES = [
-            "it depends", "generally speaking", "in most cases", "this varies",
-            "it's hard to say", "might be worth",
-            "could potentially", "there are many factors",
-            "no one-size-fits-all", "varies widely",
+            "it depends",
+            "generally speaking",
+            "in most cases",
+            "this varies",
+            "it's hard to say",
+            "might be worth",
+            "could potentially",
+            "there are many factors",
+            "no one-size-fits-all",
+            "varies widely",
         ]
         hedge_hits = sum(1 for h in _OUTPUT_HEDGES if h in lower)
         if hedge_hits >= 3:
@@ -344,9 +390,7 @@ class OutputEvaluator:
 
         return max(0.0, min(1.0, score)), ev
 
-    def _score_structure_compliance(
-        self, assembled: str, output: str
-    ) -> tuple:
+    def _score_structure_compliance(self, assembled: str, output: str) -> tuple:
         lower_ctx = assembled.lower()
 
         score = 0.4
@@ -381,9 +425,7 @@ class OutputEvaluator:
         ev = "; ".join(notes) if notes else "Default structure assessment"
         return max(0.0, min(1.0, score)), ev
 
-    def _score_cognitive_scaffolding(
-        self, assembled: str, output: str
-    ) -> tuple:
+    def _score_cognitive_scaffolding(self, assembled: str, output: str) -> tuple:
         lower_ctx = assembled.lower()
         lower_out = output.lower()
 
@@ -425,9 +467,7 @@ class OutputEvaluator:
         ev = f"Output uses {used}/{len(ctx_frameworks)} cognitive frameworks from context"
         return max(0.0, min(1.0, score)), ev
 
-    def _score_groundedness(
-        self, assembled: str, output: str
-    ) -> tuple:
+    def _score_groundedness(self, assembled: str, output: str) -> tuple:
         """How well does the output stay within the provided context/material?"""
         lower_out = output.lower()
         lower_ctx = assembled.lower()
@@ -436,10 +476,19 @@ class OutputEvaluator:
         notes: list[str] = []
 
         grounding_markers = [
-            "according to", "based on the", "the provided", "from the context",
-            "the data shows", "the material", "as stated", "per the",
-            "source material", "the packet", "[not in packet]",
-            "not found in the provided", "not available in the",
+            "according to",
+            "based on the",
+            "the provided",
+            "from the context",
+            "the data shows",
+            "the material",
+            "as stated",
+            "per the",
+            "source material",
+            "the packet",
+            "[not in packet]",
+            "not found in the provided",
+            "not available in the",
         ]
         marker_hits = sum(1 for m in grounding_markers if m in lower_out)
         if marker_hits >= 3:
@@ -450,15 +499,24 @@ class OutputEvaluator:
             notes.append(f"{marker_hits} grounding markers")
 
         hedge_inventions = [
-            "it is widely known", "experts agree that",
-            "studies have shown", "research suggests",
-            "it is common knowledge", "as we all know",
+            "it is widely known",
+            "experts agree that",
+            "studies have shown",
+            "research suggests",
+            "it is common knowledge",
+            "as we all know",
             "it goes without saying",
         ]
-        ctx_allows = any(p in lower_ctx for p in [
-            "widely known", "experts agree", "studies have shown",
-            "research suggests", "common knowledge",
-        ])
+        ctx_allows = any(
+            p in lower_ctx
+            for p in [
+                "widely known",
+                "experts agree",
+                "studies have shown",
+                "research suggests",
+                "common knowledge",
+            ]
+        )
         if not ctx_allows:
             invention_hits = sum(1 for h in hedge_inventions if h in lower_out)
             if invention_hits >= 2:
@@ -469,10 +527,16 @@ class OutputEvaluator:
                 notes.append(f"{invention_hits} unsourced authority claim")
 
         has_grounding_instruction = any(
-            p in lower_ctx for p in [
-                "only use", "do not invent", "stay within",
-                "not in packet", "grounding", "factual",
-                "do not fabricate", "source material only",
+            p in lower_ctx
+            for p in [
+                "only use",
+                "do not invent",
+                "stay within",
+                "not in packet",
+                "grounding",
+                "factual",
+                "do not fabricate",
+                "source material only",
             ]
         )
         if has_grounding_instruction:
@@ -482,9 +546,7 @@ class OutputEvaluator:
         ev = "; ".join(notes) if notes else "Default groundedness assessment"
         return max(0.0, min(1.0, score)), ev
 
-    def _score_register_fit(
-        self, assembled: str, output: str
-    ) -> tuple:
+    def _score_register_fit(self, assembled: str, output: str, constraints=None) -> tuple:
         """Does the output's register/tone match the context's declared audience and genre?"""
         lower_ctx = assembled.lower()
         lower_out = output.lower()
@@ -493,14 +555,25 @@ class OutputEvaluator:
         notes: list[str] = []
 
         _AI_BOILERPLATE = [
-            "in today's rapidly evolving", "in today's fast-paced",
-            "let's dive in", "without further ado",
-            "game-changer", "game changer", "cutting-edge",
-            "leverage the power", "unlock the full potential",
-            "embark on a journey", "navigate the complexities",
-            "delve into", "in the realm of", "tapestry of",
-            "it's no wonder that", "ever-evolving", "ever-changing",
-            "paramount importance", "of a lifetime",
+            "in today's rapidly evolving",
+            "in today's fast-paced",
+            "let's dive in",
+            "without further ado",
+            "game-changer",
+            "game changer",
+            "cutting-edge",
+            "leverage the power",
+            "unlock the full potential",
+            "embark on a journey",
+            "navigate the complexities",
+            "delve into",
+            "in the realm of",
+            "tapestry of",
+            "it's no wonder that",
+            "ever-evolving",
+            "ever-changing",
+            "paramount importance",
+            "of a lifetime",
         ]
         boilerplate_hits = sum(1 for bp in _AI_BOILERPLATE if bp in lower_out)
         if boilerplate_hits >= 4:
@@ -513,20 +586,53 @@ class OutputEvaluator:
             score += 0.15
             notes.append("No AI boilerplate detected")
 
-        is_technical = any(p in lower_ctx for p in [
-            "technical", "engineer", "developer", "staff", "senior",
-            "internal brief", "incident", "architecture",
-        ])
-        is_casual = any(p in lower_ctx for p in [
-            "blog", "traveler", "tourist", "visitor", "general public",
-            "casual", "approachable",
-        ])
+        if constraints and getattr(constraints, "forbidden_phrases", None):
+            fp_hits = sum(1 for fp in constraints.forbidden_phrases if fp.lower() in lower_out)
+            if fp_hits > 0:
+                penalty = min(0.25, fp_hits * 0.10)
+                score -= penalty
+                notes.append(f"{fp_hits} user-forbidden phrase(s) found in output")
+
+        is_technical = any(
+            p in lower_ctx
+            for p in [
+                "technical",
+                "engineer",
+                "developer",
+                "staff",
+                "senior",
+                "internal brief",
+                "incident",
+                "architecture",
+            ]
+        )
+        is_casual = any(
+            p in lower_ctx
+            for p in [
+                "blog",
+                "traveler",
+                "tourist",
+                "visitor",
+                "general public",
+                "casual",
+                "approachable",
+            ]
+        )
 
         if is_technical:
-            casual_markers = sum(1 for m in [
-                "exciting", "amazing", "wonderful", "fantastic",
-                "awesome", "incredible", "stunning",
-            ] if m in lower_out)
+            casual_markers = sum(
+                1
+                for m in [
+                    "exciting",
+                    "amazing",
+                    "wonderful",
+                    "fantastic",
+                    "awesome",
+                    "incredible",
+                    "stunning",
+                ]
+                if m in lower_out
+            )
             if casual_markers >= 3:
                 score -= 0.15
                 notes.append("Casual superlatives in a technical context")
@@ -535,10 +641,18 @@ class OutputEvaluator:
                 notes.append("Tone consistent with technical context")
 
         if is_casual:
-            jargon_markers = sum(1 for m in [
-                "pursuant to", "heretofore", "aforementioned",
-                "notwithstanding", "whereby", "therein",
-            ] if m in lower_out)
+            jargon_markers = sum(
+                1
+                for m in [
+                    "pursuant to",
+                    "heretofore",
+                    "aforementioned",
+                    "notwithstanding",
+                    "whereby",
+                    "therein",
+                ]
+                if m in lower_out
+            )
             if jargon_markers >= 2:
                 score -= 0.15
                 notes.append("Formal jargon in a casual context")
@@ -551,9 +665,7 @@ class OutputEvaluator:
 
     # -- LLM evaluation -------------------------------------------------------
 
-    def _evaluate_llm(
-        self, context: Context, output: str, **kwargs: Any
-    ) -> OutputQualityScore:
+    def _evaluate_llm(self, context: Context, output: str, **kwargs: Any) -> OutputQualityScore:
         import json
 
         assembled = context.assemble()
@@ -677,9 +789,7 @@ Output ONLY valid JSON:
                 result.metadata["mode"] = "heuristic_fallback"
                 return result
 
-    def _evaluate_hybrid(
-        self, context: Context, output: str, **kwargs: Any
-    ) -> OutputQualityScore:
+    def _evaluate_hybrid(self, context: Context, output: str, **kwargs: Any) -> OutputQualityScore:
         heuristic = self._evaluate_heuristic(context, output)
         if heuristic.overall > 0.75 or heuristic.overall < 0.35:
             heuristic.metadata["mode"] = "hybrid_fast"

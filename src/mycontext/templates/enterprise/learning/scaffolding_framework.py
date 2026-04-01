@@ -18,7 +18,7 @@ from mycontext import Constraints, Guidance, Pattern
 class ScaffoldingFramework(Pattern):
     """
     Provide temporary support that fades as competence increases.
-    
+
     Scaffolding Types:
     1. Modeling - Demonstrate the skill
     2. Coaching - Provide hints and feedback
@@ -26,23 +26,23 @@ class ScaffoldingFramework(Pattern):
     4. Reflection - Compare performance to experts
     5. Exploration - Encourage problem-solving
     6. Fading - Gradually remove support
-    
+
     Use Cases:
     - Tutoring systems
     - Skill development
     - Complex task training
     - Personalized learning
-    
+
     Example:
         >>> from mycontext.templates.enterprise.learning import ScaffoldingFramework
-        >>> 
+        >>>
         >>> pattern = ScaffoldingFramework()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     task="Learn to write recursive functions",
         ...     current_skill_level="Can write loops, unfamiliar with recursion"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -74,11 +74,7 @@ class ScaffoldingFramework(Pattern):
             description="Provide temporary support structures that fade as competence increases",
             version="1.0.0",
             tags=["learning", "enterprise", "scaffolding", "vygotsky"],
-            metadata={
-                "category": "learning",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "learning", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Expert Instructor and Learning Scaffold Designer",
                 rules=[
@@ -86,9 +82,9 @@ class ScaffoldingFramework(Pattern):
                     "Provide JUST ENOUGH support - not too much, not too little",
                     "Plan explicit fading strategy (how support will be removed)",
                     "Use multiple scaffolding types (modeling, coaching, articulation)",
-                    "Check for understanding before reducing support"
+                    "Check for understanding before reducing support",
                 ],
-                style="supportive, adaptive, structured, encouraging"
+                style="supportive, adaptive, structured, encouraging",
             ),
             directive_template="""**SCAFFOLDING FRAMEWORK**
 
@@ -229,49 +225,39 @@ Before fading support, check:
 **Success criteria**: [How to know scaffolding is working]
 
 **Warning signs**: [Indicators that support needs adjustment]""",
-            input_schema={
-                "task": str,
-                "current_skill_level": str,
-                "goal_section": str
-            },
+            input_schema={"task": str, "current_skill_level": str, "goal_section": str},
             constraints=Constraints(
                 must_include=[
                     "assess_competence",
                     "scaffolding_types",
                     "fading_strategy",
-                    "checkpoint_questions"
+                    "checkpoint_questions",
                 ],
-                must_not_include=[
-                    "one_size_fits_all",
-                    "permanent_support"
-                ],
-                style_guide="Adaptive support that gradually reduces. Balance help with independence."
-            )
+                must_not_include=["one_size_fits_all", "permanent_support"],
+                style_guide="Adaptive support that gradually reduces. Balance help with independence.",
+            ),
         )
 
     def build_context(self, task="", current_skill_level="", goal="", **kwargs):
         """Build context for scaffolding design."""
         goal_section = f"**GOAL**: {goal}" if goal else ""
-        kwargs.pop('goal_section', None)
+        kwargs.pop("goal_section", None)
 
         return super().build_context(
-            task=task,
-            current_skill_level=current_skill_level,
-            goal_section=goal_section,
-            **kwargs
+            task=task, current_skill_level=current_skill_level, goal_section=goal_section, **kwargs
         )
 
     def execute(self, provider="openai", task="", current_skill_level="", goal="", **kwargs):
         """Execute scaffolding framework design."""
         goal_section = f"**GOAL**: {goal}" if goal else ""
-        kwargs.pop('goal_section', None)
+        kwargs.pop("goal_section", None)
 
         return super().execute(
             provider=provider,
             task=task,
             current_skill_level=current_skill_level,
             goal_section=goal_section,
-            **kwargs
+            **kwargs,
         )
 
 

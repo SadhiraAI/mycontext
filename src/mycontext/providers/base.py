@@ -37,10 +37,7 @@ class ProviderResponse(BaseModel):
 
     model: str = Field(default="unknown", description="Model used")
 
-    metadata: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Provider-specific data"
-    )
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Provider-specific data")
 
 
 class BaseProvider(ABC):
@@ -60,11 +57,7 @@ class BaseProvider(ABC):
     """
 
     @abstractmethod
-    def generate(
-        self,
-        context: "Context",
-        **kwargs
-    ) -> ProviderResponse:
+    def generate(self, context: "Context", **kwargs) -> ProviderResponse:
         """
         Generate a response using this provider.
 

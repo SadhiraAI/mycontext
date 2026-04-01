@@ -389,11 +389,13 @@ export async function compileGeneric(question, templateNames) {
 }
 
 /** Smart three-tier execution via complexity router. */
-export async function smartExecute(question, provider = "openai") {
+export async function smartExecute(question, provider = "openai", quality = undefined) {
+  const payload = { question, provider };
+  if (quality) payload.quality = quality;
   const res = await fetch(`${API_BASE}/execute/smart`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ question, provider }),
+    body: JSON.stringify(payload),
   });
   return handleResponse(res);
 }

@@ -1,4 +1,5 @@
 """Specialized Patterns - Domain-specific and unique patterns"""
+
 from .code_reviewer import CodeReviewer
 from .conflict_resolver import ConflictResolver
 from .intent_recognizer import IntentRecognizer

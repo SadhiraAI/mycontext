@@ -258,6 +258,34 @@ else:
     ctx = final_bp.build(input=my_input)
 ```
 
+## Using Fragments with Blueprints
+
+Fragments are composable quality atoms designed to work with Blueprint-based architectures. Apply them after `build()` to enhance any Context:
+
+```python
+from mycontext.structure import Blueprint
+from mycontext.foundation import Guidance
+from mycontext.fragments import anti_fluff, objectivity, self_check_analysis
+
+blueprint = Blueprint(
+    name="analysis_engine",
+    guidance=Guidance(role="Senior analyst"),
+    directive_template="Analyze: {input}",
+    token_budget=4000,
+)
+
+ctx = blueprint.build(input="Why did revenue drop 40% in Q3?")
+
+# Layer on quality fragments
+anti_fluff.apply(ctx)          # Concise output, no filler
+objectivity.apply(ctx)         # Objectivity rules in guidance
+self_check_analysis.apply(ctx) # Analysis verification questions
+
+result = ctx.execute(provider="openai")
+```
+
+See the [Fragments API reference](../api/overview#fragments--mycontextfragments) for the full list of built-in fragments.
+
 ## API Reference
 
 ### `Blueprint`

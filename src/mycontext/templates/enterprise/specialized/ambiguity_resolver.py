@@ -12,22 +12,22 @@ from mycontext.structure import Pattern
 class AmbiguityResolver(Pattern):
     """
     Resolve ambiguous or unclear questions systematically.
-    
+
     Identifies:
     - Multiple possible interpretations
     - Sources of ambiguity
     - Clarifying questions needed
     - Most likely intended meaning
-    
+
     Based on: Disambiguation and clarification research
-    
+
     Example:
         >>> resolver = AmbiguityResolver()
         >>> context = resolver.build_context(
         ...     input="How do I use Python for ML?",
         ...     context="Beginner programmer"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -67,9 +67,9 @@ class AmbiguityResolver(Pattern):
                     "Generate multiple valid interpretations",
                     "Propose specific clarifying questions",
                     "Assess likelihood of each interpretation",
-                    "Provide structured disambiguation"
+                    "Provide structured disambiguation",
                 ],
-                style="precise, systematic, helpful"
+                style="precise, systematic, helpful",
             ),
             directive_template="""Resolve ambiguity in this input:
 
@@ -159,19 +159,15 @@ Systematic ambiguity resolution:
    **Recommended Approach**: [How to proceed given ambiguity]
 
 **OUTPUT FORMAT**: Structured analysis with clear disambiguation path.""",
-            input_schema={
-                "input": str,
-                "context_section": str,
-                "depth": str
-            },
+            input_schema={"input": str, "context_section": str, "depth": str},
             constraints=Constraints(
                 must_include=[
                     "identified_ambiguities",
                     "possible_interpretations",
-                    "clarifying_questions"
+                    "clarifying_questions",
                 ],
-                style_guide="Be thorough but not pedantic, helpful but not condescending"
-            )
+                style_guide="Be thorough but not pedantic, helpful but not condescending",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -181,31 +177,24 @@ Systematic ambiguity resolution:
         return ""
 
     def build_context(
-        self,
-        input: str = "",
-        context: str | None = None,
-        depth: str = "thorough",
-        **kwargs
+        self, input: str = "", context: str | None = None, depth: str = "thorough", **kwargs
     ):
         """
         Build context for ambiguity resolution.
-        
+
         Args:
             input: The ambiguous input to resolve
             context: Optional additional context
             depth: Resolution depth ("quick", "standard", "thorough")
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for export/use
         """
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            input=input,
-            context_section=context_section,
-            depth=depth,
-            **kwargs
+            input=input, context_section=context_section, depth=depth, **kwargs
         )
 
     def execute(
@@ -214,25 +203,21 @@ Systematic ambiguity resolution:
         input: str = "",
         context: str | None = None,
         depth: str = "thorough",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute ambiguity resolution.
-        
+
         Args:
             provider: LLM provider to use
             input: The ambiguous input to resolve
             context: Optional additional context
             depth: Resolution depth
             **kwargs: Provider parameters
-        
+
         Returns:
             ProviderResponse with the resolution
         """
         return super().execute(
-            provider=provider,
-            input=input,
-            context=context,
-            depth=depth,
-            **kwargs
+            provider=provider, input=input, context=context, depth=depth, **kwargs
         )

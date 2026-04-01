@@ -117,9 +117,17 @@ def _build_directive(output: str) -> str:
     configs = {
         "full_analysis": {
             "keys": [
-                "audience_analysis", "language", "core_message", "framing",
-                "examples", "tone", "structure", "adapted_message", "key_changes",
-                "questions", "delivery",
+                "audience_analysis",
+                "language",
+                "core_message",
+                "framing",
+                "examples",
+                "tone",
+                "structure",
+                "adapted_message",
+                "key_changes",
+                "questions",
+                "delivery",
             ],
             "instruction": (
                 "Conduct a full audience adaptation analysis, then deliver the adapted message "
@@ -156,6 +164,7 @@ def _build_directive(output: str) -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class AudienceAdapter(Pattern):
     """
@@ -266,9 +275,7 @@ class AudienceAdapter(Pattern):
                 | ``"message_only"`` (3 sections — adapted message + changes)
         """
         if output not in VALID_OUTPUTS:
-            raise ValueError(
-                f"Invalid output {output!r}. Choose from: {sorted(VALID_OUTPUTS)}"
-            )
+            raise ValueError(f"Invalid output {output!r}. Choose from: {sorted(VALID_OUTPUTS)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -296,6 +303,27 @@ class AudienceAdapter(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["output"] = output
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Would the target audience actually understand every sentence?",
+                "Did I preserve the core message's accuracy while adapting?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Adapt 'The API rate limit is 429 with exponential backoff' for non-technical executives",
+                    "output": (
+                        "ADAPTED: 'Our system limits how many requests we can make per minute. "
+                        "When we hit that limit, it automatically waits and retries — "
+                        "each retry waits a bit longer to avoid overloading the service.'\n"
+                        "CHANGES MADE: Removed HTTP status code, replaced 'exponential backoff' "
+                        "with behavioral description. Core meaning preserved: rate limiting exists "
+                        "and the system handles it automatically."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -321,9 +349,16 @@ class AudienceAdapter(Pattern):
             **kwargs: Provider parameters
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(

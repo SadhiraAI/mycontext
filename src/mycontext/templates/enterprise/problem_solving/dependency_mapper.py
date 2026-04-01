@@ -7,30 +7,29 @@ Based on dependency analysis and systems thinking.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class DependencyMapper(Pattern):
     """
     Map dependencies systematically.
-    
+
     Identifies:
     - Direct dependencies
     - Indirect dependencies
     - Circular dependencies
     - Critical path
     - Dependency risks
-    
+
     Based on: Dependency analysis and network theory
-    
+
     Example:
         >>> mapper = DependencyMapper()
         >>> context = mapper.build_context(
         ...     system="Product development roadmap",
         ...     context="Q1-Q2 planning"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class DependencyMapper(Pattern):
                     "Map relationships clearly",
                     "Find critical path",
                     "Highlight risks",
-                    "Suggest optimization"
+                    "Suggest optimization",
                 ],
-                style="systematic, visual, clear"
+                style="systematic, visual, clear",
             ),
             directive_template="""Map dependencies in:
 
@@ -111,14 +110,11 @@ Dependency mapping:
    - Reorder: [Better sequence]
 
 **OUTPUT FORMAT**: Clear dependency map with optimization recommendations.""",
-            input_schema={
-                "system": str,
-                "context_section": str
-            },
+            input_schema={"system": str, "context_section": str},
             constraints=Constraints(
                 must_include=["dependency_table", "critical_path", "risks"],
-                style_guide="Be clear and actionable"
-            )
+                style_guide="Be clear and actionable",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -126,30 +122,12 @@ Dependency mapping:
             return f"\n**CONTEXT**: {context}\n"
         return ""
 
-    def build_context(
-        self,
-        system: str = "",
-        context: str | None = None,
-        **kwargs
-    ):
+    def build_context(self, system: str = "", context: str | None = None, **kwargs):
         context_section = self._render_context_section(context)
 
-        return super().build_context(
-            system=system,
-            context_section=context_section,
-            **kwargs
-        )
+        return super().build_context(system=system, context_section=context_section, **kwargs)
 
     def execute(
-        self,
-        provider: str = "openai",
-        system: str = "",
-        context: str | None = None,
-        **kwargs
+        self, provider: str = "openai", system: str = "", context: str | None = None, **kwargs
     ):
-        return super().execute(
-            provider=provider,
-            system=system,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, system=system, context=context, **kwargs)

@@ -19,6 +19,7 @@ from ..core import Context
 
 class QualityDimension(Enum):
     """Dimensions of context quality."""
+
     CLARITY = "clarity"
     COMPLETENESS = "completeness"
     SPECIFICITY = "specificity"
@@ -30,6 +31,7 @@ class QualityDimension(Enum):
 @dataclass
 class QualityScore:
     """Quality score for a context."""
+
     overall: float  # 0.0 to 1.0
     dimensions: dict[QualityDimension, float]
     issues: list[str]
@@ -88,11 +90,7 @@ class QualityMetrics:
             QualityDimension.EFFICIENCY: 0.10,
         }
 
-    def evaluate(
-        self,
-        context: Context,
-        reference: str | None = None
-    ) -> QualityScore:
+    def evaluate(self, context: Context, reference: str | None = None) -> QualityScore:
         if self.mode == "llm":
             return self._evaluate_llm(context)
         elif self.mode == "hybrid":
@@ -112,49 +110,107 @@ class QualityMetrics:
         has_role_like = any(
             p in lower
             for p in [
-                "you are", "you're", "act as", "role:", "## role", "### role",
-                "**role**", "guidance:", "## guidance", "system:"
+                "you are",
+                "you're",
+                "act as",
+                "role:",
+                "## role",
+                "### role",
+                "**role**",
+                "guidance:",
+                "## guidance",
+                "system:",
             ]
         )
-        has_directive_like = any(
-            p in lower
-            for p in [
-                "analyze", "review", "identify", "instructions:", "## instructions",
-                "## task", "**task**", "directive:", "## directive", "goal:",
-                "## goal", "evaluate", "summarize", "generate", "create", "write",
-                "classify", "compare", "assess", "diagnose", "explain"
-            ]
-        ) and word_count > 25
+        has_directive_like = (
+            any(
+                p in lower
+                for p in [
+                    "analyze",
+                    "review",
+                    "identify",
+                    "instructions:",
+                    "## instructions",
+                    "## task",
+                    "**task**",
+                    "directive:",
+                    "## directive",
+                    "goal:",
+                    "## goal",
+                    "evaluate",
+                    "summarize",
+                    "generate",
+                    "create",
+                    "write",
+                    "classify",
+                    "compare",
+                    "assess",
+                    "diagnose",
+                    "explain",
+                ]
+            )
+            and word_count > 25
+        )
 
         has_constraints = any(
             p in lower
             for p in [
-                "do not", "don't", "never", "always", "constraints:", "## constraints",
-                "avoid", "must not", "should not", "must be", "limit",
-                "must include", "must_include", "format_rules", "format rules"
+                "do not",
+                "don't",
+                "never",
+                "always",
+                "constraints:",
+                "## constraints",
+                "avoid",
+                "must not",
+                "should not",
+                "must be",
+                "limit",
+                "must include",
+                "must_include",
+                "format_rules",
+                "format rules",
             ]
         )
-        has_rules = any(
-            p in lower
-            for p in [
-                "rules:", "## rules", "guidelines:", "## guidelines",
-                "principles:", "steps:", "follow these"
-            ]
-        ) or sum(1 for ln in lines if ln.startswith(("- ", "* ", "1.", "2.", "3."))) >= 2
+        has_rules = (
+            any(
+                p in lower
+                for p in [
+                    "rules:",
+                    "## rules",
+                    "guidelines:",
+                    "## guidelines",
+                    "principles:",
+                    "steps:",
+                    "follow these",
+                ]
+            )
+            or sum(1 for ln in lines if ln.startswith(("- ", "* ", "1.", "2.", "3."))) >= 2
+        )
 
         has_examples = any(
             p in lower
             for p in [
-                "example:", "for example", "e.g.", "**example**",
-                "sample output", "sample response"
+                "example:",
+                "for example",
+                "e.g.",
+                "**example**",
+                "sample output",
+                "sample response",
             ]
         ) or ("```" in text and any(p in lower for p in ["example", "output", "response"]))
 
         has_output_format = any(
             p in lower
             for p in [
-                "output format", "output_format", "respond with", "respond in",
-                "json schema", "expected schema", "format:", "## format"
+                "output format",
+                "output_format",
+                "respond with",
+                "respond in",
+                "json schema",
+                "expected schema",
+                "format:",
+                "## format",
             ]
         )
 
@@ -201,9 +257,15 @@ class QualityMetrics:
 
         # Typos / gibberish
         typo_patterns = [
-            ("objecive", "objective"), ("objetive", "objective"), ("thte", "the"),
-            ("teh", "the"), ("analzy", "analyze"), ("analyise", "analyze"),
-            ("folow", "follow"), ("recomend", "recommend"), ("imporant", "important"),
+            ("objecive", "objective"),
+            ("objetive", "objective"),
+            ("thte", "the"),
+            ("teh", "the"),
+            ("analzy", "analyze"),
+            ("analyise", "analyze"),
+            ("folow", "follow"),
+            ("recomend", "recommend"),
+            ("imporant", "important"),
         ]
         typo_count = 0
         for bad, good in typo_patterns:
@@ -218,7 +280,9 @@ class QualityMetrics:
             penalty = max(penalty, 0.25)
 
         # Empty JSON schema
-        has_empty_schema = bool(re.search(r'```\s*json\s*\{\s*\}\s*```', text, re.DOTALL | re.IGNORECASE))
+        has_empty_schema = bool(
+            re.search(r"```\s*json\s*\{\s*\}\s*```", text, re.DOTALL | re.IGNORECASE)
+        )
         has_json_example = bool(re.search(r'\{[^{}]*"[a-z_]+"\s*:', text))
         if has_empty_schema and not has_json_example:
             issues.append("Empty JSON schema -- add fields showing expected output")
@@ -235,17 +299,22 @@ class QualityMetrics:
 
         # Minimal / generic prompt detection
         core = lower[:200]
-        generic_role = any(p in core for p in ["expert assistant", "helpful assistant", "ai assistant"])
-        generic_rules = any(p in core for p in ["be clear and helpful", "do your best", "be helpful"])
+        generic_role = any(
+            p in core for p in ["expert assistant", "helpful assistant", "ai assistant"]
+        )
+        generic_rules = any(
+            p in core for p in ["be clear and helpful", "do your best", "be helpful"]
+        )
         minimal_directive = any(
-            p in core
-            for p in ["analyze the following", "help me with", "do the following"]
+            p in core for p in ["analyze the following", "help me with", "do the following"]
         )
         if generic_role and generic_rules:
             issues.append("Generic role and rules -- be specific about expertise and behavior")
             penalty = max(penalty, 0.30)
         if generic_role and minimal_directive and word_count < 60:
-            issues.append("Minimal generic prompt -- add specific goal, detailed directive, and constraints")
+            issues.append(
+                "Minimal generic prompt -- add specific goal, detailed directive, and constraints"
+            )
             penalty = max(penalty, 0.45)
 
         # Missing essential components (heavy penalty)
@@ -253,32 +322,84 @@ class QualityMetrics:
         # completeness evaluator handles those properly.
         has_structured = context and (context.guidance or context.constraints)
         if not has_structured:
-            has_goal = "## goal" in lower or "goal:" in lower or (
-                # A substantive directive IS the goal
-                any(p in lower for p in [
-                    "analyze", "review", "identify", "evaluate", "summarize",
-                    "classify", "compare", "generate", "create", "write",
-                    "assess", "diagnose", "explain", "provide", "determine",
-                    "extract", "describe", "recommend", "suggest", "calculate"
-                ]) and word_count > 40
+            has_goal = (
+                "## goal" in lower
+                or "goal:" in lower
+                or (
+                    # A substantive directive IS the goal
+                    any(
+                        p in lower
+                        for p in [
+                            "analyze",
+                            "review",
+                            "identify",
+                            "evaluate",
+                            "summarize",
+                            "classify",
+                            "compare",
+                            "generate",
+                            "create",
+                            "write",
+                            "assess",
+                            "diagnose",
+                            "explain",
+                            "provide",
+                            "determine",
+                            "extract",
+                            "describe",
+                            "recommend",
+                            "suggest",
+                            "calculate",
+                        ]
+                    )
+                    and word_count > 40
+                )
             )
             has_guidance = any(
                 p in lower
                 for p in [
-                    "you are", "you're", "act as", "role:", "## role",
-                    "guidance:", "**role**", "system:", "follow these rules"
+                    "you are",
+                    "you're",
+                    "act as",
+                    "role:",
+                    "## role",
+                    "guidance:",
+                    "**role**",
+                    "system:",
+                    "follow these rules",
                 ]
             )
-            has_directive = any(
-                p in lower
-                for p in [
-                    "analyze", "review", "identify", "instructions:", "## instructions",
-                    "## task", "**task**", "directive:", "## directive",
-                    "evaluate", "summarize", "classify", "compare", "generate",
-                    "create", "write", "assess", "diagnose", "explain",
-                    "provide", "determine", "extract", "describe"
-                ]
-            ) and word_count > 20
+            has_directive = (
+                any(
+                    p in lower
+                    for p in [
+                        "analyze",
+                        "review",
+                        "identify",
+                        "instructions:",
+                        "## instructions",
+                        "## task",
+                        "**task**",
+                        "directive:",
+                        "## directive",
+                        "evaluate",
+                        "summarize",
+                        "classify",
+                        "compare",
+                        "generate",
+                        "create",
+                        "write",
+                        "assess",
+                        "diagnose",
+                        "explain",
+                        "provide",
+                        "determine",
+                        "extract",
+                        "describe",
+                    ]
+                )
+                and word_count > 20
+            )
 
             missing = []
             if not has_goal:
@@ -296,12 +417,24 @@ class QualityMetrics:
         # topics should include grounding instructions to prevent hallucination.
         if word_count > 80:
             _grounding_signals = [
-                "grounded in", "source material", "provided material",
-                "do not invent", "do not fabricate", "not in packet",
-                "cite", "evidence", "based on the", "factual",
-                "only use", "stay within", "not found in the provided",
-                "must reference", "must trace", "supported by",
-                "provided data", "provided context",
+                "grounded in",
+                "source material",
+                "provided material",
+                "do not invent",
+                "do not fabricate",
+                "not in packet",
+                "cite",
+                "evidence",
+                "based on the",
+                "factual",
+                "only use",
+                "stay within",
+                "not found in the provided",
+                "must reference",
+                "must trace",
+                "supported by",
+                "provided data",
+                "provided context",
             ]
             has_grounding = any(s in lower for s in _grounding_signals)
             if not has_grounding:
@@ -314,9 +447,21 @@ class QualityMetrics:
         # or task type benefit from explicitly naming the genre.
         if word_count > 60:
             _genre_signals = [
-                "blog", "brief", "tutorial", "proposal", "report",
-                "memo", "internal", "external", "guide", "walkthrough",
-                "genre", "mode:", "field:", "domain:", "audience:",
+                "blog",
+                "brief",
+                "tutorial",
+                "proposal",
+                "report",
+                "memo",
+                "internal",
+                "external",
+                "guide",
+                "walkthrough",
+                "genre",
+                "mode:",
+                "field:",
+                "domain:",
+                "audience:",
             ]
             has_genre = any(s in lower for s in _genre_signals)
             if not has_genre:
@@ -328,9 +473,15 @@ class QualityMetrics:
         # Anti-boilerplate check — prompts should discourage generic AI filler.
         if word_count > 80:
             _anti_boilerplate_signals = [
-                "omit stock", "no boilerplate", "no filler",
-                "avoid generic", "no cliche", "no cliché",
-                "write as a", "practitioner", "not a generic ai",
+                "omit stock",
+                "no boilerplate",
+                "no filler",
+                "avoid generic",
+                "no cliche",
+                "no cliché",
+                "write as a",
+                "practitioner",
+                "not a generic ai",
                 "no preamble",
             ]
             has_anti_boilerplate = any(s in lower for s in _anti_boilerplate_signals)
@@ -339,6 +490,16 @@ class QualityMetrics:
                     "No anti-boilerplate rule — add a guard rail suppressing "
                     "generic AI phrases to improve register authenticity"
                 )
+
+        # Quality controls credit — reward prompts with explicit output quality settings.
+        constraints = getattr(context, "constraints", None) if context else None
+        if constraints:
+            if getattr(constraints, "self_check", None):
+                penalty = max(0.0, penalty - 0.05)
+            if getattr(constraints, "verbosity", None):
+                penalty = max(0.0, penalty - 0.03)
+            if getattr(constraints, "forbidden_phrases", None):
+                penalty = max(0.0, penalty - 0.02)
 
         return issues, min(0.70, penalty)
 
@@ -429,7 +590,7 @@ class QualityMetrics:
                 "has_directive": context.directive is not None,
                 "has_constraints": context.constraints is not None,
                 "has_knowledge": context.knowledge is not None,
-            }
+            },
         )
 
     # ── Dimension evaluators ────────────────────────────────────────────
@@ -481,8 +642,15 @@ class QualityMetrics:
         # Defined output format
         has_format = any(
             p in lower
-            for p in ["output format", "respond with", "respond in", "json schema",
-                       "output_format", "expected schema", "format rules"]
+            for p in [
+                "output format",
+                "respond with",
+                "respond in",
+                "json schema",
+                "output_format",
+                "expected schema",
+                "format rules",
+            ]
         )
         if has_format:
             score += 0.15
@@ -493,9 +661,7 @@ class QualityMetrics:
         # LLM accuracy (r=-0.187, p=0.008, n=200, TruthfulQA/gpt-4o-mini).
         words = assembled.split()
         _pronoun_set = {"it", "this", "that", "these", "those", "they", "them", "its"}
-        pronoun_ratio = (
-            sum(1 for w in words if w.lower() in _pronoun_set) / max(len(words), 1)
-        )
+        pronoun_ratio = sum(1 for w in words if w.lower() in _pronoun_set) / max(len(words), 1)
         if pronoun_ratio > 0.10:
             score -= 0.15
             issues.append(
@@ -514,10 +680,23 @@ class QualityMetrics:
 
         # Hedge density — instructional hedges erode binding force
         _hedge_phrases = {
-            "try to", "if applicable", "when possible", "as needed",
-            "generally speaking", "in most cases", "ideally", "where relevant",
-            "if necessary", "to the extent possible", "roughly", "approximately",
-            "it depends", "typically", "usually", "often", "sometimes",
+            "try to",
+            "if applicable",
+            "when possible",
+            "as needed",
+            "generally speaking",
+            "in most cases",
+            "ideally",
+            "where relevant",
+            "if necessary",
+            "to the extent possible",
+            "roughly",
+            "approximately",
+            "it depends",
+            "typically",
+            "usually",
+            "often",
+            "sometimes",
         }
         hedge_count = sum(1 for h in _hedge_phrases if h in lower)
         hedge_density = hedge_count / max(word_count / 10, 1)
@@ -538,8 +717,11 @@ class QualityMetrics:
 
         # Modal commitment ratio — binding vs suggestive modals
         import re as _re
+
         binding_count = len(_re.findall(r"\b(must|shall|will|always|never|required)\b", lower))
-        suggestive_count = len(_re.findall(r"\b(should|could|might|may|try|consider|ideally)\b", lower))
+        suggestive_count = len(
+            _re.findall(r"\b(should|could|might|may|try|consider|ideally)\b", lower)
+        )
         total_modals = binding_count + suggestive_count
         if total_modals >= 3:
             commitment_ratio = binding_count / total_modals
@@ -584,10 +766,9 @@ class QualityMetrics:
             has_guidance = inferred.get("has_role_like", False)
         if has_guidance:
             # Check if role is specific (not generic)
-            assembled_lower = context.assemble().lower()
             generic_roles = ["expert assistant", "helpful assistant", "ai assistant", "assistant"]
             role_text = ""
-            if context.guidance and hasattr(context.guidance, 'role'):
+            if context.guidance and hasattr(context.guidance, "role"):
                 role_text = (context.guidance.role or "").lower()
             is_generic = any(role_text.strip() == g for g in generic_roles)
             if is_generic:
@@ -619,7 +800,7 @@ class QualityMetrics:
         # When a structured context has guidance + substantive directive, the
         # directive serves as the task goal. Only penalize if truly absent.
         has_goal = False
-        if context.guidance and hasattr(context.guidance, 'goal') and context.guidance.goal:
+        if context.guidance and hasattr(context.guidance, "goal") and context.guidance.goal:
             has_goal = len(str(context.guidance.goal).strip()) > 10
         if not has_goal and context.directive and context.directive.content:
             # A substantive directive (>20 words) with a role = goal is defined
@@ -639,7 +820,9 @@ class QualityMetrics:
         if inferred and not has_rules:
             has_rules = inferred.get("has_rules", False)
         if has_rules:
-            rule_count = len(context.guidance.rules) if context.guidance and context.guidance.rules else 0
+            rule_count = (
+                len(context.guidance.rules) if context.guidance and context.guidance.rules else 0
+            )
             if rule_count >= 3:
                 score += 0.15
                 strengths.append(f"Well-defined rules ({rule_count})")
@@ -696,8 +879,14 @@ class QualityMetrics:
 
         # Generic language penalty
         generic_phrases = [
-            "be helpful", "do your best", "try to", "work on",
-            "general", "basic", "simple approach", "standard"
+            "be helpful",
+            "do your best",
+            "try to",
+            "work on",
+            "general",
+            "basic",
+            "simple approach",
+            "standard",
         ]
         generic_count = sum(1 for p in generic_phrases if p in lower)
         if generic_count > 2:
@@ -709,9 +898,20 @@ class QualityMetrics:
 
         # Domain-specific terminology
         domain_indicators = [
-            "algorithm", "methodology", "framework", "criteria", "metric",
-            "protocol", "taxonomy", "schema", "pipeline", "workflow",
-            "stakeholder", "baseline", "benchmark", "hypothesis"
+            "algorithm",
+            "methodology",
+            "framework",
+            "criteria",
+            "metric",
+            "protocol",
+            "taxonomy",
+            "schema",
+            "pipeline",
+            "workflow",
+            "stakeholder",
+            "baseline",
+            "benchmark",
+            "hypothesis",
         ]
         domain_count = sum(1 for t in domain_indicators if t in lower)
         if domain_count >= 3:
@@ -774,8 +974,18 @@ class QualityMetrics:
         # Measurable criteria
         measurable = any(
             p in lower
-            for p in ["confidence", "score", "rating", "percentage", "0.0", "1.0",
-                       "scale of", "1 to ", "0 to ", "between"]
+            for p in [
+                "confidence",
+                "score",
+                "rating",
+                "percentage",
+                "0.0",
+                "1.0",
+                "scale of",
+                "1 to ",
+                "0 to ",
+                "between",
+            ]
         )
         if measurable:
             score += 0.10
@@ -801,8 +1011,9 @@ class QualityMetrics:
         # Long directives with structure (headings, numbered lists) are
         # intentionally detailed, not verbose.
         has_internal_structure = (
-            "**" in dir_content or "##" in dir_content or
-            any(dir_content.strip().find(f"\n{i}.") >= 0 for i in range(1, 10))
+            "**" in dir_content
+            or "##" in dir_content
+            or any(dir_content.strip().find(f"\n{i}.") >= 0 for i in range(1, 10))
         )
         if 15 < dir_words < 150:
             score += 0.25
@@ -891,7 +1102,9 @@ class QualityMetrics:
             strengths.append("Clear guidance-directive hierarchy")
 
         # Constraints add structural completeness
-        has_constraints_section = bool(context.constraints) or (inferred and inferred.get("has_constraints"))
+        has_constraints_section = bool(context.constraints) or (
+            inferred and inferred.get("has_constraints")
+        )
         if has_constraints_section:
             score += 0.20
             strengths.append("Includes constraints section")
@@ -974,13 +1187,19 @@ class QualityMetrics:
 
         # Critical issues
         if "missing essential" in issues_text or "missing guidance" in issues_text:
-            suggestions.append("Add the missing components: a specific Role, a clear Goal, a detailed Directive, and Constraints")
+            suggestions.append(
+                "Add the missing components: a specific Role, a clear Goal, a detailed Directive, and Constraints"
+            )
 
         if "minimal generic prompt" in issues_text or "generic role and rules" in issues_text:
-            suggestions.append("Replace generic role with domain expertise (e.g. 'Senior data analyst' instead of 'Expert Assistant')")
+            suggestions.append(
+                "Replace generic role with domain expertise (e.g. 'Senior data analyst' instead of 'Expert Assistant')"
+            )
 
         if "too short" in issues_text or "too brief" in issues_text:
-            suggestions.append("Expand the prompt with more specific instructions, examples, and constraints")
+            suggestions.append(
+                "Expand the prompt with more specific instructions, examples, and constraints"
+            )
 
         if "empty json schema" in issues_text:
             suggestions.append("Replace the empty JSON schema with concrete field names and types")
@@ -993,22 +1212,38 @@ class QualityMetrics:
             for dim, score in dimensions.items():
                 if score < 0.50:
                     if dim == QualityDimension.CLARITY:
-                        suggestions.append("Improve clarity: use precise terms, define ambiguous concepts, remove vague language")
+                        suggestions.append(
+                            "Improve clarity: use precise terms, define ambiguous concepts, remove vague language"
+                        )
                     elif dim == QualityDimension.COMPLETENESS:
-                        suggestions.append("Add missing components: Goal, Role, Rules, Constraints, and Examples")
+                        suggestions.append(
+                            "Add missing components: Goal, Role, Rules, Constraints, and Examples"
+                        )
                     elif dim == QualityDimension.SPECIFICITY:
-                        suggestions.append("Add concrete examples and domain-specific details instead of generic instructions")
+                        suggestions.append(
+                            "Add concrete examples and domain-specific details instead of generic instructions"
+                        )
                     elif dim == QualityDimension.RELEVANCE:
-                        suggestions.append("Focus the directive on the core task and add constraints to scope the output")
+                        suggestions.append(
+                            "Focus the directive on the core task and add constraints to scope the output"
+                        )
                     elif dim == QualityDimension.STRUCTURE:
-                        suggestions.append("Organize with clear sections: Role, Goal, Directive, Constraints")
+                        suggestions.append(
+                            "Organize with clear sections: Role, Goal, Directive, Constraints"
+                        )
                     elif dim == QualityDimension.EFFICIENCY:
-                        suggestions.append("Balance detail and conciseness -- ensure all content serves a purpose")
+                        suggestions.append(
+                            "Balance detail and conciseness -- ensure all content serves a purpose"
+                        )
 
         if not suggestions and overall >= 0.80:
-            suggestions.append("Strong prompt. Consider adding edge cases or constraints for even better results.")
+            suggestions.append(
+                "Strong prompt. Consider adding edge cases or constraints for even better results."
+            )
         elif not suggestions and overall >= 0.65:
-            suggestions.append("Good foundation. Add examples and tighter constraints to reach excellence.")
+            suggestions.append(
+                "Good foundation. Add examples and tighter constraints to reach excellence."
+            )
         elif not suggestions:
             suggestions.append("Review each dimension and address the issues listed above.")
 
@@ -1022,8 +1257,7 @@ class QualityMetrics:
         score2 = self.evaluate(context2)
         improvement = score2.overall - score1.overall
         dimension_changes = {
-            dim: score2.dimensions[dim] - score1.dimensions[dim]
-            for dim in QualityDimension
+            dim: score2.dimensions[dim] - score1.dimensions[dim] for dim in QualityDimension
         }
         return {
             "original_score": score1.overall,
@@ -1040,12 +1274,12 @@ class QualityMetrics:
         report = f"""Context Quality Report
 =====================
 
-Overall Score: {score.overall:.1%} {'✅' if score.overall >= 0.8 else '⚠️' if score.overall >= 0.6 else '❌'}
+Overall Score: {score.overall:.1%} {"✅" if score.overall >= 0.8 else "⚠️" if score.overall >= 0.6 else "❌"}
 
 Dimension Scores:
 """
         for dim, dim_score in score.dimensions.items():
-            emoji = '✅' if dim_score >= 0.8 else '⚠️' if dim_score >= 0.6 else '❌'
+            emoji = "✅" if dim_score >= 0.8 else "⚠️" if dim_score >= 0.6 else "❌"
             report += f"  {emoji} {dim.value.title()}: {dim_score:.1%}\n"
 
         if score.strengths:
@@ -1111,7 +1345,7 @@ Output ONLY valid JSON:
         try:
             evaluator_context = Context(
                 guidance="You are a strict, honest context quality evaluator. Be critical but fair. Output ONLY valid JSON.",
-                directive=prompt
+                directive=prompt,
             )
             response = evaluator_context.execute(
                 provider=self.llm_provider,
@@ -1133,17 +1367,14 @@ Output ONLY valid JSON:
                 QualityDimension.STRUCTURE: scores_json["structure"],
                 QualityDimension.EFFICIENCY: scores_json["efficiency"],
             }
-            overall = sum(
-                score * self.weights[dim]
-                for dim, score in dimensions.items()
-            )
+            overall = sum(score * self.weights[dim] for dim, score in dimensions.items())
             return QualityScore(
                 overall=overall,
                 dimensions=dimensions,
                 issues=scores_json.get("overall_issues", []),
                 strengths=scores_json.get("overall_strengths", []),
                 suggestions=scores_json.get("improvement_suggestions", []),
-                metadata={"mode": "llm", "model": self.llm_model, "provider": self.llm_provider}
+                metadata={"mode": "llm", "model": self.llm_model, "provider": self.llm_provider},
             )
         except Exception as e:
             result = self._evaluate_heuristic(context)

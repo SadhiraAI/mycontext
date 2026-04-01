@@ -2,7 +2,6 @@
 Tests for Gemini provider (routed through LiteLLM)
 """
 
-
 import pytest
 
 from mycontext.providers import get_provider, list_providers
@@ -19,6 +18,7 @@ def test_google_alias_in_get_provider():
     try:
         provider = get_provider("google", api_key="test-key")
         from mycontext.providers.litellm_provider import LiteLLMProvider
+
         assert isinstance(provider, LiteLLMProvider)
     except ImportError:
         pytest.skip("LiteLLM not installed")
@@ -29,6 +29,7 @@ def test_gemini_provider_via_litellm():
     try:
         provider = get_provider("gemini", api_key="test-key")
         from mycontext.providers.litellm_provider import LiteLLMProvider
+
         assert isinstance(provider, LiteLLMProvider)
         assert provider.default_model == "gemini-2.0-flash"
     except ImportError:

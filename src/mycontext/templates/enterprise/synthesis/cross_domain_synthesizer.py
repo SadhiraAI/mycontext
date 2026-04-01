@@ -18,29 +18,29 @@ from mycontext import Constraints, Guidance, Pattern
 class CrossDomainSynthesizer(Pattern):
     """
     Synthesize insights across multiple domains.
-    
+
     Process:
     - Identify parallel structures across domains
     - Map concepts from source to target domain
     - Generate novel insights through cross-pollination
     - Create innovative solutions
-    
+
     Use Cases:
     - Innovation
     - Problem-solving
     - Strategy development
     - Research synthesis
-    
+
     Example:
         >>> from mycontext.templates.enterprise.synthesis import CrossDomainSynthesizer
-        >>> 
+        >>>
         >>> pattern = CrossDomainSynthesizer()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     target_problem="Improve customer retention",
         ...     source_domains="Biology (immune system), Psychology (habit formation)"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -67,11 +67,7 @@ class CrossDomainSynthesizer(Pattern):
             description="Integrate insights from multiple domains",
             version="1.0.0",
             tags=["synthesis", "enterprise", "cross-domain", "innovation"],
-            metadata={
-                "category": "synthesis",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "synthesis", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Cross-Domain Innovation Expert",
                 rules=[
@@ -79,9 +75,9 @@ class CrossDomainSynthesizer(Pattern):
                     "Map concepts rigorously from source to target domain",
                     "Generate novel insights through analogical reasoning",
                     "Test applicability of cross-domain solutions",
-                    "Combine insights from multiple domains"
+                    "Combine insights from multiple domains",
                 ],
-                style="creative, rigorous, analogical, integrative"
+                style="creative, rigorous, analogical, integrative",
             ),
             directive_template="""**CROSS-DOMAIN SYNTHESIS**
 
@@ -258,31 +254,23 @@ class CrossDomainSynthesizer(Pattern):
 **Why**: [Reasoning for selection]
 
 **Next steps**: [How to pursue this]""",
-            input_schema={
-                "target_problem": str,
-                "source_domains": str
-            },
+            input_schema={"target_problem": str, "source_domains": str},
             constraints=Constraints(
                 must_include=[
                     "domain_mapping",
                     "structural_alignment",
                     "novel_insights",
-                    "synthesized_solutions"
+                    "synthesized_solutions",
                 ],
-                must_not_include=[
-                    "superficial_analogies",
-                    "forced_connections"
-                ],
-                style_guide="Creative and rigorous. Deep structural mapping. Novel but grounded solutions."
-            )
+                must_not_include=["superficial_analogies", "forced_connections"],
+                style_guide="Creative and rigorous. Deep structural mapping. Novel but grounded solutions.",
+            ),
         )
 
     def build_context(self, target_problem="", source_domains="", **kwargs):
         """Build context for cross-domain synthesis."""
         return super().build_context(
-            target_problem=target_problem,
-            source_domains=source_domains,
-            **kwargs
+            target_problem=target_problem, source_domains=source_domains, **kwargs
         )
 
     def execute(self, provider="openai", target_problem="", source_domains="", **kwargs):
@@ -291,7 +279,7 @@ class CrossDomainSynthesizer(Pattern):
             provider=provider,
             target_problem=target_problem,
             source_domains=source_domains,
-            **kwargs
+            **kwargs,
         )
 
 

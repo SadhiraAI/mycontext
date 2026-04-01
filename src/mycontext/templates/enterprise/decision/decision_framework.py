@@ -7,30 +7,29 @@ Based on decision science and rational choice theory.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class DecisionFramework(Pattern):
     """
     Structured framework for systematic decision-making.
-    
+
     Provides comprehensive decision analysis:
     - Problem definition
     - Option generation
     - Criteria establishment
     - Evaluation
     - Recommendation
-    
+
     Based on: Decision science and multi-criteria decision analysis
-    
+
     Example:
         >>> framework = DecisionFramework()
         >>> context = framework.build_context(
         ...     decision="Choose cloud provider for our app",
         ...     options=["AWS", "Google Cloud", "Azure"]
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -68,9 +67,9 @@ class DecisionFramework(Pattern):
                     "Evaluate objectively with evidence",
                     "Consider short and long-term implications",
                     "Acknowledge uncertainty and risks",
-                    "Provide actionable recommendations"
+                    "Provide actionable recommendations",
                 ],
-                style="analytical, balanced, decisive"
+                style="analytical, balanced, decisive",
             ),
             directive_template="""Apply systematic decision framework:
 
@@ -196,17 +195,17 @@ Systematic decision analysis:
                 "context_section": str,
                 "options_section": str,
                 "provided_options": str,
-                "depth": str
+                "depth": str,
             },
             constraints=Constraints(
                 must_include=[
                     "criteria",
                     "evaluation_matrix",
                     "recommendation",
-                    "implementation_guidance"
+                    "implementation_guidance",
                 ],
-                style_guide="Be thorough but decisive, balanced but opinionated when evidence supports it"
-            )
+                style_guide="Be thorough but decisive, balanced but opinionated when evidence supports it",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -236,18 +235,18 @@ Systematic decision analysis:
         context: str | None = None,
         options: list[str] | None = None,
         depth: str = "comprehensive",
-        **kwargs
+        **kwargs,
     ):
         """
         Build context for decision framework.
-        
+
         Args:
             decision: The decision to be made
             context: Optional additional context
             options: Optional list of options to consider
             depth: Analysis depth ("quick", "standard", "comprehensive")
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for export/use
         """
@@ -261,7 +260,7 @@ Systematic decision analysis:
             options_section=options_section,
             provided_options=provided_options,
             depth=depth,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -271,11 +270,11 @@ Systematic decision analysis:
         context: str | None = None,
         options: list[str] | None = None,
         depth: str = "comprehensive",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute decision framework analysis.
-        
+
         Args:
             provider: LLM provider to use
             decision: The decision to be made
@@ -283,7 +282,7 @@ Systematic decision analysis:
             options: Optional list of options to consider
             depth: Analysis depth
             **kwargs: Provider parameters
-        
+
         Returns:
             ProviderResponse with the analysis
         """
@@ -293,5 +292,5 @@ Systematic decision analysis:
             context=context,
             options=options,
             depth=depth,
-            **kwargs
+            **kwargs,
         )

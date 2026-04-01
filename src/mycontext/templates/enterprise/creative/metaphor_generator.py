@@ -5,7 +5,6 @@ Generates effective metaphors for communication and understanding.
 Based on metaphor theory and cognitive linguistics.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class MetaphorGenerator(Pattern):
     """
     Generate effective metaphors systematically.
-    
+
     Creates:
     - Explanatory metaphors
     - Conceptual metaphors
     - Visual metaphors
     - Domain mappings
-    
+
     Based on: Conceptual metaphor theory
-    
+
     Example:
         >>> generator = MetaphorGenerator()
         >>> context = generator.build_context(
         ...     concept="How AI learns from data",
         ...     audience="non-technical stakeholders"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class MetaphorGenerator(Pattern):
                     "Map structure, not surface",
                     "Make insights transferable",
                     "Know metaphor limits",
-                    "Test understanding"
+                    "Test understanding",
                 ],
-                style="creative, insightful, clear"
+                style="creative, insightful, clear",
             ),
             directive_template="""Generate metaphors for:
 
@@ -131,15 +130,11 @@ Metaphor generation:
    Best choice and why
 
 **OUTPUT FORMAT**: Powerful metaphors with usage guidance.""",
-            input_schema={
-                "concept": str,
-                "audience": str,
-                "context_section": str
-            },
+            input_schema={"concept": str, "audience": str, "context_section": str},
             constraints=Constraints(
                 must_include=["multiple_metaphors", "mappings", "limitations"],
-                style_guide="Be creative but accurate"
-            )
+                style_guide="Be creative but accurate",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -148,19 +143,12 @@ Metaphor generation:
         return ""
 
     def build_context(
-        self,
-        concept: str = "",
-        audience: str = "general",
-        context: str | None = None,
-        **kwargs
+        self, concept: str = "", audience: str = "general", context: str | None = None, **kwargs
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            concept=concept,
-            audience=audience,
-            context_section=context_section,
-            **kwargs
+            concept=concept, audience=audience, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -169,12 +157,8 @@ Metaphor generation:
         concept: str = "",
         audience: str = "general",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            concept=concept,
-            audience=audience,
-            context=context,
-            **kwargs
+            provider=provider, concept=concept, audience=audience, context=context, **kwargs
         )

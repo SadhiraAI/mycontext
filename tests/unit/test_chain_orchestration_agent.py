@@ -2,7 +2,6 @@
 Unit tests for chain orchestration agent.
 """
 
-
 from mycontext.intelligence import (
     PATTERN_BUILD_CONTEXT_REGISTRY,
     WorkflowChainResult,
@@ -46,7 +45,10 @@ class TestChainOrchestrationAgent:
         r = WorkflowChainResult(
             chain=["pattern_recognition_engine", "feedback_composer"],
             chain_params={
-                "pattern_recognition_engine": {"data": "<from previous step>", "pattern_focus": "sentiment"},
+                "pattern_recognition_engine": {
+                    "data": "<from previous step>",
+                    "pattern_focus": "sentiment",
+                },
                 "feedback_composer": {"situation": "<from previous step>", "goal": "Feedback goal"},
             },
             reasoning="test",

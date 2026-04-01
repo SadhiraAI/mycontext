@@ -10,13 +10,13 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
 
 
 class StructuredOutputMixin:
     """
     Mixin for templates that support structured output.
-    
+
     Usage:
         class MyTemplate(Pattern, StructuredOutputMixin):
             def execute_structured(self, output_model: Type[T], **kwargs) -> T:
@@ -28,14 +28,14 @@ class StructuredOutputMixin:
     def parse_structured(text: str, model: type[T]) -> T:
         """
         Parse LLM output into Pydantic model.
-        
+
         Args:
             text: LLM response text
             model: Pydantic model class
-            
+
         Returns:
             Validated Pydantic model instance
-            
+
         Raises:
             ValidationError: If parsing or validation fails
         """
@@ -55,10 +55,10 @@ class StructuredOutputMixin:
     def parse_json(text: str) -> dict[str, Any]:
         """
         Parse JSON from LLM output.
-        
+
         Args:
             text: LLM response text
-            
+
         Returns:
             Parsed JSON dictionary
         """
@@ -71,7 +71,7 @@ class StructuredOutputMixin:
 class JSONOutput:
     """
     Decorator/wrapper for generating JSON output.
-    
+
     Usage:
         @JSONOutput(schema={
             "name": str,
@@ -85,7 +85,7 @@ class JSONOutput:
     def __init__(self, schema: dict[str, type] | None = None, strict: bool = True):
         """
         Initialize JSON output wrapper.
-        
+
         Args:
             schema: Expected JSON schema (field: type pairs)
             strict: Whether to enforce schema strictly
@@ -95,11 +95,12 @@ class JSONOutput:
 
     def __call__(self, func):
         """Wrap function to return structured JSON."""
+
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
 
             # Extract response text
-            if hasattr(result, 'response'):
+            if hasattr(result, "response"):
                 text = result.response
             else:
                 text = str(result)
@@ -123,13 +124,13 @@ class JSONOutput:
 class PydanticOutput:
     """
     Decorator for generating Pydantic model output.
-    
+
     Usage:
         class PersonInfo(BaseModel):
             name: str
             age: int
             skills: List[str]
-        
+
         @PydanticOutput(PersonInfo)
         def analyze_person(text):
             return template.execute(user=text)
@@ -138,7 +139,7 @@ class PydanticOutput:
     def __init__(self, model: type[T]):
         """
         Initialize Pydantic output wrapper.
-        
+
         Args:
             model: Pydantic model class
         """
@@ -146,11 +147,12 @@ class PydanticOutput:
 
     def __call__(self, func):
         """Wrap function to return Pydantic model."""
+
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
 
             # Extract response text
-            if hasattr(result, 'response'):
+            if hasattr(result, "response"):
                 text = result.response
             else:
                 text = str(result)
@@ -164,14 +166,14 @@ class PydanticOutput:
 def output_format(format_type: str, **format_options) -> str:
     """
     Generate output format instruction for prompts.
-    
+
     Args:
         format_type: Type of output ("json", "yaml", "xml", "markdown", "code")
         **format_options: Additional format options
-        
+
     Returns:
         Formatted instruction string to add to prompts
-        
+
     Example:
         >>> instruction = output_format("json", schema={"name": "str", "age": "int"})
         >>> context = Context(directive=f"Analyze this. {instruction}")
@@ -220,27 +222,28 @@ No explanations outside the code block."""
 
 # Helper functions
 
+
 def extract_json(text: str) -> str | None:
     """
     Extract JSON string from text (handles code blocks, markdown).
-    
+
     Args:
         text: Text potentially containing JSON
-        
+
     Returns:
         Extracted JSON string or None
     """
     import re
 
     # Try to find JSON in code blocks first
-    json_block_pattern = r'```(?:json)?\s*\n?(.*?)\n?```'
+    json_block_pattern = r"```(?:json)?\s*\n?(.*?)\n?```"
     matches = re.findall(json_block_pattern, text, re.DOTALL)
     if matches:
         return matches[0].strip()
 
     # Try to find JSON object/array
     # Look for { } or [ ]
-    json_pattern = r'(\{.*\}|\[.*\])'
+    json_pattern = r"(\{.*\}|\[.*\])"
     matches = re.findall(json_pattern, text, re.DOTALL)
     if matches:
         # Return the longest match (most likely to be complete)
@@ -252,11 +255,11 @@ def extract_json(text: str) -> str | None:
 def validate_schema(data: dict[str, Any], schema: dict[str, type]) -> None:
     """
     Validate data against simple schema.
-    
+
     Args:
         data: Data to validate
         schema: Schema (field: type pairs)
-        
+
     Raises:
         ValidationError: If validation fails
     """
@@ -274,8 +277,10 @@ def validate_schema(data: dict[str, Any], schema: dict[str, type]) -> None:
 
 # Example usage and exports
 
+
 class CodeReviewOutput(BaseModel):
     """Example Pydantic model for structured output."""
+
     issues: list
     security_score: int
     performance_score: int
@@ -292,11 +297,7 @@ def example_structured_output():
     code = "def foo(): pass"
 
     # Method 1: Parse manually
-    result = reviewer.execute(
-        provider="gemini",
-        code=code,
-        language="Python"
-    )
+    result = reviewer.execute(provider="gemini", code=code, language="Python")
 
     try:
         json_data = extract_json(result.response)

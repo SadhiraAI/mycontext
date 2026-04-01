@@ -138,7 +138,7 @@ _SECTION_DEFINITIONS: dict[str, dict[str, str]] = {
             "- [Specific trigger with details] \u2192 [Specific consequence with "
             "numbers] \u2192 [Specific outcome/decision]\n"
             'Example: "SQLAlchemy 2.1.0 JSONB query bug \u2192 3 failing unit tests '
-            "on PostgreSQL 15 \u2192 downgraded to 2.0.23, all tests passing\"\n"
+            'on PostgreSQL 15 \u2192 downgraded to 2.0.23, all tests passing"\n'
             'Example: "No rate limiting on POST /auth/login \u2192 unlimited brute-force '
             "possible \u2192 Bob added 10 req/s/IP middleware + Dave added WAF rule "
             '100 attempts/hr/IP"'
@@ -201,10 +201,7 @@ _SECTION_DEFINITIONS: dict[str, dict[str, str]] = {
             "(Unresolved questions, pending decisions, blockers)\n"
             "- [Item]: [Status/context]"
         ),
-        "progressive": (
-            "## OPEN ITEMS (updated)\n"
-            "- [Item]: [Status] [NEW/RESOLVED/unchanged]"
-        ),
+        "progressive": ("## OPEN ITEMS (updated)\n- [Item]: [Status] [NEW/RESOLVED/unchanged]"),
     },
     "key_numbers": {
         "session": (
@@ -230,8 +227,7 @@ _SECTION_DEFINITIONS: dict[str, dict[str, str]] = {
     },
     "changes_this_update": {
         "progressive": (
-            "## CHANGES THIS UPDATE\n"
-            "(Brief list of what changed from the previous memory state)"
+            "## CHANGES THIS UPDATE\n(Brief list of what changed from the previous memory state)"
         ),
     },
 }
@@ -242,34 +238,58 @@ _SECTION_DEFINITIONS: dict[str, dict[str, str]] = {
 
 _DETAIL_LEVELS: dict[str, list[str]] = {
     "minimal": [
-        "entities", "decisions", "constraints",
+        "entities",
+        "decisions",
+        "constraints",
     ],
     "standard": [
-        "entities", "decisions", "constraints",
-        "timeline", "open_items", "key_numbers",
+        "entities",
+        "decisions",
+        "constraints",
+        "timeline",
+        "open_items",
+        "key_numbers",
     ],
     "narrative": [
-        "entities", "decisions", "constraints",
-        "events", "causal_chains",
-        "timeline", "open_items", "key_numbers",
+        "entities",
+        "decisions",
+        "constraints",
+        "events",
+        "causal_chains",
+        "timeline",
+        "open_items",
+        "key_numbers",
     ],
     "full": [
-        "entities", "decisions", "constraints",
-        "events", "causal_chains", "state_transitions", "context_rationale",
-        "timeline", "open_items", "key_numbers",
+        "entities",
+        "decisions",
+        "constraints",
+        "events",
+        "causal_chains",
+        "state_transitions",
+        "context_rationale",
+        "timeline",
+        "open_items",
+        "key_numbers",
     ],
 }
 
 VALID_DETAIL_LEVELS: frozenset[str] = frozenset(_DETAIL_LEVELS)
 
-_EPISODIC_SECTION_KEYS: frozenset[str] = frozenset({
-    "events", "causal_chains", "state_transitions", "context_rationale",
-})
+_EPISODIC_SECTION_KEYS: frozenset[str] = frozenset(
+    {
+        "events",
+        "causal_chains",
+        "state_transitions",
+        "context_rationale",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
 # Dynamic output structure composition
 # ---------------------------------------------------------------------------
+
 
 def _compose_output_structure(sections: list[str], intent: str) -> str:
     """Build output structure text by joining section templates for *intent*."""
@@ -328,8 +348,7 @@ def _build_session_instructions(sections: list[str], detail_level: str = "standa
         letter += 1
     if "state_transitions" in section_set:
         addon_parts.append(
-            f"   {chr(letter)}. Every STATE TRANSITION "
-            f"(before/after for significant changes)\n"
+            f"   {chr(letter)}. Every STATE TRANSITION (before/after for significant changes)\n"
         )
         letter += 1
     if "context_rationale" in section_set:
@@ -339,16 +358,18 @@ def _build_session_instructions(sections: list[str], detail_level: str = "standa
         )
         letter += 1
 
-    enumeration = base_enum + "".join(addon_parts) + (
-        "   If a person, number, or technology appears even once, it must "
-        "appear in your output.\n"
+    enumeration = (
+        base_enum
+        + "".join(addon_parts)
+        + (
+            "   If a person, number, or technology appears even once, it must "
+            "appear in your output.\n"
+        )
     )
 
     return (
         "You are compressing a conversation into structured state.\n\n"
-        "Process:\n"
-        + enumeration
-        + "2. DISCARD filler: greetings, confirmations ('sounds good'), "
+        "Process:\n" + enumeration + "2. DISCARD filler: greetings, confirmations ('sounds good'), "
         "repeated statements, thinking-out-loud, pleasantries.\n"
         "3. EXTRACT into the structured sections below. "
         "Preserve exact names, versions, dates, numbers, and technical terms \u2014 "
@@ -382,8 +403,7 @@ def _build_progressive_instructions(sections: list[str], detail_level: str = "st
     has_episodic = bool(section_set & _EPISODIC_SECTION_KEYS)
 
     scan_items = (
-        "new entities, changed decisions, resolved questions, "
-        "new constraints, updated preferences"
+        "new entities, changed decisions, resolved questions, new constraints, updated preferences"
     )
     if "events" in section_set:
         scan_items += ", new events/incidents"
@@ -583,9 +603,7 @@ class MemoryCompressor(Pattern):
         "If content is empty or incoherent, say so."
     )
 
-    VALID_INTENTS: ClassVar[frozenset[str]] = frozenset({
-        "session", "progressive", "context"
-    })
+    VALID_INTENTS: ClassVar[frozenset[str]] = frozenset({"session", "progressive", "context"})
 
     VALID_DETAIL_LEVELS: ClassVar[frozenset[str]] = VALID_DETAIL_LEVELS
 
@@ -685,10 +703,7 @@ class MemoryCompressor(Pattern):
         goal_section = f"**Compression goal**: {goal}" if goal else ""
 
         if intent == "progressive" and existing_memory:
-            existing_memory_section = (
-                "### EXISTING MEMORY STATE (to update)\n\n"
-                f"{existing_memory}"
-            )
+            existing_memory_section = f"### EXISTING MEMORY STATE (to update)\n\n{existing_memory}"
         else:
             existing_memory_section = ""
 
@@ -771,14 +786,12 @@ class MemoryCompressor(Pattern):
             invalid = set(custom_sections) - valid_keys
             if invalid:
                 raise ValueError(
-                    f"Unknown section(s): {sorted(invalid)}. "
-                    f"Available: {sorted(valid_keys)}"
+                    f"Unknown section(s): {sorted(invalid)}. Available: {sorted(valid_keys)}"
                 )
             return list(custom_sections)
 
         if detail_level not in _DETAIL_LEVELS:
             raise ValueError(
-                f"Invalid detail_level {detail_level!r}. "
-                f"Choose from: {sorted(_DETAIL_LEVELS)}"
+                f"Invalid detail_level {detail_level!r}. Choose from: {sorted(_DETAIL_LEVELS)}"
             )
         return list(_DETAIL_LEVELS[detail_level])

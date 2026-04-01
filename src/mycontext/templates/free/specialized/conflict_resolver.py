@@ -5,7 +5,6 @@ Systematic conflict resolution using proven frameworks.
 Based on conflict resolution theory and mediation practices.
 """
 
-
 from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
 from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
@@ -14,23 +13,23 @@ from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_d
 class ConflictResolver(Pattern):
     """
     Resolve conflicts systematically.
-    
+
     Addresses:
     - Interpersonal conflicts
     - Team disagreements
     - Stakeholder conflicts
     - Value conflicts
     - Resource conflicts
-    
+
     Based on: Conflict resolution theory and mediation
-    
+
     Example:
         >>> resolver = ConflictResolver()
         >>> context = resolver.build_context(
         ...     conflict="Team disagrees on technical approach",
         ...     parties=["Engineering team", "Product team"]
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -53,13 +52,14 @@ class ConflictResolver(Pattern):
             guidance=Guidance(
                 role="Expert Mediator and Conflict Resolution Specialist",
                 rules=[
+                    "Do not favor the party who framed the conflict. Present both perspectives with equal rigor.",
                     "Stay neutral and objective",
                     "Understand all perspectives",
                     "Find common ground",
                     "Focus on interests, not positions",
-                    "Seek win-win solutions"
+                    "Seek win-win solutions",
                 ],
-                style="diplomatic, empathetic, solution-focused"
+                style="diplomatic, empathetic, solution-focused",
             ),
             directive_template="""Resolve this conflict:
 
@@ -117,15 +117,11 @@ Conflict resolution:
    - Follow-up: [Ensure it sticks]
 
 **OUTPUT FORMAT**: Balanced resolution with implementation plan.""",
-            input_schema={
-                "conflict": str,
-                "parties": str,
-                "context_section": str
-            },
+            input_schema={"conflict": str, "parties": str, "context_section": str},
             constraints=Constraints(
                 must_include=["perspectives", "common_ground", "resolution"],
-                style_guide="Be neutral and constructive"
-            )
+                style_guide="Be neutral and constructive",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -167,6 +163,27 @@ Conflict resolution:
         if fmt and ctx.directive:
             ctx.directive = Directive(content=ctx.directive.content + fmt)
             ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Would both parties feel fairly represented?",
+                "Am I favoring the party who framed the question?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Marketing wants to launch next week but Engineering says the feature is not ready",
+                    "output": (
+                        "MARKETING'S POSITION: Revenue target at risk; competitor launching similar feature.\n"
+                        "ENGINEERING'S POSITION: Two critical bugs remain; launching risks customer trust.\n"
+                        "COMMON GROUND: Both want the product to succeed long-term.\n"
+                        "RECOMMENDATION: Launch with a controlled rollout (10% of users) next week — "
+                        "Marketing meets their date, Engineering gets real usage data on the bugs "
+                        "before full exposure."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -190,9 +207,16 @@ Conflict resolution:
                 | ``"narrative"`` | ``"brief"`` | ``"actionable"`` | ``"table"``
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(

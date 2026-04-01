@@ -18,6 +18,7 @@ from mycontext.intelligence.prompt_composer import ComposedPrompt, PromptCompose
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_warnings(caplog):
     return [r for r in caplog.records if r.levelno == logging.WARNING]
 
@@ -25,6 +26,7 @@ def _get_warnings(caplog):
 # ---------------------------------------------------------------------------
 # PromptComposer
 # ---------------------------------------------------------------------------
+
 
 class TestPromptComposerLogging:
     """Verify that PromptComposer logs warnings instead of silently swallowing errors."""
@@ -50,8 +52,9 @@ class TestPromptComposerLogging:
         assert result.metadata.get("composition_mode") == "fallback"
         assert "LLM unavailable" in result.metadata.get("error", "")
         warnings = _get_warnings(caplog)
-        assert any("compose" in r.message and "LLM merge" in r.message for r in warnings), \
+        assert any("compose" in r.message and "LLM merge" in r.message for r in warnings), (
             f"Expected compose warning, got: {[r.message for r in warnings]}"
+        )
 
     def test_compose_llm_failure_fallback_is_non_empty(self, caplog):
         """Fallback result must be non-empty."""
@@ -83,13 +86,18 @@ class TestPromptComposerLogging:
             MockCtx.return_value = mock_instance
 
             with caplog.at_level(logging.DEBUG, logger="mycontext.intelligence.prompt_composer"):
-                composer.compose(prompts=["Prompt A content.", "Prompt B content."], question="q", provider="openai")
+                composer.compose(
+                    prompts=["Prompt A content.", "Prompt B content."],
+                    question="q",
+                    provider="openai",
+                )
 
         warning_records = [r for r in caplog.records if r.levelno == logging.WARNING]
         error_records = [r for r in caplog.records if r.levelno == logging.ERROR]
         assert len(warning_records) >= 1
-        assert len(error_records) == 0, \
+        assert len(error_records) == 0, (
             f"Fallback failures should be WARNING not ERROR. Got errors: {[r.message for r in error_records]}"
+        )
 
     def test_compose_from_templates_bad_klass_logs_warning(self, caplog):
         """compose_from_templates(): a template whose build_context raises logs a warning."""
@@ -116,6 +124,7 @@ class TestPromptComposerLogging:
         original_get = None
         try:
             import mycontext.intelligence.pattern_suggester as ps
+
             original_get = ps.get_pattern_class
             ps.get_pattern_class = lambda name, include_enterprise=False: bad_klass
 
@@ -130,8 +139,9 @@ class TestPromptComposerLogging:
                 ps.get_pattern_class = original_get
 
         warnings = _get_warnings(caplog)
-        assert any("compose_from_templates" in r.message for r in warnings), \
+        assert any("compose_from_templates" in r.message for r in warnings), (
             f"Expected compose_from_templates warning. Got: {[r.message for r in warnings]}"
+        )
         assert isinstance(result, ComposedPrompt)
 
     def test_compile_generic_failure_logs_warning(self, caplog):
@@ -152,8 +162,9 @@ class TestPromptComposerLogging:
                 )
 
         warnings = _get_warnings(caplog)
-        assert any("compile_generic" in r.message for r in warnings), \
+        assert any("compile_generic" in r.message for r in warnings), (
             f"Expected compile_generic warning. Got: {[r.message for r in warnings]}"
+        )
         assert isinstance(result, ComposedPrompt)
 
     def test_get_generic_prompt_for_failure_logs_warning(self, caplog):
@@ -181,13 +192,15 @@ class TestPromptComposerLogging:
 
         assert result is None
         warnings = _get_warnings(caplog)
-        assert any("get_generic_prompt_for" in r.message for r in warnings), \
+        assert any("get_generic_prompt_for" in r.message for r in warnings), (
             f"Expected get_generic_prompt_for warning. Got: {[r.message for r in warnings]}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # TemplateIntegratorAgent
 # ---------------------------------------------------------------------------
+
 
 class TestTemplateIntegratorLogging:
     """Verify that TemplateIntegratorAgent._get_template_detail logs warnings."""
@@ -202,6 +215,7 @@ class TestTemplateIntegratorLogging:
         bad_klass.return_value.build_context.side_effect = RuntimeError("context error")
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: bad_klass
@@ -216,8 +230,9 @@ class TestTemplateIntegratorLogging:
 
         assert result == ""
         warnings = _get_warnings(caplog)
-        assert any("_get_template_detail" in r.message for r in warnings), \
+        assert any("_get_template_detail" in r.message for r in warnings), (
             f"Expected _get_template_detail warning. Got: {[r.message for r in warnings]}"
+        )
 
     def test_get_template_detail_missing_class_returns_empty(self):
         """_get_template_detail(): when pattern class is None, returns '' (no warning needed)."""
@@ -226,6 +241,7 @@ class TestTemplateIntegratorLogging:
         agent = TemplateIntegratorAgent()
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: None
@@ -240,6 +256,7 @@ class TestTemplateIntegratorLogging:
 # PatternSuggester
 # ---------------------------------------------------------------------------
 
+
 class TestPatternSuggesterLogging:
     """Verify that _suggest_with_llm logs warnings on failure."""
 
@@ -249,11 +266,13 @@ class TestPatternSuggesterLogging:
         # Patch at the source: mycontext.core.Context
         import mycontext.core as core_mod
         from mycontext.intelligence import pattern_suggester
+
         original_ctx = core_mod.Context
 
         class FakeContext:
             def __init__(self, **kwargs):
                 pass
+
             def execute(self, **kwargs):
                 raise ConnectionError("API timeout")
 
@@ -277,18 +296,21 @@ class TestPatternSuggesterLogging:
         assert names == []
         assert "API timeout" in error_str
         warnings = _get_warnings(caplog)
-        assert any("_suggest_with_llm" in r.message for r in warnings), \
+        assert any("_suggest_with_llm" in r.message for r in warnings), (
             f"Expected _suggest_with_llm warning. Got: {[r.message for r in warnings]}"
+        )
 
     def test_suggest_with_llm_failure_preserves_error_string(self):
         """The error tuple must include the original exception message."""
         import mycontext.core as core_mod
         from mycontext.intelligence import pattern_suggester
+
         original_ctx = core_mod.Context
 
         class FakeContext:
             def __init__(self, **kwargs):
                 pass
+
             def execute(self, **kwargs):
                 raise ValueError("Invalid API key: sk-xxx")
 

@@ -129,8 +129,16 @@ def _build_directive(view: str) -> str:
     configs = {
         "full": {
             "sections": [
-                identification, power_interest, influence_network, profiles, support_analysis,
-                _engagement(6), _comms_plan(7), risks, _action_plan(9), monitoring,
+                identification,
+                power_interest,
+                influence_network,
+                profiles,
+                support_analysis,
+                _engagement(6),
+                _comms_plan(7),
+                risks,
+                _action_plan(9),
+                monitoring,
             ],
             "instruction": (
                 "Produce a complete stakeholder map and management plan. Cover all "
@@ -176,6 +184,7 @@ def _build_directive(view: str) -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class StakeholderMapper(Pattern):
     """
@@ -291,9 +300,7 @@ class StakeholderMapper(Pattern):
                 | ``"operational"`` (4 sections — engagement and comms kit)
         """
         if view not in VALID_VIEWS:
-            raise ValueError(
-                f"Invalid view {view!r}. Choose from: {sorted(VALID_VIEWS)}"
-            )
+            raise ValueError(f"Invalid view {view!r}. Choose from: {sorted(VALID_VIEWS)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -320,6 +327,13 @@ class StakeholderMapper(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["view"] = view
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Did I identify informal influencers, not just formal authority holders?",
+                "Did I account for stakeholders who are affected but have no voice?",
+            ],
+        )
         return ctx
 
     def execute(
@@ -343,12 +357,22 @@ class StakeholderMapper(Pattern):
             **kwargs: Provider parameters
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(
-            project=project, context=context, goals=goals, view=view,
+            project=project,
+            context=context,
+            goals=goals,
+            view=view,
         )
         return ctx.execute(provider=provider, **provider_kwargs)

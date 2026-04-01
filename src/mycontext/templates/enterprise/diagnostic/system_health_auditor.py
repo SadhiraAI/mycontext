@@ -18,7 +18,7 @@ from mycontext import Constraints, Guidance, Pattern
 class SystemHealthAuditor(Pattern):
     """
     Comprehensive system health audit.
-    
+
     Audit Dimensions:
     - Performance
     - Reliability
@@ -26,23 +26,23 @@ class SystemHealthAuditor(Pattern):
     - Scalability
     - Maintainability
     - Compliance
-    
+
     Use Cases:
     - System audits
     - Health checks
     - Preventive maintenance
     - Risk assessment
-    
+
     Example:
         >>> from mycontext.templates.enterprise.diagnostic import SystemHealthAuditor
-        >>> 
+        >>>
         >>> pattern = SystemHealthAuditor()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     system="E-commerce web application",
         ...     audit_focus="Performance, security, scalability"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -69,11 +69,7 @@ class SystemHealthAuditor(Pattern):
             description="Comprehensive system health check",
             version="1.0.0",
             tags=["diagnostic", "enterprise", "audit", "health-check"],
-            metadata={
-                "category": "diagnostic",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "diagnostic", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Systems Auditor and Health Check Specialist",
                 rules=[
@@ -81,9 +77,9 @@ class SystemHealthAuditor(Pattern):
                     "Use objective metrics where possible",
                     "Identify issues before they become critical",
                     "Prioritize findings by severity and urgency",
-                    "Provide actionable recommendations"
+                    "Provide actionable recommendations",
                 ],
-                style="thorough, objective, risk-focused, actionable"
+                style="thorough, objective, risk-focused, actionable",
             ),
             directive_template="""**SYSTEM HEALTH AUDIT**
 
@@ -369,41 +365,26 @@ class SystemHealthAuditor(Pattern):
 **Risk if not addressed**: [Consequences]
 
 **Recommended next steps**: [Priority actions]""",
-            input_schema={
-                "system": str,
-                "audit_focus": str
-            },
+            input_schema={"system": str, "audit_focus": str},
             constraints=Constraints(
                 must_include=[
                     "multi_dimensional_audit",
                     "health_scores",
                     "prioritized_findings",
-                    "remediation_plan"
+                    "remediation_plan",
                 ],
-                must_not_include=[
-                    "superficial_check",
-                    "vague_findings"
-                ],
-                style_guide="Systematic and thorough. Objective metrics. Prioritized by risk. Actionable recommendations."
-            )
+                must_not_include=["superficial_check", "vague_findings"],
+                style_guide="Systematic and thorough. Objective metrics. Prioritized by risk. Actionable recommendations.",
+            ),
         )
 
     def build_context(self, system="", audit_focus="", **kwargs):
         """Build context for system health audit."""
-        return super().build_context(
-            system=system,
-            audit_focus=audit_focus,
-            **kwargs
-        )
+        return super().build_context(system=system, audit_focus=audit_focus, **kwargs)
 
     def execute(self, provider="openai", system="", audit_focus="", **kwargs):
         """Execute system health audit."""
-        return super().execute(
-            provider=provider,
-            system=system,
-            audit_focus=audit_focus,
-            **kwargs
-        )
+        return super().execute(provider=provider, system=system, audit_focus=audit_focus, **kwargs)
 
 
 __all__ = ["SystemHealthAuditor"]

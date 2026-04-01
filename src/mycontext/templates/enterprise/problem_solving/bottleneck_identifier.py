@@ -7,30 +7,29 @@ Based on theory of constraints and systems optimization.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class BottleneckIdentifier(Pattern):
     """
     Identify bottlenecks and constraints systematically.
-    
+
     Finds:
     - Process bottlenecks
     - Resource constraints
     - System limitations
     - Throughput limiters
     - Performance blockers
-    
+
     Based on: Theory of Constraints (Goldratt) and systems analysis
-    
+
     Example:
         >>> identifier = BottleneckIdentifier()
         >>> context = identifier.build_context(
         ...     system="Software deployment pipeline",
         ...     goal="Reduce deployment time"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class BottleneckIdentifier(Pattern):
                     "Measure throughput at each step",
                     "Identify the true bottleneck, not symptoms",
                     "Consider upstream and downstream effects",
-                    "Optimize the constraint first"
+                    "Optimize the constraint first",
                 ],
-                style="analytical, systematic, data-driven"
+                style="analytical, systematic, data-driven",
             ),
             directive_template="""Identify bottlenecks in:
 
@@ -260,19 +259,15 @@ Bottleneck identification:
     **Review frequency**: [How often to check]
 
 **OUTPUT FORMAT**: Data-driven bottleneck analysis with actionable optimization plan.""",
-            input_schema={
-                "system": str,
-                "context_section": str,
-                "goal": str
-            },
+            input_schema={"system": str, "context_section": str, "goal": str},
             constraints=Constraints(
                 must_include=[
                     "primary_bottleneck",
                     "impact_quantification",
-                    "optimization_roadmap"
+                    "optimization_roadmap",
                 ],
-                style_guide="Be systematic and evidence-based"
-            )
+                style_guide="Be systematic and evidence-based",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -285,15 +280,12 @@ Bottleneck identification:
         system: str = "",
         goal: str = "Improve throughput",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            system=system,
-            goal=goal,
-            context_section=context_section,
-            **kwargs
+            system=system, goal=goal, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -302,12 +294,8 @@ Bottleneck identification:
         system: str = "",
         goal: str = "Improve throughput",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            system=system,
-            goal=goal,
-            context=context,
-            **kwargs
+            provider=provider, system=system, goal=goal, context=context, **kwargs
         )

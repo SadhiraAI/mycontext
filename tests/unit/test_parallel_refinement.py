@@ -19,6 +19,7 @@ from mycontext.intelligence.prompt_composer import ComposedPrompt, PromptCompose
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_delayed_klass(prompt_text: str, delay_secs: float = 0.0):
     """Return a mock Pattern class whose to_prompt() returns after a delay."""
     ctx_mock = MagicMock()
@@ -45,8 +46,8 @@ def _make_failing_klass():
 # Order preservation
 # ---------------------------------------------------------------------------
 
-class TestOrderPreservation:
 
+class TestOrderPreservation:
     def test_output_order_matches_input_order(self):
         """Even when tasks complete out of order, prompts must be in template_names order."""
         composer = PromptComposer()
@@ -72,6 +73,7 @@ class TestOrderPreservation:
         }
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = fake_get_pattern
@@ -109,16 +111,17 @@ class TestOrderPreservation:
             ps.get_pattern_class = original_get
 
         # Order must be A → B → C regardless of which thread finished first
-        assert captured_prompts == ["Prompt from A", "Prompt from B", "Prompt from C"], \
+        assert captured_prompts == ["Prompt from A", "Prompt from B", "Prompt from C"], (
             f"Expected ordered prompts, got: {captured_prompts}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Partial failures
 # ---------------------------------------------------------------------------
 
-class TestPartialFailures:
 
+class TestPartialFailures:
     def test_one_bad_template_does_not_kill_others(self, caplog):
         """If template_b fails, templates a and c still produce output."""
         import logging
@@ -133,6 +136,7 @@ class TestPartialFailures:
         registry = {"ta": ("input", {}), "tb": ("input", {}), "tc": ("input", {})}
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: template_map.get(name)
@@ -150,7 +154,9 @@ class TestPartialFailures:
                 "mycontext.intelligence.chain_orchestration_agent.PATTERN_BUILD_CONTEXT_REGISTRY",
                 registry,
             ):
-                with caplog.at_level(logging.WARNING, logger="mycontext.intelligence.prompt_composer"):
+                with caplog.at_level(
+                    logging.WARNING, logger="mycontext.intelligence.prompt_composer"
+                ):
                     result = composer.compose_from_templates(
                         question="test",
                         template_names=["ta", "tb", "tc"],
@@ -163,8 +169,9 @@ class TestPartialFailures:
         assert "Good prompt A" in captured
         assert "Good prompt C" in captured
         # Warning about the failed template must be logged
-        assert any("tb" in r.message or "compose_from_templates" in r.message
-                   for r in caplog.records)
+        assert any(
+            "tb" in r.message or "compose_from_templates" in r.message for r in caplog.records
+        )
 
     def test_all_templates_fail_returns_empty_fallback(self):
         """If every template fails, empty_fallback is returned."""
@@ -175,6 +182,7 @@ class TestPartialFailures:
         registry = {"t1": ("input", {}), "t2": ("input", {})}
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: template_map.get(name)
@@ -199,8 +207,8 @@ class TestPartialFailures:
 # Parallel speedup
 # ---------------------------------------------------------------------------
 
-class TestParallelSpeedup:
 
+class TestParallelSpeedup:
     def test_parallel_faster_than_sequential(self):
         """
         Parallel execution of 3 templates each taking ~0.1s should complete
@@ -211,11 +219,11 @@ class TestParallelSpeedup:
         N = 3
         composer = PromptComposer()
 
-        klasses = {f"t{i}": _make_delayed_klass(f"Prompt {i}", delay_secs=DELAY)
-                   for i in range(N)}
+        klasses = {f"t{i}": _make_delayed_klass(f"Prompt {i}", delay_secs=DELAY) for i in range(N)}
         registry = {f"t{i}": ("input", {}) for i in range(N)}
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: klasses.get(name)
@@ -252,8 +260,8 @@ class TestParallelSpeedup:
 # Sequential path (refine=False)
 # ---------------------------------------------------------------------------
 
-class TestSequentialPath:
 
+class TestSequentialPath:
     def test_refine_false_still_works(self):
         """When refine=False, the sequential path must also work correctly."""
         composer = PromptComposer()
@@ -265,6 +273,7 @@ class TestSequentialPath:
         registry = {"sa": ("input", {}), "sb": ("input", {})}
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: template_map.get(name)
@@ -299,6 +308,7 @@ class TestSequentialPath:
         registry = {"solo": ("input", {})}
 
         import mycontext.intelligence.pattern_suggester as ps
+
         original_get = ps.get_pattern_class
         try:
             ps.get_pattern_class = lambda name, include_enterprise=False: klass

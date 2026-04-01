@@ -5,7 +5,6 @@ Generates creative ideas using structured brainstorming techniques.
 Based on creative thinking research and ideation methodologies.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class IdeaGenerator(Pattern):
     """
     Generate creative ideas systematically.
-    
+
     Uses multiple ideation techniques:
     - SCAMPER method
     - Random stimulus
     - Reverse thinking
     - Analogical inspiration
-    
+
     Based on: Creative cognition and ideation research
-    
+
     Example:
         >>> generator = IdeaGenerator()
         >>> context = generator.build_context(
         ...     challenge="Improve customer onboarding experience",
         ...     constraints=["Budget: $10K", "Timeline: 1 month"]
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -69,9 +68,9 @@ class IdeaGenerator(Pattern):
                     "Suspend judgment during generation",
                     "Build on existing ideas",
                     "Encourage wild ideas",
-                    "Aim for quantity first, then quality"
+                    "Aim for quantity first, then quality",
                 ],
-                style="creative, open-minded, energetic"
+                style="creative, open-minded, energetic",
             ),
             directive_template="""Generate creative ideas for:
 
@@ -210,19 +209,11 @@ Creative ideation process:
     - Risks: [What could go wrong]
 
 **OUTPUT FORMAT**: Creative, diverse ideas with actionable next steps.""",
-            input_schema={
-                "challenge": str,
-                "context_section": str,
-                "constraints_section": str
-            },
+            input_schema={"challenge": str, "context_section": str, "constraints_section": str},
             constraints=Constraints(
-                must_include=[
-                    "multiple_techniques",
-                    "diverse_ideas",
-                    "top_selections"
-                ],
-                style_guide="Be wildly creative but structured, divergent then convergent"
-            )
+                must_include=["multiple_techniques", "diverse_ideas", "top_selections"],
+                style_guide="Be wildly creative but structured, divergent then convergent",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -240,7 +231,7 @@ Creative ideation process:
         challenge: str = "",
         context: str | None = None,
         constraints: list | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
         constraints_section = self._render_constraints_section(constraints)
@@ -249,7 +240,7 @@ Creative ideation process:
             challenge=challenge,
             context_section=context_section,
             constraints_section=constraints_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -258,12 +249,12 @@ Creative ideation process:
         challenge: str = "",
         context: str | None = None,
         constraints: list | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
             provider=provider,
             challenge=challenge,
             context=context,
             constraints=constraints,
-            **kwargs
+            **kwargs,
         )

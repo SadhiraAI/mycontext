@@ -7,30 +7,29 @@ Based on economic analysis and decision theory.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class CostBenefitAnalyzer(Pattern):
     """
     Conduct systematic cost-benefit analysis.
-    
+
     Analyzes:
     - All costs (direct, indirect, opportunity)
     - All benefits (tangible, intangible)
     - ROI and payback period
     - Break-even analysis
     - Risk-adjusted returns
-    
+
     Based on: Economic analysis and cost-benefit frameworks
-    
+
     Example:
         >>> analyzer = CostBenefitAnalyzer()
         >>> context = analyzer.build_context(
         ...     decision="Migrate to cloud infrastructure",
         ...     timeframe="3 years"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class CostBenefitAnalyzer(Pattern):
                     "Quantify benefits where possible",
                     "Consider time value of money",
                     "Include intangibles",
-                    "Calculate ROI and payback"
+                    "Calculate ROI and payback",
                 ],
-                style="rigorous, quantitative, balanced"
+                style="rigorous, quantitative, balanced",
             ),
             directive_template="""Conduct cost-benefit analysis:
 
@@ -132,15 +131,11 @@ Cost-benefit analysis:
    - Conditions: [If any]
 
 **OUTPUT FORMAT**: Quantitative cost-benefit analysis with clear recommendation.""",
-            input_schema={
-                "decision": str,
-                "context_section": str,
-                "timeframe": str
-            },
+            input_schema={"decision": str, "context_section": str, "timeframe": str},
             constraints=Constraints(
                 must_include=["costs", "benefits", "roi", "recommendation"],
-                style_guide="Be quantitative and rigorous"
-            )
+                style_guide="Be quantitative and rigorous",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -149,19 +144,12 @@ Cost-benefit analysis:
         return ""
 
     def build_context(
-        self,
-        decision: str = "",
-        timeframe: str = "1 year",
-        context: str | None = None,
-        **kwargs
+        self, decision: str = "", timeframe: str = "1 year", context: str | None = None, **kwargs
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            decision=decision,
-            timeframe=timeframe,
-            context_section=context_section,
-            **kwargs
+            decision=decision, timeframe=timeframe, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -170,12 +158,8 @@ Cost-benefit analysis:
         decision: str = "",
         timeframe: str = "1 year",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            decision=decision,
-            timeframe=timeframe,
-            context=context,
-            **kwargs
+            provider=provider, decision=decision, timeframe=timeframe, context=context, **kwargs
         )

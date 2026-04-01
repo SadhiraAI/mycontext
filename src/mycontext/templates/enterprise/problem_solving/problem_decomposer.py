@@ -7,29 +7,28 @@ Based on systems thinking and problem-solving research.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class ProblemDecomposer(Pattern):
     """
     Break down complex problems into manageable sub-problems.
-    
+
     Uses systematic decomposition:
     - Hierarchical breakdown
     - Dependency identification
     - Prioritization
     - Solution strategy
-    
+
     Based on: Systems thinking and problem decomposition research
-    
+
     Example:
         >>> decomposer = ProblemDecomposer()
         >>> context = decomposer.build_context(
         ...     problem="Build a scalable e-commerce platform",
         ...     constraints=["Budget: $50K", "Timeline: 6 months"]
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class ProblemDecomposer(Pattern):
                     "Identify dependencies clearly",
                     "Prioritize based on impact and urgency",
                     "Ensure completeness - no gaps",
-                    "Maintain traceability to original problem"
+                    "Maintain traceability to original problem",
                 ],
-                style="systematic, structured, clear"
+                style="systematic, structured, clear",
             ),
             directive_template="""Decompose this complex problem:
 
@@ -181,17 +180,17 @@ Systematic problem decomposition:
                 "problem": str,
                 "context_section": str,
                 "constraints_section": str,
-                "depth": str
+                "depth": str,
             },
             constraints=Constraints(
                 must_include=[
                     "hierarchical_breakdown",
                     "dependencies",
                     "prioritization",
-                    "solution_strategy"
+                    "solution_strategy",
                 ],
-                style_guide="Be thorough but practical, detailed but actionable"
-            )
+                style_guide="Be thorough but practical, detailed but actionable",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -212,18 +211,18 @@ Systematic problem decomposition:
         context: str | None = None,
         constraints: list[str] | None = None,
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Build context for problem decomposition.
-        
+
         Args:
             problem: The complex problem to decompose
             context: Optional additional context
             constraints: Optional list of constraints
             depth: Decomposition depth ("overview", "detailed", "comprehensive")
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for export/use
         """
@@ -235,7 +234,7 @@ Systematic problem decomposition:
             context_section=context_section,
             constraints_section=constraints_section,
             depth=depth,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -245,11 +244,11 @@ Systematic problem decomposition:
         context: str | None = None,
         constraints: list[str] | None = None,
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute problem decomposition.
-        
+
         Args:
             provider: LLM provider to use
             problem: The complex problem to decompose
@@ -257,7 +256,7 @@ Systematic problem decomposition:
             constraints: Optional list of constraints
             depth: Decomposition depth
             **kwargs: Provider parameters
-        
+
         Returns:
             ProviderResponse with the decomposition
         """
@@ -267,5 +266,5 @@ Systematic problem decomposition:
             context=context,
             constraints=constraints,
             depth=depth,
-            **kwargs
+            **kwargs,
         )

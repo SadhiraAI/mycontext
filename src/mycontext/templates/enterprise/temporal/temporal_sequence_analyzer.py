@@ -17,30 +17,30 @@ from mycontext import Constraints, Guidance, Pattern
 class TemporalSequenceAnalyzer(Pattern):
     """
     Analyze temporal sequences to identify patterns and causality.
-    
+
     Capabilities:
     - Chronological ordering
     - Pattern identification across time
     - Trend analysis
     - Causal sequence detection
     - Temporal relationships (before, after, during, overlaps)
-    
+
     Use Cases:
     - Historical analysis
     - Timeline construction
     - Event sequence understanding
     - Trend forecasting
-    
+
     Example:
         >>> from mycontext.templates.enterprise.temporal import TemporalSequenceAnalyzer
-        >>> 
+        >>>
         >>> pattern = TemporalSequenceAnalyzer()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     events="Company layoffs, stock price drop, CEO resignation",
         ...     time_span="Last 6 months"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -67,11 +67,7 @@ class TemporalSequenceAnalyzer(Pattern):
             description="Analyze events across time to identify patterns and causality",
             version="1.0.0",
             tags=["temporal", "enterprise", "time-series", "causality"],
-            metadata={
-                "category": "temporal",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "temporal", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Temporal Analysis Expert and Historian",
                 rules=[
@@ -79,9 +75,9 @@ class TemporalSequenceAnalyzer(Pattern):
                     "Identify temporal relationships (before/after/during/overlaps)",
                     "Distinguish correlation from causation",
                     "Recognize patterns and trends over time",
-                    "Consider multiple timescales (immediate, medium, long-term)"
+                    "Consider multiple timescales (immediate, medium, long-term)",
                 ],
-                style="analytical, precise, chronological, evidence-based"
+                style="analytical, precise, chronological, evidence-based",
             ),
             directive_template="""**TEMPORAL SEQUENCE ANALYSIS**
 
@@ -277,49 +273,39 @@ T4 ----------------[Event E]----
 **Critical periods**: [Most important timeframes]
 
 **Causality summary**: [How events drove each other]""",
-            input_schema={
-                "events": str,
-                "time_span": str,
-                "context_section": str
-            },
+            input_schema={"events": str, "time_span": str, "context_section": str},
             constraints=Constraints(
                 must_include=[
                     "chronological_order",
                     "temporal_relationships",
                     "pattern_identification",
-                    "causal_analysis"
+                    "causal_analysis",
                 ],
-                must_not_include=[
-                    "temporal_confusion",
-                    "causation_without_evidence"
-                ],
-                style_guide="Chronological and precise. Clear temporal relationships. Evidence-based causality."
-            )
+                must_not_include=["temporal_confusion", "causation_without_evidence"],
+                style_guide="Chronological and precise. Clear temporal relationships. Evidence-based causality.",
+            ),
         )
 
     def build_context(self, events="", time_span="", context="", **kwargs):
         """Build context for temporal sequence analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().build_context(
-            events=events,
-            time_span=time_span,
-            context_section=context_section,
-            **kwargs
+            events=events, time_span=time_span, context_section=context_section, **kwargs
         )
 
     def execute(self, provider="openai", events="", time_span="", context="", **kwargs):
         """Execute temporal sequence analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().execute(
             provider=provider,
             events=events,
             time_span=time_span,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
 

@@ -86,6 +86,7 @@ class DataAnalyzer(Pattern):
             guidance=Guidance(
                 role="Expert Data Analyst and Insights Specialist",
                 rules=[
+                    "Report what the data shows, not what the user hopes it shows. Flag when conclusions require assumptions not supported by the data.",
                     "Begin by stating what the data covers: time range, metrics, and any visible gaps.",
                     "Cite the specific metric or value behind every pattern or anomaly you identify.",
                     "Every correlation must include an explicit causation caveat.",
@@ -224,8 +225,8 @@ class DataAnalyzer(Pattern):
                 "     - Would need: [What additional data would resolve this]\n"
                 "   \n"
                 "   If a section above could not be completed due to missing data, "
-                "restate it here explicitly: \"[Section X] cannot be answered -- "
-                "[specific data] is not available.\""
+                'restate it here explicitly: "[Section X] cannot be answered -- '
+                '[specific data] is not available."'
             ),
             "recommendations": (
                 "10. **RECOMMENDATIONS**\n"
@@ -258,18 +259,27 @@ class DataAnalyzer(Pattern):
     def _intent_sections() -> dict[str, list[str] | None]:
         return {
             "executive": [
-                "data_overview", "key_insights",
-                "visualization_suggestions", "recommendations",
+                "data_overview",
+                "key_insights",
+                "visualization_suggestions",
+                "recommendations",
             ],
             "analyst": [
-                "data_overview", "descriptive_statistics",
-                "pattern_detection", "correlation_analysis", "hypotheses",
+                "data_overview",
+                "descriptive_statistics",
+                "pattern_detection",
+                "correlation_analysis",
+                "hypotheses",
             ],
             "operations": [
-                "data_overview", "anomaly_detection", "recommendations",
+                "data_overview",
+                "anomaly_detection",
+                "recommendations",
             ],
             "summary": [
-                "data_overview", "key_insights", "recommendations",
+                "data_overview",
+                "key_insights",
+                "recommendations",
             ],
             "comprehensive": None,
         }
@@ -367,9 +377,7 @@ class DataAnalyzer(Pattern):
     @staticmethod
     def _validate_intent_investment(intent: str, investment: str) -> None:
         if intent not in VALID_INTENTS:
-            raise ValueError(
-                f"Invalid intent {intent!r}. Choose from: {sorted(VALID_INTENTS)}"
-            )
+            raise ValueError(f"Invalid intent {intent!r}. Choose from: {sorted(VALID_INTENTS)}")
         if investment not in VALID_INVESTMENTS:
             raise ValueError(
                 f"Invalid investment {investment!r}. Choose from: {sorted(VALID_INVESTMENTS)}"
@@ -419,7 +427,12 @@ class DataAnalyzer(Pattern):
         from mycontext.core import Context
 
         directive_content = self._build_intent_directive(
-            data_description, goal, context_section, intent, investment, output_format,
+            data_description,
+            goal,
+            context_section,
+            intent,
+            investment,
+            output_format,
         )
 
         inv_cfg = self._investment_config()
@@ -447,6 +460,27 @@ class DataAnalyzer(Pattern):
         ctx.metadata["intent"] = intent
         ctx.metadata["investment"] = investment
         ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Did I distinguish correlation from causation?",
+                "Are my conclusions supported by the data provided, or am I extrapolating?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Monthly sales data shows 20% drop in March",
+                    "output": (
+                        "DATA COVERAGE: Monthly sales, Jan-Mar. No customer segment breakdown available.\n"
+                        "KEY FINDING: March revenue fell 20% vs February ($120K → $96K). "
+                        "This correlates with the Feb 28 price increase but causation is not established — "
+                        "March also had 2 fewer business days.\n"
+                        "MISSING: Customer-level data needed to determine if the drop is fewer transactions "
+                        "or lower average order value. Without this, root cause remains ambiguous."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -471,9 +505,16 @@ class DataAnalyzer(Pattern):
         self._validate_intent_investment(intent, investment)
 
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         template_kwargs = {k: v for k, v in kwargs.items() if k not in provider_params}
@@ -725,10 +766,7 @@ class DataAnalyzer(Pattern):
         # Build a simple table representation
         header = " | ".join(cols)
         sep = " | ".join(["---"] * len(cols))
-        rows_str = "\n".join(
-            " | ".join(str(row.get(c, "")) for c in cols)
-            for row in sample
-        )
+        rows_str = "\n".join(" | ".join(str(row.get(c, "")) for c in cols) for row in sample)
 
         # Infer types from first record
         types = {}
@@ -743,7 +781,7 @@ class DataAnalyzer(Pattern):
             if vals and len(vals) >= 3:
                 numeric_summary.append(
                     f"  {c}: min={min(vals)}, max={max(vals)}, "
-                    f"mean={sum(vals)/len(vals):.2f}, count={len(vals)}"
+                    f"mean={sum(vals) / len(vals):.2f}, count={len(vals)}"
                 )
 
         stats_block = ""
@@ -817,8 +855,7 @@ class DataAnalyzer(Pattern):
             import pandas as pd
         except ImportError as exc:
             raise ImportError(
-                "pandas is required for from_csv_path(). "
-                "Install it with: pip install pandas"
+                "pandas is required for from_csv_path(). Install it with: pip install pandas"
             ) from exc
 
         df = pd.read_csv(path, **read_csv_kwargs)

@@ -17,13 +17,13 @@ from mycontext import Constraints, Guidance, Pattern
 class MoralDilemmaResolver(Pattern):
     """
     Resolve moral dilemmas where principles conflict.
-    
+
     Use Cases:
     - Healthcare triage decisions
     - Autonomous vehicle programming
     - Resource allocation
     - Policy trade-offs
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -54,16 +54,20 @@ class MoralDilemmaResolver(Pattern):
             description="Navigate situations where ethical principles conflict",
             version="1.0.0",
             tags=["ethical-reasoning", "enterprise", "dilemma", "ethics"],
-            metadata={"category": "ethical_reasoning", "license": "enterprise", "tier": "enterprise"},
+            metadata={
+                "category": "ethical_reasoning",
+                "license": "enterprise",
+                "tier": "enterprise",
+            },
             guidance=Guidance(
                 role="Moral Philosophy Expert",
                 rules=[
                     "Identify conflicting principles clearly",
                     "Consider both deontological and consequentialist perspectives",
                     "Acknowledge moral uncertainty",
-                    "Provide reasoning for recommended resolution"
+                    "Provide reasoning for recommended resolution",
                 ],
-                style="balanced, thoughtful, nuanced"
+                style="balanced, thoughtful, nuanced",
             ),
             directive_template="""**MORAL DILEMMA ANALYSIS**
 
@@ -101,19 +105,32 @@ class MoralDilemmaResolver(Pattern):
             constraints=Constraints(
                 must_include=["both_perspectives", "stakeholder_analysis", "moral_cost"],
                 must_not_include=["oversimplification"],
-                style_guide="Acknowledge complexity and moral cost of decisions"
-            )
+                style_guide="Acknowledge complexity and moral cost of decisions",
+            ),
         )
 
     def build_context(self, dilemma="", conflicting_principles="", context="", **kwargs):
         context_section = f"**CONTEXT**: {context}" if context else ""
-        kwargs.pop('context_section', None)
-        return super().build_context(dilemma=dilemma, conflicting_principles=conflicting_principles, context_section=context_section, **kwargs)
+        kwargs.pop("context_section", None)
+        return super().build_context(
+            dilemma=dilemma,
+            conflicting_principles=conflicting_principles,
+            context_section=context_section,
+            **kwargs,
+        )
 
-    def execute(self, provider="gemini", dilemma="", conflicting_principles="", context="", **kwargs):
+    def execute(
+        self, provider="gemini", dilemma="", conflicting_principles="", context="", **kwargs
+    ):
         context_section = f"**CONTEXT**: {context}" if context else ""
-        kwargs.pop('context_section', None)
-        return super().execute(provider=provider, dilemma=dilemma, conflicting_principles=conflicting_principles, context_section=context_section, **kwargs)
+        kwargs.pop("context_section", None)
+        return super().execute(
+            provider=provider,
+            dilemma=dilemma,
+            conflicting_principles=conflicting_principles,
+            context_section=context_section,
+            **kwargs,
+        )
 
 
 __all__ = ["MoralDilemmaResolver"]

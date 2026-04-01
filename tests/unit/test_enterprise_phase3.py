@@ -33,6 +33,7 @@ from mycontext.templates.enterprise.temporal import (
 # TEMPORAL PATTERNS (3)
 # =====================
 
+
 def test_temporal_sequence_analyzer_basic():
     """Test TemporalSequenceAnalyzer pattern basics."""
     pattern = TemporalSequenceAnalyzer()
@@ -49,8 +50,7 @@ def test_temporal_sequence_analyzer_basic():
 
     # Test context building
     context = pattern.build_context(
-        events="Product launch, Sales spike, Competitor reaction",
-        time_span="Last 3 months"
+        events="Product launch, Sales spike, Competitor reaction", time_span="Last 3 months"
     )
 
     assert context.guidance.role == "Temporal Analysis Expert and Historian"
@@ -63,8 +63,7 @@ def test_temporal_sequence_analyzer_quality():
     pattern = TemporalSequenceAnalyzer()
 
     context = pattern.build_context(
-        events="Economic recession, unemployment rise, policy changes",
-        time_span="2008-2010"
+        events="Economic recession, unemployment rise, policy changes", time_span="2008-2010"
     )
 
     metrics = QualityMetrics()
@@ -91,7 +90,7 @@ def test_future_scenario_planner_basic():
     context = pattern.build_context(
         focal_question="How will remote work evolve?",
         time_horizon="5 years",
-        current_situation="Post-pandemic hybrid work models"
+        current_situation="Post-pandemic hybrid work models",
     )
 
     assert context.guidance.role == "Scenario Planning Expert and Strategic Futurist"
@@ -106,7 +105,7 @@ def test_future_scenario_planner_quality():
     context = pattern.build_context(
         focal_question="Future of AI in healthcare",
         time_horizon="10 years",
-        current_situation="Emerging AI diagnostic tools"
+        current_situation="Emerging AI diagnostic tools",
     )
 
     metrics = QualityMetrics()
@@ -132,7 +131,7 @@ def test_historical_context_mapper_basic():
     # Test context
     context = pattern.build_context(
         current_situation="Economic inflation and policy debates",
-        question="What can we learn from past inflationary periods?"
+        question="What can we learn from past inflationary periods?",
     )
 
     assert "Historian" in context.guidance.role
@@ -145,8 +144,7 @@ def test_historical_context_mapper_quality():
     pattern = HistoricalContextMapper()
 
     context = pattern.build_context(
-        current_situation="Tech market downturn",
-        question="How did past tech bubbles resolve?"
+        current_situation="Tech market downturn", question="How did past tech bubbles resolve?"
     )
 
     metrics = QualityMetrics()
@@ -158,6 +156,7 @@ def test_historical_context_mapper_quality():
 # =======================
 # DIAGNOSTIC PATTERNS (3)
 # =======================
+
 
 def test_root_cause_analyzer_basic():
     """Test RootCauseAnalyzer pattern basics."""
@@ -175,7 +174,7 @@ def test_root_cause_analyzer_basic():
     # Test context
     context = pattern.build_context(
         problem="Website downtime increasing",
-        symptoms="Slow response, 500 errors, database timeouts"
+        symptoms="Slow response, 500 errors, database timeouts",
     )
 
     assert "Root Cause Analysis Expert" in context.guidance.role
@@ -190,7 +189,7 @@ def test_root_cause_analyzer_quality():
 
     context = pattern.build_context(
         problem="Customer satisfaction scores dropping",
-        symptoms="Complaints about support, slow resolution times"
+        symptoms="Complaints about support, slow resolution times",
     )
 
     metrics = QualityMetrics()
@@ -216,7 +215,7 @@ def test_differential_diagnoser_basic():
     context = pattern.build_context(
         presenting_problem="API response time degraded 10x",
         observed_data="Started yesterday, all endpoints affected",
-        domain="Web services"
+        domain="Web services",
     )
 
     assert "Diagnostic Reasoning Expert" in context.guidance.role
@@ -230,7 +229,7 @@ def test_differential_diagnoser_quality():
 
     context = pattern.build_context(
         presenting_problem="Memory leak in production",
-        observed_data="Memory usage grows steadily, restarts temporarily fix"
+        observed_data="Memory usage grows steadily, restarts temporarily fix",
     )
 
     metrics = QualityMetrics()
@@ -253,8 +252,7 @@ def test_system_health_auditor_basic():
 
     # Test context
     context = pattern.build_context(
-        system="E-commerce platform",
-        audit_focus="Performance, security, scalability"
+        system="E-commerce platform", audit_focus="Performance, security, scalability"
     )
 
     assert "Systems Auditor" in context.guidance.role
@@ -267,8 +265,7 @@ def test_system_health_auditor_quality():
     pattern = SystemHealthAuditor()
 
     context = pattern.build_context(
-        system="Mobile application backend",
-        audit_focus="Reliability and security"
+        system="Mobile application backend", audit_focus="Reliability and security"
     )
 
     metrics = QualityMetrics()
@@ -281,6 +278,7 @@ def test_system_health_auditor_quality():
 # ======================
 # SYNTHESIS PATTERNS (3)
 # ======================
+
 
 def test_cross_domain_synthesizer_basic():
     """Test CrossDomainSynthesizer pattern basics."""
@@ -298,7 +296,7 @@ def test_cross_domain_synthesizer_basic():
     # Test context
     context = pattern.build_context(
         target_problem="Improve team collaboration",
-        source_domains="Neuroscience (neural networks), Jazz music (improvisation)"
+        source_domains="Neuroscience (neural networks), Jazz music (improvisation)",
     )
 
     assert "Cross-Domain Innovation Expert" in context.guidance.role
@@ -312,7 +310,7 @@ def test_cross_domain_synthesizer_quality():
 
     context = pattern.build_context(
         target_problem="Reduce customer churn",
-        source_domains="Biology (immune system), Physics (entropy)"
+        source_domains="Biology (immune system), Physics (entropy)",
     )
 
     metrics = QualityMetrics()
@@ -336,7 +334,7 @@ def test_pattern_recognition_engine_basic():
     # Test context
     context = pattern.build_context(
         data="User behavior logs: 10k sessions with clicks, time, conversions",
-        pattern_focus="What drives conversions"
+        pattern_focus="What drives conversions",
     )
 
     assert "Pattern Recognition" in context.guidance.role
@@ -350,7 +348,7 @@ def test_pattern_recognition_engine_quality():
 
     context = pattern.build_context(
         data="Sales data: 500 transactions over 2 years",
-        pattern_focus="Seasonal trends and customer segments"
+        pattern_focus="Seasonal trends and customer segments",
     )
 
     metrics = QualityMetrics()
@@ -376,7 +374,7 @@ def test_holistic_integrator_basic():
     # Test context
     context = pattern.build_context(
         topic="Company digital transformation",
-        perspectives="Technical, Business, Cultural, Customer"
+        perspectives="Technical, Business, Cultural, Customer",
     )
 
     assert "Holistic Systems Integrator" in context.guidance.role
@@ -390,7 +388,7 @@ def test_holistic_integrator_quality():
 
     context = pattern.build_context(
         topic="Healthcare system redesign",
-        perspectives="Clinical, Administrative, Patient, Financial"
+        perspectives="Clinical, Administrative, Patient, Financial",
     )
 
     metrics = QualityMetrics()
@@ -404,6 +402,7 @@ def test_holistic_integrator_quality():
 # INTEGRATION TESTS
 # ======================
 
+
 def test_all_phase3_patterns_importable():
     """Test that all Phase 3 patterns are importable."""
     from mycontext.templates.enterprise.diagnostic import __all__ as diagnostic_all
@@ -411,7 +410,9 @@ def test_all_phase3_patterns_importable():
     from mycontext.templates.enterprise.temporal import __all__ as temporal_all
 
     assert len(temporal_all) == 3
-    assert len(diagnostic_all) == 4  # DiagnosticRootCauseAnalyzer + RootCauseAnalyzer alias + 2 others
+    assert (
+        len(diagnostic_all) == 4
+    )  # DiagnosticRootCauseAnalyzer + RootCauseAnalyzer alias + 2 others
     assert len(synthesis_all) == 3
 
 

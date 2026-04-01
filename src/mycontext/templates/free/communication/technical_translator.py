@@ -5,7 +5,6 @@ Converts technical jargon into accessible, understandable language.
 Based on technical communication and plain language principles.
 """
 
-
 from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
 from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
@@ -14,21 +13,21 @@ from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_d
 class TechnicalTranslator(Pattern):
     """
     Translate technical content to plain language.
-    
+
     Converts:
     - Technical jargon → Plain language
     - Complex concepts → Simple terms
     - Specialist knowledge → General understanding
-    
+
     Based on: Plain language principles and technical communication
-    
+
     Example:
         >>> translator = TechnicalTranslator()
         >>> context = translator.build_context(
         ...     technical_text="Our microservices architecture uses event-driven patterns",
         ...     target_audience="business stakeholders"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -54,9 +53,9 @@ class TechnicalTranslator(Pattern):
                     "Use concrete examples",
                     "Maintain accuracy",
                     "Test understanding",
-                    "Respect audience intelligence"
+                    "Respect audience intelligence",
                 ],
-                style="clear, accessible, respectful"
+                style="clear, accessible, respectful",
             ),
             directive_template="""Translate to plain language:
 
@@ -89,15 +88,11 @@ Translation:
    - Examples included? [Yes/No]
 
 **OUTPUT FORMAT**: Clear, accessible translation.""",
-            input_schema={
-                "technical_text": str,
-                "target_audience": str,
-                "context_section": str
-            },
+            input_schema={"technical_text": str, "target_audience": str, "context_section": str},
             constraints=Constraints(
                 must_include=["translation_map", "plain_version"],
-                style_guide="Be clear without being condescending"
-            )
+                style_guide="Be clear without being condescending",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -140,6 +135,13 @@ Translation:
         if fmt and ctx.directive:
             ctx.directive = Directive(content=ctx.directive.content + fmt)
             ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Would a non-expert understand this without additional research?",
+                "Did I sacrifice accuracy for simplicity in any critical point?",
+            ],
+        )
         return ctx
 
     def execute(
@@ -163,9 +165,16 @@ Translation:
                 | ``"narrative"`` | ``"brief"`` | ``"actionable"``
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(

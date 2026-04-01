@@ -18,29 +18,29 @@ from mycontext import Constraints, Guidance, Pattern
 class PeerAssessmentStructure(Pattern):
     """
     Design structured peer review frameworks.
-    
+
     Benefits of Peer Assessment:
     - Develops evaluative judgment
     - Provides multiple perspectives
     - Increases engagement
     - Scales better than teacher-only feedback
-    
+
     Use Cases:
     - Writing assignments
     - Project reviews
     - Presentations
     - Code review
-    
+
     Example:
         >>> from mycontext.templates.enterprise.evaluation import PeerAssessmentStructure
-        >>> 
+        >>>
         >>> pattern = PeerAssessmentStructure()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     assessment_task="Research paper peer review",
         ...     learning_objective="Evaluate research quality and provide constructive feedback"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -73,11 +73,7 @@ class PeerAssessmentStructure(Pattern):
             description="Design structured peer review frameworks",
             version="1.0.0",
             tags=["evaluation", "enterprise", "peer-assessment", "feedback"],
-            metadata={
-                "category": "evaluation",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "evaluation", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Peer Assessment Design Expert",
                 rules=[
@@ -85,9 +81,9 @@ class PeerAssessmentStructure(Pattern):
                     "Train reviewers in giving constructive feedback",
                     "Use anonymous or double-blind review when appropriate",
                     "Balance positive and critical feedback",
-                    "Include accountability mechanisms"
+                    "Include accountability mechanisms",
                 ],
-                style="structured, constructive, fair, developmental"
+                style="structured, constructive, fair, developmental",
             ),
             directive_template="""**PEER ASSESSMENT STRUCTURE**
 
@@ -395,31 +391,23 @@ class PeerAssessmentStructure(Pattern):
 - Teacher provides expert guidance and final judgment
 - Authors triangulate multiple sources of feedback
 - Best of both worlds""",
-            input_schema={
-                "assessment_task": str,
-                "learning_objective": str
-            },
+            input_schema={"assessment_task": str, "learning_objective": str},
             constraints=Constraints(
                 must_include=[
                     "reviewer_training",
                     "structured_template",
                     "feedback_guidelines",
-                    "quality_control"
+                    "quality_control",
                 ],
-                must_not_include=[
-                    "unstructured_review",
-                    "no_training"
-                ],
-                style_guide="Structured and supportive. Train reviewers. Balance positive and critical feedback."
-            )
+                must_not_include=["unstructured_review", "no_training"],
+                style_guide="Structured and supportive. Train reviewers. Balance positive and critical feedback.",
+            ),
         )
 
     def build_context(self, assessment_task="", learning_objective="", **kwargs):
         """Build context for peer assessment design."""
         return super().build_context(
-            assessment_task=assessment_task,
-            learning_objective=learning_objective,
-            **kwargs
+            assessment_task=assessment_task, learning_objective=learning_objective, **kwargs
         )
 
     def execute(self, provider="openai", assessment_task="", learning_objective="", **kwargs):
@@ -428,7 +416,7 @@ class PeerAssessmentStructure(Pattern):
             provider=provider,
             assessment_task=assessment_task,
             learning_objective=learning_objective,
-            **kwargs
+            **kwargs,
         )
 
 

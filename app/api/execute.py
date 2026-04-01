@@ -24,11 +24,22 @@ class ExecuteRequest(BaseModel):
     output_format: str | None = None  # json, markdown - append structured-output instructions
 
 
+class QualityOverrides(BaseModel):
+    """Optional quality control overrides — auto-suggested by PromptArchitect, user-overridable."""
+
+    verbosity: str | None = None
+    communication_posture: str | None = None
+    answer_first: bool | None = None
+    forbidden_phrases: list[str] | None = None
+    self_check: list[str] | None = None
+
+
 class SmartExecuteRequest(BaseModel):
     """Smart three-tier execution request."""
 
     question: str
     provider: str = "openai"
+    quality: QualityOverrides | None = None
 
 
 @router.post("")
@@ -80,11 +91,15 @@ async def smart_execute(
             400, detail=f"Add an API key for '{body.provider}' in Settings to use Smart Execute",
         )
     has_enterprise = getattr(user, "enterprise_license", False)
+    quality_kwargs: dict = {}
+    if body.quality:
+        quality_kwargs = body.quality.model_dump(exclude_none=True)
     result = execute_service.smart_execute(
         question=body.question,
         provider=body.provider,
         api_key=api_key,
         include_enterprise=has_enterprise,
+        **quality_kwargs,
     )
     if not result:
         raise HTTPException(503, detail="Smart execute service unavailable")

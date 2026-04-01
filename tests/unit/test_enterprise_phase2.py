@@ -44,7 +44,7 @@ class TestLearningPatterns:
         # Build context
         context = pattern.build_context(
             task="Learn recursive programming",
-            current_skill_level="Can write loops, unfamiliar with recursion"
+            current_skill_level="Can write loops, unfamiliar with recursion",
         )
 
         # Verify context structure
@@ -61,8 +61,7 @@ class TestLearningPatterns:
         assert "spaced-repetition" in pattern.tags
 
         context = pattern.build_context(
-            learning_material="Spanish vocabulary: 50 words",
-            initial_mastery="Just learned today"
+            learning_material="Spanish vocabulary: 50 words", initial_mastery="Just learned today"
         )
 
         assert "SPACED REPETITION SCHEDULE" in context.directive.content
@@ -79,7 +78,7 @@ class TestLearningPatterns:
 
         context = pattern.build_context(
             learner_current_abilities="Can write basic Python functions",
-            learning_goal="Master object-oriented programming"
+            learning_goal="Master object-oriented programming",
         )
 
         assert "ZONE OF PROXIMAL DEVELOPMENT" in context.directive.content
@@ -95,7 +94,7 @@ class TestLearningPatterns:
 
         context = pattern.build_context(
             learning_material="Quantum mechanics module",
-            learner_background="Undergraduate physics students"
+            learner_background="Undergraduate physics students",
         )
 
         assert "COGNITIVE LOAD ANALYSIS" in context.directive.content
@@ -113,7 +112,7 @@ class TestLearningPatterns:
 
         context = pattern.build_context(
             topic="Newton's laws of motion",
-            current_understanding="Objects need continuous force to stay in motion"
+            current_understanding="Objects need continuous force to stay in motion",
         )
 
         assert "CONCEPTUAL CHANGE ANALYSIS" in context.directive.content
@@ -135,7 +134,7 @@ class TestEvaluationPatterns:
 
         context = pattern.build_context(
             assessment_task="Research paper",
-            learning_objectives="Synthesize sources, analyze critically"
+            learning_objectives="Synthesize sources, analyze critically",
         )
 
         assert "RUBRIC DESIGN" in context.directive.content
@@ -150,8 +149,7 @@ class TestEvaluationPatterns:
         assert "formative" in pattern.tags
 
         context = pattern.build_context(
-            learning_unit="Quadratic equations",
-            learning_goal="Solve using multiple methods"
+            learning_unit="Quadratic equations", learning_goal="Solve using multiple methods"
         )
 
         assert "FORMATIVE ASSESSMENT FRAMEWORK" in context.directive.content
@@ -168,7 +166,7 @@ class TestEvaluationPatterns:
 
         context = pattern.build_context(
             course_title="Introduction to Data Science",
-            learning_outcomes="Apply statistics, visualize data, build models"
+            learning_outcomes="Apply statistics, visualize data, build models",
         )
 
         assert "SUMMATIVE EVALUATION DESIGN" in context.directive.content
@@ -184,7 +182,7 @@ class TestEvaluationPatterns:
 
         context = pattern.build_context(
             assessment_task="Research paper peer review",
-            learning_objective="Evaluate research quality"
+            learning_objective="Evaluate research quality",
         )
 
         assert "PEER ASSESSMENT STRUCTURE" in context.directive.content
@@ -199,8 +197,7 @@ class TestEvaluationPatterns:
         assert "self-assessment" in pattern.tags
 
         context = pattern.build_context(
-            work_to_assess="Final project",
-            success_criteria="Functional UI, meets requirements"
+            work_to_assess="Final project", success_criteria="Functional UI, meets requirements"
         )
 
         assert "SELF-ASSESSMENT GUIDE" in context.directive.content
@@ -221,7 +218,7 @@ class TestPhase2Quality:
         context = pattern.build_context(
             task="Learn Python decorators",
             current_skill_level="Can write functions, new to decorators",
-            goal="Understand and apply decorators"
+            goal="Understand and apply decorators",
         )
         score = metrics.evaluate(context)
         assert score.overall >= 0.70, f"Scaffolding quality too low: {score.overall}"
@@ -232,7 +229,7 @@ class TestPhase2Quality:
         context = pattern.build_context(
             learning_material="French vocabulary: 100 words",
             initial_mastery="Just learned",
-            previous_performance="80% recall after 1 day"
+            previous_performance="80% recall after 1 day",
         )
         score = metrics.evaluate(context)
         assert score.overall >= 0.70
@@ -246,7 +243,7 @@ class TestPhase2Quality:
         pattern = RubricDesigner()
         context = pattern.build_context(
             assessment_task="Essay on climate change",
-            learning_objectives="Analyze sources, develop argument, write clearly"
+            learning_objectives="Analyze sources, develop argument, write clearly",
         )
         score = metrics.evaluate(context)
         assert score.overall >= 0.70
@@ -256,7 +253,7 @@ class TestPhase2Quality:
         pattern = FormativeAssessmentFramework()
         context = pattern.build_context(
             learning_unit="Linear equations module",
-            learning_goal="Solve and graph linear equations"
+            learning_goal="Solve and graph linear equations",
         )
         score = metrics.evaluate(context)
         assert score.overall >= 0.70

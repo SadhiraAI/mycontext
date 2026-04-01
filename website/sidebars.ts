@@ -115,6 +115,7 @@ const sidebars: SidebarsConfig = {
       label: 'Advanced',
       items: [
         'advanced/blueprints',
+        'advanced/fragments',
         'advanced/agent-skills',
         'advanced/output-format',
         'advanced/structured-output',

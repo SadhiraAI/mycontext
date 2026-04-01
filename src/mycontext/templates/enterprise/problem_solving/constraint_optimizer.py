@@ -7,30 +7,29 @@ Based on constrained optimization theory and operations research.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class ConstraintOptimizer(Pattern):
     """
     Optimize within constraints.
-    
+
     Handles:
     - Budget constraints
-    - Time constraints  
+    - Time constraints
     - Resource constraints
     - Policy constraints
     - Trade-offs
-    
+
     Based on: Constrained optimization and operations research
-    
+
     Example:
         >>> optimizer = ConstraintOptimizer()
         >>> context = optimizer.build_context(
         ...     objective="Maximize feature delivery",
         ...     constraints=["Budget: $50K", "Time: 3 months"]
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class ConstraintOptimizer(Pattern):
                     "Find creative solutions",
                     "Identify binding constraints",
                     "Maximize objective within limits",
-                    "Suggest constraint relaxation if needed"
+                    "Suggest constraint relaxation if needed",
                 ],
-                style="analytical, creative, pragmatic"
+                style="analytical, creative, pragmatic",
             ),
             directive_template="""Optimize within constraints:
 
@@ -104,15 +103,11 @@ Constrained optimization:
    Optimal solution within all constraints
 
 **OUTPUT FORMAT**: Optimal solution respecting all constraints.""",
-            input_schema={
-                "objective": str,
-                "constraints_section": str,
-                "context_section": str
-            },
+            input_schema={"objective": str, "constraints_section": str, "context_section": str},
             constraints=Constraints(
                 must_include=["binding_constraints", "optimal_solution"],
-                style_guide="Be creative within boundaries"
-            )
+                style_guide="Be creative within boundaries",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -130,7 +125,7 @@ Constrained optimization:
         objective: str = "",
         constraints: list[str] | None = None,
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         constraints_section = self._render_constraints_section(constraints)
         context_section = self._render_context_section(context)
@@ -139,7 +134,7 @@ Constrained optimization:
             objective=objective,
             constraints_section=constraints_section,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -148,12 +143,12 @@ Constrained optimization:
         objective: str = "",
         constraints: list[str] | None = None,
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
             provider=provider,
             objective=objective,
             constraints=constraints,
             context=context,
-            **kwargs
+            **kwargs,
         )

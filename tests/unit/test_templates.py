@@ -1,6 +1,7 @@
 """
 Tests for Pattern class and template system
 """
+
 import pytest
 
 from mycontext.foundation import Guidance
@@ -21,7 +22,7 @@ class TestPatternBase:
             description="A test pattern",
             guidance=Guidance(role="Test Expert"),
             directive_template="Process: {input}",
-            input_schema={"input": str}
+            input_schema={"input": str},
         )
         assert pattern.name == "test_pattern"
         assert pattern.guidance.role == "Test Expert"
@@ -31,7 +32,7 @@ class TestPatternBase:
         pattern = Pattern(
             name="test_pattern",
             directive_template="Process: {required_input}",
-            input_schema={"required_input": str}
+            input_schema={"required_input": str},
         )
 
         # Should raise error for missing input
@@ -44,7 +45,7 @@ class TestPatternBase:
             name="test_pattern",
             guidance=Guidance(role="Expert"),
             directive_template="Analyze: {topic}",
-            input_schema={"topic": str}
+            input_schema={"topic": str},
         )
 
         context = pattern.build_context(topic="AI")
@@ -64,10 +65,7 @@ class TestQuestionAnalyzer:
     def test_build_context_simple(self):
         """Test building context with simple question"""
         analyzer = QuestionAnalyzer()
-        context = analyzer.build_context(
-            question="What is AI?",
-            depth="brief"
-        )
+        context = analyzer.build_context(question="What is AI?", depth="brief")
         assert context.directive is not None
         assert "What is AI?" in context.directive.content
 
@@ -75,8 +73,7 @@ class TestQuestionAnalyzer:
         """Test building context with comprehensive depth"""
         analyzer = QuestionAnalyzer()
         context = analyzer.build_context(
-            question="Should I invest in solar panels?",
-            depth="comprehensive"
+            question="Should I invest in solar panels?", depth="comprehensive"
         )
         assert context.directive is not None
         assert "solar panels" in context.directive.content
@@ -89,7 +86,7 @@ class TestQuestionAnalyzer:
         context = analyzer.build_context(
             question="What car should I buy?",
             context="Budget: $30,000, Family of 4",
-            depth="moderate"
+            depth="moderate",
         )
         assert context.directive is not None
         # Context section should be included
@@ -109,8 +106,7 @@ class TestStepByStepReasoner:
         """Test building context for step-by-step reasoning"""
         reasoner = StepByStepReasoner()
         context = reasoner.build_context(
-            problem="How to optimize database queries?",
-            depth="detailed"
+            problem="How to optimize database queries?", depth="detailed"
         )
         assert context.directive is not None
         assert "database queries" in context.directive.content
@@ -129,10 +125,7 @@ class TestPatternParameterSeparation:
         """Test that provider params don't leak into context data"""
         analyzer = QuestionAnalyzer()
 
-        context = analyzer.build_context(
-            question="Test question",
-            depth="brief"
-        )
+        context = analyzer.build_context(question="Test question", depth="brief")
 
         # Template inputs are stored in context.data (by design)
         assert "question" in context.data
@@ -144,10 +137,7 @@ class TestPatternParameterSeparation:
     def test_metadata_is_set(self):
         """Test that pattern metadata is set correctly"""
         analyzer = QuestionAnalyzer()
-        context = analyzer.build_context(
-            question="Test",
-            depth="brief"
-        )
+        context = analyzer.build_context(question="Test", depth="brief")
 
         assert context.metadata.get("pattern") == "question_analyzer"
         assert "pattern_version" in context.metadata
@@ -161,15 +151,13 @@ class TestTemplateIntegration:
         # First analyze a question
         analyzer = QuestionAnalyzer()
         analysis_context = analyzer.build_context(
-            question="Should I start a business?",
-            depth="comprehensive"
+            question="Should I start a business?", depth="comprehensive"
         )
 
         # Then reason through it step by step
         reasoner = StepByStepReasoner()
         reasoning_context = reasoner.build_context(
-            problem="Starting a business successfully",
-            depth="detailed"
+            problem="Starting a business successfully", depth="detailed"
         )
 
         # Both should produce valid contexts
@@ -179,10 +167,7 @@ class TestTemplateIntegration:
     def test_export_from_template(self):
         """Test that template-created contexts can be exported"""
         reasoner = StepByStepReasoner()
-        context = reasoner.build_context(
-            problem="How to learn Python?",
-            depth="detailed"
-        )
+        context = reasoner.build_context(problem="How to learn Python?", depth="detailed")
 
         # Should be able to export in all formats
         messages = context.to_messages()

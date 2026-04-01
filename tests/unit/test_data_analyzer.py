@@ -14,8 +14,8 @@ def analyzer():
 
 # ── Core API ─────────────────────────────────────────────────────────
 
-class TestDataAnalyzerCore:
 
+class TestDataAnalyzerCore:
     def test_creation(self, analyzer):
         assert analyzer.name == "data_analyzer"
         assert analyzer.guidance is not None
@@ -62,27 +62,19 @@ class TestDataAnalyzerCore:
 
     def test_invalid_intent_raises(self, analyzer):
         with pytest.raises(ValueError, match="Invalid intent"):
-            analyzer.build_context(
-                data_description="data", goal="g", intent="invalid"
-            )
+            analyzer.build_context(data_description="data", goal="g", intent="invalid")
 
     def test_invalid_investment_raises(self, analyzer):
         with pytest.raises(ValueError, match="Invalid investment"):
-            analyzer.build_context(
-                data_description="data", goal="g", investment="extreme"
-            )
+            analyzer.build_context(data_description="data", goal="g", investment="extreme")
 
     def test_invalid_output_format_raises(self, analyzer):
         with pytest.raises(ValueError, match="Invalid output_format"):
-            analyzer.build_context(
-                data_description="data", goal="g", output_format="xml"
-            )
+            analyzer.build_context(data_description="data", goal="g", output_format="xml")
 
     def test_output_formats(self, analyzer):
         for fmt in ("structured", "narrative", "brief", "actionable", "json", "table"):
-            ctx = analyzer.build_context(
-                data_description="data", goal="g", output_format=fmt
-            )
+            ctx = analyzer.build_context(data_description="data", goal="g", output_format=fmt)
             assert ctx.metadata["output_format"] == fmt
 
     def test_generic_prompt(self, analyzer):
@@ -97,17 +89,19 @@ class TestDataAnalyzerCore:
 
 # ── Convenience: from_dataframe ──────────────────────────────────────
 
-class TestFromDataFrame:
 
+class TestFromDataFrame:
     @pytest.fixture
     def sample_df(self):
         pd = pytest.importorskip("pandas")
-        return pd.DataFrame({
-            "month": ["Jan", "Feb", "Mar", "Apr"],
-            "revenue": [100, 120, 110, 150],
-            "units": [10, 12, 11, 15],
-            "region": ["North", "South", "North", "East"],
-        })
+        return pd.DataFrame(
+            {
+                "month": ["Jan", "Feb", "Mar", "Apr"],
+                "revenue": [100, 120, 110, 150],
+                "units": [10, 12, 11, 15],
+                "region": ["North", "South", "North", "East"],
+            }
+        )
 
     def test_from_dataframe_returns_context(self, analyzer, sample_df):
         ctx = analyzer.from_dataframe(sample_df, goal="Revenue trends")
@@ -141,8 +135,8 @@ class TestFromDataFrame:
 
 # ── Convenience: from_json ───────────────────────────────────────────
 
-class TestFromJson:
 
+class TestFromJson:
     def test_from_json_list_of_dicts(self, analyzer):
         data = [
             {"name": "Alice", "score": 95, "grade": "A"},
@@ -168,9 +162,7 @@ class TestFromJson:
         assert "total_users" in content
 
     def test_from_json_respects_intent(self, analyzer):
-        ctx = analyzer.from_json(
-            {"metric": 42}, goal="Test", intent="summary"
-        )
+        ctx = analyzer.from_json({"metric": 42}, goal="Test", intent="summary")
         assert ctx.metadata["intent"] == "summary"
 
     def test_from_json_empty_dict(self, analyzer):
@@ -185,8 +177,8 @@ class TestFromJson:
 
 # ── Convenience: from_records ────────────────────────────────────────
 
-class TestFromRecords:
 
+class TestFromRecords:
     def test_from_records_basic(self, analyzer):
         records = [
             {"id": 1, "name": "Widget A", "revenue": 1200, "units": 100},
@@ -216,9 +208,7 @@ class TestFromRecords:
             {"id": 1, "name": "A", "secret": "xxx", "revenue": 100},
             {"id": 2, "name": "B", "secret": "yyy", "revenue": 200},
         ]
-        ctx = analyzer.from_records(
-            records, goal="Test", columns=["name", "revenue"]
-        )
+        ctx = analyzer.from_records(records, goal="Test", columns=["name", "revenue"])
         content = ctx.directive.content
         assert "name" in content
         assert "revenue" in content
@@ -238,8 +228,8 @@ class TestFromRecords:
 
 # ── Convenience: from_csv_path ───────────────────────────────────────
 
-class TestFromCsvPath:
 
+class TestFromCsvPath:
     def test_from_csv_path(self, analyzer, tmp_path):
         pd = pytest.importorskip("pandas")
         csv_file = tmp_path / "test_data.csv"

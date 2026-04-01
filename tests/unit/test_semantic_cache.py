@@ -30,6 +30,7 @@ from mycontext.utils.semantic_cache import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _fake_response(text: str = "hello") -> ProviderResponse:
     return ProviderResponse(response=text, model="test-model", tokens_used=10)
 
@@ -38,8 +39,8 @@ def _fake_response(text: str = "hello") -> ProviderResponse:
 # Basic semantics
 # ---------------------------------------------------------------------------
 
-class TestSemanticCacheBasic:
 
+class TestSemanticCacheBasic:
     def setup_method(self):
         self.cache = SemanticCache(ttl_seconds=60, max_size=10)
 
@@ -101,8 +102,8 @@ class TestSemanticCacheBasic:
 # TTL expiry
 # ---------------------------------------------------------------------------
 
-class TestSemanticCacheTTL:
 
+class TestSemanticCacheTTL:
     def test_entry_expired_after_ttl(self):
         cache = SemanticCache(ttl_seconds=0.05)  # 50ms TTL
         cache.set("prompt", "m", _fake_response("fresh"))
@@ -134,8 +135,8 @@ class TestSemanticCacheTTL:
 # Eviction
 # ---------------------------------------------------------------------------
 
-class TestSemanticCacheEviction:
 
+class TestSemanticCacheEviction:
     def test_oldest_evicted_when_full(self):
         cache = SemanticCache(ttl_seconds=60, max_size=3)
         cache.set("a", "m", _fake_response("A"))
@@ -147,7 +148,7 @@ class TestSemanticCacheEviction:
         cache.set("d", "m", _fake_response("D"))  # triggers eviction of "a"
 
         assert len(cache) == 3
-        assert cache.get("a", "m") is None   # evicted
+        assert cache.get("a", "m") is None  # evicted
         assert cache.get("b", "m") is not None
         assert cache.get("c", "m") is not None
         assert cache.get("d", "m") is not None
@@ -164,8 +165,8 @@ class TestSemanticCacheEviction:
 # Statistics
 # ---------------------------------------------------------------------------
 
-class TestCacheStats:
 
+class TestCacheStats:
     def test_initial_stats_are_zero(self):
         cache = SemanticCache()
         s = cache.stats()
@@ -190,13 +191,13 @@ class TestCacheStats:
     def test_hit_rate_calculation(self):
         cache = SemanticCache()
         cache.set("p", "m", _fake_response())
-        cache.get("p", "m")     # hit
-        cache.get("p", "m")     # hit
+        cache.get("p", "m")  # hit
+        cache.get("p", "m")  # hit
         cache.get("miss", "m")  # miss
         s = cache.stats()
         assert s.hits == 2
         assert s.misses == 1
-        assert abs(s.hit_rate - 2/3) < 0.01
+        assert abs(s.hit_rate - 2 / 3) < 0.01
 
     def test_stats_to_dict(self):
         cache = SemanticCache()
@@ -221,8 +222,8 @@ class TestCacheStats:
 # Disabled cache
 # ---------------------------------------------------------------------------
 
-class TestSemanticCacheDisabled:
 
+class TestSemanticCacheDisabled:
     def test_get_always_returns_none_when_disabled(self):
         cache = SemanticCache(enabled=False)
         cache.set("p", "m", _fake_response())  # should not actually store
@@ -238,8 +239,8 @@ class TestSemanticCacheDisabled:
 # Thread safety
 # ---------------------------------------------------------------------------
 
-class TestSemanticCacheThreadSafety:
 
+class TestSemanticCacheThreadSafety:
     def test_concurrent_writes_no_exception(self):
         cache = SemanticCache(ttl_seconds=60, max_size=1000)
         errors = []
@@ -287,8 +288,8 @@ class TestSemanticCacheThreadSafety:
 # Default cache module API
 # ---------------------------------------------------------------------------
 
-class TestDefaultCache:
 
+class TestDefaultCache:
     def setup_method(self):
         reset_default_cache()
 
@@ -312,6 +313,7 @@ class TestDefaultCache:
 # LiteLLMProvider integration
 # ---------------------------------------------------------------------------
 
+
 class TestLiteLLMProviderCache:
     """Verify that LiteLLMProvider.generate() uses the cache correctly."""
 
@@ -320,6 +322,7 @@ class TestLiteLLMProviderCache:
 
     def _make_provider(self):
         from mycontext.providers.litellm_provider import LiteLLMProvider
+
         provider = LiteLLMProvider.__new__(LiteLLMProvider)
         provider._provider = "openai"
         provider.api_key = "test-key"
@@ -362,9 +365,7 @@ class TestLiteLLMProviderCache:
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "fresh answer"
         mock_response.choices[0].finish_reason = "stop"
-        mock_response.usage = MagicMock(
-            total_tokens=50, prompt_tokens=30, completion_tokens=20
-        )
+        mock_response.usage = MagicMock(total_tokens=50, prompt_tokens=30, completion_tokens=20)
 
         with patch("litellm.completion", return_value=mock_response) as mock_litellm:
             with patch("litellm.completion_cost", return_value=0.001):
@@ -384,9 +385,7 @@ class TestLiteLLMProviderCache:
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "stored answer"
         mock_response.choices[0].finish_reason = "stop"
-        mock_response.usage = MagicMock(
-            total_tokens=50, prompt_tokens=30, completion_tokens=20
-        )
+        mock_response.usage = MagicMock(total_tokens=50, prompt_tokens=30, completion_tokens=20)
 
         with patch("litellm.completion", return_value=mock_response):
             with patch("litellm.completion_cost", return_value=0.0):
@@ -410,9 +409,7 @@ class TestLiteLLMProviderCache:
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "fresh"
         mock_response.choices[0].finish_reason = "stop"
-        mock_response.usage = MagicMock(
-            total_tokens=10, prompt_tokens=5, completion_tokens=5
-        )
+        mock_response.usage = MagicMock(total_tokens=10, prompt_tokens=5, completion_tokens=5)
 
         with patch("litellm.completion", return_value=mock_response) as mock_litellm:
             with patch("litellm.completion_cost", return_value=0.0):

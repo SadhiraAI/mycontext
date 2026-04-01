@@ -101,7 +101,14 @@ def _build_directive(depth: str, output_format: str = "structured") -> str:
             "total": 4,
         },
         "detailed": {
-            "keys": ["situation", "identification", "analysis", "prioritization", "mitigation", "risk_benefit"],
+            "keys": [
+                "situation",
+                "identification",
+                "analysis",
+                "prioritization",
+                "mitigation",
+                "risk_benefit",
+            ],
             "summary_n": 7,
             "instruction": (
                 "Conduct a thorough risk assessment: identify, analyse with probability \u00d7 "
@@ -112,8 +119,14 @@ def _build_directive(depth: str, output_format: str = "structured") -> str:
         },
         "comprehensive": {
             "keys": [
-                "situation", "identification", "analysis", "prioritization",
-                "interdependencies", "mitigation", "risk_benefit", "monitoring",
+                "situation",
+                "identification",
+                "analysis",
+                "prioritization",
+                "interdependencies",
+                "mitigation",
+                "risk_benefit",
+                "monitoring",
             ],
             "summary_n": 9,
             "instruction": (
@@ -142,6 +155,7 @@ def _build_directive(depth: str, output_format: str = "structured") -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class RiskAssessor(Pattern):
     """
@@ -204,6 +218,7 @@ class RiskAssessor(Pattern):
             guidance=Guidance(
                 role="Expert Risk Management Consultant and Strategic Advisor",
                 rules=[
+                    "Present risks the user may not want to hear. If the question's framing minimizes a real risk, say so directly.",
                     "Identify both obvious and hidden risks",
                     "Assess probability and impact objectively",
                     "Consider cascading and compounding risks",
@@ -253,9 +268,7 @@ class RiskAssessor(Pattern):
             Context configured for risk assessment
         """
         if depth not in VALID_DEPTHS:
-            raise ValueError(
-                f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}"
-            )
+            raise ValueError(f"Invalid depth {depth!r}. Choose from: {sorted(VALID_DEPTHS)}")
         if output_format not in VALID_OUTPUT_FORMATS:
             raise ValueError(
                 f"Invalid output_format {output_format!r}. "
@@ -280,6 +293,28 @@ class RiskAssessor(Pattern):
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["depth"] = depth
         ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Did I identify risks the user may not want to hear?",
+                "Am I downplaying anything because of how the question was framed?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Risks of expanding our bakery to a second location",
+                    "output": (
+                        "HIGH: Cash flow strain — second location typically takes 8-14 months to break even. "
+                        "If location 1 revenue dips during that period, both locations are at risk.\n"
+                        "HIGH: Management bandwidth — owner cannot be in two places. Delegation gaps "
+                        "cause quality inconsistency, which is fatal for a food brand.\n"
+                        "MEDIUM: Cannibalization — if locations are within 3 miles, you split your own customer base.\n"
+                        "OFTEN MISSED: Lease timing — signing a 5-year lease commits you before you know "
+                        "if the location works. Negotiate a 1-year with option to extend."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -309,9 +344,16 @@ class RiskAssessor(Pattern):
             Provider response with risk assessment
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(

@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PatternSuggestion:
     """A suggested pattern with reasoning."""
+
     name: str
     category: str  # "free" | "enterprise"
     reason: str
@@ -38,6 +39,7 @@ class PatternSuggestion:
 @dataclass
 class SuggestionResult:
     """Result of pattern suggestion."""
+
     question: str
     suggested_patterns: list[PatternSuggestion] = field(default_factory=list)
     suggested_chain: list[str] | None = None  # Ordered pattern names for chaining
@@ -71,23 +73,28 @@ class SuggestionResult:
             lines.append(f"- `{s.name}`{step}: {s.reason}")
         if self.llm_reasoning:
             lines.append("\n**LLM raw**:")
-            lines.append(f"> {self.llm_reasoning[:500]}{'...' if len(self.llm_reasoning) > 500 else ''}")
+            lines.append(
+                f"> {self.llm_reasoning[:500]}{'...' if len(self.llm_reasoning) > 500 else ''}"
+            )
         return "\n".join(lines)
 
     def to_json(self) -> str:
         """Export as JSON string (for APIs, storage)."""
         import json
+
         return json.dumps(self.to_dict(), indent=2)
 
     def to_yaml(self) -> str:
         """Export as YAML string (for configs, pipelines)."""
         import yaml
+
         return yaml.dump(self.to_dict(), default_flow_style=False, sort_keys=False)
 
     def to_xml(self) -> str:
         """Export as XML string (for XML-based systems)."""
         from xml.dom import minidom
         from xml.etree.ElementTree import Element, SubElement, tostring
+
         root = Element("suggestion_result")
         SubElement(root, "question").text = self.question
         SubElement(root, "source").text = self.source
@@ -131,8 +138,8 @@ class SuggestionResult:
     def from_json(cls, json_str: str) -> "SuggestionResult":
         """Create from JSON string (round-trip with to_json)."""
         import json
-        return cls.from_dict(json.loads(json_str))
 
+        return cls.from_dict(json.loads(json_str))
 
 
 def _try_suggest_routes(
@@ -146,6 +153,7 @@ def _try_suggest_routes(
     """Try to delegate to suggest_routes(); return None on any failure."""
     try:
         from .route_suggester import suggest_routes
+
         return suggest_routes(
             question=question,
             max_routes=1,
@@ -159,7 +167,8 @@ def _try_suggest_routes(
         logger.debug(
             "suggest_patterns: suggest_routes delegation failed (%s), "
             "falling back to _suggest_with_llm. Error: %s",
-            type(exc).__name__, exc,
+            type(exc).__name__,
+            exc,
         )
         return None
 
@@ -206,7 +215,11 @@ def suggest_patterns(
         # Primary path: delegate to suggest_routes() for richer intelligence
         kw_hints = [s.name for s in keyword_result.suggested_patterns]
         route_result = _try_suggest_routes(
-            question, include_enterprise, llm_provider, temperature, model,
+            question,
+            include_enterprise,
+            llm_provider,
+            temperature,
+            model,
             **llm_kwargs,
         )
         if route_result is not None and route_result.routes:
@@ -220,14 +233,23 @@ def suggest_patterns(
                 names = names[:max_patterns]
                 reasons = {**kw_reasons, **reasons}
             return _names_to_result(
-                question, names, suggest_chain, max_patterns,
+                question,
+                names,
+                suggest_chain,
+                max_patterns,
                 "llm" if mode == "llm" else "hybrid",
-                "", include_enterprise, reasons, integration,
+                "",
+                include_enterprise,
+                reasons,
+                integration,
             )
 
         # Fallback: original _suggest_with_llm if suggest_routes failed
         llm_selections, integration_note, llm_raw = _suggest_with_llm(
-            question, llm_provider, temperature=temperature, model=model,
+            question,
+            llm_provider,
+            temperature=temperature,
+            model=model,
             keyword_hints=kw_hints if mode == "hybrid" else None,
             **llm_kwargs,
         )
@@ -243,8 +265,15 @@ def suggest_patterns(
             )
         if mode == "llm":
             return _names_to_result(
-                question, llm_names, suggest_chain, max_patterns, "llm",
-                llm_raw, include_enterprise, llm_reasons, integration_note,
+                question,
+                llm_names,
+                suggest_chain,
+                max_patterns,
+                "llm",
+                llm_raw,
+                include_enterprise,
+                llm_reasons,
+                integration_note,
             )
         # hybrid: LLM selections are primary, keyword fills gaps
         kw_reasons = {s.name: s.reason for s in keyword_result.suggested_patterns}
@@ -252,8 +281,15 @@ def suggest_patterns(
         merged = merged[:max_patterns]
         merged_reasons = {**kw_reasons, **llm_reasons}
         return _names_to_result(
-            question, merged, suggest_chain, max_patterns, "hybrid",
-            llm_raw, include_enterprise, merged_reasons, integration_note,
+            question,
+            merged,
+            suggest_chain,
+            max_patterns,
+            "hybrid",
+            llm_raw,
+            include_enterprise,
+            merged_reasons,
+            integration_note,
         )
 
     return keyword_result
@@ -278,12 +314,14 @@ def _suggest_with_keywords(
                 reason_text = f"Question mentions '{kw}' -> {reason}"
                 if category == "enterprise" and not include_enterprise:
                     reason_text += ENTERPRISE_LICENSE_NOTE
-                suggestions.append(PatternSuggestion(
-                    name=pattern_name,
-                    category=category,
-                    reason=reason_text,
-                    confidence=0.85,
-                ))
+                suggestions.append(
+                    PatternSuggestion(
+                        name=pattern_name,
+                        category=category,
+                        reason=reason_text,
+                        confidence=0.85,
+                    )
+                )
                 seen.add(pattern_name)
                 break
 
@@ -308,7 +346,9 @@ def _suggest_with_keywords(
     for s in suggestions:
         pos = f" (chain step {s.chain_position})" if s.chain_position else ""
         reasoning_parts.append(f"- {s.name}{pos}: {s.reason}")
-    reasoning = "\n".join(reasoning_parts) if reasoning_parts else "No strong match. Try question_analyzer."
+    reasoning = (
+        "\n".join(reasoning_parts) if reasoning_parts else "No strong match. Try question_analyzer."
+    )
 
     return SuggestionResult(
         question=question,
@@ -399,7 +439,8 @@ INTEGRATION: 2-3 sentences explaining how these templates work together as a pip
             logger.debug(
                 "_suggest_with_llm: instructor path failed (%s), falling back to "
                 "regex parse. Error: %s",
-                type(exc).__name__, exc,
+                type(exc).__name__,
+                exc,
             )
 
     # ── Fallback: classic LLM call + Pydantic parse ──────────────────────────
@@ -412,7 +453,7 @@ INTEGRATION: 2-3 sentences explaining how these templates work together as a pip
                     "Select 2-4 templates. Quality over quantity — each template must directly address a core aspect of the question.",
                     "Order them as a pipeline: investigation/analysis first, then reasoning/comparison, then synthesis/decision last.",
                     "Each REASON must be specific to the user's question, not generic.",
-                    "Respond as valid JSON: {\"selections\":[{\"name\":\"...\",\"reason\":\"...\"},...],\"integration\":\"...\"}",
+                    'Respond as valid JSON: {"selections":[{"name":"...","reason":"..."},...],"integration":"..."}',
                 ],
             ),
             directive=Directive(content=prompt),
@@ -432,7 +473,9 @@ INTEGRATION: 2-3 sentences explaining how these templates work together as a pip
         logger.warning(
             "_suggest_with_llm: LLM suggestion call failed (%s). "
             "Returning empty suggestions; caller will fall back to keyword mode. Error: %s",
-            type(e).__name__, e, exc_info=True,
+            type(e).__name__,
+            e,
+            exc_info=True,
         )
         return ([], "", str(e))
 
@@ -440,6 +483,7 @@ INTEGRATION: 2-3 sentences explaining how these templates work together as a pip
 def _parse_llm_structured_response_regex(raw: str) -> tuple:
     """Regex fallback parser — used when JSON parse fails."""
     import re as _re
+
     selections: list[tuple] = []
     integration = ""
 
@@ -495,12 +539,14 @@ def _names_to_result(
         reason = per_template_reasons.get(name, f"Selected by {source}")
         if cat == "enterprise" and not include_enterprise:
             reason += ENTERPRISE_LICENSE_NOTE
-        suggestions.append(PatternSuggestion(
-            name=name,
-            category=cat,
-            reason=reason,
-            confidence=0.9 if source in ("llm", "hybrid") else 0.85,
-        ))
+        suggestions.append(
+            PatternSuggestion(
+                name=name,
+                category=cat,
+                reason=reason,
+                confidence=0.9 if source in ("llm", "hybrid") else 0.85,
+            )
+        )
 
     chain = _order_chain(names) if suggest_chain and len(names) >= 2 else None
     if chain:
@@ -542,6 +588,7 @@ def _order_chain(pattern_names: list[str]) -> list[str]:
     )
     return ordered + others
 
+
 def get_pattern_class(pattern_name: str, include_enterprise: bool = True):
     """
     Get the Pattern class for a given pattern name.
@@ -579,6 +626,7 @@ import functools as _functools  # noqa: E402 — placed after the function that 
 def _get_pattern_class_cached(pattern_name: str):
     """LRU-cached registry lookup — called only after access control checks."""
     from ..skills.pattern_registry import get_pattern_registry
+
     registry = get_pattern_registry()
     return registry.get(pattern_name)
 
@@ -587,9 +635,11 @@ def _get_pattern_class_cached(pattern_name: str):
 # Complexity Router — decide IF templates will help before selecting them
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ComplexityResult:
     """Result of question complexity assessment."""
+
     complexity: str  # "low", "medium", "high"
     domains: list[str]  # e.g. ["business", "technical", "ethical"]
     reasoning_type: str  # "diagnostic", "comparative", "strategic", etc.
@@ -807,6 +857,7 @@ Respond with ONLY valid JSON."""
             raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
 
         import json
+
         data = json.loads(raw)
         best_tpl = data.get("best_template", "") or None
         if best_tpl and best_tpl not in VALID_PATTERN_NAMES:
@@ -833,6 +884,7 @@ Respond with ONLY valid JSON."""
 # Shared routing logic — used by smart_execute / smart_prompt / smart_generic_prompt
 # ---------------------------------------------------------------------------
 
+
 def _resolve_routing(
     question: str,
     provider: str,
@@ -854,9 +906,7 @@ def _resolve_routing(
         return "raw", [], assessment
 
     if assessment.recommendation == "single_template" and assessment.best_template:
-        klass = get_pattern_class(
-            assessment.best_template, include_enterprise=include_enterprise
-        )
+        klass = get_pattern_class(assessment.best_template, include_enterprise=include_enterprise)
         if klass is not None:
             return "single", [assessment.best_template], assessment
 
@@ -880,6 +930,7 @@ def _resolve_routing(
 # ---------------------------------------------------------------------------
 # Public smart_ functions — thin wrappers over _resolve_routing
 # ---------------------------------------------------------------------------
+
 
 def smart_execute(
     question: str,

@@ -11,17 +11,17 @@ from mycontext import Constraints, Guidance, Pattern
 class ContentOutliner(Pattern):
     """
     Generate comprehensive, structured outlines for articles, docs, presentations, etc.
-    
+
     This template creates content outlines using proven content strategy principles:
     - Audience-first approach
     - Clear hierarchical structure
     - Logical flow and progression
     - Actionable section descriptions
     - Hooks, transitions, and CTAs
-    
+
     Examples:
         >>> from mycontext.templates.free import ContentOutliner
-        >>> 
+        >>>
         >>> outliner = ContentOutliner()
         >>> result = outliner.execute(
         ...     provider="gemini",
@@ -31,7 +31,7 @@ class ContentOutliner(Pattern):
         ...     audience="developers new to LLM applications"
         ... )
         >>> print(result.response)
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -73,9 +73,9 @@ class ContentOutliner(Pattern):
                     "Ensure logical flow from section to section",
                     "Include specific, actionable content for each section",
                     "Add hooks, transitions, and calls-to-action where appropriate",
-                    "Balance depth with readability"
+                    "Balance depth with readability",
                 ],
-                style="structured, clear, strategic, audience-focused"
+                style="structured, clear, strategic, audience-focused",
             ),
             directive_template="""Create a comprehensive outline for this content.
 
@@ -239,21 +239,21 @@ Generate a detailed, actionable content outline:
                 "target_length": str,
                 "audience": str,
                 "purpose": str,
-                "context": str
+                "context": str,
             },
             constraints=Constraints(
                 must_include=[
                     "content strategy",
                     "hierarchical outline with specific sections",
                     "word count breakdown",
-                    "supporting elements (visuals, examples)"
+                    "supporting elements (visuals, examples)",
                 ],
                 must_not_include=[
                     "vague section descriptions",
-                    "missing transitions between sections"
+                    "missing transitions between sections",
                 ],
-                style_guide="Use clear hierarchy (###), specific content descriptions, word counts for sections"
-            )
+                style_guide="Use clear hierarchy (###), specific content descriptions, word counts for sections",
+            ),
         )
 
     def _render_context_section(self, context):
@@ -266,7 +266,8 @@ Generate a detailed, actionable content outline:
         """Estimate section lengths based on total."""
         # Simple parsing - extract number
         import re
-        match = re.search(r'(\d+)', target_length_str)
+
+        match = re.search(r"(\d+)", target_length_str)
         if match:
             total = int(match.group(1))
             # Rough distribution: intro 10%, sections 70%, conclusion 10%, buffer 10%
@@ -285,15 +286,15 @@ Generate a detailed, actionable content outline:
         purpose="educate and inform",
         context=None,
         temperature=0.7,
-        **kwargs
+        **kwargs,
     ):
         """
         Execute content outlining.
-        
+
         Args:
             provider: LLM provider to use ("gemini", "openai", "anthropic")
             topic: The content topic
-            content_type: Type of content ("blog post", "article", "documentation", 
+            content_type: Type of content ("blog post", "article", "documentation",
                          "presentation", "tutorial", "whitepaper")
             target_length: Target length ("1500 words", "10 minutes", "20 slides", etc.)
             audience: Target audience description
@@ -301,7 +302,7 @@ Generate a detailed, actionable content outline:
             context: Optional additional context
             temperature: Moderate values (0.6-0.8) for creative but structured outlines
             **kwargs: Additional provider options
-        
+
         Returns:
             ProviderResponse with the outline
         """
@@ -324,5 +325,5 @@ Generate a detailed, actionable content outline:
             section_length=section_length,
             conclusion_length=conclusion_length,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )

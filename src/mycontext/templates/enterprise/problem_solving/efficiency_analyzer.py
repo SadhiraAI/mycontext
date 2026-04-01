@@ -7,29 +7,28 @@ Based on process optimization and lean principles.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class EfficiencyAnalyzer(Pattern):
     """
     Analyze and improve efficiency.
-    
+
     Analyzes:
     - Process efficiency
     - Resource utilization
     - Waste identification
     - Optimization opportunities
-    
+
     Based on: Lean principles and process optimization
-    
+
     Example:
         >>> analyzer = EfficiencyAnalyzer()
         >>> context = analyzer.build_context(
         ...     process="Customer onboarding workflow",
         ...     goal="Reduce time by 50%"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -65,9 +64,9 @@ class EfficiencyAnalyzer(Pattern):
                     "Identify waste",
                     "Find quick wins",
                     "Optimize bottlenecks",
-                    "Quantify improvements"
+                    "Quantify improvements",
                 ],
-                style="analytical, pragmatic, results-focused"
+                style="analytical, pragmatic, results-focused",
             ),
             directive_template="""Analyze efficiency of:
 
@@ -127,15 +126,11 @@ Efficiency analysis:
    - Cost savings: [$]
 
 **OUTPUT FORMAT**: Data-driven efficiency analysis with ROI projections.""",
-            input_schema={
-                "process": str,
-                "goal": str,
-                "context_section": str
-            },
+            input_schema={"process": str, "goal": str, "context_section": str},
             constraints=Constraints(
                 must_include=["waste_identification", "opportunities", "projections"],
-                style_guide="Be quantitative and actionable"
-            )
+                style_guide="Be quantitative and actionable",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -148,15 +143,12 @@ Efficiency analysis:
         process: str = "",
         goal: str = "Maximize efficiency",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            process=process,
-            goal=goal,
-            context_section=context_section,
-            **kwargs
+            process=process, goal=goal, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -165,12 +157,8 @@ Efficiency analysis:
         process: str = "",
         goal: str = "Maximize efficiency",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            process=process,
-            goal=goal,
-            context=context,
-            **kwargs
+            provider=provider, process=process, goal=goal, context=context, **kwargs
         )

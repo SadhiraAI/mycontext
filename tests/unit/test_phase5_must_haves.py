@@ -42,10 +42,12 @@ from mycontext.providers.base import ProviderResponse
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_litellm_provider():
     from mycontext.providers.litellm_provider import LiteLLMProvider
     from mycontext.utils.semantic_cache import reset_default_cache
     from mycontext.utils.tracing import get_tracer
+
     reset_default_cache()
     get_tracer().clear()
     p = LiteLLMProvider.__new__(LiteLLMProvider)
@@ -71,15 +73,18 @@ def _mock_acompletion_response(text: str = "async answer"):
 # assemble_for_model
 # ---------------------------------------------------------------------------
 
-class TestAssembleForModel:
 
+class TestAssembleForModel:
     def _ctx(self, with_knowledge: bool = True) -> Context:
         from mycontext.foundation import Constraints
+
         ctx = Context(
             guidance=Guidance(role="Senior analyst", rules=["Be precise", "Cite sources"]),
             directive=Directive(content="Analyze the following data and provide insights."),
             constraints=Constraints(format_rules=["Use bullet points", "Include severity ratings"]),
-            knowledge="Background: This is a financial services company." if with_knowledge else None,
+            knowledge="Background: This is a financial services company."
+            if with_knowledge
+            else None,
         )
         return ctx
 
@@ -99,6 +104,7 @@ class TestAssembleForModel:
     def test_tight_budget_result_fits(self):
         ctx = self._ctx()
         from mycontext.utils.tokens import count_tokens
+
         result = ctx.assemble_for_model(model="gpt-4o", max_tokens=30)
         token_count = count_tokens(result, "gpt-4o")
         # Allow small separator overhead (the "\n\n" join may add 1-2 tokens)
@@ -120,6 +126,7 @@ class TestAssembleForModel:
         """With a moderate budget, knowledge (lowest priority) should be dropped first."""
         ctx = self._ctx(with_knowledge=True)
         from mycontext.utils.tokens import count_tokens
+
         directive_tokens = count_tokens(ctx.directive.render(), "gpt-4o")
         guidance_tokens = count_tokens(ctx.guidance.render(), "gpt-4o")
 
@@ -131,6 +138,7 @@ class TestAssembleForModel:
 
     def test_result_token_count_never_exceeds_budget(self):
         from mycontext.utils.tokens import count_tokens
+
         ctx = self._ctx()
         for budget in (10, 50, 100, 500):
             result = ctx.assemble_for_model(model="gpt-4o", max_tokens=budget)
@@ -144,8 +152,8 @@ class TestAssembleForModel:
 # BaseProvider.agenerate default
 # ---------------------------------------------------------------------------
 
-class TestBaseProviderDefaultAgenerate:
 
+class TestBaseProviderDefaultAgenerate:
     def test_default_agenerate_runs_generate(self):
         from mycontext.providers.mock import MockProvider
 
@@ -174,11 +182,12 @@ class TestBaseProviderDefaultAgenerate:
 # LiteLLMProvider.agenerate
 # ---------------------------------------------------------------------------
 
-class TestLiteLLMProviderAgenerate:
 
+class TestLiteLLMProviderAgenerate:
     def setup_method(self):
         from mycontext.utils.semantic_cache import reset_default_cache
         from mycontext.utils.tracing import get_tracer
+
         reset_default_cache()
         get_tracer().clear()
 
@@ -187,11 +196,11 @@ class TestLiteLLMProviderAgenerate:
         ctx = Context("async test guidance")
 
         mock_resp = _mock_acompletion_response()
-        with patch("litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp) as mock_async:
+        with patch(
+            "litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp
+        ) as mock_async:
             with patch("litellm.completion_cost", return_value=0.001):
-                result = asyncio.run(
-                    provider.agenerate(ctx, model="gpt-4o-mini", use_cache=False)
-                )
+                result = asyncio.run(provider.agenerate(ctx, model="gpt-4o-mini", use_cache=False))
         mock_async.assert_called_once()
         assert result.response == "async answer"
 
@@ -202,9 +211,7 @@ class TestLiteLLMProviderAgenerate:
         mock_resp = _mock_acompletion_response("structured answer")
         with patch("litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp):
             with patch("litellm.completion_cost", return_value=0.002):
-                result = asyncio.run(
-                    provider.agenerate(ctx, model="gpt-4o-mini", use_cache=False)
-                )
+                result = asyncio.run(provider.agenerate(ctx, model="gpt-4o-mini", use_cache=False))
 
         assert isinstance(result, ProviderResponse)
         assert result.response == "structured answer"
@@ -214,6 +221,7 @@ class TestLiteLLMProviderAgenerate:
 
     def test_agenerate_writes_to_cache(self):
         from mycontext.utils.semantic_cache import get_default_cache
+
         provider = _make_litellm_provider()
         ctx = Context("cache write test")
 
@@ -230,7 +238,9 @@ class TestLiteLLMProviderAgenerate:
         ctx = Context("cache hit async test")
 
         mock_resp = _mock_acompletion_response()
-        with patch("litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp) as mock_ac:
+        with patch(
+            "litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp
+        ) as mock_ac:
             with patch("litellm.completion_cost", return_value=0.0):
                 asyncio.run(provider.agenerate(ctx, model="gpt-4o-mini", use_cache=True))
                 asyncio.run(provider.agenerate(ctx, model="gpt-4o-mini", use_cache=True))
@@ -243,7 +253,9 @@ class TestLiteLLMProviderAgenerate:
         ctx = Context("bypass cache async test")
 
         mock_resp = _mock_acompletion_response()
-        with patch("litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp) as mock_ac:
+        with patch(
+            "litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp
+        ) as mock_ac:
             with patch("litellm.completion_cost", return_value=0.0):
                 asyncio.run(provider.agenerate(ctx, model="gpt-4o-mini", use_cache=False))
                 asyncio.run(provider.agenerate(ctx, model="gpt-4o-mini", use_cache=False))
@@ -252,6 +264,7 @@ class TestLiteLLMProviderAgenerate:
 
     def test_agenerate_emits_span(self):
         from mycontext.utils.tracing import get_tracer
+
         provider = _make_litellm_provider()
         ctx = Context("span async test")
 
@@ -268,10 +281,11 @@ class TestLiteLLMProviderAgenerate:
 # Context.aexecute
 # ---------------------------------------------------------------------------
 
-class TestContextAexecute:
 
+class TestContextAexecute:
     def setup_method(self):
         from mycontext.utils.semantic_cache import reset_default_cache
+
         reset_default_cache()
 
     def test_aexecute_returns_provider_response(self):
@@ -292,7 +306,9 @@ class TestContextAexecute:
         ctx = Context("test guidance for aexecute")
         mock_resp = _mock_acompletion_response()
 
-        with patch("litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp) as mock_ac:
+        with patch(
+            "litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp
+        ) as mock_ac:
             with patch("litellm.completion_cost", return_value=0.0):
                 asyncio.run(ctx.aexecute(provider="openai", model="gpt-4o-mini", use_cache=False))
 
@@ -310,8 +326,10 @@ class TestContextAexecute:
             with patch("litellm.acompletion", new_callable=AsyncMock, return_value=mock_resp):
                 with patch("litellm.completion_cost", return_value=0.0):
                     results = await asyncio.gather(
-                        *[ctx.aexecute(provider="openai", model="gpt-4o-mini", use_cache=False)
-                          for ctx in contexts]
+                        *[
+                            ctx.aexecute(provider="openai", model="gpt-4o-mini", use_cache=False)
+                            for ctx in contexts
+                        ]
                     )
             return results
 

@@ -17,7 +17,7 @@ from mycontext import Constraints, Guidance, Pattern
 class EthicalFrameworkAnalyzer(Pattern):
     """
     Analyze decisions through 6 ethical frameworks.
-    
+
     Frameworks:
     1. Utilitarian: Greatest good for greatest number
     2. Rights: Respect human dignity and moral rights
@@ -25,24 +25,24 @@ class EthicalFrameworkAnalyzer(Pattern):
     4. Common Good: Community welfare
     5. Virtue: What would a virtuous person do?
     6. Care Ethics: Relationships and responsibilities
-    
+
     Use Cases:
     - AI safety decisions
     - Medical ethics
     - Business ethics
     - Policy decisions
     - Product decisions
-    
+
     Example:
         >>> from mycontext.templates.enterprise.ethical_reasoning import EthicalFrameworkAnalyzer
-        >>> 
+        >>>
         >>> pattern = EthicalFrameworkAnalyzer()
         >>> result = pattern.execute(
         ...     provider="gemini",
         ...     decision="Deploy facial recognition in public spaces",
         ...     stakeholders="Citizens, law enforcement, businesses"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -76,7 +76,7 @@ class EthicalFrameworkAnalyzer(Pattern):
             metadata={
                 "category": "ethical_reasoning",
                 "license": "enterprise",
-                "tier": "enterprise"
+                "tier": "enterprise",
             },
             guidance=Guidance(
                 role="Ethics Professor and Moral Philosophy Expert",
@@ -85,9 +85,9 @@ class EthicalFrameworkAnalyzer(Pattern):
                     "Consider multiple stakeholder perspectives",
                     "Identify ethical tensions and trade-offs",
                     "Provide framework-specific reasoning (not generic)",
-                    "Balance theoretical analysis with practical implications"
+                    "Balance theoretical analysis with practical implications",
                 ],
-                style="balanced, rigorous, multi-perspective, thoughtful, clear"
+                style="balanced, rigorous, multi-perspective, thoughtful, clear",
             ),
             directive_template="""**ETHICAL FRAMEWORK ANALYSIS**
 
@@ -232,62 +232,39 @@ class EthicalFrameworkAnalyzer(Pattern):
 **Alternative approaches**: [Are there more ethical alternatives?]
 
 **Critical question**: Can this decision be publicly justified to all stakeholders using ethical reasoning?""",
-            input_schema={
-                "decision": str,
-                "stakeholders": str,
-                "context_section": str
-            },
+            input_schema={"decision": str, "stakeholders": str, "context_section": str},
             constraints=Constraints(
                 must_include=[
                     "all_six_frameworks",
                     "framework_specific_reasoning",
                     "stakeholder_analysis",
-                    "ethical_tensions"
+                    "ethical_tensions",
                 ],
-                must_not_include=[
-                    "generic_ethical_claims",
-                    "single_framework_bias"
-                ],
-                style_guide="Apply each framework rigorously with specific reasoning. Identify tensions between frameworks."
-            )
+                must_not_include=["generic_ethical_claims", "single_framework_bias"],
+                style_guide="Apply each framework rigorously with specific reasoning. Identify tensions between frameworks.",
+            ),
         )
 
-    def build_context(
-        self,
-        decision="",
-        stakeholders="",
-        context="",
-        **kwargs
-    ):
+    def build_context(self, decision="", stakeholders="", context="", **kwargs):
         """Build context for ethical framework analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().build_context(
-            decision=decision,
-            stakeholders=stakeholders,
-            context_section=context_section,
-            **kwargs
+            decision=decision, stakeholders=stakeholders, context_section=context_section, **kwargs
         )
 
-    def execute(
-        self,
-        provider="gemini",
-        decision="",
-        stakeholders="",
-        context="",
-        **kwargs
-    ):
+    def execute(self, provider="gemini", decision="", stakeholders="", context="", **kwargs):
         """Execute ethical framework analysis."""
         context_section = f"**CONTEXT**: {context}" if context else ""
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         return super().execute(
             provider=provider,
             decision=decision,
             stakeholders=stakeholders,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
 

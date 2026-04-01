@@ -88,9 +88,9 @@ class CodeReviewer(Pattern):
                     "Assess risk, not just severity — every finding needs impact, likelihood, and blast radius",
                     "Think about failure modes — what breaks in production, not just what looks wrong",
                     "Provide concrete fixes — every finding must include a working code example",
-                    "Acknowledge strengths — note what the code does well"
+                    "Acknowledge strengths — note what the code does well",
                 ],
-                style="risk-aware, specific, constructive, failure-mode-oriented"
+                style="risk-aware, specific, constructive, failure-mode-oriented",
             ),
             directive_template="""Review this {language} code using a structured cognitive process.
 
@@ -202,32 +202,32 @@ If fewer than 3 issues were found, include only the issues that exist — do not
 - Every recommendation MUST include a working code fix
 - Do NOT include style, formatting, or naming feedback — linters handle those
 - If a requested focus area has no issues, say so explicitly""",
-            input_schema={
-                "code": str,
-                "language": str,
-                "context_section": str,
-                "focus_areas": str
-            },
+            input_schema={"code": str, "language": str, "context_section": str, "focus_areas": str},
             constraints=Constraints(
                 must_include=[
                     "orientation phase showing understanding of the code before critique",
                     "risk assessment with impact, likelihood, and blast radius for each finding",
                     "concrete code examples for fixes",
-                    "failure scenarios for each finding"
+                    "failure scenarios for each finding",
                 ],
                 must_not_include=[
                     "style, formatting, or naming convention feedback",
                     "vague generalities without specific locations",
                     "criticisms without constructive solutions",
-                    "invented findings when no real issues exist"
+                    "invented findings when no real issues exist",
                 ],
-                style_guide="Use markdown formatting with code blocks and risk assessment tables"
-            )
+                style_guide="Use markdown formatting with code blocks and risk assessment tables",
+            ),
         )
 
     DEFAULT_FOCUS_AREAS: ClassVar[list[str]] = [
-        "correctness", "security", "performance", "design",
-        "resilience", "testing", "maintainability"
+        "correctness",
+        "security",
+        "performance",
+        "design",
+        "resilience",
+        "testing",
+        "maintainability",
     ]
 
     def _render_context_section(self, context):
@@ -243,8 +243,13 @@ If fewer than 3 issues were found, include only the issues that exist — do not
         return str(focus_areas)
 
     def build_context(
-        self, code="", language="Python", context=None,
-        focus_areas=None, output_format="structured", **kwargs
+        self,
+        code="",
+        language="Python",
+        context=None,
+        focus_areas=None,
+        output_format="structured",
+        **kwargs,
     ):
         """
         Build context for code review (without executing).
@@ -276,14 +281,14 @@ If fewer than 3 issues were found, include only the issues that exist — do not
         context_section = self._render_context_section(context)
         focus_areas_str = self._render_focus_areas(focus_areas)
 
-        kwargs.pop('context_section', None)
+        kwargs.pop("context_section", None)
 
         ctx = super().build_context(
             code=code,
             language=language,
             context_section=context_section,
             focus_areas=focus_areas_str,
-            **kwargs
+            **kwargs,
         )
 
         fmt = get_format_directive(output_format)
@@ -291,6 +296,13 @@ If fewer than 3 issues were found, include only the issues that exist — do not
             ctx.directive = Directive(content=ctx.directive.content + fmt)
             ctx.metadata["output_format"] = output_format
 
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Did I check for OWASP top 10 vulnerabilities?",
+                "Are my suggestions actionable with specific line references?",
+            ],
+        )
         return ctx
 
     def execute(
@@ -301,7 +313,7 @@ If fewer than 3 issues were found, include only the issues that exist — do not
         context=None,
         focus_areas=None,
         output_format="structured",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute code review.
@@ -328,9 +340,16 @@ If fewer than 3 issues were found, include only the issues that exist — do not
             focus_areas = self.DEFAULT_FOCUS_AREAS
 
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
 

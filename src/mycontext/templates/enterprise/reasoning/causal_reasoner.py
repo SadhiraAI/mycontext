@@ -11,27 +11,27 @@ from mycontext.structure import Pattern
 class CausalReasoner(Pattern):
     """
     Causal reasoning template for analyzing cause-effect relationships.
-    
+
     Systematically examines:
     - Root causes
     - Contributing factors
     - Causal chains
     - Effects and consequences
     - Correlation vs causation
-    
+
     Based on: Causal inference and systems thinking frameworks
-    
+
     Example:
         ```python
         from mycontext.templates.free import CausalReasoner
-        
+
         reasoner = CausalReasoner()
         context = reasoner.build_context(
             phenomenon="Declining customer retention",
             depth="thorough"
         )
         ```
-    
+
     Input Schema:
         - phenomenon (str): The effect or outcome to analyze
         - context_section (str, optional): Additional context
@@ -79,9 +79,9 @@ class CausalReasoner(Pattern):
                     "Use evidence to support causal claims",
                     "Acknowledge uncertainty and alternative explanations",
                     "Consider temporal sequences (cause must precede effect)",
-                    "Identify confounding variables"
+                    "Identify confounding variables",
                 ],
-                style="analytical, evidence-based, systematic"
+                style="analytical, evidence-based, systematic",
             ),
             directive_template="""Analyze the causes and effects related to:
 
@@ -145,11 +145,7 @@ Causal Analysis Framework:
     - Key uncertainties or gaps in understanding
 
 Use evidence, logic, and systems thinking throughout.""",
-            input_schema={
-                "phenomenon": str,
-                "context_section": str,
-                "depth": str
-            }
+            input_schema={"phenomenon": str, "context_section": str, "depth": str},
         )
 
     def _render_context_section(self, context: str) -> str:
@@ -158,36 +154,27 @@ Use evidence, logic, and systems thinking throughout.""",
             return ""
         return f"\nAdditional Context:\n{context}\n"
 
-    def build_context(
-        self,
-        phenomenon: str,
-        context: str = "",
-        depth: str = "detailed",
-        **kwargs
-    ):
+    def build_context(self, phenomenon: str, context: str = "", depth: str = "detailed", **kwargs):
         """
         Build a context for causal analysis.
-        
+
         Args:
             phenomenon: The effect or outcome to analyze
             context: Optional additional context
             depth: Analysis depth
             **kwargs: Additional parameters
-            
+
         Returns:
             Context configured for causal reasoning
         """
         context_section = self._render_context_section(context or "")
 
         # Clean up kwargs
-        kwargs.pop('context', None)
-        kwargs.pop('context_section', None)
+        kwargs.pop("context", None)
+        kwargs.pop("context_section", None)
 
         return super().build_context(
-            phenomenon=phenomenon,
-            context_section=context_section,
-            depth=depth,
-            **kwargs
+            phenomenon=phenomenon, context_section=context_section, depth=depth, **kwargs
         )
 
     def execute(
@@ -196,18 +183,18 @@ Use evidence, logic, and systems thinking throughout.""",
         phenomenon: str = None,
         context: str = "",
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute causal analysis directly.
-        
+
         Args:
             provider: LLM provider to use
             phenomenon: The effect to analyze
             context: Additional context
             depth: Analysis depth
             **kwargs: Provider parameters
-            
+
         Returns:
             Provider response with causal analysis
         """
@@ -215,22 +202,31 @@ Use evidence, logic, and systems thinking throughout.""",
 
         # Separate provider kwargs
         provider_params = {}
-        provider_param_names = {'model', 'temperature', 'max_tokens', 'top_p',
-                               'frequency_penalty', 'presence_penalty', 'stop',
-                               'user', 'api_key', 'base_url'}
+        provider_param_names = {
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
+        }
 
         for key in list(kwargs.keys()):
             if key in provider_param_names:
                 provider_params[key] = kwargs.pop(key)
 
         # Clean up
-        kwargs.pop('context', None)
-        kwargs.pop('context_section', None)
+        kwargs.pop("context", None)
+        kwargs.pop("context_section", None)
 
         return super().execute(
             provider=provider,
             phenomenon=phenomenon,
             context_section=context_section,
             depth=depth,
-            **provider_params
+            **provider_params,
         )

@@ -40,6 +40,7 @@ _PATTERN_REGISTRY_LOCK = threading.Lock()
 
 class InputType(Enum):
     """Types of inputs the engine can process."""
+
     QUESTION = "question"
     PROBLEM = "problem"
     DECISION = "decision"
@@ -53,6 +54,7 @@ class InputType(Enum):
 
 class ComplexityLevel(Enum):
     """Complexity assessment levels."""
+
     SIMPLE = "simple"
     MODERATE = "moderate"
     COMPLEX = "complex"
@@ -62,6 +64,7 @@ class ComplexityLevel(Enum):
 @dataclass
 class InputAnalysis:
     """Analysis of an input for pattern selection."""
+
     input_type: InputType
     complexity: ComplexityLevel
     domain: str
@@ -77,12 +80,12 @@ class InputAnalysis:
 class TransformationEngine:
     """
     Intelligent context transformation engine with automatic pattern selection.
-    
+
     Core features:
     - Analyzes input characteristics
     - Selects optimal cognitive patterns
     - Composes multi-pattern transformations
-    
+
     Example:
         >>> engine = TransformationEngine()
         >>> context = engine.transform(
@@ -90,7 +93,7 @@ class TransformationEngine:
         ...     metadata={"domain": "software", "user_level": "professional"}
         ... )
         >>> print(f"Patterns used: {context.metadata['patterns_applied']}")
-    
+
     This is the core innovation of mycontext - automatic, intelligent transformation.
     """
 
@@ -163,6 +166,7 @@ class TransformationEngine:
                     AnalogicalReasoner,
                     CausalReasoner,
                 )
+
                 patterns.extend([CausalReasoner(), AmbiguityResolver(), AnalogicalReasoner()])
 
                 from ..templates.enterprise.decision import (
@@ -172,30 +176,28 @@ class TransformationEngine:
                 )
                 from ..templates.enterprise.problem_solving import ProblemDecomposer
 
-                patterns.extend([
-                    ComparativeAnalyzer(),
-                    TradeoffAnalyzer(),
-                    ProblemDecomposer(),
-                    DecisionFramework(),
-                ])
+                patterns.extend(
+                    [
+                        ComparativeAnalyzer(),
+                        TradeoffAnalyzer(),
+                        ProblemDecomposer(),
+                        DecisionFramework(),
+                    ]
+                )
             except ImportError:
                 pass
 
         for pattern in patterns:
             registry[pattern.name] = pattern
 
-    def analyze_input(
-        self,
-        input: str,
-        metadata: dict[str, Any] | None = None
-    ) -> InputAnalysis:
+    def analyze_input(self, input: str, metadata: dict[str, Any] | None = None) -> InputAnalysis:
         """
         Analyze input to determine characteristics and optimal patterns.
-        
+
         Args:
             input: The raw input to analyze
             metadata: Optional metadata (domain, user_level, etc.)
-        
+
         Returns:
             InputAnalysis with recommendations
         """
@@ -216,17 +218,19 @@ class TransformationEngine:
         key_concepts = self._extract_concepts(input)
 
         # Assess requirements
-        requires_reasoning = any(word in input_lower for word in [
-            "why", "how", "explain", "reason", "cause", "because"
-        ])
+        requires_reasoning = any(
+            word in input_lower for word in ["why", "how", "explain", "reason", "cause", "because"]
+        )
 
-        requires_comparison = any(word in input_lower for word in [
-            "compare", "versus", "vs", "better", "best", "which", "choose"
-        ])
+        requires_comparison = any(
+            word in input_lower
+            for word in ["compare", "versus", "vs", "better", "best", "which", "choose"]
+        )
 
-        requires_verification = any(word in input_lower for word in [
-            "correct", "valid", "verify", "check", "confirm", "true"
-        ])
+        requires_verification = any(
+            word in input_lower
+            for word in ["correct", "valid", "verify", "check", "confirm", "true"]
+        )
 
         # Assess ambiguity
         ambiguity_level = self._assess_ambiguity(input)
@@ -238,7 +242,7 @@ class TransformationEngine:
             requires_reasoning,
             requires_comparison,
             requires_verification,
-            ambiguity_level
+            ambiguity_level,
         )
         # Filter to only patterns we have loaded (excludes enterprise when include_enterprise=False)
         recommended_patterns = [p for p in recommended_patterns if p in self._pattern_registry]
@@ -256,17 +260,37 @@ class TransformationEngine:
             requires_verification=requires_verification,
             ambiguity_level=ambiguity_level,
             recommended_patterns=recommended_patterns,
-            confidence=confidence
+            confidence=confidence,
         )
 
     def _detect_input_type(self, input_lower: str) -> InputType:
         """Detect the type of input."""
-        if any(phrase in input_lower for phrase in [
-            "root cause", "why did", "why is", "why does", "why are", "why was",
-            "what caused", "five whys", "fishbone", "led to", "resulted in",
-            "cause of", "causes of", "reason for", "spike", "drop", "churn",
-            "incident", "outage", "failure", "diagnos",
-        ]):
+        if any(
+            phrase in input_lower
+            for phrase in [
+                "root cause",
+                "why did",
+                "why is",
+                "why does",
+                "why are",
+                "why was",
+                "what caused",
+                "five whys",
+                "fishbone",
+                "led to",
+                "resulted in",
+                "cause of",
+                "causes of",
+                "reason for",
+                "spike",
+                "drop",
+                "churn",
+                "incident",
+                "outage",
+                "failure",
+                "diagnos",
+            ]
+        ):
             return InputType.CAUSAL
         elif any(word in input_lower for word in ["should i", "should we", "decide", "choose"]):
             return InputType.DECISION
@@ -274,14 +298,30 @@ class TransformationEngine:
             return InputType.COMPARISON
         elif any(word in input_lower for word in ["what is", "explain", "how does", "define"]):
             return InputType.CONCEPT
-        elif any(word in input_lower for word in [
-            "solve", "fix", "how to", "problem with", "troubleshoot",
-            "issue", "bug", "broken", "error",
-        ]):
+        elif any(
+            word in input_lower
+            for word in [
+                "solve",
+                "fix",
+                "how to",
+                "problem with",
+                "troubleshoot",
+                "issue",
+                "bug",
+                "broken",
+                "error",
+            ]
+        ):
             return InputType.PROBLEM
-        elif any(word in input_lower for word in [
-            "why", "cause", "causal", "because",
-        ]):
+        elif any(
+            word in input_lower
+            for word in [
+                "why",
+                "cause",
+                "causal",
+                "because",
+            ]
+        ):
             return InputType.CAUSAL
         elif "?" in input_lower:
             return InputType.QUESTION
@@ -293,7 +333,6 @@ class TransformationEngine:
         # Simple heuristic
         word_count = len(input.split())
         has_multiple_questions = input.count("?") > 1
-        domain_complexity = metadata.get("complexity", "moderate")
 
         if word_count < 10 and not has_multiple_questions:
             return ComplexityLevel.SIMPLE
@@ -347,7 +386,7 @@ class TransformationEngine:
         requires_reasoning: bool,
         requires_comparison: bool,
         requires_verification: bool,
-        ambiguity_level: str
+        ambiguity_level: str,
     ) -> list[str]:
         """Recommend optimal patterns based on analysis."""
         patterns = []
@@ -425,16 +464,16 @@ class TransformationEngine:
     ) -> Context:
         """
         Transform raw input into perfect context.
-        
+
         This is the main API method - automatic, intelligent transformation.
-        
+
         Args:
             input: Raw input to transform
             metadata: Optional metadata (domain, complexity, user_level, etc.)
             patterns: Pattern selection strategy:
                 - "auto": Automatic selection (default)
                 - ["pattern1", "pattern2"]: Specific patterns
-        
+
         Returns:
             Context object with metadata about transformation
         """
@@ -447,7 +486,9 @@ class TransformationEngine:
         elif isinstance(patterns, list):
             selected_patterns = patterns
         else:
-            selected_patterns = [analysis.recommended_patterns[0]] if analysis.recommended_patterns else []
+            selected_patterns = (
+                [analysis.recommended_patterns[0]] if analysis.recommended_patterns else []
+            )
 
         # Apply primary pattern
         if selected_patterns:
@@ -461,6 +502,24 @@ class TransformationEngine:
                     **self._prepare_pattern_inputs(input, analysis, pattern)
                 )
 
+                # Auto-set verbosity from complexity if not already set
+                _COMPLEXITY_TO_VERBOSITY = {
+                    ComplexityLevel.SIMPLE: "minimal",
+                    ComplexityLevel.MODERATE: "standard",
+                    ComplexityLevel.COMPLEX: "detailed",
+                    ComplexityLevel.HIGHLY_COMPLEX: "detailed",
+                }
+                auto_verbosity = _COMPLEXITY_TO_VERBOSITY.get(analysis.complexity)
+                if auto_verbosity and context.constraints:
+                    if context.constraints.verbosity is None:
+                        context.constraints = context.constraints.model_copy(
+                            update={"verbosity": auto_verbosity}
+                        )
+                elif auto_verbosity and context.constraints is None:
+                    from ..foundation import Constraints
+
+                    context.constraints = Constraints(verbosity=auto_verbosity)
+
                 # Add transformation metadata
                 context.data = context.data or {}
                 context.data["transformation_metadata"] = {
@@ -469,7 +528,7 @@ class TransformationEngine:
                         "type": analysis.input_type.value,
                         "complexity": analysis.complexity.value,
                         "domain": analysis.domain,
-                        "ambiguity": analysis.ambiguity_level
+                        "ambiguity": analysis.ambiguity_level,
                     },
                     "confidence": analysis.confidence,
                 }
@@ -478,22 +537,14 @@ class TransformationEngine:
 
         # Fallback: Create basic context
         from ..foundation import Directive, Guidance
+
         return Context(
-            directive=Directive(
-                content=input,
-                priority=5
-            ),
-            guidance=Guidance(
-                role="Helpful Assistant",
-                rules=["Be clear and helpful"]
-            )
+            directive=Directive(content=input, priority=5),
+            guidance=Guidance(role="Helpful Assistant", rules=["Be clear and helpful"]),
         )
 
     def _prepare_pattern_inputs(
-        self,
-        input: str,
-        analysis: InputAnalysis,
-        pattern: Pattern
+        self, input: str, analysis: InputAnalysis, pattern: Pattern
     ) -> dict[str, Any]:
         """Prepare inputs for a specific pattern."""
         # Generic mapping - each pattern has different parameter names
@@ -504,7 +555,12 @@ class TransformationEngine:
         # Try common parameter names
         if pattern.name in ["question_analyzer", "intent_recognizer"]:
             inputs["question"] = input
-        elif pattern.name in ["step_by_step_reasoner", "problem_decomposer", "root_cause_analyzer", "diagnostic_root_cause_analyzer"]:
+        elif pattern.name in [
+            "step_by_step_reasoner",
+            "problem_decomposer",
+            "root_cause_analyzer",
+            "diagnostic_root_cause_analyzer",
+        ]:
             inputs["problem"] = input
         elif pattern.name == "decision_framework":
             inputs["decision"] = input
@@ -581,7 +637,8 @@ class TransformationEngine:
         }
         by_pattern = _DEPTH_MAP.get(engine_depth, _DEPTH_MAP["standard"])
         inputs["depth"] = by_pattern.get(
-            pattern.name, by_pattern.get("risk_assessor", "detailed")  # fallback
+            pattern.name,
+            by_pattern.get("risk_assessor", "detailed"),  # fallback
         )
 
         return inputs
@@ -594,18 +651,14 @@ class TransformationEngine:
         """Get a specific pattern by name."""
         return self._pattern_registry.get(name)
 
-    def explain_selection(
-        self,
-        input: str,
-        metadata: dict[str, Any] | None = None
-    ) -> str:
+    def explain_selection(self, input: str, metadata: dict[str, Any] | None = None) -> str:
         """
         Explain why certain patterns were selected.
-        
+
         Args:
             input: The input to analyze
             metadata: Optional metadata
-        
+
         Returns:
             Human-readable explanation of pattern selection
         """
@@ -638,20 +691,20 @@ def transform(
     input: str,
     metadata: dict[str, Any] | None = None,
     patterns: str | list[str] | None = "auto",
-    include_enterprise: bool = True
+    include_enterprise: bool = True,
 ) -> Context:
     """
     Quick transformation function.
-    
+
     Args:
         input: Raw input to transform
         metadata: Optional metadata
         patterns: Pattern selection strategy
         include_enterprise: If False, only free patterns are used
-    
+
     Returns:
         Transformed context
-    
+
     Example:
         >>> from mycontext.intelligence import transform
         >>> context = transform("Should we use microservices?")

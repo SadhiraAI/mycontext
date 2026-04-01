@@ -12,7 +12,7 @@ from pydantic import BaseModel, ValidationError
 class ContextValidator:
     """
     Validate contexts before execution.
-    
+
     Catch issues before making expensive LLM calls.
     """
 
@@ -20,10 +20,10 @@ class ContextValidator:
     def validate_context(context: Any) -> dict[str, Any]:
         """
         Validate a context object.
-        
+
         Args:
             context: Context to validate
-            
+
         Returns:
             Validation result with issues
         """
@@ -31,7 +31,7 @@ class ContextValidator:
         warnings = []
 
         # Get context text
-        if hasattr(context, 'assemble'):
+        if hasattr(context, "assemble"):
             text = context.assemble()
         else:
             text = str(context)
@@ -44,17 +44,18 @@ class ContextValidator:
             warnings.append("Context is very long (>100k chars) - may be expensive")
 
         # Check for empty directives
-        if hasattr(context, 'directive') and context.directive is None:
+        if hasattr(context, "directive") and context.directive is None:
             warnings.append("No directive provided - context may be vague")
 
         # Check for placeholder text
-        placeholders = ['{', '{{', '[placeholder]', 'TODO', 'FIXME']
+        placeholders = ["{", "{{", "[placeholder]", "TODO", "FIXME"]
         for placeholder in placeholders:
             if placeholder in text:
                 issues.append(f"Placeholder text found: '{placeholder}'")
 
         # Accurate token count
         from .tokens import count_tokens
+
         estimated_tokens = count_tokens(text)
         if estimated_tokens > 8000:
             warnings.append(f"High token count (~{estimated_tokens}) - consider compression")
@@ -64,18 +65,18 @@ class ContextValidator:
             "issues": issues,
             "warnings": warnings,
             "estimated_tokens": estimated_tokens,
-            "text_length": len(text)
+            "text_length": len(text),
         }
 
     @staticmethod
     def validate_inputs(inputs: dict[str, Any], required: list[str]) -> dict[str, Any]:
         """
         Validate template inputs.
-        
+
         Args:
             inputs: Input dictionary
             required: List of required field names
-            
+
         Returns:
             Validation result
         """
@@ -87,16 +88,13 @@ class ContextValidator:
             elif inputs[field] is None or inputs[field] == "":
                 issues.append(f"Field '{field}' is empty")
 
-        return {
-            "valid": len(issues) == 0,
-            "issues": issues
-        }
+        return {"valid": len(issues) == 0, "issues": issues}
 
 
 class OutputValidator:
     """
     Validate LLM outputs against expectations.
-    
+
     Ensure outputs meet quality and format requirements.
     """
 
@@ -104,11 +102,11 @@ class OutputValidator:
     def validate_json(text: str, schema: dict[str, type] | None = None) -> dict[str, Any]:
         """
         Validate JSON output.
-        
+
         Args:
             text: Text to validate
             schema: Expected schema (field: type pairs)
-            
+
         Returns:
             Validation result
         """
@@ -138,20 +136,17 @@ class OutputValidator:
         except Exception as e:
             issues.append(f"JSON parsing failed: {e}")
 
-        return {
-            "valid": len(issues) == 0,
-            "issues": issues
-        }
+        return {"valid": len(issues) == 0, "issues": issues}
 
     @staticmethod
     def validate_code(text: str, language: str) -> dict[str, Any]:
         """
         Validate code output.
-        
+
         Args:
             text: Text to validate
             language: Expected language
-            
+
         Returns:
             Validation result
         """
@@ -168,20 +163,17 @@ class OutputValidator:
             if language not in code:
                 issues.append(f"No {language} code block found")
 
-        return {
-            "valid": len(issues) == 0,
-            "issues": issues
-        }
+        return {"valid": len(issues) == 0, "issues": issues}
 
     @staticmethod
     def validate_completeness(text: str, required_sections: list[str]) -> dict[str, Any]:
         """
         Validate that output contains required sections.
-        
+
         Args:
             text: Text to validate
             required_sections: List of required section headers
-            
+
         Returns:
             Validation result
         """
@@ -195,7 +187,7 @@ class OutputValidator:
         return {
             "valid": len(issues) == 0,
             "issues": issues,
-            "missing_sections": [s for s in required_sections if s.lower() not in text_lower]
+            "missing_sections": [s for s in required_sections if s.lower() not in text_lower],
         }
 
 
@@ -206,24 +198,20 @@ class SchemaValidator:
     def validate_model(data: dict[str, Any], model: type[BaseModel]) -> dict[str, Any]:
         """
         Validate data against Pydantic model.
-        
+
         Args:
             data: Data to validate
             model: Pydantic model class
-            
+
         Returns:
             Validation result with details
         """
         try:
             validated = model(**data)
-            return {
-                "valid": True,
-                "issues": [],
-                "validated_data": validated.model_dump()
-            }
+            return {"valid": True, "issues": [], "validated_data": validated.model_dump()}
         except ValidationError as e:
             return {
                 "valid": False,
                 "issues": [str(err) for err in e.errors()],
-                "error_count": len(e.errors())
+                "error_count": len(e.errors()),
             }

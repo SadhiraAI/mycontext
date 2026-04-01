@@ -106,6 +106,7 @@ class LiteLLMProvider(BaseProvider):
         if not LITELLM_AVAILABLE:
             try:
                 import litellm as _litellm
+
                 _litellm.drop_params = True
                 litellm = _litellm
                 LITELLM_AVAILABLE = True
@@ -167,6 +168,7 @@ class LiteLLMProvider(BaseProvider):
 
         # ── Tracing ───────────────────────────────────────────────────────────
         from ..utils.tracing import get_tracer
+
         _tracer = get_tracer()
 
         api_key = kwargs.pop("api_key", self.api_key)
@@ -195,19 +197,14 @@ class LiteLLMProvider(BaseProvider):
                     response = litellm.completion(**call_kwargs)
                     latency_ms = int((time.time() - start) * 1000)
 
-                    if (
-                        _reasoning_tokens_exhausted(response)
-                        and "max_tokens" in call_kwargs
-                    ):
+                    if _reasoning_tokens_exhausted(response) and "max_tokens" in call_kwargs:
                         logger.info(
                             "Reasoning model %s exhausted max_tokens=%s on "
                             "thinking — retrying without cap.",
                             model,
                             call_kwargs["max_tokens"],
                         )
-                        retry_kwargs = {
-                            k: v for k, v in call_kwargs.items() if k != "max_tokens"
-                        }
+                        retry_kwargs = {k: v for k, v in call_kwargs.items() if k != "max_tokens"}
                         start = time.time()
                         response = litellm.completion(**retry_kwargs)
                         latency_ms = int((time.time() - start) * 1000)
@@ -241,9 +238,7 @@ class LiteLLMProvider(BaseProvider):
                             "input_tokens": input_tokens,
                             "output_tokens": output_tokens,
                             "finish_reason": (
-                                response.choices[0].finish_reason
-                                if response.choices
-                                else None
+                                response.choices[0].finish_reason if response.choices else None
                             ),
                             "attempt": attempt,
                             "cache_hit": False,
@@ -322,9 +317,7 @@ class LiteLLMProvider(BaseProvider):
 
         _tracer = get_tracer()
         api_key = kwargs.pop("api_key", self.api_key)
-        kwargs = {
-            k: v for k, v in kwargs.items() if k not in _EXECUTE_KWARGS_BLOCKLIST
-        }
+        kwargs = {k: v for k, v in kwargs.items() if k not in _EXECUTE_KWARGS_BLOCKLIST}
 
         call_kwargs: dict[str, Any] = {
             "model": litellm_model,
@@ -346,23 +339,19 @@ class LiteLLMProvider(BaseProvider):
             ) as _span:
                 try:
                     import time as _time
+
                     start = _time.time()
                     response = await litellm.acompletion(**call_kwargs)
                     latency_ms = int((_time.time() - start) * 1000)
 
-                    if (
-                        _reasoning_tokens_exhausted(response)
-                        and "max_tokens" in call_kwargs
-                    ):
+                    if _reasoning_tokens_exhausted(response) and "max_tokens" in call_kwargs:
                         logger.info(
                             "Reasoning model %s exhausted max_tokens=%s on "
                             "thinking — retrying without cap.",
                             model,
                             call_kwargs["max_tokens"],
                         )
-                        retry_kwargs = {
-                            k: v for k, v in call_kwargs.items() if k != "max_tokens"
-                        }
+                        retry_kwargs = {k: v for k, v in call_kwargs.items() if k != "max_tokens"}
                         start = _time.time()
                         response = await litellm.acompletion(**retry_kwargs)
                         latency_ms = int((_time.time() - start) * 1000)
@@ -396,9 +385,7 @@ class LiteLLMProvider(BaseProvider):
                             "input_tokens": input_tokens,
                             "output_tokens": output_tokens,
                             "finish_reason": (
-                                response.choices[0].finish_reason
-                                if response.choices
-                                else None
+                                response.choices[0].finish_reason if response.choices else None
                             ),
                             "attempt": attempt,
                             "cache_hit": False,
@@ -419,7 +406,10 @@ class LiteLLMProvider(BaseProvider):
                     wait = self.retry_backoff * (2 ** (attempt - 1))
                     logger.warning(
                         "Async LLM call failed (attempt %d/%d): %s — retrying in %.1fs",
-                        attempt, self.max_retries, exc, wait,
+                        attempt,
+                        self.max_retries,
+                        exc,
+                        wait,
                     )
                     await asyncio.sleep(wait)
 

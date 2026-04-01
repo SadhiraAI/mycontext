@@ -5,7 +5,6 @@ Develops comprehensive risk mitigation and contingency plans.
 Based on risk management and business continuity principles.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class RiskMitigator(Pattern):
     """
     Develop risk mitigation strategies.
-    
+
     Creates:
     - Mitigation plans for identified risks
     - Contingency plans
     - Response strategies
     - Monitoring mechanisms
-    
+
     Based on: Risk management frameworks
-    
+
     Example:
         >>> mitigator = RiskMitigator()
         >>> context = mitigator.build_context(
         ...     risk="Key team member might leave",
         ...     impact="Critical project delays"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -70,9 +69,9 @@ class RiskMitigator(Pattern):
                     "Prepare contingencies",
                     "Assign ownership",
                     "Enable monitoring",
-                    "Plan responses"
+                    "Plan responses",
                 ],
-                style="proactive, thorough, pragmatic"
+                style="proactive, thorough, pragmatic",
             ),
             directive_template="""Develop mitigation for:
 
@@ -131,15 +130,11 @@ Risk mitigation:
    - ROI of mitigation: [Calculation]
 
 **OUTPUT FORMAT**: Actionable mitigation plan with contingencies.""",
-            input_schema={
-                "risk": str,
-                "impact": str,
-                "context_section": str
-            },
+            input_schema={"risk": str, "impact": str, "context_section": str},
             constraints=Constraints(
                 must_include=["mitigation", "contingency", "monitoring"],
-                style_guide="Be practical and action-oriented"
-            )
+                style_guide="Be practical and action-oriented",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -147,20 +142,11 @@ Risk mitigation:
             return f"\n**CONTEXT**: {context}\n"
         return ""
 
-    def build_context(
-        self,
-        risk: str = "",
-        impact: str = "",
-        context: str | None = None,
-        **kwargs
-    ):
+    def build_context(self, risk: str = "", impact: str = "", context: str | None = None, **kwargs):
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            risk=risk,
-            impact=impact,
-            context_section=context_section,
-            **kwargs
+            risk=risk, impact=impact, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -169,12 +155,8 @@ Risk mitigation:
         risk: str = "",
         impact: str = "",
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         return super().execute(
-            provider=provider,
-            risk=risk,
-            impact=impact,
-            context=context,
-            **kwargs
+            provider=provider, risk=risk, impact=impact, context=context, **kwargs
         )

@@ -171,8 +171,7 @@ def get_format_directive(output_format: str) -> str:
     """
     if output_format not in VALID_OUTPUT_FORMATS:
         raise ValueError(
-            f"Invalid output_format {output_format!r}. "
-            f"Choose from: {sorted(VALID_OUTPUT_FORMATS)}"
+            f"Invalid output_format {output_format!r}. Choose from: {sorted(VALID_OUTPUT_FORMATS)}"
         )
     return _FORMAT_DIRECTIVES[output_format]
 

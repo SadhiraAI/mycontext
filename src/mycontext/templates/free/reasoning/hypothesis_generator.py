@@ -121,9 +121,15 @@ def _build_directive(rigor: str) -> str:
         },
         "scientific": {
             "keys": [
-                "observation", "background", "hypotheses", "predictions",
-                "variables", "experimental_design", "success_criteria",
-                "limitations", "rival_hypotheses",
+                "observation",
+                "background",
+                "hypotheses",
+                "predictions",
+                "variables",
+                "experimental_design",
+                "success_criteria",
+                "limitations",
+                "rival_hypotheses",
             ],
             "next_steps_n": 10,
             "instruction": (
@@ -155,6 +161,7 @@ def _build_directive(rigor: str) -> str:
 # ---------------------------------------------------------------------------
 # Template class
 # ---------------------------------------------------------------------------
+
 
 class HypothesisGenerator(Pattern):
     """
@@ -212,6 +219,7 @@ class HypothesisGenerator(Pattern):
             guidance=Guidance(
                 role="Expert Scientific Researcher and Hypothesis Specialist",
                 rules=[
+                    "Include at least one hypothesis that contradicts the user's implied expectation.",
                     "Hypotheses must be testable and falsifiable",
                     "State clear cause-effect relationships",
                     "Include null and alternative hypotheses",
@@ -261,9 +269,7 @@ class HypothesisGenerator(Pattern):
             **kwargs: Additional options
         """
         if rigor not in VALID_RIGOR_LEVELS:
-            raise ValueError(
-                f"Invalid rigor {rigor!r}. Choose from: {sorted(VALID_RIGOR_LEVELS)}"
-            )
+            raise ValueError(f"Invalid rigor {rigor!r}. Choose from: {sorted(VALID_RIGOR_LEVELS)}")
         from mycontext.core import Context
         from mycontext.utils.template_safety import safe_format_template
 
@@ -285,6 +291,27 @@ class HypothesisGenerator(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["rigor"] = rigor
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Did I include at least one hypothesis that contradicts the user's implied expectation?",
+                "Can each hypothesis be tested or falsified with available methods?",
+            ],
+        )
+        if ctx.examples is None:
+            ctx.examples = [
+                {
+                    "input": "Website conversion rate dropped after redesign",
+                    "output": (
+                        "H1: New layout moves the CTA below the fold on mobile (test: compare scroll-depth heatmaps).\n"
+                        "H2: Page load time increased with new assets (test: compare Core Web Vitals before/after).\n"
+                        "H3 (null): The drop is within normal weekly variance and unrelated to the redesign "
+                        "(test: run A/B with old design for 2 weeks).\n"
+                        "H4 (contrarian): The redesign actually improved UX, but a concurrent pricing change "
+                        "drove users away (test: segment conversion by new vs returning visitors)."
+                    ),
+                }
+            ]
         return ctx
 
     def execute(
@@ -308,13 +335,22 @@ class HypothesisGenerator(Pattern):
             **kwargs: Provider parameters (model, temperature, max_tokens, etc.)
         """
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         ctx = self.build_context(
-            observation=observation, domain=domain,
-            context=context, rigor=rigor,
+            observation=observation,
+            domain=domain,
+            context=context,
+            rigor=rigor,
         )
         return ctx.execute(provider=provider, **provider_kwargs)

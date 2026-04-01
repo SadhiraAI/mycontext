@@ -240,9 +240,7 @@ class QueryPlanner(Pattern):
         from mycontext.utils.template_safety import safe_format_template
 
         if mode not in self.VALID_MODES:
-            raise ValueError(
-                f"Invalid mode {mode!r}. Choose from: {sorted(self.VALID_MODES)}"
-            )
+            raise ValueError(f"Invalid mode {mode!r}. Choose from: {sorted(self.VALID_MODES)}")
 
         mode_instructions = _MODE_INSTRUCTIONS[mode]
         directive_content = safe_format_template(

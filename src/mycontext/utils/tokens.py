@@ -61,6 +61,7 @@ _DEFAULT_ENCODING = "cl100k_base"
 def _get_encoder(encoding_name: str):
     """Return a cached tiktoken Encoding for *encoding_name*."""
     import tiktoken  # soft dependency — not required at import time
+
     return tiktoken.get_encoding(encoding_name)
 
 

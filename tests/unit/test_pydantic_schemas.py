@@ -48,8 +48,8 @@ from mycontext.intelligence.schemas import (
 # Schema unit tests
 # ---------------------------------------------------------------------------
 
-class TestPatternSuggestionResponse:
 
+class TestPatternSuggestionResponse:
     def test_valid_selections(self):
         data = {
             "selections": [
@@ -72,6 +72,7 @@ class TestPatternSuggestionResponse:
 
     def test_unknown_names_pass_through_with_warning(self, caplog):
         import logging
+
         data = {
             "selections": [{"name": "totally_fake_xyz", "reason": "reason"}],
             "integration": "",
@@ -92,7 +93,6 @@ class TestPatternSuggestionResponse:
 
 
 class TestIntegrationResponse:
-
     def test_full_fields(self):
         data = {
             "role": "Senior analyst",
@@ -114,7 +114,6 @@ class TestIntegrationResponse:
 
 
 class TestContextSpec:
-
     def _full_data(self):
         return {
             "rules": ["Be precise", "Always cite sources"],
@@ -165,18 +164,22 @@ class TestContextSpec:
 # parse_with_fallback
 # ---------------------------------------------------------------------------
 
-class TestParseWithFallback:
 
+class TestParseWithFallback:
     def test_valid_json_succeeds(self):
-        raw = json.dumps({
-            "selections": [{"name": "root_cause_analyzer", "reason": "good"}],
-            "integration": "works together",
-        })
+        raw = json.dumps(
+            {
+                "selections": [{"name": "root_cause_analyzer", "reason": "good"}],
+                "integration": "works together",
+            }
+        )
         result = parse_with_fallback(PatternSuggestionResponse, raw)
         assert len(result.selections) == 1
 
     def test_json_in_markdown_fence_succeeds(self):
-        raw = '```json\n{"selections":[{"name":"risk_assessor","reason":"r"}],"integration":""}\n```'
+        raw = (
+            '```json\n{"selections":[{"name":"risk_assessor","reason":"r"}],"integration":""}\n```'
+        )
         result = parse_with_fallback(PatternSuggestionResponse, raw)
         assert len(result.selections) == 1
 
@@ -186,7 +189,6 @@ class TestParseWithFallback:
 
 
 class TestExtractJsonBlock:
-
     def test_bare_json(self):
         raw = '{"key": "value"}'
         assert _extract_json_block(raw) == raw
@@ -206,16 +208,18 @@ class TestExtractJsonBlock:
 # pattern_suggester integration
 # ---------------------------------------------------------------------------
 
-class TestSuggestWithLLMPydantic:
 
+class TestSuggestWithLLMPydantic:
     def _make_json_response(self):
-        return json.dumps({
-            "selections": [
-                {"name": "root_cause_analyzer", "reason": "finds root causes"},
-                {"name": "risk_assessor", "reason": "assesses risk"},
-            ],
-            "integration": "Use in sequence.",
-        })
+        return json.dumps(
+            {
+                "selections": [
+                    {"name": "root_cause_analyzer", "reason": "finds root causes"},
+                    {"name": "risk_assessor", "reason": "assesses risk"},
+                ],
+                "integration": "Use in sequence.",
+            }
+        )
 
     def test_pydantic_parse_used_when_llm_returns_json(self):
         """When the LLM returns valid JSON, Pydantic parsing should succeed."""
@@ -269,10 +273,11 @@ class TestSuggestWithLLMPydantic:
 # template_integrator_agent integration
 # ---------------------------------------------------------------------------
 
-class TestTemplateIntegratorParsing:
 
+class TestTemplateIntegratorParsing:
     def _make_agent(self):
         from mycontext.intelligence.template_integrator_agent import TemplateIntegratorAgent
+
         agent = TemplateIntegratorAgent.__new__(TemplateIntegratorAgent)
         agent.include_enterprise = True
         agent._last_structured = None
@@ -280,13 +285,15 @@ class TestTemplateIntegratorParsing:
 
     def test_pydantic_path_when_raw_is_json(self):
         agent = self._make_agent()
-        raw = json.dumps({
-            "role": "Senior analyst",
-            "rules": ["Be precise"],
-            "directive": "Analyze thoroughly and provide actionable insights.",
-            "output_requirements": ["Summary"],
-            "integration_rationale": "Works well together.",
-        })
+        raw = json.dumps(
+            {
+                "role": "Senior analyst",
+                "rules": ["Be precise"],
+                "directive": "Analyze thoroughly and provide actionable insights.",
+                "output_requirements": ["Summary"],
+                "integration_rationale": "Works well together.",
+            }
+        )
         result = agent._parse_result("test question", ["root_cause_analyzer"], raw)
         assert result.role == "Senior analyst"
         assert result.rules == ["Be precise"]
@@ -308,21 +315,23 @@ class TestTemplateIntegratorParsing:
 # context_generator integration
 # ---------------------------------------------------------------------------
 
-class TestContextGeneratorParsing:
 
+class TestContextGeneratorParsing:
     def test_pydantic_path_on_valid_json(self):
         from mycontext.intelligence.context_generator import _parse_llm_json
 
-        raw = json.dumps({
-            "rules": ["Rule A", "Rule B"],
-            "style": "Professional",
-            "expertise": ["Finance"],
-            "thinking_strategy": "step_by_step",
-            "examples": [{"input": "Q", "output": "A"}],
-            "output_schema": [{"name": "result", "type": "str"}],
-            "must_include": ["confidence"],
-            "must_not_include": ["opinions"],
-        })
+        raw = json.dumps(
+            {
+                "rules": ["Rule A", "Rule B"],
+                "style": "Professional",
+                "expertise": ["Finance"],
+                "thinking_strategy": "step_by_step",
+                "examples": [{"input": "Q", "output": "A"}],
+                "output_schema": [{"name": "result", "type": "str"}],
+                "must_include": ["confidence"],
+                "must_not_include": ["opinions"],
+            }
+        )
         result = _parse_llm_json(raw)
         assert result["rules"] == ["Rule A", "Rule B"]
         assert result["thinking_strategy"] == "step_by_step"
@@ -330,16 +339,18 @@ class TestContextGeneratorParsing:
     def test_normalises_invalid_strategy(self):
         from mycontext.intelligence.context_generator import _parse_llm_json
 
-        raw = json.dumps({
-            "rules": [],
-            "style": "",
-            "expertise": [],
-            "thinking_strategy": "invalid_one",
-            "examples": [],
-            "output_schema": [],
-            "must_include": [],
-            "must_not_include": [],
-        })
+        raw = json.dumps(
+            {
+                "rules": [],
+                "style": "",
+                "expertise": [],
+                "thinking_strategy": "invalid_one",
+                "examples": [],
+                "output_schema": [],
+                "must_include": [],
+                "must_not_include": [],
+            }
+        )
         result = _parse_llm_json(raw)
         assert result["thinking_strategy"] == "step_by_step"
 

@@ -17,28 +17,28 @@ from mycontext import Constraints, Guidance, Pattern
 class ZoneOfProximalDevelopment(Pattern):
     """
     Identify tasks in the Zone of Proximal Development.
-    
+
     Three Zones:
     1. What learner can do independently (too easy)
     2. What learner can do with support (ZPD - optimal)
     3. What is beyond current reach (too hard)
-    
+
     Use Cases:
     - Adaptive learning systems
     - Personalized curriculum design
     - Skill progression planning
     - Challenge calibration
-    
+
     Example:
         >>> from mycontext.templates.enterprise.learning import ZoneOfProximalDevelopment
-        >>> 
+        >>>
         >>> pattern = ZoneOfProximalDevelopment()
         >>> result = pattern.execute(
         ...     provider="openai",
         ...     learner_current_abilities="Can write basic Python functions",
         ...     learning_goal="Master object-oriented programming"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -70,11 +70,7 @@ class ZoneOfProximalDevelopment(Pattern):
             description="Identify tasks at optimal difficulty level (ZPD)",
             version="1.0.0",
             tags=["learning", "enterprise", "zpd", "vygotsky"],
-            metadata={
-                "category": "learning",
-                "license": "enterprise",
-                "tier": "enterprise"
-            },
+            metadata={"category": "learning", "license": "enterprise", "tier": "enterprise"},
             guidance=Guidance(
                 role="Developmental Learning Expert",
                 rules=[
@@ -82,9 +78,9 @@ class ZoneOfProximalDevelopment(Pattern):
                     "Identify three distinct zones (independent, ZPD, beyond reach)",
                     "Focus learning in the ZPD (challenging but achievable)",
                     "Avoid tasks that are too easy (no growth) or too hard (frustration)",
-                    "Provide specific task examples for each zone"
+                    "Provide specific task examples for each zone",
                 ],
-                style="diagnostic, precise, developmental, strategic"
+                style="diagnostic, precise, developmental, strategic",
             ),
             directive_template="""**ZONE OF PROXIMAL DEVELOPMENT ANALYSIS**
 
@@ -243,23 +239,12 @@ Task: [Specific task in ZPD]
 **Success milestones**: [How to know learner is progressing]
 
 **Next reassessment**: [When to re-evaluate ZPD]""",
-            input_schema={
-                "learner_current_abilities": str,
-                "learning_goal": str
-            },
+            input_schema={"learner_current_abilities": str, "learning_goal": str},
             constraints=Constraints(
-                must_include=[
-                    "three_zones",
-                    "zpd_tasks",
-                    "support_plan",
-                    "progression_pathway"
-                ],
-                must_not_include=[
-                    "one_size_fits_all",
-                    "tasks_too_easy_or_hard"
-                ],
-                style_guide="Diagnostic and developmental. Clearly distinguish three zones. Focus on ZPD."
-            )
+                must_include=["three_zones", "zpd_tasks", "support_plan", "progression_pathway"],
+                must_not_include=["one_size_fits_all", "tasks_too_easy_or_hard"],
+                style_guide="Diagnostic and developmental. Clearly distinguish three zones. Focus on ZPD.",
+            ),
         )
 
     def build_context(self, learner_current_abilities="", learning_goal="", **kwargs):
@@ -267,7 +252,7 @@ Task: [Specific task in ZPD]
         return super().build_context(
             learner_current_abilities=learner_current_abilities,
             learning_goal=learning_goal,
-            **kwargs
+            **kwargs,
         )
 
     def execute(self, provider="openai", learner_current_abilities="", learning_goal="", **kwargs):
@@ -276,7 +261,7 @@ Task: [Specific task in ZPD]
             provider=provider,
             learner_current_abilities=learner_current_abilities,
             learning_goal=learning_goal,
-            **kwargs
+            **kwargs,
         )
 
 

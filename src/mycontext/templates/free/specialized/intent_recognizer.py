@@ -7,7 +7,6 @@ research.  The depth parameter controls how many analytical layers are
 applied: quick (4), standard (8), or comprehensive (12).
 """
 
-
 from mycontext.foundation import Constraints, Directive, Guidance
 from mycontext.structure import Pattern
 from mycontext.utils.format_directives import VALID_OUTPUT_FORMATS, get_format_directive
@@ -128,7 +127,15 @@ def _build_directive(depth: str) -> str:
             ),
         },
         "standard": {
-            "keys": ["surface", "goals", "motivation", "context", "assumptions", "needs", "affective"],
+            "keys": [
+                "surface",
+                "goals",
+                "motivation",
+                "context",
+                "assumptions",
+                "needs",
+                "affective",
+            ],
             "reformulated_n": 8,
             "recommendation_n": 9,
             "instruction": (
@@ -139,8 +146,17 @@ def _build_directive(depth: str) -> str:
         },
         "comprehensive": {
             "keys": [
-                "surface", "goals", "motivation", "context", "assumptions", "needs",
-                "affective", "speech_acts", "implicature", "indirectness", "frames",
+                "surface",
+                "goals",
+                "motivation",
+                "context",
+                "assumptions",
+                "needs",
+                "affective",
+                "speech_acts",
+                "implicature",
+                "indirectness",
+                "frames",
             ],
             "reformulated_n": 12,
             "recommendation_n": 13,
@@ -227,14 +243,10 @@ class IntentRecognizer(Pattern):
                     "Distinguish stated vs. actual needs",
                     "Identify success criteria",
                 ],
-                style="perceptive, analytical, empathetic"
+                style="perceptive, analytical, empathetic",
             ),
             directive_template=_build_directive("comprehensive"),
-            input_schema={
-                "input": str,
-                "context_section": str,
-                "depth": str
-            },
+            input_schema={"input": str, "context_section": str, "depth": str},
             constraints=Constraints(
                 must_include=[
                     "underlying_goal",
@@ -246,7 +258,7 @@ class IntentRecognizer(Pattern):
                     "When identifying emotional state, be clinical and descriptive — "
                     "not judgmental."
                 ),
-            )
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -261,7 +273,7 @@ class IntentRecognizer(Pattern):
         context: str | None = None,
         depth: str = "comprehensive",
         output_format: str = "structured",
-        **kwargs
+        **kwargs,
     ):
         """
         Build context for intent recognition.
@@ -306,6 +318,13 @@ class IntentRecognizer(Pattern):
         ctx.metadata["pattern"] = self.name
         ctx.metadata["pattern_version"] = self.version
         ctx.metadata["output_format"] = output_format
+        self._apply_default_self_check(
+            ctx,
+            [
+                "Am I reading intent from what was said, or projecting what I expect?",
+                "Did I consider that the stated request may mask a deeper need?",
+            ],
+        )
         return ctx
 
     def execute(
@@ -315,7 +334,7 @@ class IntentRecognizer(Pattern):
         context: str | None = None,
         depth: str = "comprehensive",
         output_format: str = "structured",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute intent recognition.
@@ -340,9 +359,16 @@ class IntentRecognizer(Pattern):
             output_format=output_format,
         )
         provider_params = {
-            "model", "temperature", "max_tokens", "top_p",
-            "frequency_penalty", "presence_penalty", "stop",
-            "user", "api_key", "base_url",
+            "model",
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "user",
+            "api_key",
+            "base_url",
         }
         provider_kwargs = {k: v for k, v in kwargs.items() if k in provider_params}
         return ctx.execute(provider=provider, **provider_kwargs)

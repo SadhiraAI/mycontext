@@ -60,7 +60,59 @@ The engine doesn't generate answers. It generates the *best possible question* f
 
 These are capabilities that exist in mycontext-ai and, to our knowledge, do not exist in any other open-source context or prompt engineering library.
 
-### 1. 87 Research-Backed Cognitive Patterns
+### 1. Auto-Suggested Quality Controls — PromptArchitect as the Brain
+
+Every prompt built or improved by `PromptArchitect` now automatically infers five quality control fields from the task description — no manual tuning required. Users can override any suggestion:
+
+```python
+from mycontext.intelligence import PromptArchitect
+
+arch = PromptArchitect(provider="openai")
+result = arch.build("Analyze customer churn data and identify at-risk segments")
+
+# PromptArchitect auto-suggested:
+#   verbosity: "detailed"
+#   communication_posture: "direct"
+#   answer_first: True
+#   forbidden_phrases: ["it depends", "delve into"]
+#   self_check: ["Did I distinguish correlation from causation?",
+#                 "Did I quantify the confidence of each segment?"]
+
+# Override any field before execution
+result.improved_context.constraints.verbosity = "minimal"
+```
+
+**Five fields, all auto-inferred:**
+
+| Field | Values | Auto-logic |
+|-------|--------|------------|
+| `verbosity` | `minimal` · `standard` · `detailed` | Inferred from task complexity |
+| `communication_posture` | `direct` · `collaborative` · `educational` | Inferred from audience |
+| `answer_first` | `True` / `False` | `True` for decisions; `False` for tutorials |
+| `forbidden_phrases` | `list[str]` | Bans hedging for analysis, jargon for lay audiences |
+| `self_check` | `list[str]` | Domain-specific verification questions |
+
+Templates also ship with smart defaults — all 16 free patterns include domain-specific `self_check` questions and objectivity rules out of the box.
+
+### 2. Fragment Library — Composable Quality Atoms for Blueprints
+
+Fragments are reusable quality-enhancing snippets that can be applied to any `Context`. They are the composable atoms that `Blueprint` orchestrates:
+
+```python
+from mycontext.fragments import anti_fluff, answer_first_fragment, objectivity
+
+ctx = some_template.build_context(...)
+anti_fluff.apply(ctx)           # Sets verbosity="minimal", bans filler phrases
+answer_first_fragment.apply(ctx) # Sets answer_first=True
+objectivity.apply(ctx)          # Adds objectivity rules to guidance
+
+# Or use with Blueprint composition
+from mycontext.fragments import self_check_analysis, grounding_strict
+```
+
+12 built-in fragments covering anti-fluff, answer ordering, objectivity, self-verification, structured output, grounding, and more.
+
+### 3. 88 Research-Backed Cognitive Patterns
 
 Not generic "write a poem" templates. Each pattern implements a real cognitive framework — Five Whys, fishbone analysis, Socratic method, temporal reasoning, systems archetypes, ethical frameworks — backed by **150+ peer-reviewed papers** from cognitive science, decision theory, and systems thinking.
 
@@ -75,7 +127,7 @@ ctx = RootCauseAnalyzer().build_context(
 )
 ```
 
-### 2. Quality Metrics — Score Any Context on 6 Dimensions
+### 4. Quality Metrics — Score Any Context on 6 Dimensions
 
 No more guessing. `QualityMetrics` evaluates any context across six calibrated dimensions: **clarity, completeness, specificity, relevance, structure, efficiency**. Returns a numeric score, concrete issues, strengths, and actionable suggestions.
 
@@ -95,7 +147,7 @@ print(metrics.report(score))
 diff = metrics.compare(old_ctx, new_ctx)
 ```
 
-### 3. Context Amplification Index (CAI) — Prove Templates Work
+### 5. Context Amplification Index (CAI) — Prove Templates Work
 
 CAI is a quantitative metric that answers: *"Did this template actually produce better LLM output than a raw prompt?"*
 
@@ -117,7 +169,7 @@ print(f"CAI: {result.cai_overall:.2f}x ({result.verdict})")
 # → CAI: 1.42x (significant lift)
 ```
 
-### 4. Output Evaluator — Score LLM Responses, Not Just Prompts
+### 6. Output Evaluator — Score LLM Responses, Not Just Prompts
 
 Other tools score prompts. mycontext also scores the *output*. The Output Evaluator measures LLM responses across five dimensions that are distinct from prompt quality:
 
@@ -136,7 +188,7 @@ print(f"Output quality: {score.overall:.2f}")
 print(f"Reasoning depth: {score.dimensions[OutputDimension.REASONING_DEPTH]:.2f}")
 ```
 
-### 5. Template Integrator Agent — Fuse Multiple Patterns Into One
+### 7. Template Integrator Agent — Fuse Multiple Patterns Into One
 
 When a question needs multiple cognitive methods (e.g., root cause *and* scenario planning *and* stakeholder analysis), the Template Integrator doesn't just concatenate them. It uses an LLM to **intelligently merge** methodologies from multiple templates into a single unified context — one role, one set of rules, one directive.
 
@@ -152,7 +204,7 @@ ctx = result.to_context()
 ctx.execute(provider="openai")
 ```
 
-### 6. Chain Orchestration Agent — Auto-Build Multi-Step Workflows
+### 8. Chain Orchestration Agent — Auto-Build Multi-Step Workflows
 
 Complex questions need multiple reasoning steps. The Chain Orchestration Agent analyzes your question, selects and orders patterns from the full catalog, and generates the `build_context()` parameters for each step — automatically.
 
@@ -167,7 +219,7 @@ print(result.chain)        # ['temporal_sequence_analyzer', 'root_cause_analyzer
 print(result.chain_params) # auto-generated build_context params for each step
 ```
 
-### 7. Intelligent Pattern Suggestion — Keyword, LLM, or Hybrid
+### 9. Intelligent Pattern Suggestion — Keyword, LLM, or Hybrid
 
 Don't know which pattern fits? `suggest_patterns()` maps your question to the best patterns using keyword matching, LLM reasoning, or both:
 
@@ -185,7 +237,7 @@ print(result.suggested_chain)
 print(result.to_markdown())
 ```
 
-### 8. Context Generator — Build a Full Context from Role + Goal
+### 10. Context Generator — Build a Full Context from Role + Goal
 
 Provide a role and a goal. An LLM generates everything else: behavioral rules, communication style, expertise areas, reasoning strategy, few-shot examples, output schema, and guard rails. Returns a fully assembled `Context` ready to execute.
 
@@ -211,7 +263,7 @@ response = result.execute(provider="openai")
 
 No manual prompt engineering. No template hunting. Describe your role and what you're optimising for — the SDK does the rest.
 
-### 9. Auto-Transform Any Question → Perfect Context
+### 11. Auto-Transform Any Question → Perfect Context
 
 One call. No pattern selection needed. The Transformation Engine analyzes your input (type, complexity, domain, key concepts) and builds the right context automatically:
 
@@ -223,7 +275,7 @@ ctx = transform("Should we migrate to microservices? Compare tradeoffs.")
 print(ctx.to_markdown())
 ```
 
-### 10. Blueprint — Multi-Component Context Architecture
+### 12. Blueprint — Multi-Component Context Architecture
 
 For production applications that need more than a single template. Blueprints orchestrate multiple components (guidance, knowledge, reasoning) with **token budget management** and strategy-based optimization (speed / quality / cost / balanced):
 
@@ -241,7 +293,7 @@ blueprint = Blueprint(
 ctx = blueprint.build(topic="Quantum computing advances in 2025")
 ```
 
-### 11. 13 Export Formats — True Vendor Neutrality
+### 13. 13 Export Formats — True Vendor Neutrality
 
 Build once, export everywhere. One context works with every LLM and framework:
 
@@ -263,7 +315,7 @@ ctx.to_dict()         # Python dict
 
 Plus dedicated integration helpers for **LangChain, LlamaIndex, CrewAI, AutoGen, DSPy, Semantic Kernel, and Google ADK**.
 
-### 12. Agent Skills with Quality Gates
+### 14. Agent Skills with Quality Gates
 
 Define reusable skills as SKILL.md files. Fuse them with cognitive patterns. Gate execution on quality — if the generated context scores below threshold, it blocks *before* wasting an API call:
 
@@ -286,7 +338,7 @@ for edit in suggested_edits(result):
 
 Skills can declare `pattern: comparative_analyzer` in frontmatter — the runner fuses the skill body with that cognitive pattern automatically.
 
-### 13. Template Benchmarking with CAI
+### 15. Template Benchmarking with CAI
 
 Automated test suites for cognitive templates. Load YAML test cases, run templates through questions, evaluate output quality, and compute CAI scores — in CI or from the CLI:
 
@@ -295,7 +347,7 @@ python -m mycontext.benchmark_cli run --template diagnostic_root_cause_analyzer
 python -m mycontext.benchmark_cli run-all --output results.json
 ```
 
-### 14. Generic Prompts — Zero-Cost Cognitive Scaffolding
+### 16. Generic Prompts — Zero-Cost Cognitive Scaffolding
 
 Every template carries a hand-crafted `GENERIC_PROMPT` (~600-1200 chars) that distills its core methodology into a self-contained prompt. No LLM call needed — just string substitution.
 
@@ -315,7 +367,7 @@ from mycontext.intelligence import get_generic_prompt_for
 prompt = get_generic_prompt_for("root_cause_analyzer", "Why did sales drop?")
 ```
 
-### 15. Prompt Compilation Pipeline — Reusable Prompt Artifacts
+### 17. Prompt Compilation Pipeline — Reusable Prompt Artifacts
 
 Instead of executing templates and getting responses, compile them into **reusable, provider-agnostic prompts** that can be executed on any LLM:
 
@@ -327,7 +379,7 @@ print(composed.to_string())    # reusable prompt artifact
 response = composed.execute()  # or execute directly
 ```
 
-### 16. Static Generic Compilation — Maximum Cost Efficiency
+### 18. Static Generic Compilation — Maximum Cost Efficiency
 
 Compile generic prompts from multiple templates with **zero LLM calls for compilation**. The only LLM call is the complexity assessment:
 
@@ -343,7 +395,7 @@ print(composed.source_templates)  # e.g. ['root_cause_analyzer']
 response = composed.execute()     # execute with 1 more call
 ```
 
-### 17. Three-Tier Execution Model
+### 19. Three-Tier Execution Model
 
 Choose your cost/quality tradeoff:
 
@@ -355,7 +407,7 @@ Choose your cost/quality tradeoff:
 
 All three tiers validated across 6 sprints of controlled experimentation (60+ experimental runs, 10 diverse questions, 5 evaluation dimensions).
 
-### 18. Complexity Router — Automatic Template Selection
+### 20. Complexity Router — Automatic Template Selection
 
 `assess_complexity()` classifies your question and decides the optimal approach *before* running anything:
 
@@ -368,7 +420,7 @@ print(meta['mode'])            # 'single_template' or 'integrated'
 print(meta['templates_used'])  # ['root_cause_analyzer']
 ```
 
-### 19. Built-In Retry & Timeout
+### 21. Built-In Retry & Timeout
 
 All LLM calls include automatic retry with exponential backoff (rate limits, timeouts, server errors) and configurable timeout — production-ready out of the box.
 
@@ -400,7 +452,7 @@ asyncio.run(main())
 
 Uses `litellm.acompletion` under the hood with full cache, retry, and tracing parity with the sync path.
 
-### 21. Token-Budget Context Assembly
+### 23. Token-Budget Context Assembly
 
 Assemble any context within a precise token budget for a specific model. Sections are included in priority order (directive → guidance → constraints → knowledge) and the last fitting section is trimmed to fit — guaranteed `≤ max_tokens` as measured by `tiktoken`:
 
@@ -417,7 +469,7 @@ prompt = ctx.assemble_for_model()
 
 Replaces the previous character-based truncation. Prevents context overflow and stops artificially discarding sections that would fit.
 
-### 22. Validated Structured Output Parsing
+### 24. Validated Structured Output Parsing
 
 All intelligence-layer LLM responses are now validated through Pydantic v2 schemas before use. When the optional `instructor` package is installed, the LLM is constrained to produce valid JSON via function-calling mode with automatic retry on validation failure (~98% parse success rate vs ~70% for regex alone):
 
@@ -427,7 +479,7 @@ pip install instructor   # optional — enables structured LLM output
 
 Falls back to Pydantic-validated JSON parsing → original regex parser without `instructor`. No behaviour change if not installed.
 
-### 23. Prompt Architect — Apply the 9-Section Architecture to Any Raw Prompt
+### 25. Prompt Architect — Apply the 9-Section Architecture to Any Raw Prompt
 
 Takes any raw prompt string and upgrades it automatically — parses which of the 9 sections exist, scores quality, rewrites weak or missing sections using an LLM, and returns a before/after diff with score deltas. Also builds complete structured prompts from a plain task description.
 
@@ -452,7 +504,7 @@ print(result.improved_prompt)   # ready to use
 
 Three entry points: `parse()` detects sections heuristically (no LLM). `build()` constructs from a task description (1 LLM call). `improve()` rewrites and diffs an existing prompt.
 
-### 24. Guidance Optimizer — Upgrade Template Rules Automatically
+### 26. Guidance Optimizer — Upgrade Template Rules Automatically
 
 Audits `Guidance` objects in SDK templates for three common weaknesses — suggestive modals (`should/try to/ideally`), vague directives (`be accurate`), and under-specified rules — and rewrites only the weak ones using an LLM. Binding rules are kept exactly as written.
 
@@ -488,7 +540,7 @@ print(result.optimized_guidance.rules)
 #  "Every claim must cite the specific data point that supports it."]  ← unchanged
 ```
 
-### 25. Output Format Control — 10 Formats, Every Template
+### 27. Output Format Control — 10 Formats, Every Template
 
 Every template's `build_context()` and `execute()` now accept an `output_format` parameter. Control *how* the LLM presents its response without changing *what* it analyses:
 
@@ -518,7 +570,10 @@ Works on all 87 templates — implemented once at the `Pattern` base class level
 
 | Capability | mycontext-ai | Typical prompt libraries |
 |-----------|-------------|------------------------|
-| Cognitive patterns | 87 research-backed (16 free + 71 enterprise) | 10-20 generic templates |
+| Cognitive patterns | 88 research-backed (16 free + 72 enterprise) | 10-20 generic templates |
+| Auto-suggested quality controls | 5 fields inferred by PromptArchitect (verbosity, posture, answer_first, forbidden_phrases, self_check) | None |
+| Fragment library | 12 composable quality atoms for Blueprint | None |
+| Template self-check | Domain-specific verification questions on all 16 free templates | None |
 | Context generator | Role + goal → full context via LLM | None |
 | Structured prompt assembly | 9-section research-backed ordering | None |
 | Thinking strategies | 5 named strategies (CoT, ToT, Self-Reflection, ...) | None |
@@ -664,7 +719,7 @@ ctx = Context(directive=Directive(content=f"Analyze this proposal.\n\n{instructi
 
 ---
 
-## 87 Cognitive Patterns
+## 88 Cognitive Patterns
 
 ### Free Patterns (16)
 
@@ -689,7 +744,7 @@ Included in every install. Production-ready for analysis, decision-making, reaso
 | **ConflictResolver** | Mediate conflicts by identifying interests and common ground |
 | **IntentRecognizer** | Identify core intent, goals, and motivations behind a statement |
 
-### Enterprise Patterns (+71)
+### Enterprise Patterns (+72)
 
 Advanced patterns for temporal reasoning, diagnostics, systems thinking, ethical analysis, metacognition, learning science, and cross-domain synthesis. **Enterprise patterns require a valid license key.** Contact us to obtain a license.
 

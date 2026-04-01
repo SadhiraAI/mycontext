@@ -11,17 +11,17 @@ from mycontext import Constraints, Guidance, Pattern
 class ConceptExplainer(Pattern):
     """
     Explain complex concepts clearly with examples, analogies, and visual aids.
-    
+
     This template structures explanations using proven pedagogical techniques:
     - Start with the "why" before the "how"
     - Use multiple representation modes (text, examples, analogies, visuals)
     - Build from familiar to unfamiliar
     - Include concrete examples
     - Check understanding with edge cases
-    
+
     Examples:
         >>> from mycontext.templates.free import ConceptExplainer
-        >>> 
+        >>>
         >>> explainer = ConceptExplainer()
         >>> result = explainer.execute(
         ...     provider="gemini",
@@ -30,7 +30,7 @@ class ConceptExplainer(Pattern):
         ...     depth="comprehensive"
         ... )
         >>> print(result.response)
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -70,9 +70,9 @@ class ConceptExplainer(Pattern):
                     "Build from familiar concepts to new ones",
                     "Provide concrete, relatable examples",
                     "Address common misconceptions explicitly",
-                    "Check understanding with thought experiments or edge cases"
+                    "Check understanding with thought experiments or edge cases",
                 ],
-                style="clear, accessible, engaging, pedagogical"
+                style="clear, accessible, engaging, pedagogical",
             ),
             directive_template="""Explain this concept clearly and comprehensively.
 
@@ -212,26 +212,18 @@ The core insight in simple terms: [Explain the central idea without jargon]
 - Include specific examples, not just abstractions
 - Address potential confusions proactively
 - Make it engaging and memorable""",
-            input_schema={
-                "concept": str,
-                "audience": str,
-                "depth": str,
-                "context": str
-            },
+            input_schema={"concept": str, "audience": str, "depth": str, "context": str},
             constraints=Constraints(
                 must_include=[
                     "why it matters",
                     "simple definition",
                     "concrete examples",
                     "visual representation",
-                    "common misconceptions"
+                    "common misconceptions",
                 ],
-                must_not_include=[
-                    "unexplained jargon",
-                    "pure abstractions without examples"
-                ],
-                style_guide="Use clear headings, examples, analogies, and visual aids. Adjust complexity to audience."
-            )
+                must_not_include=["unexplained jargon", "pure abstractions without examples"],
+                style_guide="Use clear headings, examples, analogies, and visual aids. Adjust complexity to audience.",
+            ),
         )
 
     def _render_context_section(self, context):
@@ -240,8 +232,9 @@ The core insight in simple terms: [Explain the central idea without jargon]
             return f"\n**ADDITIONAL CONTEXT**: {context}\n"
         return ""
 
-
-    def build_context(self, concept="", audience="general audience", depth="comprehensive", context=None, **kwargs):
+    def build_context(
+        self, concept="", audience="general audience", depth="comprehensive", context=None, **kwargs
+    ):
         if context is None:
             context = ""
         context_section = self._render_context_section(context)
@@ -251,7 +244,7 @@ The core insight in simple terms: [Explain the central idea without jargon]
             depth=depth,
             context=context,
             context_section=context_section,
-            **kwargs
+            **kwargs,
         )
 
     def execute(
@@ -262,21 +255,21 @@ The core insight in simple terms: [Explain the central idea without jargon]
         depth="comprehensive",
         context=None,
         temperature=0.7,  # Moderate temp for clear but engaging explanations
-        **kwargs
+        **kwargs,
     ):
         """
         Execute concept explanation.
-        
+
         Args:
             provider: LLM provider to use ("gemini", "openai", "anthropic")
             concept: The concept to explain
-            audience: Target audience ("general audience", "high school students", 
+            audience: Target audience ("general audience", "high school students",
                      "college students", "professionals", "experts")
             depth: Explanation depth ("brief", "moderate", "comprehensive")
             context: Optional context about why this explanation is needed
             temperature: Moderate values (0.6-0.8) for clarity with engagement
             **kwargs: Additional provider options
-        
+
         Returns:
             ProviderResponse with the explanation
         """
@@ -294,5 +287,5 @@ The core insight in simple terms: [Explain the central idea without jargon]
             context=context,
             context_section=context_section,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )

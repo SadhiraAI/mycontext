@@ -47,7 +47,8 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CacheEntry:
     """A single cached LLM response."""
-    response: Any                       # ProviderResponse instance
+
+    response: Any  # ProviderResponse instance
     created_at: float = field(default_factory=time.monotonic)
     hits: int = 0
 
@@ -58,6 +59,7 @@ class CacheEntry:
 @dataclass
 class CacheStats:
     """Accumulated statistics for the cache instance."""
+
     hits: int = 0
     misses: int = 0
     evictions: int = 0
@@ -160,7 +162,10 @@ class SemanticCache:
             self._stats.hits += 1
             logger.debug(
                 "SemanticCache HIT  model=%s  key=%s...  total_hits=%d  hit_rate=%.1f%%",
-                model, key[:12], self._stats.hits, self._stats.hit_rate * 100,
+                model,
+                key[:12],
+                self._stats.hits,
+                self._stats.hit_rate * 100,
             )
             return entry.response
 

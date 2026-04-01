@@ -94,6 +94,7 @@ Respond with ONLY valid JSON matching this schema:
 # Post-processing
 # ---------------------------------------------------------------------------
 
+
 def _deduplicate_terminal_templates(routes: list[AnalysisRoute]) -> list[AnalysisRoute]:
     """Drop routes that share a terminal template, keeping the first."""
     seen_terminals: set[str] = set()
@@ -109,7 +110,8 @@ def _deduplicate_terminal_templates(routes: list[AnalysisRoute]) -> list[Analysi
             logger.debug(
                 "suggest_routes: dropping duplicate terminal-template route %r "
                 "(terminal=%s already used)",
-                route.label, terminal,
+                route.label,
+                terminal,
             )
     return unique
 
@@ -138,7 +140,8 @@ def _fuzzy_fix_template_names(steps: list[RouteStep]) -> list[RouteStep]:
                 break
         if not matched:
             logger.warning(
-                "suggest_routes: dropping step with unknown template %r", name,
+                "suggest_routes: dropping step with unknown template %r",
+                name,
             )
     return fixed
 
@@ -146,6 +149,7 @@ def _fuzzy_fix_template_names(steps: list[RouteStep]) -> list[RouteStep]:
 # ---------------------------------------------------------------------------
 # Main function
 # ---------------------------------------------------------------------------
+
 
 def suggest_routes(
     question: str,
@@ -209,18 +213,15 @@ def suggest_routes(
             return _postprocess(result, include_enterprise)
         except Exception as exc:
             logger.debug(
-                "suggest_routes: instructor path failed (%s), falling back. "
-                "Error: %s",
-                type(exc).__name__, exc,
+                "suggest_routes: instructor path failed (%s), falling back. Error: %s",
+                type(exc).__name__,
+                exc,
             )
 
     # ── Fallback: classic LLM call + Pydantic parse ──────────────────────
     ctx = Context(
         guidance=Guidance(
-            role=(
-                "Expert cognitive-pattern architect specializing in "
-                "multi-agent system design"
-            ),
+            role=("Expert cognitive-pattern architect specializing in multi-agent system design"),
             rules=[
                 "Analyze questions to identify every meaningful analytical dimension.",
                 "Design differentiated template pipelines for each dimension.",
@@ -242,7 +243,8 @@ def suggest_routes(
         return _postprocess(parsed, include_enterprise)
     except (ValueError, Exception) as exc:
         logger.warning(
-            "suggest_routes: could not parse LLM response: %s", exc,
+            "suggest_routes: could not parse LLM response: %s",
+            exc,
         )
         return RouteAnalysis(
             question_decomposition=f"Failed to decompose: {question}",
@@ -262,8 +264,7 @@ def _postprocess(result: RouteAnalysis, include_enterprise: bool) -> RouteAnalys
             continue
         if not include_enterprise:
             enterprise_only = all(
-                NAME_TO_CATEGORY.get(s.template) == "enterprise"
-                for s in fixed_steps
+                NAME_TO_CATEGORY.get(s.template) == "enterprise" for s in fixed_steps
             )
             if enterprise_only:
                 continue

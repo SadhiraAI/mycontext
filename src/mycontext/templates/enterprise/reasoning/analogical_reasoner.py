@@ -5,7 +5,6 @@ Leverages analogies to explain complex concepts or solve problems.
 Based on cognitive science research on analogical transfer.
 """
 
-
 from mycontext.foundation import Constraints, Guidance
 from mycontext.structure import Pattern
 
@@ -13,22 +12,22 @@ from mycontext.structure import Pattern
 class AnalogicalReasoner(Pattern):
     """
     Use analogies and mental models for reasoning and understanding.
-    
+
     Systematic analogical thinking:
     - Find relevant analogies
     - Map correspondences
     - Transfer insights
     - Identify limitations
-    
+
     Based on: Cognitive science research on analogical reasoning
-    
+
     Example:
         >>> reasoner = AnalogicalReasoner()
         >>> context = reasoner.build_context(
         ...     concept="How does a neural network learn?",
         ...     domain="machine learning"
         ... )
-    
+
     Free Template - Part of mycontext open source edition.
     """
 
@@ -70,9 +69,9 @@ class AnalogicalReasoner(Pattern):
                     "Map correspondences explicitly",
                     "Identify where analogies break down",
                     "Use multiple analogies for robustness",
-                    "Transfer insights systematically"
+                    "Transfer insights systematically",
                 ],
-                style="creative, insightful, pedagogical"
+                style="creative, insightful, pedagogical",
             ),
             directive_template="""Use analogical reasoning for this concept/problem:
 
@@ -162,20 +161,11 @@ Systematic analogical reasoning:
    **Key Takeaway**: [Most important insight]
 
 **OUTPUT FORMAT**: Creative but rigorous analogical analysis.""",
-            input_schema={
-                "concept": str,
-                "context_section": str,
-                "domain": str,
-                "depth": str
-            },
+            input_schema={"concept": str, "context_section": str, "domain": str, "depth": str},
             constraints=Constraints(
-                must_include=[
-                    "multiple_analogies",
-                    "correspondence_mapping",
-                    "limitations"
-                ],
-                style_guide="Be creative but grounded, insightful but accurate"
-            )
+                must_include=["multiple_analogies", "correspondence_mapping", "limitations"],
+                style_guide="Be creative but grounded, insightful but accurate",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -190,29 +180,25 @@ Systematic analogical reasoning:
         domain: str = "general",
         context: str | None = None,
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Build context for analogical reasoning.
-        
+
         Args:
             concept: The concept/problem to reason about
             domain: The domain context
             context: Optional additional context
             depth: Reasoning depth ("quick", "detailed", "deep")
             **kwargs: Additional options
-        
+
         Returns:
             Context object ready for export/use
         """
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            concept=concept,
-            domain=domain,
-            context_section=context_section,
-            depth=depth,
-            **kwargs
+            concept=concept, domain=domain, context_section=context_section, depth=depth, **kwargs
         )
 
     def execute(
@@ -222,11 +208,11 @@ Systematic analogical reasoning:
         domain: str = "general",
         context: str | None = None,
         depth: str = "detailed",
-        **kwargs
+        **kwargs,
     ):
         """
         Execute analogical reasoning.
-        
+
         Args:
             provider: LLM provider to use
             concept: The concept/problem to reason about
@@ -234,7 +220,7 @@ Systematic analogical reasoning:
             context: Optional additional context
             depth: Reasoning depth
             **kwargs: Provider parameters
-        
+
         Returns:
             ProviderResponse with the reasoning
         """
@@ -244,5 +230,5 @@ Systematic analogical reasoning:
             domain=domain,
             context=context,
             depth=depth,
-            **kwargs
+            **kwargs,
         )

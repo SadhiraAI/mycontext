@@ -7,29 +7,28 @@ Based on multi-criteria decision analysis and Pareto optimization.
 License: Enterprise
 """
 
-
 from mycontext import Constraints, Guidance, Pattern
 
 
 class MultiObjectiveOptimizer(Pattern):
     """
     Optimize for multiple objectives.
-    
+
     Balances:
     - Competing goals
     - Trade-offs
     - Pareto frontiers
     - Weighted objectives
-    
+
     Based on: Multi-criteria decision analysis
-    
+
     Example:
         >>> optimizer = MultiObjectiveOptimizer()
         >>> context = optimizer.build_context(
         ...     objectives=["Minimize cost", "Maximize quality", "Minimize time"],
         ...     context="Product development"
         ... )
-    
+
     Enterprise Template - Requires Enterprise license.
     """
 
@@ -63,9 +62,9 @@ class MultiObjectiveOptimizer(Pattern):
                     "Find Pareto optimal solutions",
                     "Consider trade-offs explicitly",
                     "Weight objectives appropriately",
-                    "Provide multiple solutions"
+                    "Provide multiple solutions",
                 ],
-                style="analytical, balanced, comprehensive"
+                style="analytical, balanced, comprehensive",
             ),
             directive_template="""Optimize multiple objectives:
 
@@ -108,14 +107,11 @@ Multi-objective optimization:
    - Expected outcomes: [Results]
 
 **OUTPUT FORMAT**: Multiple solutions with clear trade-offs.""",
-            input_schema={
-                "objectives_section": str,
-                "context_section": str
-            },
+            input_schema={"objectives_section": str, "context_section": str},
             constraints=Constraints(
                 must_include=["trade_offs", "alternatives", "recommendation"],
-                style_guide="Be objective about compromises"
-            )
+                style_guide="Be objective about compromises",
+            ),
         )
 
     def _render_context_section(self, context: str | None) -> str:
@@ -125,22 +121,17 @@ Multi-objective optimization:
 
     def _render_objectives_section(self, objectives: list[str] | None) -> str:
         if objectives:
-            return "\n".join(f"{i+1}. {obj}" for i, obj in enumerate(objectives))
+            return "\n".join(f"{i + 1}. {obj}" for i, obj in enumerate(objectives))
         return "1. [Define objectives]"
 
     def build_context(
-        self,
-        objectives: list[str] | None = None,
-        context: str | None = None,
-        **kwargs
+        self, objectives: list[str] | None = None, context: str | None = None, **kwargs
     ):
         objectives_section = self._render_objectives_section(objectives)
         context_section = self._render_context_section(context)
 
         return super().build_context(
-            objectives_section=objectives_section,
-            context_section=context_section,
-            **kwargs
+            objectives_section=objectives_section, context_section=context_section, **kwargs
         )
 
     def execute(
@@ -148,11 +139,6 @@ Multi-objective optimization:
         provider: str = "openai",
         objectives: list[str] | None = None,
         context: str | None = None,
-        **kwargs
+        **kwargs,
     ):
-        return super().execute(
-            provider=provider,
-            objectives=objectives,
-            context=context,
-            **kwargs
-        )
+        return super().execute(provider=provider, objectives=objectives, context=context, **kwargs)

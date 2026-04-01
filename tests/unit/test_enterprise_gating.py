@@ -73,9 +73,7 @@ class TestPatternSuggesterGating:
             include_enterprise=False,
             max_patterns=10,
         )
-        ent_suggestions = [
-            s for s in result.suggested_patterns if s.category == "enterprise"
-        ]
+        ent_suggestions = [s for s in result.suggested_patterns if s.category == "enterprise"]
         for s in ent_suggestions:
             assert ENTERPRISE_LICENSE_NOTE in s.reason, (
                 f"Enterprise suggestion '{s.name}' should include license note"
@@ -87,9 +85,7 @@ class TestPatternSuggesterGating:
             include_enterprise=True,
             max_patterns=10,
         )
-        ent_suggestions = [
-            s for s in result.suggested_patterns if s.category == "enterprise"
-        ]
+        ent_suggestions = [s for s in result.suggested_patterns if s.category == "enterprise"]
         for s in ent_suggestions:
             assert ENTERPRISE_LICENSE_NOTE not in s.reason, (
                 f"Enterprise suggestion '{s.name}' should NOT include license note"
@@ -195,11 +191,13 @@ class TestLicenseKeyFormat:
 
     def test_key_format(self):
         import secrets
+
         key = f"MC-ENT-{secrets.token_hex(16).upper()}"
         assert key.startswith("MC-ENT-")
         assert len(key) == 7 + 32  # prefix + 32 hex chars
 
     def test_keys_are_unique(self):
         import secrets
+
         keys = {f"MC-ENT-{secrets.token_hex(16).upper()}" for _ in range(100)}
         assert len(keys) == 100, "All generated keys should be unique"
