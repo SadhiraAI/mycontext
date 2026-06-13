@@ -9,9 +9,9 @@ description: Generate multi-level explanations of complex concepts using Concept
 **Scenario:** You need to explain a difficult concept to different audiences: a technical deep-dive for experts, a conceptual overview for managers, and a plain-language version for a general audience. You want explanations that use the right analogies and metaphors for each audience — not the same explanation dumbed down.
 
 **Patterns used:**
-- `ConceptExplainer` (enterprise) — breaks complex concepts into structured, layered explanations
-- `AnalogicalReasoner` (enterprise) — finds concrete analogies that make abstract concepts accessible
-- `MetaphorGenerator` (enterprise) — creates vivid, memorable metaphors calibrated to the audience
+- `ConceptExplainer` — breaks complex concepts into structured, layered explanations
+- `AnalogicalReasoner` — finds concrete analogies that make abstract concepts accessible
+- `MetaphorGenerator` — creates vivid, memorable metaphors calibrated to the audience
 
 **Integration:** Raw `Context` builds + `ContextAmplificationIndex` to measure how much the patterns add
 
@@ -19,7 +19,6 @@ description: Generate multi-level explanations of complex concepts using Concept
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.templates.enterprise.specialized import ConceptExplainer
 from mycontext.templates.enterprise.reasoning import AnalogicalReasoner

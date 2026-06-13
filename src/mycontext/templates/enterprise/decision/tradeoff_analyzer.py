@@ -55,7 +55,6 @@ class TradeoffAnalyzer(Pattern):
         "(5) Pareto analysis — which solutions dominate, where are the sweet spots?\n"
         "(6) Quantify opportunity costs and recommend an optimization strategy.\n\n"
         "Be realistic about limits. Propose creative solutions that reduce trade-offs where possible.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

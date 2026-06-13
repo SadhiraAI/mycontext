@@ -34,7 +34,7 @@ const sidebars: SidebarsConfig = {
         'cognitive-patterns/overview',
         {
           type: 'category',
-          label: 'Free Patterns (16)',
+          label: 'Core Patterns (16)',
           items: [
             'cognitive-patterns/free/root-cause-analyzer',
             'cognitive-patterns/free/step-by-step-reasoner',
@@ -75,6 +75,16 @@ const sidebars: SidebarsConfig = {
         'intelligence/token-budget',
         'intelligence/prompt-architect',
         'intelligence/guidance-optimizer',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'CLI & Agentic',
+      items: [
+        'cli/overview',
+        'cli/skills-export',
+        'cli/local-mcp',
+        'cli/requirements-as-code',
       ],
     },
     {

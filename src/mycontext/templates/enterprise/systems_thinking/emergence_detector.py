@@ -56,8 +56,6 @@ class EmergenceDetector(Pattern):
         "nurture beneficial or dampen harmful emergence.\n\n"
         "Remember: emergent properties cannot be controlled directly — only the "
         "underlying interactions can be changed.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

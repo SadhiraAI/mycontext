@@ -47,7 +47,6 @@ class CostBenefitAnalyzer(Pattern):
         "(5) Sensitivity analysis — best, base, and worst case scenarios.\n"
         "(6) Go/No-Go recommendation with clear rationale and conditions.\n\n"
         "Be rigorous and quantitative. Include all visible and hidden costs.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

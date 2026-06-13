@@ -63,8 +63,6 @@ class PeerAssessmentStructure(Pattern):
         "meta-feedback, and accountability mechanisms.\n\n"
         "Include a peer review rubric assessing specificity, actionability, balance, "
         "thoroughness, and professionalism.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

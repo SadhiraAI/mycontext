@@ -17,4 +17,4 @@ Six production-ready use cases for engineering teams. Each one shows how cogniti
 | [Developer Onboarding](./onboarding-assistant) | TechnicalTranslator + ScaffoldingFramework + SocraticQuestioner | Agent Skill + LangChain memory |
 | [AI-Assisted Testing](./ai-testing) | StepByStepReasoner + ErrorDetectionFramework + RiskAssessor + HypothesisGenerator | CrewAI + Blueprint |
 
-All examples use Python 3.10+. Enterprise patterns require a license key.
+All examples use Python 3.10+. All patterns are open source and included in every install.

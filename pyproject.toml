@@ -1,6 +1,6 @@
 [project]
 name = "mycontext-ai"
-version = "0.11.0"
+version = "0.12.0"
 description = "Context engineering for LLMs — 88 cognitive patterns, auto-suggested quality controls, prompt compilation, 3-tier execution, 13 export formats"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -34,6 +34,9 @@ openai = ["openai>=2.0.0"]
 anthropic = ["anthropic>=0.79.0"]
 google = ["google-genai>=1.0.0"]  # google-generativeai is EOL; use google-genai
 tokens = ["tiktoken>=0.7.0"]
+
+# Local stdio MCP server (mycontext mcp)
+mcp = ["mcp>=1.2.0"]
 
 # Orchestrator integrations (for examples/orchestration notebooks)
 orchestration = [
@@ -80,6 +83,9 @@ all = [
     "mycontext-ai[openai,anthropic,google,tokens]",
 ]
 
+[project.scripts]
+mycontext = "mycontext.cli:main"
+
 [project.urls]
 Homepage = "https://mycontext-docs.pages.dev/"
 Documentation = "https://mycontext-docs.pages.dev/"
@@ -93,15 +99,11 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mycontext"]
-# Exclude enterprise for free-only PyPI release (remove these lines to include enterprise)
-exclude = [
-    "src/mycontext/templates/enterprise",
-]
+# All cognitive patterns ship in the wheel — the SDK is fully open source (no license tiers).
 
 [tool.hatch.build.targets.sdist]
-# Exclude enterprise and all non-essential repo content to stay under PyPI 100 MB limit
+# Exclude non-essential repo content to stay under PyPI 100 MB limit
 exclude = [
-    "src/mycontext/templates/enterprise",
     "docs/",
     "app/",
     "website/",

@@ -9,9 +9,9 @@ description: Diagnose organisational culture and health using FeedbackLoopIdenti
 **Scenario:** Your organisation ran an engagement survey. The results are mixed — some things are good, some are not, and the root causes are unclear. You want a structured diagnosis that goes beyond survey scores to identify the cultural dynamics at play and what interventions would actually improve things.
 
 **Patterns used:**
-- `FeedbackLoopIdentifier` (enterprise) — maps the cultural reinforcing loops that sustain current behaviour
-- `SWOTAnalyzer` (enterprise) — assesses cultural strengths to build on and weaknesses to address
-- `SystemArchetypeAnalyzer` (enterprise) — identifies systemic patterns (shifting the burden, eroding goals) in the culture
+- `FeedbackLoopIdentifier` — maps the cultural reinforcing loops that sustain current behaviour
+- `SWOTAnalyzer` — assesses cultural strengths to build on and weaknesses to address
+- `SystemArchetypeAnalyzer` — identifies systemic patterns (shifting the burden, eroding goals) in the culture
 
 **Integration:** CrewAI diagnostic crew — culture analyst, systems thinker, intervention designer
 
@@ -19,7 +19,6 @@ description: Diagnose organisational culture and health using FeedbackLoopIdenti
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.enterprise.systems_thinking import (

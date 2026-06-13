@@ -10,7 +10,7 @@ description: Generate comprehensive test strategies using HypothesisGenerator + 
 
 **Patterns used:**
 - `HypothesisGenerator` — generates hypotheses about what could go wrong (edge cases, failure modes)
-- `ErrorDetectionFramework` (enterprise) — systematically identifies error conditions and failure states
+- `ErrorDetectionFramework` — systematically identifies error conditions and failure states
 - `RiskAssessor` — evaluates which scenarios pose the highest risk if untested
 - `StepByStepReasoner` — builds a step-by-step test execution plan
 
@@ -20,7 +20,6 @@ description: Generate comprehensive test strategies using HypothesisGenerator + 
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.free.reasoning import HypothesisGenerator, StepByStepReasoner

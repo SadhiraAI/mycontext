@@ -92,7 +92,7 @@ result.improved_context.constraints.verbosity = "minimal"
 | `forbidden_phrases` | `list[str]` | Bans hedging for analysis, jargon for lay audiences |
 | `self_check` | `list[str]` | Domain-specific verification questions |
 
-Templates also ship with smart defaults — all 16 free patterns include domain-specific `self_check` questions and objectivity rules out of the box.
+Templates also ship with smart defaults — all 88 patterns include domain-specific `self_check` questions and objectivity rules out of the box.
 
 ### 2. Fragment Library — Composable Quality Atoms for Blueprints
 
@@ -562,7 +562,7 @@ ctx = rca.build_context(problem="API latency tripled after deploy", output_forma
 **Human formats:** `structured` (default) · `narrative` · `brief` · `actionable` · `slides` · `email` · `qa` · `checklist`  
 **Machine formats:** `json` · `table` (auto-sets `temperature=0.0`)
 
-Works on all 87 templates — implemented once at the `Pattern` base class level.
+Works on all 88 templates — implemented once at the `Pattern` base class level.
 
 ---
 
@@ -570,15 +570,15 @@ Works on all 87 templates — implemented once at the `Pattern` base class level
 
 | Capability | mycontext-ai | Typical prompt libraries |
 |-----------|-------------|------------------------|
-| Cognitive patterns | 88 research-backed (16 free + 72 enterprise) | 10-20 generic templates |
+| Cognitive patterns | 88 research-backed (all open source) | 10-20 generic templates |
 | Auto-suggested quality controls | 5 fields inferred by PromptArchitect (verbosity, posture, answer_first, forbidden_phrases, self_check) | None |
 | Fragment library | 12 composable quality atoms for Blueprint | None |
-| Template self-check | Domain-specific verification questions on all 16 free templates | None |
+| Template self-check | Domain-specific verification questions on all 88 templates | None |
 | Context generator | Role + goal → full context via LLM | None |
 | Structured prompt assembly | 9-section research-backed ordering | None |
 | Thinking strategies | 5 named strategies (CoT, ToT, Self-Reflection, ...) | None |
 | Few-shot calibration | Typed examples field, auto-positioned | Manual |
-| Generic prompts (zero-cost) | 87 pre-authored, compilable | None |
+| Generic prompts (zero-cost) | 88 pre-authored, compilable | None |
 | Prompt compilation pipeline | Static + dynamic + full (3 tiers) | None |
 | Complexity router | Auto-selects optimal approach per question | None |
 | Context quality scoring | 6 dimensions + issues + suggestions | None |
@@ -668,7 +668,7 @@ All providers route through LiteLLM, giving you access to 100+ models. You can a
 Strategic questions need multiple reasoning steps. Chain patterns so each stage feeds the next:
 
 ```python
-# Enterprise templates — requires license (see Enterprise Patterns section)
+# All patterns are open source and importable directly
 from mycontext.templates.enterprise.temporal import TemporalSequenceAnalyzer
 from mycontext.templates.free.reasoning import RootCauseAnalyzer
 from mycontext.templates.enterprise.synthesis import HolisticIntegrator
@@ -721,9 +721,9 @@ ctx = Context(directive=Directive(content=f"Analyze this proposal.\n\n{instructi
 
 ## 88 Cognitive Patterns
 
-### Free Patterns (16)
+### Core Patterns (16)
 
-Included in every install. Production-ready for analysis, decision-making, reasoning, and communication.
+Production-ready for analysis, decision-making, reasoning, and communication.
 
 | Pattern | What it does |
 |---------|-------------|
@@ -744,24 +744,15 @@ Included in every install. Production-ready for analysis, decision-making, reaso
 | **ConflictResolver** | Mediate conflicts by identifying interests and common ground |
 | **IntentRecognizer** | Identify core intent, goals, and motivations behind a statement |
 
-### Enterprise Patterns (+72)
+### Advanced Patterns (+72)
 
-Advanced patterns for temporal reasoning, diagnostics, systems thinking, ethical analysis, metacognition, learning science, and cross-domain synthesis. **Enterprise patterns require a valid license key.** Contact us to obtain a license.
-
-The SDK will warn you when an enterprise template is accessed without a license and automatically suggest free alternatives:
+Advanced patterns for temporal reasoning, diagnostics, systems thinking, ethical analysis, metacognition, learning science, and cross-domain synthesis. **All patterns are open source** — they ship in every install and run offline with your own LLM key. No license key, no tiers.
 
 ```python
-import mycontext
-
-# Without license — SDK warns and falls back to best free template
 from mycontext.intelligence import smart_execute
-response, meta = smart_execute("Analyze this...", include_enterprise=False)
-# → UserWarning: Template 'causal_reasoner' requires an enterprise license.
-#   Free alternatives (16 templates) are available.
 
-# With license — full access
-mycontext.activate_license("MC-ENT-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-response, meta = smart_execute("Analyze this...", include_enterprise=True)
+# The intelligence layer auto-selects the best of all 88 patterns
+response, meta = smart_execute("Analyze the root cause of this incident...")
 ```
 
 Includes specialized RAG patterns: **`QueryPlanner`** (pre-retrieval query decomposition, HyDE, step-back rewriting) and **`RagAnswerer`** (grounded answer generation with citation and abstention), plus **`MemoryCompressor`** for long-context agent memory.
@@ -779,7 +770,7 @@ mycontext also ships as a full-featured **web application** — a context engine
 ## Installation
 
 ```bash
-# Core SDK (includes 16 free patterns, intelligence layer, quality metrics)
+# Core SDK (all 88 patterns, intelligence layer, quality metrics)
 pip install mycontext-ai
 
 # Add LLM execution support (recommended)
@@ -790,6 +781,21 @@ pip install "mycontext-ai[openai]"       # OpenAI SDK
 pip install "mycontext-ai[anthropic]"    # Anthropic SDK
 pip install "mycontext-ai[google]"       # Google GenAI SDK
 pip install "mycontext-ai[all]"          # All provider SDKs
+
+# Optional: local MCP server for Agent / IDE integration
+pip install "mycontext-ai[mcp]"
+```
+
+### Command-line interface
+
+The package installs a `mycontext` console script:
+
+```bash
+mycontext list                          # list all 88 patterns
+mycontext run root_cause_analyzer --generic    # print a pre-authored prompt
+mycontext skills export all -o ./skills        # export progressive-disclosure SKILL.md packages
+mycontext skills export decision_framework --plugin -o ./plugin   # Claude Code / Cowork plugin
+mycontext mcp                           # start the local stdio MCP server
 ```
 
 ---
@@ -800,13 +806,15 @@ pip install "mycontext-ai[all]"          # All provider SDKs
 
 **It is not** a prompt template string library. It is not an LLM wrapper. It is not an agent framework. It works *with* your existing agent framework (LangChain, CrewAI, AutoGen, etc.) by giving it better inputs.
 
+**Terminology:** *Graph prompt learning* in the GNN literature (e.g. ProG, “pre-train, prompt” on graph encoders) means **learnable adapters on Graph Neural Networks** — not the same as mycontext’s **structured LLM prompts** or **template workflow chains**. mycontext can still sit **downstream** of graph systems by taking **graph-derived facts as text** (for example in `Context.knowledge`). See [docs/research/2026-04-10-graph-prompting-vs-structured-context.md](docs/research/2026-04-10-graph-prompting-vs-structured-context.md) and [examples/graph_context_bridge/](examples/graph_context_bridge/).
+
 The core insight: **the quality of an LLM's output is bounded by the quality of its input.** mycontext engineers that input — and proves it.
 
 ---
 
 ## License
 
-MIT. Free edition includes 16 patterns and the full intelligence layer. Enterprise edition (+71 advanced patterns) requires a license key.
+MIT. All 88 cognitive patterns and the full intelligence layer are open source and ship in every install — no tiers, no license keys. Run everything offline with your own LLM API key.
 
 ---
 

@@ -47,7 +47,6 @@ class EfficiencyAnalyzer(Pattern):
         "(5) Prioritize optimization opportunities: quick wins (easy, high impact) and major improvements.\n"
         "(6) Project quantified improvements — time savings, cost savings, and target efficiency.\n\n"
         "Be pragmatic and results-focused. Quantify every improvement.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

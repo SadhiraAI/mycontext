@@ -53,8 +53,6 @@ class IdeaGenerator(Pattern):
         "(6) Implementation sketch - for the best idea, outline quick wins, "
         "resources needed, and success criteria.\n\n"
         "Be wildly creative first, then strategically selective.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

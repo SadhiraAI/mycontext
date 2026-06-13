@@ -54,8 +54,6 @@ class RiskMitigator(Pattern):
         "mitigation, and who monitors, plus a cost-benefit analysis of the "
         "mitigation investment vs. potential loss.\n\n"
         "Be practical and action-oriented. Every plan needs an owner.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

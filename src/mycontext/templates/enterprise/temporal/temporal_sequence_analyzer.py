@@ -58,7 +58,6 @@ class TemporalSequenceAnalyzer(Pattern):
         "(5) Identify critical turning points and tipping moments in the sequence.\n"
         "(6) Provide forecasting implications — what temporal patterns suggest about the future.\n\n"
         "Be chronologically precise. Distinguish correlation from causation with evidence.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

@@ -34,8 +34,6 @@ class ValueConflictNavigator(Pattern):
         "both values be partially honored through creative alternatives? "
         "(5) Recommend a resolution with clear reasoning that acknowledges the "
         "importance of both values.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

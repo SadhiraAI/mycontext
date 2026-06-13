@@ -10,8 +10,8 @@ description: Coordinate multi-agency crisis response using ScenarioPlanner + Ris
 
 **Patterns used:**
 - `ScenarioPlanner` — develops detailed crisis scenarios and escalation paths
-- `RiskMitigator` (enterprise) — identifies risk reduction interventions at each scenario stage
-- `FutureScenarioPlanner` (enterprise) — models how the crisis might evolve over time
+- `RiskMitigator` — identifies risk reduction interventions at each scenario stage
+- `FutureScenarioPlanner` — models how the crisis might evolve over time
 - `StakeholderMapper` — maps all agencies, their roles, and coordination points
 
 **Integration:** CrewAI multi-agency simulation crew
@@ -20,7 +20,6 @@ description: Coordinate multi-agency crisis response using ScenarioPlanner + Ris
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.free.planning import ScenarioPlanner, StakeholderMapper

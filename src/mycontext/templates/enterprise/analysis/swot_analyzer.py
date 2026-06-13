@@ -53,8 +53,6 @@ class SWOTAnalyzer(Pattern):
         "(6) Priority actions - recommend immediate, short-term, and long-term "
         "actions with clear owners and success metrics.\n\n"
         "Be balanced, honest, and strategic in your assessment.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

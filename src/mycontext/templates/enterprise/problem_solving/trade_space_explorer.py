@@ -47,7 +47,6 @@ class TradeSpaceExplorer(Pattern):
         "(6) Pinpoint sweet spots — optimal balances where multiple objectives align.\n"
         "(7) Summarize key trade-offs, dominant solutions, and surprising findings.\n\n"
         "Be exploratory and thorough. Document trade-offs at every decision point.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

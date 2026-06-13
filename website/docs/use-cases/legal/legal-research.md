@@ -10,8 +10,8 @@ description: Multi-step legal research with SynthesisBuilder + AnalogicalReasone
 
 **Patterns used:**
 - `SynthesisBuilder` — synthesises findings from multiple cases and sources
-- `AnalogicalReasoner` (enterprise) — draws analogies between this case and cases in other areas
-- `CrossDomainSynthesizer` (enterprise) — identifies relevant principles from adjacent legal domains
+- `AnalogicalReasoner` — draws analogies between this case and cases in other areas
+- `CrossDomainSynthesizer` — identifies relevant principles from adjacent legal domains
 
 **Integration:** LangChain with `ConversationBufferMemory` — multi-step research session with threading
 
@@ -19,7 +19,6 @@ description: Multi-step legal research with SynthesisBuilder + AnalogicalReasone
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory

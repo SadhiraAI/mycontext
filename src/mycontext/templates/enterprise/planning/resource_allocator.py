@@ -53,8 +53,6 @@ class ResourceAllocator(Pattern):
         "(6) Produce a detailed allocation table with rationale, expected "
         "outcomes, and clear measurement criteria for each allocation.\n\n"
         "Be analytical and evidence-based. Justify every allocation.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

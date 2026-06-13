@@ -60,7 +60,6 @@ class SystemHealthAuditor(Pattern):
         "(6) Verify compliance — regulatory requirements and standards adherence.\n"
         "(7) Provide an overall health score with prioritized findings and a phased remediation roadmap.\n\n"
         "Be objective and risk-focused. Prioritize findings by severity and urgency.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

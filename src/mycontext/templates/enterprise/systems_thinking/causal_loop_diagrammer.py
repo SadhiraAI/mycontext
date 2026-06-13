@@ -55,8 +55,6 @@ class CausalLoopDiagrammer(Pattern):
         "medium-, and long-term system behavior.\n\n"
         "Provide a text-based CLD diagram. Highlight the highest-leverage causal "
         "link and any counter-intuitive findings.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

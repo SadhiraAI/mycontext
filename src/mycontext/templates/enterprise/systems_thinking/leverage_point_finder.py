@@ -55,8 +55,6 @@ class LeveragePointFinder(Pattern):
         "impact and feasibility. Rank the top 3 by impact-to-effort ratio and "
         "suggest implementation sequencing. Warn about counter-intuitive dynamics "
         "and unintended consequences.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

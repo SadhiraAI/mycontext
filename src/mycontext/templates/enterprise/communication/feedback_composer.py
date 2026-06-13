@@ -50,8 +50,6 @@ class FeedbackComposer(Pattern):
         "(5) Write the complete feedback message in a supportive, growth-oriented "
         "tone that balances positive recognition with constructive guidance.\n\n"
         "Be specific, not vague. Focus on behaviors, not personality.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

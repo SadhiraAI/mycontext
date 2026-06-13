@@ -230,12 +230,11 @@ from mycontext.templates.free.reasoning import (
 )
 ```
 
-### Enterprise Patterns
+### Advanced Patterns
+
+All open source — import directly, no activation step:
 
 ```python
-import mycontext
-mycontext.activate_license("MC-ENT-...")
-
 from mycontext.templates.enterprise.decision import (
     DecisionFramework, ComparativeAnalyzer, TradeoffAnalyzer,
     CostBenefitAnalyzer, MultiObjectiveOptimizer,
@@ -259,7 +258,7 @@ from mycontext.templates.enterprise.ethical_reasoning import (
 |----------|-----------|---------|-------------|
 | `generate_context` | `generate_context(role, goal, task?, provider, model, **kwargs)` | `GeneratedContext` | LLM generates full context from role + goal |
 | `transform` | `transform(input_text, provider?, model?)` | `Context` | Auto-select pattern + build context |
-| `suggest_patterns` | `suggest_patterns(text, mode, top_k, include_enterprise)` | `SuggestionResult` | Pattern recommendations |
+| `suggest_patterns` | `suggest_patterns(text, mode, top_k)` | `SuggestionResult` | Pattern recommendations |
 | `assess_complexity` | `assess_complexity(text, provider?)` | `ComplexityResult` | Template needed? |
 | `smart_execute` | `smart_execute(text, provider, model?)` | `ProviderResponse` | One-liner intelligent execution |
 | `smart_prompt` | `smart_prompt(text, provider?, model?)` | `str` | One-liner prompt generation |
@@ -306,10 +305,10 @@ class SuggestionResult:
 @dataclass
 class PatternSuggestion:
     name: str
-    confidence: float
-    reason: str
     category: str
-    is_enterprise: bool
+    reason: str
+    confidence: float
+    chain_position: int | None = None
 ```
 
 ### `ComplexityResult`
@@ -651,16 +650,18 @@ prompt = safe_format_template("Analyze {topic} for {audience}.", topic="revenue"
 
 ---
 
-## Enterprise License — `mycontext`
+## License API — `mycontext` (deprecated)
+
+mycontext is fully open source — all 88 patterns ship in the package with no
+license keys. These functions are **deprecated no-op shims** kept for one
+release; they emit a `DeprecationWarning` and otherwise do nothing.
 
 ```python
 import mycontext
 
-mycontext.activate_license("MC-ENT-...")   # Persist key locally
-mycontext.deactivate_license()              # Remove key
-mycontext.is_enterprise_active()            # bool
-
-from mycontext.license import get_license_key  # Returns key or None
+mycontext.activate_license("...")   # no-op, returns True, warns
+mycontext.deactivate_license()       # no-op, warns
+mycontext.is_enterprise_active()     # always True, warns
 ```
 
 ---
@@ -728,8 +729,4 @@ from mycontext.utils.template_safety import safe_format_template
 # Structured output
 from mycontext.utils.structured_output import extract_json, PydanticOutput
 from mycontext.utils.parsers import JSONParser, ListParser
-
-# License
-import mycontext
-mycontext.activate_license("MC-ENT-...")
 ```

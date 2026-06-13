@@ -43,7 +43,7 @@ suggest_patterns(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `question` | `str` | required | Question or problem description |
-| `include_enterprise` | `bool` | `True` | Include enterprise patterns. If False, enterprise patterns appear with a license note. |
+| `include_enterprise` | `bool` | `True` | Deprecated and ignored — all 88 patterns are always available. Kept for backwards compatibility. |
 | `suggest_chain` | `bool` | `True` | Order suggestions as a workflow chain |
 | `max_patterns` | `int` | `5` | Maximum patterns to suggest |
 | `mode` | `str` | `"keyword"` | Selection mode: `"keyword"`, `"llm"`, or `"hybrid"` |
@@ -57,7 +57,7 @@ suggest_patterns(
 
 ### Mode 1: `"keyword"` (instant, 0 LLM calls)
 
-Matches question keywords against a curated map of all 87 patterns. Fast, deterministic, and free.
+Matches question keywords against a curated map of all 88 patterns. Fast, deterministic, and free.
 
 ```python
 result = suggest_patterns(
@@ -193,20 +193,19 @@ print(result.suggested_chain)
 #     │ diagnosis          │ evidence       │ future options
 ```
 
-## Enterprise Pattern Handling
+## All Patterns Considered
 
-When `include_enterprise=False`, enterprise patterns still appear in suggestions but with a license note — so you know they exist and can get a license:
+Suggestions are always drawn from the full set of 88 patterns — there is no gating. The `include_enterprise` argument is deprecated and ignored:
 
 ```python
 result = suggest_patterns(
     "Complex multi-domain business question",
-    include_enterprise=False,
     mode="keyword",
 )
 for pattern in result.suggested_patterns:
     print(f"{pattern.name} [{pattern.category}]: {pattern.reason}")
-# → decision_framework [enterprise]: ... Requires enterprise license.
-# → root_cause_analyzer [free]: ...
+# → decision_framework [decision]: ...
+# → root_cause_analyzer [reasoning]: ...
 ```
 
 ## Examples
@@ -339,4 +338,4 @@ def get_pattern_class(
 ) -> type | None
 ```
 
-Returns the pattern class for a given name, or None if not found / not licensed.
+Returns the pattern class for a given name, or `None` if not found. The `include_enterprise` argument is deprecated and ignored — all 88 patterns are always available.

@@ -64,8 +64,6 @@ class SummativeEvaluator(Pattern):
         "with accommodations.\n\n"
         "Include sample items and post-assessment analysis guidelines for "
         "continuous improvement.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

@@ -33,8 +33,6 @@ class ConsequentialistAnalyzer(Pattern):
         "impact distribution — who bears costs vs who gains benefits.\n\n"
         "Provide a net consequentialist assessment (positive/negative/uncertain) "
         "with a clear recommendation.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

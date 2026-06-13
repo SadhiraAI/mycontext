@@ -57,7 +57,6 @@ class DiagnosticRootCauseAnalyzer(Pattern):
         "(5) Map the causal chain from root causes through intermediate effects to symptoms.\n"
         "(6) Recommend corrective actions for each root cause and preventive measures to stop recurrence.\n\n"
         "Distinguish symptoms from causes. Find actionable root causes, not just descriptions.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

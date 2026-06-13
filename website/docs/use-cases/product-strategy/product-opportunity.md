@@ -9,10 +9,10 @@ description: Evaluate new product ideas with IdeaGenerator + InnovationFramework
 **Scenario:** Your product team has a new product idea. Before committing resources, you want structured analysis: how good is the idea, what are the risks, who are the competitors, and is this worth pursuing? You want to move from "we have an idea" to "here is a structured go/no-go with rationale" in hours, not weeks.
 
 **Patterns used:**
-- `IdeaGenerator` (enterprise) — expands the initial idea space and identifies adjacent opportunities
-- `InnovationFramework` (enterprise) — evaluates feasibility, desirability, and viability
-- `SWOTAnalyzer` (enterprise) — structured competitive and strategic assessment
-- `DecisionFramework` (enterprise) — structured go/no-go with explicit criteria
+- `IdeaGenerator` — expands the initial idea space and identifies adjacent opportunities
+- `InnovationFramework` — evaluates feasibility, desirability, and viability
+- `SWOTAnalyzer` — structured competitive and strategic assessment
+- `DecisionFramework` — structured go/no-go with explicit criteria
 
 **Integration:** CrewAI four-agent crew: ideation, innovation assessment, competitive analysis, decision
 
@@ -20,7 +20,6 @@ description: Evaluate new product ideas with IdeaGenerator + InnovationFramework
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.enterprise.creative import IdeaGenerator, InnovationFramework

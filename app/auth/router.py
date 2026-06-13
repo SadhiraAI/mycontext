@@ -92,7 +92,6 @@ class UserResponse(BaseModel):
 
     id: str
     email: str
-    enterprise_license: bool = False
     email_verified: bool = False
 
     model_config = {"from_attributes": True}
@@ -208,6 +207,5 @@ async def me(user: User = Depends(get_current_user)) -> UserResponse:
     return UserResponse(
         id=user.id,
         email=user.email,
-        enterprise_license=getattr(user, "enterprise_license", False),
         email_verified=getattr(user, "email_verified", False),
     )

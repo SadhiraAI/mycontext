@@ -47,7 +47,6 @@ class DependencyMapper(Pattern):
         "(6) Assess dependency risks: single points of failure, tight coupling, and fragile chains.\n"
         "(7) Recommend optimization: parallelization, decoupling, and reordering opportunities.\n\n"
         "Be thorough and visual. Present clear dependency tables and actionable improvements.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

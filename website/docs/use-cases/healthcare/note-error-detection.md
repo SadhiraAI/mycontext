@@ -9,9 +9,9 @@ description: Scan clinical notes for inconsistencies, contradictions, and omissi
 **Scenario:** Clinical notes contain errors: medications listed without dosages, contradictions between history and assessment, missing allergy documentation, or discrepancies between note sections. Catching these manually is time-consuming. You want an automated scan that flags issues for clinician review before notes are finalised.
 
 **Patterns used:**
-- `ErrorDetectionFramework` (enterprise) — systematically identifies errors, omissions, and inconsistencies
-- `DiagnosticRootCauseAnalyzer` (enterprise) — traces each error to its likely cause
-- `SystemHealthAuditor` (enterprise) — assesses the overall completeness and reliability of the note
+- `ErrorDetectionFramework` — systematically identifies errors, omissions, and inconsistencies
+- `DiagnosticRootCauseAnalyzer` — traces each error to its likely cause
+- `SystemHealthAuditor` — assesses the overall completeness and reliability of the note
 
 **Integration:** Blueprint + `OutputEvaluator` to score the quality of the scan itself
 
@@ -19,7 +19,6 @@ description: Scan clinical notes for inconsistencies, contradictions, and omissi
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

@@ -9,9 +9,9 @@ description: Assess proposed policy using ImpactAssessor + ConsequentialistAnaly
 **Scenario:** A government agency is evaluating proposed legislation. They need to assess who is affected, how, at what cost, and whether the policy achieves its stated objectives without harmful unintended consequences. The analysis must be documentable and auditable.
 
 **Patterns used:**
-- `ImpactAssessor` (enterprise) — maps direct, indirect, and second-order impacts across time horizons
-- `ConsequentialistAnalyzer` (enterprise) — evaluates net welfare outcomes across affected groups
-- `StakeholderEthicsAssessor` (enterprise) — assesses the policy from each stakeholder's ethical position
+- `ImpactAssessor` — maps direct, indirect, and second-order impacts across time horizons
+- `ConsequentialistAnalyzer` — evaluates net welfare outcomes across affected groups
+- `StakeholderEthicsAssessor` — assesses the policy from each stakeholder's ethical position
 
 **Integration:** Raw Context builds + `QualityMetrics` gate + JSON audit trail
 
@@ -19,7 +19,6 @@ description: Assess proposed policy using ImpactAssessor + ConsequentialistAnaly
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 import json
 from pathlib import Path

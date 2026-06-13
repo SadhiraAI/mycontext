@@ -9,9 +9,9 @@ description: Generate structured, well-reasoned ADRs using DecisionFramework + T
 **Scenario:** Your team makes architectural decisions constantly — new databases, framework migrations, API design choices. You want consistent, well-reasoned documentation that captures alternatives considered, constraints weighed, and the rationale — not just the conclusion.
 
 **Patterns used:**
-- `DecisionFramework` (enterprise) — structured multi-criteria decision analysis
-- `TradeoffAnalyzer` (enterprise) — explicit tradeoff mapping across dimensions
-- `ConstraintOptimizer` (enterprise) — identifies which constraints are hard vs. negotiable
+- `DecisionFramework` — structured multi-criteria decision analysis
+- `TradeoffAnalyzer` — explicit tradeoff mapping across dimensions
+- `ConstraintOptimizer` — identifies which constraints are hard vs. negotiable
 
 **Integration:** Blueprint for reusable ADR generation + `to_markdown()` export
 
@@ -19,7 +19,6 @@ description: Generate structured, well-reasoned ADRs using DecisionFramework + T
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

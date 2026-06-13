@@ -58,7 +58,6 @@ class HolisticIntegrator(Pattern):
         "(6) Synthesize a unified framework with leverage points for maximum impact.\n"
         "(7) Provide integrated recommendations that serve multiple perspectives simultaneously.\n\n"
         "Balance detail with big picture. No single perspective should dominate.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

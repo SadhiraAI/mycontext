@@ -51,8 +51,7 @@ const EXAMPLES = [
 export default function ChainBuilder() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const hasEnterprise = user?.enterprise_license === true;
+  useAuth();
 
   const [activeTab, setActiveTab] = useState("heuristic");
   const [question, setQuestion] = useState("");
@@ -186,7 +185,7 @@ export default function ChainBuilder() {
     setIntegratedResult(null);
     setEditableChain([]);
     try {
-      const opts = { mode: info.apiMode, include_enterprise: true };
+      const opts = { mode: info.apiMode };
       if (info.needsKey) opts.provider = provider;
       const res = await api.suggestChain(query, opts);
       setResult(res);
@@ -237,17 +236,6 @@ export default function ChainBuilder() {
     return result?.selection_reasoning || {};
   }, [result]);
 
-  const allCategories = useMemo(() => {
-    const c = {};
-    if (result?.pattern_categories) Object.assign(c, result.pattern_categories);
-    allTemplates.forEach((t) => { if (t.category) c[t.name] = t.category; });
-    return c;
-  }, [result, allTemplates]);
-
-  function hasEnterpriseInSelection() {
-    return editableChain.some((t) => (allCategories[t] || "free") === "enterprise");
-  }
-
   const filteredAddTemplates = useMemo(() => {
     const q = addSearch.toLowerCase();
     return allTemplates
@@ -289,7 +277,6 @@ export default function ChainBuilder() {
 
   const modeInfo = MODE_INFO[activeTab];
   const canIntegrate = hasKey && editableChain.length >= 2;
-  const blockedByEnterprise = !hasEnterprise && hasEnterpriseInSelection();
   const hasResultData = result?.chain != null;
   const isRunning = suggesting;
   const currentError = suggestError;
@@ -446,11 +433,6 @@ export default function ChainBuilder() {
               Your Workflow
               <span className="chain-result-count">{editableChain.length} pattern{editableChain.length !== 1 ? "s" : ""}</span>
             </h3>
-            {hasEnterpriseInSelection() && (
-              <span className="chain-ent-notice">
-                {"\uD83D\uDD12"} Contains enterprise patterns
-              </span>
-            )}
           </div>
 
           {result?.reasoning && <p className="chain-reasoning">{result.reasoning}</p>}
@@ -471,21 +453,16 @@ export default function ChainBuilder() {
           {/* Pipeline cards */}
           <div className="chain-pipeline">
             {editableChain.map((name, i) => {
-              const cat = allCategories[name] || "free";
-              const isFree = cat !== "enterprise";
               const reason = allReasoning[name];
               const tpl = allTemplates.find((t) => t.name === name);
               return (
-                <div key={name} className={`chain-pipeline-card ${!isFree ? "chain-pipeline-card--enterprise" : ""}`}>
+                <div key={name} className="chain-pipeline-card">
                   <div className="chain-pipeline-header">
                     <span className="chain-pipeline-num">{i + 1}</span>
                     <div className="chain-pipeline-info">
                       <span className="chain-pipeline-name">{name.replace(/_/g, " ")}</span>
                       {tpl?.description && <span className="chain-pipeline-desc">{tpl.description}</span>}
                     </div>
-                    <span className={`chain-pipeline-badge ${isFree ? "chain-pipeline-badge--free" : "chain-pipeline-badge--ent"}`}>
-                      {isFree ? "Free" : "Enterprise"}
-                    </span>
                     <button className="chain-pipeline-remove" onClick={() => removePattern(name)} title="Remove">&times;</button>
                   </div>
                   {reason && <p className="chain-pipeline-reason">{reason}</p>}
@@ -519,16 +496,12 @@ export default function ChainBuilder() {
                     <p className="chain-add-empty">No matching templates.</p>
                   )}
                   {filteredAddTemplates.slice(0, 20).map((t) => {
-                    const isFree = (t.category || "free") !== "enterprise";
                     return (
                       <div key={t.name} className="chain-add-item" onClick={() => addPattern(t.name)} role="button" tabIndex={0}>
                         <div className="chain-add-item-info">
                           <span className="chain-add-item-name">{t.name.replace(/_/g, " ")}</span>
                           {t.description && <span className="chain-add-item-desc">{t.description}</span>}
                         </div>
-                        <span className={`chain-pipeline-badge ${isFree ? "chain-pipeline-badge--free" : "chain-pipeline-badge--ent"}`}>
-                          {isFree ? "Free" : "Enterprise"}
-                        </span>
                       </div>
                     );
                   })}
@@ -711,21 +684,7 @@ export default function ChainBuilder() {
               </div>
             </div>
 
-            {blockedByEnterprise && (
-              <div className="chain-integrate-blocked">
-                <span>{"\uD83D\uDD12"}</span>
-                <div>
-                  <strong>Enterprise license required</strong>
-                  <p>Your chain includes enterprise patterns ({editableChain.filter((t) => (allCategories[t] || "free") === "enterprise").map((t) => t.replace(/_/g, " ")).join(", ")}).
-                  The integrator cannot generate a composite prompt with enterprise templates without a license.</p>
-                  <button type="button" className="chain-link-btn" onClick={() => navigate("/settings", { state: { tab: "License" } })}>
-                    Enter License Key
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {!hasKey && !blockedByEnterprise && (
+            {!hasKey && (
               <div className="chain-integrate-blocked chain-integrate-blocked--key">
                 <span>{"\uD83D\uDD11"}</span>
                 <div>
@@ -738,7 +697,7 @@ export default function ChainBuilder() {
             <button
               type="button"
               onClick={handleIntegrate}
-              disabled={integrating || !canIntegrate || blockedByEnterprise}
+              disabled={integrating || !canIntegrate}
               className="chain-btn chain-btn--integrate"
             >
               {integrating ? "Integrating patterns\u2026" : `Generate Integrated Prompt (${editableChain.length} patterns)`}
@@ -811,16 +770,12 @@ export default function ChainBuilder() {
                     <p className="chain-add-empty">No matching templates.</p>
                   )}
                   {filteredAddTemplates.slice(0, 20).map((t) => {
-                    const isFree = (t.category || "free") !== "enterprise";
                     return (
                       <div key={t.name} className="chain-add-item" onClick={() => addPattern(t.name)} role="button" tabIndex={0}>
                         <div className="chain-add-item-info">
                           <span className="chain-add-item-name">{t.name.replace(/_/g, " ")}</span>
                           {t.description && <span className="chain-add-item-desc">{t.description}</span>}
                         </div>
-                        <span className={`chain-pipeline-badge ${isFree ? "chain-pipeline-badge--free" : "chain-pipeline-badge--ent"}`}>
-                          {isFree ? "Free" : "Enterprise"}
-                        </span>
                       </div>
                     );
                   })}

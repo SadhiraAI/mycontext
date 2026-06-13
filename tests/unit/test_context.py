@@ -305,6 +305,41 @@ class TestResearchFlow:
         assert "**You MUST follow" in assembled
         assert "Must NOT include" in assembled
 
+    def test_research_flow_guard_rails_includes_quality_segments(self):
+        """0.11+ quality fields must appear in assemble() when research_flow=True."""
+        ctx = Context(
+            guidance=Guidance(role="Expert", goal="Summarize"),
+            directive=Directive(content="Do the task"),
+            constraints=Constraints(
+                verbosity="minimal",
+                communication_posture="direct",
+                answer_first=True,
+                forbidden_phrases=["delve into"],
+                self_check=["Did I cite sources?"],
+            ),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "## GUARD RAILS" in assembled
+        assert "Be concise. Lead with the essential answer." in assembled
+        assert "Respond directly. Skip meta-commentary" in assembled
+        assert "State your conclusion or answer first" in assembled
+        assert 'Do NOT use these phrases in your response: "delve into"' in assembled
+        assert "SELF-VERIFICATION — before finalizing, confirm:" in assembled
+        assert "Did I cite sources?" in assembled
+
+    def test_research_flow_quality_only_still_emits_guard_rails(self):
+        """Quality-only constraints still produce a GUARD RAILS section."""
+        ctx = Context(
+            guidance=Guidance(role="Bot"),
+            directive=Directive(content="Hi"),
+            constraints=Constraints(verbosity="detailed"),
+            research_flow=True,
+        )
+        assembled = ctx.assemble()
+        assert "## GUARD RAILS" in assembled
+        assert "thorough analysis with supporting evidence" in assembled
+
     def test_research_flow_thinking_strategy(self):
         for strategy in ["step_by_step", "multiple_angles", "verify", "explain_simply", "creative"]:
             ctx = Context(

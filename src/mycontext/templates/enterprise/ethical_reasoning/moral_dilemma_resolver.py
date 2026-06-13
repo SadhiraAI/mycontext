@@ -44,8 +44,6 @@ class MoralDilemmaResolver(Pattern):
         "be sacrificed.\n\n"
         "Avoid oversimplification. Acknowledge moral uncertainty and the genuine "
         "difficulty of the trade-off.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

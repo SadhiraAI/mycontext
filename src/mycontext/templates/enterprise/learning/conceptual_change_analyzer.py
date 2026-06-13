@@ -64,8 +64,6 @@ class ConceptualChangeAnalyzer(Pattern):
         "phenomena, and has broader applications the old model lacked.\n\n"
         "Include a comparison table of old vs new conceptions and consolidation "
         "activities.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

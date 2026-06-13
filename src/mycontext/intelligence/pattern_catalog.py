@@ -5,9 +5,6 @@ Contains pattern metadata, keyword mappings, and derived lookup dicts.
 Extracted from pattern_suggester.py for single-responsibility.
 """
 
-ENTERPRISE_LICENSE_NOTE = " Requires enterprise license. Set include_enterprise=True to use."
-
-
 # (name, category, one-line description) for all 88 templates (all unique names)
 FULL_PATTERN_CATALOG: list[tuple[str, str, str]] = [
     # FREE - Analysis (2)
@@ -1522,10 +1519,9 @@ PATTERN_MAP: list[tuple[list[str], tuple[str, str, str]]] = [
 
 
 # ---------------------------------------------------------------------------
-# GENERIC_PROMPT_FALLBACK — maps enterprise templates to the closest free
-# template that has a GENERIC_PROMPT.  Used when the complexity router
-# selects an enterprise template but the user needs a generic prompt
-# (e.g. free-tier, or static compilation).
+# GENERIC_PROMPT_FALLBACK — maps a template that has no GENERIC_PROMPT to the
+# closest template that does. Used when the complexity router selects a
+# template without a pre-authored generic prompt (e.g. for static compilation).
 # ---------------------------------------------------------------------------
 GENERIC_PROMPT_FALLBACK: dict = {
     # Reasoning

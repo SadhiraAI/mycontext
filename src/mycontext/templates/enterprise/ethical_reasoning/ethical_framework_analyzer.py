@@ -63,8 +63,6 @@ class EthicalFrameworkAnalyzer(Pattern):
         "For each framework, provide a verdict (ethical/questionable/unethical) with "
         "specific reasoning. Identify tensions between frameworks and provide an "
         "integrated recommendation.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

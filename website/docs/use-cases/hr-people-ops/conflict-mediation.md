@@ -10,7 +10,7 @@ description: Structure workplace conflict resolution using ConflictResolver + Mo
 
 **Patterns used:**
 - `ConflictResolver` — applies principled negotiation (interests, not positions)
-- `MoralDilemmaResolver` (enterprise) — navigates situations where values genuinely conflict
+- `MoralDilemmaResolver` — navigates situations where values genuinely conflict
 - `StakeholderMapper` — maps each party's interests and what resolution looks like for them
 
 **Integration:** Raw Context builds for separate party preparation + quality-gated synthesis
@@ -19,7 +19,6 @@ description: Structure workplace conflict resolution using ConflictResolver + Mo
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext import Context
 from mycontext.foundation import Directive, Guidance, Constraints

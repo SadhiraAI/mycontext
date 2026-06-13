@@ -54,8 +54,6 @@ class DesignThinker(Pattern):
         "(6) Iterate - based on anticipated feedback, describe how the "
         "solution would evolve through successive learning loops.\n\n"
         "Stay user-focused and iterative throughout.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

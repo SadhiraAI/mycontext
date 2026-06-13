@@ -283,21 +283,21 @@ class TestTokenOptimizerForwarding:
 
 class TestTransformationEngineLazySingleton:
     def setup_method(self):
-        """Clear the module-level cache before each test."""
+        """Reset the module-level cache before each test."""
         from mycontext.intelligence import transformation_engine as te
 
-        te._PATTERN_REGISTRY_CACHE.clear()
+        te._PATTERN_REGISTRY_CACHE = None
 
     def teardown_method(self):
-        """Clear cache after tests to avoid cross-test pollution."""
+        """Reset cache after tests to avoid cross-test pollution."""
         from mycontext.intelligence import transformation_engine as te
 
-        te._PATTERN_REGISTRY_CACHE.clear()
+        te._PATTERN_REGISTRY_CACHE = None
 
     def test_first_instantiation_builds_registry(self):
         from mycontext.intelligence.transformation_engine import TransformationEngine
 
-        engine = TransformationEngine(include_enterprise=False)
+        engine = TransformationEngine()
         assert len(engine._pattern_registry) > 0
 
     def test_second_instantiation_reuses_cache(self):
@@ -305,32 +305,30 @@ class TestTransformationEngineLazySingleton:
         from mycontext.intelligence.transformation_engine import TransformationEngine
 
         # First call populates the cache
-        e1 = TransformationEngine(include_enterprise=False)
-        registry_id_1 = id(te._PATTERN_REGISTRY_CACHE[False])
+        e1 = TransformationEngine()
+        registry_id_1 = id(te._PATTERN_REGISTRY_CACHE)
 
         # Second call must reuse the same dict object
-        e2 = TransformationEngine(include_enterprise=False)
-        registry_id_2 = id(te._PATTERN_REGISTRY_CACHE[False])
+        e2 = TransformationEngine()
+        registry_id_2 = id(te._PATTERN_REGISTRY_CACHE)
 
         assert registry_id_1 == registry_id_2
         assert e1._pattern_registry is e2._pattern_registry
 
-    def test_enterprise_and_free_variants_cached_separately(self):
-        from mycontext.intelligence import transformation_engine as te
+    def test_all_patterns_loaded_regardless_of_flag(self):
+        """All cognitive patterns are open source and always loaded."""
         from mycontext.intelligence.transformation_engine import TransformationEngine
 
-        TransformationEngine(include_enterprise=False)
-        TransformationEngine(include_enterprise=True)
+        # include_enterprise is accepted but ignored — both load the full set.
+        e_off = TransformationEngine(include_enterprise=False)
+        e_on = TransformationEngine(include_enterprise=True)
+        assert len(e_off._pattern_registry) == len(e_on._pattern_registry)
+        assert len(e_on._pattern_registry) == 88
 
-        assert False in te._PATTERN_REGISTRY_CACHE
-        assert True in te._PATTERN_REGISTRY_CACHE
-        # Enterprise registry should have at least as many patterns as free
-        assert len(te._PATTERN_REGISTRY_CACHE[True]) >= len(te._PATTERN_REGISTRY_CACHE[False])
-
-    def test_registry_contains_expected_free_patterns(self):
+    def test_registry_contains_expected_patterns(self):
         from mycontext.intelligence.transformation_engine import TransformationEngine
 
-        engine = TransformationEngine(include_enterprise=False)
+        engine = TransformationEngine()
         expected = {"question_analyzer", "step_by_step_reasoner", "risk_assessor"}
         for name in expected:
             assert name in engine._pattern_registry, f"Missing pattern: {name}"
@@ -345,7 +343,7 @@ class TestTransformationEngineLazySingleton:
 
         def create_engine():
             try:
-                engine = TransformationEngine(include_enterprise=False)
+                engine = TransformationEngine()
                 results.append(id(engine._pattern_registry))
             except Exception as e:
                 errors.append(e)
@@ -360,19 +358,19 @@ class TestTransformationEngineLazySingleton:
         # All threads should have gotten the same registry object
         assert len(set(results)) == 1, "Multiple registry objects created — thread safety failure"
 
-    def test_cache_cleared_forces_reload(self):
-        """After clearing the cache, a new instantiation rebuilds the registry."""
+    def test_cache_reset_forces_reload(self):
+        """After resetting the cache, a new instantiation rebuilds the registry."""
         from mycontext.intelligence import transformation_engine as te
         from mycontext.intelligence.transformation_engine import TransformationEngine
 
-        e1 = TransformationEngine(include_enterprise=False)
-        first_id = id(te._PATTERN_REGISTRY_CACHE[False])
+        TransformationEngine()
+        first_id = id(te._PATTERN_REGISTRY_CACHE)
 
-        te._PATTERN_REGISTRY_CACHE.clear()
+        te._PATTERN_REGISTRY_CACHE = None
 
-        e2 = TransformationEngine(include_enterprise=False)
-        second_id = id(te._PATTERN_REGISTRY_CACHE[False])
+        e2 = TransformationEngine()
+        second_id = id(te._PATTERN_REGISTRY_CACHE)
 
-        # After clear, a new dict should have been created
+        # After reset, a new dict should have been created
         assert first_id != second_id
         assert len(e2._pattern_registry) > 0

@@ -45,9 +45,9 @@ const PRODUCT_SUITE = [
   {
     icon: "\uD83E\uDDE0",
     title: "Cognitive Studio",
-    badge: "87 Patterns",
-    desc: "Research-backed cognitive frameworks — not generic prompt snippets. Root cause analysis, decision frameworks, systems thinking, and 80 more. Grounded in peer-reviewed science.",
-    highlights: ["87 reasoning frameworks", "7 categories + enterprise", "Fill params \u2192 export to any LLM"],
+    badge: "88 Patterns",
+    desc: "Research-backed cognitive frameworks — not generic prompt snippets. Root cause analysis, decision frameworks, systems thinking, and 80 more. Grounded in peer-reviewed science. All open source.",
+    highlights: ["88 reasoning frameworks", "All patterns, no tiers", "Fill params \u2192 export to any LLM"],
     link: "/signup",
     linkText: "Browse all patterns",
     accent: "#0d9488",
@@ -90,7 +90,7 @@ const RESEARCH_PROOF = [
     stat: "66.7%",
     claim: "improvement with cognitive scaffolding",
     source: "Cognitive Foundations for Reasoning (arxiv 2511.16660)",
-    detail: "LLMs under-utilize cognitive elements correlated with success. Scaffolding with structured reasoning frameworks — exactly what our 87 patterns do — improved performance by up to 66.7% on complex tasks.",
+    detail: "LLMs under-utilize cognitive elements correlated with success. Scaffolding with structured reasoning frameworks — exactly what our 88 patterns do — improved performance by up to 66.7% on complex tasks.",
   },
   {
     stat: "25–65%",
@@ -286,7 +286,7 @@ export default function Landing() {
             Engineer contexts.
           </h1>
           <p className="landing-tagline">
-            Research-backed prompt flows. 87 cognitive reasoning frameworks. AI-driven copilot.
+            Research-backed prompt flows. 88 cognitive reasoning frameworks. AI-driven copilot.
             Multi-pattern composition. Quality metrics. One SDK — 13 export formats.
           </p>
           <blockquote className="landing-epigraph">
@@ -308,7 +308,7 @@ export default function Landing() {
           </div>
           <div className="landing-hero-actions">
             <Link to="/signup" className="landing-btn primary large">Let's slink in</Link>
-            <Link to="/signup" className="landing-btn secondary large">See all 87 patterns</Link>
+            <Link to="/signup" className="landing-btn secondary large">See all 88 patterns</Link>
           </div>
 
           <div className="landing-demo">
@@ -530,16 +530,16 @@ export default function Landing() {
 
         {/* ── Template Showcase ────────────────────────── */}
         <section className="landing-section">
-          <h2 className="landing-section-title">87 research-backed cognitive patterns</h2>
+          <h2 className="landing-section-title">88 research-backed cognitive patterns</h2>
           <p className="landing-section-sub">
             Not generic prompt snippets. Reasoning frameworks grounded in cognitive science,
             decision theory, and systems thinking — each backed by peer-reviewed research.
+            All 88 are open source.
           </p>
           <div className="landing-categories">
             {CATEGORIES.map((c) => (
               <span key={c} className="landing-category-chip">{c}</span>
             ))}
-            <span className="landing-category-chip enterprise">+71 Enterprise</span>
           </div>
           <div className="landing-templates-grid">
             {FEATURED_TEMPLATES.map((t) => (
@@ -558,7 +558,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="landing-templates-cta">
-            <Link to="/signup" className="landing-btn secondary">Browse all 87 patterns →</Link>
+            <Link to="/signup" className="landing-btn secondary">Browse all 88 patterns →</Link>
           </div>
         </section>
 
@@ -609,7 +609,7 @@ export default function Landing() {
         <section className="landing-section landing-stats-section">
           <div className="landing-stats">
             <div className="landing-stat">
-              <span className="landing-stat-num">87</span>
+              <span className="landing-stat-num">88</span>
               <span className="landing-stat-label">Cognitive Patterns</span>
             </div>
             <div className="landing-stat">
@@ -635,13 +635,14 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ── Enterprise Teaser ────────────────────────── */}
+        {/* ── Advanced Patterns ────────────────────────── */}
         <section className="landing-section landing-enterprise">
           <div className="landing-enterprise-content">
-            <h2>Enterprise Edition</h2>
+            <h2>Advanced reasoning patterns — all open source</h2>
             <p className="landing-enterprise-lead">
-              71 advanced patterns for teams that need deeper analysis — decision optimization,
-              systems thinking, ethical reasoning, metacognition, and more.
+              Deeper analysis frameworks for complex work — decision optimization,
+              systems thinking, ethical reasoning, metacognition, and more. Every pattern
+              ships in the SDK with no license tiers.
             </p>
             <div className="landing-enterprise-cats">
               {ENTERPRISE_CATEGORIES.map((c) => (
@@ -654,14 +655,14 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <Link to="/signup" className="landing-btn primary">Start with free edition</Link>
+            <Link to="/signup" className="landing-btn primary">Explore all patterns</Link>
           </div>
         </section>
 
         {/* ── Footer CTA ──────────────────────────────── */}
         <section className="landing-section landing-final-cta">
           <h2>Start composing better contexts</h2>
-          <p>16 free patterns forever. No credit card required.</p>
+          <p>All 88 patterns, free and open source. No credit card required.</p>
           <div className="landing-hero-actions">
             <Link to="/signup" className="landing-btn primary large">Get started free</Link>
           </div>

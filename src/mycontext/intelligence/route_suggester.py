@@ -253,21 +253,13 @@ def suggest_routes(
         )
 
 
-def _postprocess(result: RouteAnalysis, include_enterprise: bool) -> RouteAnalysis:
+def _postprocess(result: RouteAnalysis, include_enterprise: bool = True) -> RouteAnalysis:
     """Validate template names, fix fuzzy matches, deduplicate terminals."""
-    from .pattern_catalog import NAME_TO_CATEGORY
-
     cleaned_routes: list[AnalysisRoute] = []
     for route in result.routes:
         fixed_steps = _fuzzy_fix_template_names(route.steps)
         if not fixed_steps:
             continue
-        if not include_enterprise:
-            enterprise_only = all(
-                NAME_TO_CATEGORY.get(s.template) == "enterprise" for s in fixed_steps
-            )
-            if enterprise_only:
-                continue
         route.steps = fixed_steps
         cleaned_routes.append(route)
 

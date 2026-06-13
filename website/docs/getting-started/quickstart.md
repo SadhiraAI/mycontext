@@ -131,7 +131,7 @@ print(ctx.to_markdown())
 result = ctx.execute(provider="openai")
 ```
 
-There are **16 free patterns** covering analysis, reasoning, planning, communication, and specialized tasks. [See all patterns →](../cognitive-patterns/overview)
+There are **88 cognitive patterns** — all open source — covering analysis, reasoning, planning, communication, and specialized tasks. [See all patterns →](../cognitive-patterns/overview)
 
 ## Let the Intelligence Layer Choose
 
@@ -224,11 +224,25 @@ Requires `tiktoken` for accurate counting (`pip install tiktoken`). Falls back t
 | **Use a pattern** | You know the reasoning method | `RootCauseAnalyzer().build_context(...)` |
 | **Let the SDK choose** | You have a question, want the best answer | `smart_execute("Your question")` |
 
+## Try It From the Command Line
+
+Prefer the terminal? The `mycontext` CLI ships with the package and runs offline:
+
+```bash
+mycontext list                                       # all 88 patterns
+mycontext run root_cause_analyzer "Why did latency spike?"   # print a portable prompt
+mycontext run decision_framework "Pick a database" --generic # pre-authored prompt
+mycontext skills export all -o ./skills              # export agent skills
+```
+
+See the [CLI reference](../cli/overview) for the full command set, plus
+[skills export](../cli/skills-export) and the [local MCP server](../cli/local-mcp).
+
 ## What's Next
 
 - **[Core Concepts](./core-concepts)** — understand Context, Guidance, Directive, Constraints, and the research flow
 - **[Prompt Assembly & Thinking Strategies](../foundations/research-flow)** — the nine-section structure, each thinking strategy in depth, and how few-shot examples are placed
-- **[Cognitive Patterns](../cognitive-patterns/overview)** — browse all 87 patterns
+- **[Cognitive Patterns](../cognitive-patterns/overview)** — browse all 88 patterns
 - **[Intelligence Layer](../intelligence/overview)** — auto-transform, pattern suggestion, multi-template fusion
 - **[Async Execution](../intelligence/async-execution)** — `aexecute`, `agenerate`, concurrent patterns
 - **[Token-Budget Assembly](../intelligence/token-budget)** — `assemble_for_model` in depth

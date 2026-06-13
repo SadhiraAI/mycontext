@@ -433,15 +433,6 @@ export async function changePassword(currentPassword, newPassword) {
   return handleResponse(res);
 }
 
-export async function activateLicense(key) {
-  const res = await fetch(`${API_BASE}/license/activate`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify({ key }),
-  });
-  return handleResponse(res);
-}
-
 export async function verifyEmail(token) {
   const res = await fetch(`${API_BASE}/auth/verify-email?token=${encodeURIComponent(token)}`, {
     headers: getHeaders(),

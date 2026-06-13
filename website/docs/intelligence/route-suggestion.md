@@ -50,7 +50,7 @@ def suggest_routes(
 |-----------|-------------|
 | `question` | User question or task |
 | `max_routes` | How many alternative routes to generate (clamped 2–6) |
-| `include_enterprise` | Whether enterprise-only templates may appear |
+| `include_enterprise` | Deprecated and ignored — all 88 patterns are always available |
 | `provider` / `model` / `temperature` | Passed to the LLM (same pattern as other intelligence APIs) |
 | `**kwargs` | e.g. `max_tokens`, `top_p` when using the instructor path |
 

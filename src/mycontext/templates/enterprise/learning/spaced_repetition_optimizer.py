@@ -61,8 +61,6 @@ class SpacedRepetitionOptimizer(Pattern):
         "(5) Provide a concrete implementation calendar with dates and activities.\n\n"
         "Emphasize active retrieval over re-reading. Include tracking metrics "
         "(success rate, confidence, recall speed) for ongoing adjustment.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

@@ -57,7 +57,6 @@ class HistoricalContextMapper(Pattern):
         "(6) Document what worked and what failed historically, and assess applicability now.\n"
         "(7) Provide history-informed recommendations: what to do, what to avoid, what to monitor.\n\n"
         "Use multiple examples, not single cases. Note differences as carefully as similarities.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

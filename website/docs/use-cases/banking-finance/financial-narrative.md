@@ -11,7 +11,7 @@ description: Turn raw financial data into executive-ready narrative with DataAna
 **Patterns used:**
 - `DataAnalyzer` — extracts meaningful insights from numerical and tabular data
 - `SynthesisBuilder` — synthesises insights into a coherent narrative
-- `NarrativeBuilder` (enterprise) — crafts the final narrative with appropriate structure, tone, and emphasis
+- `NarrativeBuilder` — crafts the final narrative with appropriate structure, tone, and emphasis
 
 **Integration:** Blueprint + `to_markdown()` export for direct document insertion
 
@@ -19,7 +19,6 @@ description: Turn raw financial data into executive-ready narrative with DataAna
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

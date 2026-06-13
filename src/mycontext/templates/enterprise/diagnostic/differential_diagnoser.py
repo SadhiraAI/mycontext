@@ -59,7 +59,6 @@ class DifferentialDiagnoser(Pattern):
         "(5) Narrow the differential with updated probabilities after evaluating evidence.\n"
         "(6) State the primary diagnosis with confidence level and a verification strategy.\n\n"
         "Be systematic and evidence-based. Consider multiple hypotheses before narrowing.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

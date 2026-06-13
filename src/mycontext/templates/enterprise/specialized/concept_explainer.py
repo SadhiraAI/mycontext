@@ -55,8 +55,6 @@ class ConceptExplainer(Pattern):
         "(6) Address common misconceptions — correct the top wrong beliefs and "
         "clarify key distinctions with related concepts.\n\n"
         "Adjust complexity to the audience. Use active voice and clear language.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

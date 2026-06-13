@@ -64,8 +64,6 @@ class ScaffoldingFramework(Pattern):
         "triggers for reducing support. (5) Include checkpoint questions to verify "
         "understanding before fading.\n\n"
         "Provide just enough support — not too much, not too little.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

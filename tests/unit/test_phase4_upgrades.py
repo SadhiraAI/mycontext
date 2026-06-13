@@ -183,20 +183,16 @@ class TestGetPatternClassCache:
 
         assert get_pattern_class("nonexistent_xyz") is None
 
-    def test_enterprise_gated_pattern_returns_none_when_blocked(self):
+    def test_all_patterns_available_regardless_of_flag(self):
+        """All patterns are open source — include_enterprise no longer gates."""
         from mycontext.intelligence.pattern_catalog import NAME_TO_CATEGORY
         from mycontext.intelligence.pattern_suggester import get_pattern_class
 
         ent_names = [n for n, c in NAME_TO_CATEGORY.items() if c == "enterprise"]
         if not ent_names:
             pytest.skip("No enterprise patterns registered")
-        import warnings
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            result = get_pattern_class(ent_names[0], include_enterprise=False)
-        assert result is None
-        assert len(w) == 1
+        assert get_pattern_class(ent_names[0], include_enterprise=False) is not None
+        assert get_pattern_class(ent_names[0], include_enterprise=True) is not None
 
     def test_cache_is_lru_cache_instance(self):
         from mycontext.intelligence.pattern_suggester import _get_pattern_class_cached

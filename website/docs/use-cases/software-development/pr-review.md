@@ -11,7 +11,7 @@ description: Automate pull request reviews using a three-stage LangChain LCEL ch
 **Patterns used:**
 - `CodeReviewer` — severity-ranked code quality and maintainability analysis
 - `RiskAssessor` — security vulnerability scanning with OWASP context
-- `BottleneckIdentifier` (enterprise) — spots performance bottlenecks and inefficient patterns
+- `BottleneckIdentifier` — spots performance bottlenecks and inefficient patterns
 
 **Integration:** LangChain LCEL chain with structured JSON output
 
@@ -19,7 +19,6 @@ description: Automate pull request reviews using a three-stage LangChain LCEL ch
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage

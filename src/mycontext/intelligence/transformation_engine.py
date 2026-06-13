@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 #   race condition that would cause duplicate pattern loading under concurrent
 #   instantiation.
 #
-# The registry is keyed by include_enterprise (True/False) so enterprise and
-# free-only instances each get their own lazily-built cache.
+# All cognitive patterns are open source, so there is a single shared registry
+# built from the unified pattern registry (skills.pattern_registry).
 
-_PATTERN_REGISTRY_CACHE: dict[bool, dict[str, Pattern]] = {}
+_PATTERN_REGISTRY_CACHE: dict[str, Pattern] | None = None
 _PATTERN_REGISTRY_LOCK = threading.Lock()
 
 
@@ -101,94 +101,51 @@ class TransformationEngine:
         """
         Initialize the transformation engine.
 
-        Pattern modules are loaded once per (include_enterprise) variant and
-        cached at module level — subsequent instantiations reuse the cached
-        registry without re-importing any modules.
+        All cognitive patterns are loaded once and cached at module level —
+        subsequent instantiations reuse the cached registry without re-importing
+        any modules.
 
         Args:
-            include_enterprise: If False, only free patterns are used.
+            include_enterprise: Accepted for backwards compatibility; all
+                patterns are open source and always loaded.
         """
         self.include_enterprise = include_enterprise
         # Delegate to the lazy-loaded module-level cache.
-        self._pattern_registry = self._get_registry(include_enterprise)
+        self._pattern_registry = self._get_registry()
 
     # ------------------------------------------------------------------
     # Lazy singleton registry
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _get_registry(include_enterprise: bool) -> dict[str, "Pattern"]:
+    def _get_registry() -> dict[str, "Pattern"]:
         """Return (and lazily build) the module-level pattern registry."""
-        if include_enterprise in _PATTERN_REGISTRY_CACHE:
-            return _PATTERN_REGISTRY_CACHE[include_enterprise]
+        global _PATTERN_REGISTRY_CACHE
+        if _PATTERN_REGISTRY_CACHE is not None:
+            return _PATTERN_REGISTRY_CACHE
 
         with _PATTERN_REGISTRY_LOCK:
             # Double-checked locking: re-test inside the lock to avoid
             # duplicate loading if two threads arrived simultaneously.
-            if include_enterprise in _PATTERN_REGISTRY_CACHE:
-                return _PATTERN_REGISTRY_CACHE[include_enterprise]
+            if _PATTERN_REGISTRY_CACHE is not None:
+                return _PATTERN_REGISTRY_CACHE
 
             registry: dict[str, Pattern] = {}
-            TransformationEngine._load_patterns_into(registry, include_enterprise)
-            _PATTERN_REGISTRY_CACHE[include_enterprise] = registry
-            logger.debug(
-                "TransformationEngine: loaded %d patterns (enterprise=%s)",
-                len(registry),
-                include_enterprise,
-            )
+            TransformationEngine._load_patterns_into(registry)
+            _PATTERN_REGISTRY_CACHE = registry
+            logger.debug("TransformationEngine: loaded %d patterns", len(registry))
             return registry
 
     @staticmethod
-    def _load_patterns_into(registry: dict[str, "Pattern"], include_enterprise: bool) -> None:
-        """Populate *registry* with all applicable patterns."""
-        from ..templates.free import (
-            IntentRecognizer,
-            QuestionAnalyzer,
-            RiskAssessor,
-            RootCauseAnalyzer,
-            SocraticQuestioner,
-            StepByStepReasoner,
-        )
+    def _load_patterns_into(registry: dict[str, "Pattern"]) -> None:
+        """Populate *registry* with every available pattern (one instance each)."""
+        from ..skills.pattern_registry import get_pattern_registry
 
-        patterns: list[Pattern] = [
-            QuestionAnalyzer(),
-            StepByStepReasoner(),
-            SocraticQuestioner(),
-            RiskAssessor(),
-            IntentRecognizer(),
-            RootCauseAnalyzer(),
-        ]
-
-        if include_enterprise:
+        for name, cls in get_pattern_registry().items():
             try:
-                from ..templates.enterprise import (
-                    AmbiguityResolver,
-                    AnalogicalReasoner,
-                    CausalReasoner,
-                )
-
-                patterns.extend([CausalReasoner(), AmbiguityResolver(), AnalogicalReasoner()])
-
-                from ..templates.enterprise.decision import (
-                    ComparativeAnalyzer,
-                    DecisionFramework,
-                    TradeoffAnalyzer,
-                )
-                from ..templates.enterprise.problem_solving import ProblemDecomposer
-
-                patterns.extend(
-                    [
-                        ComparativeAnalyzer(),
-                        TradeoffAnalyzer(),
-                        ProblemDecomposer(),
-                        DecisionFramework(),
-                    ]
-                )
-            except ImportError:
-                pass
-
-        for pattern in patterns:
-            registry[pattern.name] = pattern
+                registry[name] = cls()
+            except Exception:  # pragma: no cover - defensive
+                logger.debug("Skipping pattern %s — failed to instantiate", name)
 
     def analyze_input(self, input: str, metadata: dict[str, Any] | None = None) -> InputAnalysis:
         """
@@ -244,7 +201,7 @@ class TransformationEngine:
             requires_verification,
             ambiguity_level,
         )
-        # Filter to only patterns we have loaded (excludes enterprise when include_enterprise=False)
+        # Filter to only patterns we have loaded into the registry.
         recommended_patterns = [p for p in recommended_patterns if p in self._pattern_registry]
 
         # Calculate confidence

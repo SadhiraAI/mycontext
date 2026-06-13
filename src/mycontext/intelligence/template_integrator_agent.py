@@ -15,7 +15,6 @@ from dataclasses import dataclass, field
 
 from ..intelligence.pattern_catalog import NAME_TO_DESCRIPTION
 from ..intelligence.pattern_suggester import (
-    ENTERPRISE_LICENSE_NOTE,
     NAME_TO_CATEGORY,
     VALID_PATTERN_NAMES,
 )
@@ -105,8 +104,7 @@ class TemplateIntegratorAgent:
     2. Asks the LLM to fuse them into a single integrated context
     3. Returns a structured IntegrationResult that can be used directly
 
-    Enterprise gating: non-enterprise users cannot integrate enterprise
-    templates unless include_enterprise=True.
+    All cognitive patterns are open source and available to every user.
 
     Usage (SDK):
         >>> agent = TemplateIntegratorAgent()
@@ -256,16 +254,6 @@ class TemplateIntegratorAgent:
         invalid = [t for t in template_names if t not in VALID_PATTERN_NAMES]
         if invalid:
             raise ValueError("Unknown template(s): " + str(invalid))
-
-        if not self.include_enterprise:
-            ent = [t for t in template_names if NAME_TO_CATEGORY.get(t) == "enterprise"]
-            if ent:
-                raise ValueError(
-                    "Enterprise license required for: "
-                    + str(ent)
-                    + ". "
-                    + ENTERPRISE_LICENSE_NOTE.strip()
-                )
 
     def _build_summaries(self, names, reasoning):
         from .pattern_catalog import ENRICHED_CATALOG

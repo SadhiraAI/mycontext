@@ -55,7 +55,6 @@ class ComparativeAnalyzer(Pattern):
         "(5) Summary comparison matrix.\n"
         "(6) Clear recommendation with reasoning, alternatives, and key decision factors.\n\n"
         "Be objective, balanced, and actionable. Quantify where possible.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

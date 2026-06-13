@@ -54,8 +54,6 @@ class AnalogicalReasoner(Pattern):
         "analogies into a comprehensive, nuanced understanding of the "
         "concept.\n\n"
         "Be creative but grounded, insightful but accurate.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

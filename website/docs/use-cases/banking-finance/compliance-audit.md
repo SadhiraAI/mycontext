@@ -9,9 +9,9 @@ description: Audit processes against regulatory requirements using SystemHealthA
 **Scenario:** Your compliance team needs to audit internal processes against a growing body of financial regulations (Basel III, MiFID II, GDPR, AML directives). Manual review is slow and risks missing gaps. You want an AI audit that retrieves the relevant regulation, compares it to your process documentation, and surfaces gaps.
 
 **Patterns used:**
-- `SystemHealthAuditor` (enterprise) — assesses completeness and soundness of processes against standards
-- `AnomalyDetector` (enterprise) — flags deviations from expected regulatory compliance patterns
-- `EthicalFrameworkAnalyzer` (enterprise) — evaluates whether processes meet ethical and governance standards
+- `SystemHealthAuditor` — assesses completeness and soundness of processes against standards
+- `AnomalyDetector` — flags deviations from expected regulatory compliance patterns
+- `EthicalFrameworkAnalyzer` — evaluates whether processes meet ethical and governance standards
 
 **Integration:** LangChain + LlamaIndex RAG over a regulation document corpus
 
@@ -19,7 +19,6 @@ description: Audit processes against regulatory requirements using SystemHealthA
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from langchain_openai import ChatOpenAI

@@ -1,27 +1,18 @@
 ---
 sidebar_position: 2
-title: Enterprise Patterns
-description: 71 advanced cognitive patterns for specialized reasoning tasks. Requires a valid license key. Covers specialized intelligence, decision science, systems thinking, metacognition, ethics, and more.
+title: Advanced Patterns
+description: Advanced cognitive patterns for specialized reasoning tasks — all open source. Covers specialized intelligence, decision science, systems thinking, metacognition, ethics, and more.
 ---
 
-# Enterprise Patterns (71)
+# Advanced Patterns
 
-Enterprise patterns extend the free tier with advanced reasoning capabilities across specialized domains. They follow the same API as free patterns — `build_context()`, `execute()`, `generic_prompt()` — and integrate seamlessly with the intelligence layer.
+Advanced patterns extend the 16 core patterns to the full set of 88, adding reasoning capabilities across specialized domains. They follow the same API as the core patterns — `build_context()`, `execute()`, `generic_prompt()` — and integrate seamlessly with the intelligence layer.
 
-:::info License Required
-Enterprise patterns require a valid license key. Set your key via:
-```bash
-export MYCONTEXT_LICENSE_KEY="your-license-key"
-```
-Or configure programmatically:
-```python
-import mycontext
-mycontext.configure(license_key="your-license-key")
-```
-[Get a license →](https://sadhiraai.com)
+:::info All open source
+Every pattern is open source, ships in every install, and runs offline with your own LLM API key. No license keys, no tiers.
 :::
 
-## Importing Enterprise Patterns
+## Importing Advanced Patterns
 
 ```python
 from mycontext.templates.enterprise.decision import DecisionFramework
@@ -37,7 +28,7 @@ result = DecisionFramework().execute(
 )
 ```
 
-## All 71 Enterprise Patterns
+## The Advanced Patterns
 
 ### Specialized Intelligence (3 patterns)
 
@@ -273,7 +264,7 @@ Assessment and feedback patterns for systematic quality evaluation.
 
 ## Pattern Combinations
 
-Enterprise patterns are designed to chain with each other and with free patterns:
+Advanced patterns are designed to chain with each other and with the core patterns:
 
 ```python
 from mycontext.templates.enterprise.decision import TradeoffAnalyzer
@@ -302,11 +293,6 @@ scenarios = ScenarioPlanner().execute(
 )
 ```
 
-## License and Pricing
+## License
 
-Enterprise patterns are available in the following tiers:
-- **Professional**: All 71 patterns, single workspace
-- **Team**: All 71 patterns, up to 10 seats
-- **Enterprise**: All patterns, unlimited seats, custom SLAs
-
-[View pricing →](https://sadhiraai.com/pricing)
+All 88 cognitive patterns — core and advanced — are open source under the MIT license and ship in every `pip install mycontext-ai`. There are no tiers and no license keys. Run any pattern offline with your own LLM API key.

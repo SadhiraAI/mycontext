@@ -78,9 +78,6 @@ export default function Account() {
           <div className="account-profile-info">
             <strong>{displayName || user?.email?.split("@")[0]}</strong>
             <span>{user?.email}</span>
-            <span className={`account-plan-badge ${user?.enterprise_license ? "enterprise" : ""}`}>
-              {user?.enterprise_license ? "Enterprise" : "Free"}
-            </span>
           </div>
         </div>
 

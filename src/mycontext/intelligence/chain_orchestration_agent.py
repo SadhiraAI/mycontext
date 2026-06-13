@@ -9,7 +9,7 @@ for deterministic output and supports LLM overrides for task-specific params.
 from dataclasses import dataclass, field
 from typing import Any
 
-from .pattern_catalog import ENRICHED_CATALOG_TEXT, ENTERPRISE_LICENSE_NOTE, NAME_TO_CATEGORY
+from .pattern_catalog import ENRICHED_CATALOG_TEXT, NAME_TO_CATEGORY
 from .pattern_suggester import (
     VALID_PATTERN_NAMES,
     get_pattern_class,
@@ -321,18 +321,10 @@ Respond with ONLY valid JSON. No markdown, no explanation outside JSON."""
             merged[primary] = "<from previous step>"
         merged_params[name] = merged
 
-    # Tag each pattern with its category and append license note for
-    # enterprise patterns when the user doesn't have enterprise access —
-    # mirrors the behaviour of heuristic / hybrid modes.
+    # Tag each pattern with its category (all patterns are open source).
     categories: dict[str, str] = {}
     for name in chain:
         categories[name] = NAME_TO_CATEGORY.get(name, "free")
-    if not include_enterprise:
-        for name in chain:
-            if categories.get(name) == "enterprise":
-                existing = selection_reasoning.get(name, "")
-                if ENTERPRISE_LICENSE_NOTE not in existing:
-                    selection_reasoning[name] = existing + ENTERPRISE_LICENSE_NOTE
 
     reasoning_parts = []
     if question_analysis:

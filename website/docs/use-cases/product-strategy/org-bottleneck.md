@@ -9,9 +9,9 @@ description: Find what is slowing your org with FeedbackLoopIdentifier + Bottlen
 **Scenario:** Something is slowing your organization — but it is not obvious what. Decisions take too long, teams are blocked, output is below what the headcount would suggest. You want structured systems thinking that finds the root constraint, not just visible symptoms.
 
 **Patterns used:**
-- `FeedbackLoopIdentifier` (enterprise) — maps reinforcing and balancing feedback loops
-- `BottleneckIdentifier` (enterprise) — finds the single constraint limiting the whole system
-- `SystemArchetypeAnalyzer` (enterprise) — identifies which systemic archetype is in play
+- `FeedbackLoopIdentifier` — maps reinforcing and balancing feedback loops
+- `BottleneckIdentifier` — finds the single constraint limiting the whole system
+- `SystemArchetypeAnalyzer` — identifies which systemic archetype is in play
 
 **Integration:** AutoGen three-agent workshop with round-robin expert analysis
 
@@ -19,7 +19,6 @@ description: Find what is slowing your org with FeedbackLoopIdentifier + Bottlen
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
 from mycontext.templates.enterprise.systems_thinking import (

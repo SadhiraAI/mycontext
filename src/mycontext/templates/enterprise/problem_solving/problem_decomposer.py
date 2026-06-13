@@ -47,7 +47,6 @@ class ProblemDecomposer(Pattern):
         "(5) Prioritize sub-problems by impact, effort, and risk in a prioritization matrix.\n"
         "(6) Provide a phased solution roadmap with integration plan and success metrics.\n\n"
         "Be systematic and practical. Ensure completeness with no gaps.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

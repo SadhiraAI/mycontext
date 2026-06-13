@@ -52,8 +52,6 @@ class NarrativeBuilder(Pattern):
         "and the lasting meaning for the audience. "
         "(6) Write the complete narrative with vivid details and emotional arc.\n\n"
         "Show, don't just tell. Make it authentic and memorable.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

@@ -62,6 +62,11 @@ from .pattern_suggester import (
     smart_prompt,
     suggest_patterns,
 )
+from .generation_routing import (
+    classify_generation_intent,
+    model_allows_sampling,
+    resolve_generation_kwargs,
+)
 from .prompt_architect import (
     ArchitectResult,
     ParsedSections,
@@ -133,6 +138,9 @@ __all__ = [
     "ArchitectResult",
     "ParsedSections",
     "SectionDiff",
+    "classify_generation_intent",
+    "model_allows_sampling",
+    "resolve_generation_kwargs",
     "GuidanceOptimizer",
     "OptimizedGuidance",
     "GuidanceAuditResult",

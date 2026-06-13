@@ -9,7 +9,7 @@ description: Write inclusive job descriptions and evaluate candidates consistent
 **Scenario:** Your job descriptions are written by hiring managers, resulting in inconsistent quality, hidden bias (language that deters qualified candidates), and requirements that don't actually predict success. Candidate evaluation is similarly inconsistent. You want AI to audit and improve JDs, and to structure candidate comparison.
 
 **Patterns used:**
-- `ComparativeAnalyzer` (enterprise) — structured head-to-head candidate comparison against criteria
+- `ComparativeAnalyzer` — structured head-to-head candidate comparison against criteria
 - `RiskAssessor` — flags hiring risks (over-specified requirements, potential bias signals)
 - `AudienceAdapter` — calibrates the JD to attract the right candidate audience
 
@@ -19,7 +19,6 @@ description: Write inclusive job descriptions and evaluate candidates consistent
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage

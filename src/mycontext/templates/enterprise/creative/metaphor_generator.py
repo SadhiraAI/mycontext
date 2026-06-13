@@ -53,8 +53,6 @@ class MetaphorGenerator(Pattern):
         "(6) Provide usage guidance - suggest how to deploy each metaphor in "
         "context with example sentences tailored to the audience.\n\n"
         "Be creative but accurate, vivid but faithful to the concept.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

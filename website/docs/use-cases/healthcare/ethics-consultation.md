@@ -9,9 +9,9 @@ description: Simulate a multi-perspective ethics board with EthicalFrameworkAnal
 **Scenario:** A hospital faces an ethically complex case: a patient with diminishing capacity, disagreeing family members, resource constraints, and conflicting clinical recommendations. The ethics committee needs a structured consultation that applies multiple ethical frameworks and surfaces all stakeholder perspectives.
 
 **Patterns used:**
-- `EthicalFrameworkAnalyzer` (enterprise) — applies deontological, consequentialist, and virtue ethics lenses
-- `MoralDilemmaResolver` (enterprise) — navigates the specific tension between competing moral claims
-- `StakeholderEthicsAssessor` (enterprise) — maps each stakeholder's ethical position and interests
+- `EthicalFrameworkAnalyzer` — applies deontological, consequentialist, and virtue ethics lenses
+- `MoralDilemmaResolver` — navigates the specific tension between competing moral claims
+- `StakeholderEthicsAssessor` — maps each stakeholder's ethical position and interests
 
 **Integration:** CrewAI multi-agent simulation — patient advocate, clinical ethics specialist, and family mediator
 
@@ -19,7 +19,6 @@ description: Simulate a multi-perspective ethics board with EthicalFrameworkAnal
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.enterprise.ethical_reasoning import (

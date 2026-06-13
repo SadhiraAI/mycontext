@@ -25,26 +25,11 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     email_verified: Mapped[bool] = mapped_column(default=False)
     email_verify_token: Mapped[str | None] = mapped_column(String(128), nullable=True)
-    enterprise_license: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     api_keys: Mapped[list["UserAPIKey"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     custom_templates: Mapped[list["CustomTemplate"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-
-
-class LicenseKey(Base):
-    """Pre-generated license keys for enterprise activation."""
-
-    __tablename__ = "license_keys"
-
-    id: Mapped[str] = mapped_column(CHAR(36), primary_key=True, default=generate_uuid)
-    key: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
-    label: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    is_valid: Mapped[bool] = mapped_column(default=True)
-    redeemed_by: Mapped[str | None] = mapped_column(CHAR(36), ForeignKey("users.id"), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    redeemed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class UserAPIKey(Base):

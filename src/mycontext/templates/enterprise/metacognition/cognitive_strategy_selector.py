@@ -58,8 +58,6 @@ class CognitiveStrategySelector(Pattern):
         "stalls. (6) Identify strategies to AVOID for this task and explain why.\n\n"
         "Include implementation guidance: preparation steps, monitoring checkpoints, "
         "and success indicators.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

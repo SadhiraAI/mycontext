@@ -26,7 +26,6 @@ class SuggestRequest(BaseModel):
     provider: str = "openai"
     use_question_analyzer: bool = True
     max_patterns: int | None = None
-    include_enterprise: bool = True
 
 
 class SuggestResponse(BaseModel):
@@ -49,13 +48,10 @@ async def suggest_chain(
 ) -> SuggestResponse:
     """Suggest workflow chain. Quick=no key, Smart/Best=needs key."""
     mode = (body.mode or "smart").lower()
-    has_enterprise = getattr(user, "enterprise_license", False)
-    include_ent = body.include_enterprise and has_enterprise
     if mode == "quick":
         result = chain_service.suggest_patterns_chain(
             body.question,
             mode="quick",
-            include_enterprise=include_ent,
             max_patterns=body.max_patterns or 5,
         )
         if not result:
@@ -83,7 +79,6 @@ async def suggest_chain(
             result = chain_service.suggest_patterns_chain(
                 body.question,
                 mode="best",
-                include_enterprise=include_ent,
                 max_patterns=body.max_patterns or 5,
                 llm_provider=body.provider,
                 api_key=api_key,
@@ -116,7 +111,6 @@ async def suggest_chain(
             provider=body.provider,
             use_question_analyzer=body.use_question_analyzer,
             max_patterns=body.max_patterns,
-            include_enterprise=include_ent,
             api_key=api_key,
         )
     except Exception as e:
@@ -164,18 +158,7 @@ async def integrate_templates(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
-    """LLM merges selected templates into one integrated context. Enterprise gated."""
-    has_enterprise = getattr(user, "enterprise_license", False)
-
-    cats = chain_service.categories_for_chain(body.selected_templates)
-    enterprise_templates = [t for t, c in cats.items() if c == "enterprise"]
-    if enterprise_templates and not has_enterprise:
-        raise HTTPException(
-            403,
-            detail=f"Enterprise license required to integrate enterprise templates: {', '.join(enterprise_templates)}. "
-                   "Remove them or upgrade your license.",
-        )
-
+    """LLM merges selected templates into one integrated context."""
     api_key = await get_decrypted_key_for_user(db, str(user.id), body.provider)
     if not api_key:
         raise HTTPException(400, detail=f"Add an API key for '{body.provider}' in Settings to use integration.")
@@ -186,7 +169,6 @@ async def integrate_templates(
         selection_reasoning=body.selection_reasoning,
         provider=body.provider,
         api_key=api_key,
-        include_enterprise=has_enterprise,
     )
     if not result:
         raise HTTPException(503, detail="Integration service unavailable")
@@ -218,7 +200,6 @@ async def compile_prompt(
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
     """Compile templates into a single prompt (dynamic, LLM-refined)."""
-    has_enterprise = getattr(user, "enterprise_license", False)
     api_key = await get_decrypted_key_for_user(db, str(user.id), body.provider)
     if not api_key:
         raise HTTPException(400, detail=f"Add an API key for '{body.provider}' to compile prompts.")
@@ -227,7 +208,6 @@ async def compile_prompt(
         template_names=body.template_names,
         provider=body.provider,
         api_key=api_key,
-        include_enterprise=has_enterprise,
         refine=body.refine,
     )
     if not result:
@@ -243,11 +223,9 @@ async def compile_generic(
     user: User = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Compile generic prompts statically — zero LLM calls."""
-    has_enterprise = getattr(user, "enterprise_license", False)
     result = chain_service.compile_generic(
         question=body.question,
         template_names=body.template_names,
-        include_enterprise=has_enterprise,
     )
     if not result:
         raise HTTPException(503, detail="Generic compile service unavailable")

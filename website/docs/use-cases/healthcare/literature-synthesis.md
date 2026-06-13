@@ -10,8 +10,8 @@ description: Synthesize evidence across a corpus of medical papers using Synthes
 
 **Patterns used:**
 - `SynthesisBuilder` — synthesizes findings across multiple sources into a coherent narrative
-- `CrossDomainSynthesizer` (enterprise) — identifies connections and patterns that span different studies or specialties
-- `PatternRecognitionEngine` (enterprise) — detects recurring themes, effect sizes, and inconsistencies across papers
+- `CrossDomainSynthesizer` — identifies connections and patterns that span different studies or specialties
+- `PatternRecognitionEngine` — detects recurring themes, effect sizes, and inconsistencies across papers
 
 **Integration:** LlamaIndex RAG over a PDF paper corpus + multi-stage synthesis chain
 
@@ -19,7 +19,6 @@ description: Synthesize evidence across a corpus of medical papers using Synthes
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.core.query_engine import RetrieverQueryEngine

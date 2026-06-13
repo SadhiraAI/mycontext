@@ -71,8 +71,6 @@ class MetacognitiveMonitor(Pattern):
         "and work quality. (5) Recommended Adjustments — specify the immediate next "
         "action, strategy changes, and resources needed.\n\n"
         "Be honest and specific. Provide concrete, actionable guidance.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

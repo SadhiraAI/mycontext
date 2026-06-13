@@ -58,8 +58,6 @@ class ContentOutliner(Pattern):
         "(6) Close with a strong conclusion — recap key points, state "
         "implications, and include a clear call to action.\n\n"
         "Make every section specific enough to write from directly.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

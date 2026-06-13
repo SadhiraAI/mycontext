@@ -1,8 +1,8 @@
 """
 Pattern Suggester - Auto-suggest essential templates for any question.
 
-Maps question intent/keywords to optimal patterns (all 85 free + enterprise).
-Always suggests from full catalog; enterprise patterns show license note when include_enterprise=False.
+Maps question intent/keywords to optimal patterns across all 88 cognitive
+patterns. All patterns are open source and always available.
 """
 
 import logging
@@ -12,7 +12,6 @@ from typing import Any
 
 from .pattern_catalog import (
     ENRICHED_CATALOG_TEXT,
-    ENTERPRISE_LICENSE_NOTE,
     NAME_TO_CATEGORY,
     PATTERN_MAP,
     VALID_PATTERN_NAMES,
@@ -312,8 +311,6 @@ def _suggest_with_keywords(
         for kw in keywords:
             if kw in question_lower:
                 reason_text = f"Question mentions '{kw}' -> {reason}"
-                if category == "enterprise" and not include_enterprise:
-                    reason_text += ENTERPRISE_LICENSE_NOTE
                 suggestions.append(
                     PatternSuggestion(
                         name=pattern_name,
@@ -537,8 +534,6 @@ def _names_to_result(
     for name in names[:max_patterns]:
         cat = NAME_TO_CATEGORY.get(name, "free")
         reason = per_template_reasons.get(name, f"Selected by {source}")
-        if cat == "enterprise" and not include_enterprise:
-            reason += ENTERPRISE_LICENSE_NOTE
         suggestions.append(
             PatternSuggestion(
                 name=name,
@@ -593,28 +588,15 @@ def get_pattern_class(pattern_name: str, include_enterprise: bool = True):
     """
     Get the Pattern class for a given pattern name.
 
-    Delegates to the unified pattern registry. When include_enterprise=False
-    and pattern is enterprise, returns None and emits a warning directing the
-    user to either activate an enterprise license or use a free template.
+    Delegates to the unified pattern registry. All cognitive patterns are open
+    source and available — the ``include_enterprise`` parameter is accepted for
+    backwards compatibility but no longer gates anything.
 
     Pattern classes are stateless definitions — the result is cached with
     functools.lru_cache so repeated lookups (e.g., inside compose_from_templates
     or parallel refinement loops) pay the import cost only once.
     """
-    import warnings
-
-    category = NAME_TO_CATEGORY.get(pattern_name)
-    if category is None:
-        return None
-    if category == "enterprise" and not include_enterprise:
-        warnings.warn(
-            f"Template '{pattern_name}' requires an enterprise license. "
-            f"Activate with: mycontext.activate_license('MC-ENT-...'). "
-            f"Free alternatives (16 templates) are available — use "
-            f"include_enterprise=False to route to them automatically.",
-            UserWarning,
-            stacklevel=2,
-        )
+    if NAME_TO_CATEGORY.get(pattern_name) is None:
         return None
     return _get_pattern_class_cached(pattern_name)
 

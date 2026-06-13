@@ -9,9 +9,9 @@ description: Translate complex government documents into accessible public notic
 **Scenario:** Government agencies produce legislation, regulations, and public notices in complex legal and bureaucratic language. Citizens cannot understand what they are required to do, leading to non-compliance, public distrust, and avoidable helpline calls. You want plain-language versions generated automatically.
 
 **Patterns used:**
-- `SimplificationEngine` (enterprise) — removes jargon without losing accuracy
+- `SimplificationEngine` — removes jargon without losing accuracy
 - `AudienceAdapter` — adapts the communication to the target public audience
-- `ClarityOptimizer` (enterprise) — ensures every instruction is unambiguous and actionable
+- `ClarityOptimizer` — ensures every instruction is unambiguous and actionable
 
 **Integration:** Blueprint + LangChain streaming for real-time portal delivery
 
@@ -19,7 +19,6 @@ description: Translate complex government documents into accessible public notic
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

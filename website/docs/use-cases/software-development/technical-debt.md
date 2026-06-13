@@ -9,9 +9,9 @@ description: Scan a codebase module by module with BottleneckIdentifier + Depend
 **Scenario:** You have a legacy codebase and vague agreement that "tech debt is bad" but no systematic picture of where it lives, what it costs, or what to fix first. You want a structured, repeatable analysis that produces a ranked debt register across modules.
 
 **Patterns used:**
-- `BottleneckIdentifier` (enterprise) — finds complexity, coupling, or inefficiency that creates friction
-- `DependencyMapper` (enterprise) — maps hidden dependencies that make changes risky
-- `EfficiencyAnalyzer` (enterprise) — assesses operational and development efficiency costs
+- `BottleneckIdentifier` — finds complexity, coupling, or inefficiency that creates friction
+- `DependencyMapper` — maps hidden dependencies that make changes risky
+- `EfficiencyAnalyzer` — assesses operational and development efficiency costs
 
 **Integration:** Blueprint for consistent per-module analysis + `QualityMetrics` quality gate + JSON report
 
@@ -19,7 +19,6 @@ description: Scan a codebase module by module with BottleneckIdentifier + Depend
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 import json
 from pathlib import Path

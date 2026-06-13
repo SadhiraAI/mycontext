@@ -90,7 +90,6 @@ async def smart_execute(
         raise HTTPException(
             400, detail=f"Add an API key for '{body.provider}' in Settings to use Smart Execute",
         )
-    has_enterprise = getattr(user, "enterprise_license", False)
     quality_kwargs: dict = {}
     if body.quality:
         quality_kwargs = body.quality.model_dump(exclude_none=True)
@@ -98,7 +97,6 @@ async def smart_execute(
         question=body.question,
         provider=body.provider,
         api_key=api_key,
-        include_enterprise=has_enterprise,
         **quality_kwargs,
     )
     if not result:

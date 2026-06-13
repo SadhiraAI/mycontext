@@ -9,9 +9,9 @@ description: Audit public sector processes against statutory obligations using S
 **Scenario:** A government body or publicly funded organisation must demonstrate compliance with statutory obligations, procurement rules, data protection legislation, or sector-specific regulation. Manual audits are slow and subjective. You want a structured AI audit that compares processes against the actual statutory text.
 
 **Patterns used:**
-- `SystemHealthAuditor` (enterprise) — assesses completeness and soundness of processes against standards
-- `AnomalyDetector` (enterprise) — flags deviations from expected compliance patterns
-- `EthicalFrameworkAnalyzer` (enterprise) — evaluates whether processes meet governance and ethical standards
+- `SystemHealthAuditor` — assesses completeness and soundness of processes against standards
+- `AnomalyDetector` — flags deviations from expected compliance patterns
+- `EthicalFrameworkAnalyzer` — evaluates whether processes meet governance and ethical standards
 
 **Integration:** LlamaIndex RAG over statute corpus + quality-gated Context pipeline
 
@@ -19,7 +19,6 @@ description: Audit public sector processes against statutory obligations using S
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from langchain_openai import ChatOpenAI

@@ -1876,7 +1876,7 @@ def _has_generic_prompt(name: str) -> bool:
 
 
 def list_templates() -> list[dict[str, Any]]:
-    """List all 85 templates with enriched metadata."""
+    """List all 88 templates with enriched metadata."""
     results = []
     for name, cat, desc in FULL_PATTERN_CATALOG:
         meta = TEMPLATE_METADATA.get(name, {})
@@ -1935,11 +1935,11 @@ def build_context(name: str, params: dict[str, Any]) -> Any:
     return Klass().build_context(**params)
 
 
-def get_generic_prompt(name: str, question: str, include_enterprise: bool = True) -> str | None:
+def get_generic_prompt(name: str, question: str) -> str | None:
     """Get the filled generic prompt for a template. Returns prompt string or None."""
     if not get_generic_prompt_for:
         return None
     try:
-        return get_generic_prompt_for(name, question, include_enterprise=include_enterprise)
+        return get_generic_prompt_for(name, question)
     except Exception:
         return None

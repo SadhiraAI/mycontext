@@ -56,8 +56,6 @@ class SystemArchetypeAnalyzer(Pattern):
         "behavioral phase, provide the archetype-specific intervention strategy, "
         "and warn about typical mistakes. Note any secondary archetypes that "
         "compound or counteract the primary one.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

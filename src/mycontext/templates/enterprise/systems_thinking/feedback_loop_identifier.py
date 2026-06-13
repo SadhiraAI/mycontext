@@ -56,8 +56,6 @@ class FeedbackLoopIdentifier(Pattern):
         "collapse, or equilibrium. (6) Recommend high-leverage interventions that "
         "shift loop dominance toward desired behavior.\n\n"
         "Use standard R/B notation with numbered labels (R1, B1, etc.).\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

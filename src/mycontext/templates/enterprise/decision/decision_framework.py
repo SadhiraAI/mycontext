@@ -48,7 +48,6 @@ class DecisionFramework(Pattern):
         "(5) Assess risks and reversibility for top options.\n"
         "(6) Provide a primary recommendation with confidence level and implementation guidance.\n\n"
         "Be thorough, balanced, and decisive. Support recommendations with evidence.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

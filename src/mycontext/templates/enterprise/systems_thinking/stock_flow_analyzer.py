@@ -57,8 +57,6 @@ class StockFlowAnalyzer(Pattern):
         "Use precise language: stocks have levels (units), flows have rates "
         "(units/time). Recommend short-term flow adjustments and long-term "
         "structural changes.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

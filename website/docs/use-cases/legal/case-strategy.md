@@ -9,7 +9,7 @@ description: Adversarial case preparation using DecisionFramework + ScenarioPlan
 **Scenario:** A litigation team is preparing for trial. They need to stress-test their strategy from every angle: how will opposing counsel attack it, how will a judge view it, what are the factual weaknesses. You want a structured simulation that surfaces these perspectives before the courtroom does.
 
 **Patterns used:**
-- `DecisionFramework` (enterprise) — evaluates strategic options with explicit criteria
+- `DecisionFramework` — evaluates strategic options with explicit criteria
 - `ScenarioPlanner` — plans for multiple case trajectory scenarios
 - `StakeholderMapper` — maps each party's interests, motivations, and likely moves
 
@@ -19,7 +19,6 @@ description: Adversarial case preparation using DecisionFramework + ScenarioPlan
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.enterprise.decision import DecisionFramework

@@ -9,9 +9,9 @@ description: Build personalised L&D plans using ScaffoldingFramework + SpacedRep
 **Scenario:** Your organisation's L&D programmes are one-size-fits-all. New managers get the same course regardless of their background. Technical upskilling ignores what people already know. You want personalised learning paths that start at the learner's actual level and build progressively.
 
 **Patterns used:**
-- `ScaffoldingFramework` (enterprise) — progressive support structure that withdraws as competence grows
-- `SpacedRepetitionOptimizer` (enterprise) — schedules learning for maximum retention
-- `CognitiveLoadManager` (enterprise) — prevents overload by controlling complexity and pacing
+- `ScaffoldingFramework` — progressive support structure that withdraws as competence grows
+- `SpacedRepetitionOptimizer` — schedules learning for maximum retention
+- `CognitiveLoadManager` — prevents overload by controlling complexity and pacing
 
 **Integration:** AutoGen coaching conversation loop with adaptive path generation
 
@@ -19,7 +19,6 @@ description: Build personalised L&D plans using ScaffoldingFramework + SpacedRep
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from autogen import AssistantAgent, UserProxyAgent
 from mycontext.templates.enterprise.learning import (

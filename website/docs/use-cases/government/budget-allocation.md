@@ -9,9 +9,9 @@ description: Optimise public budget allocation across competing priorities using
 **Scenario:** A government department must allocate a fixed budget across multiple competing programmes. Each programme has different outcomes, beneficiary groups, and evidence bases. You want structured analysis that applies consistent cost-benefit methodology and optimises for multiple objectives (welfare, equity, efficiency, political feasibility).
 
 **Patterns used:**
-- `CostBenefitAnalyzer` (enterprise) — applies rigorous cost-benefit analysis to each programme option
-- `ResourceAllocator` (enterprise) — optimises allocation across competing uses under constraints
-- `MultiObjectiveOptimizer` (enterprise) — finds allocations that balance multiple competing objectives
+- `CostBenefitAnalyzer` — applies rigorous cost-benefit analysis to each programme option
+- `ResourceAllocator` — optimises allocation across competing uses under constraints
+- `MultiObjectiveOptimizer` — finds allocations that balance multiple competing objectives
 
 **Integration:** Blueprint + `OutputEvaluator` to score the quality of the allocation analysis
 
@@ -19,7 +19,6 @@ description: Optimise public budget allocation across competing priorities using
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

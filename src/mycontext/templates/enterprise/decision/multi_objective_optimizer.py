@@ -45,7 +45,6 @@ class MultiObjectiveOptimizer(Pattern):
         "(5) Quantify trade-off rates between competing objectives.\n"
         "(6) Recommend the best balanced solution with clear rationale.\n\n"
         "Be analytical about compromises. Present multiple viable solutions with explicit trade-offs.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

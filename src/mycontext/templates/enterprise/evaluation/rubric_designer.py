@@ -61,8 +61,6 @@ class RubricDesigner(Pattern):
         "objectivity, distinctiveness, completeness, and usability.\n\n"
         "Avoid vague terms like 'good' or 'adequate.' Use specific, observable "
         "behaviors. Provide a sample scoring application.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

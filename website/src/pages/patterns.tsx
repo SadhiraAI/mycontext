@@ -15,7 +15,7 @@ type Pattern = {
 };
 
 const PATTERNS: Pattern[] = [
-  // ── FREE (16) ────────────────────────────────────────────────────────────
+  // ── CORE (16) ────────────────────────────────────────────────────────────
   { name: 'RootCauseAnalyzer', category: 'Reasoning', tier: 'free', description: 'Five Whys + Ishikawa systematic diagnosis', inputs: ['problem', 'depth'], docPath: '/docs/cognitive-patterns/free/root-cause-analyzer' },
   { name: 'StepByStepReasoner', category: 'Reasoning', tier: 'free', description: 'Chain-of-thought with transparent, auditable steps', inputs: ['problem', 'domain'], docPath: '/docs/cognitive-patterns/free/step-by-step-reasoner' },
   { name: 'HypothesisGenerator', category: 'Reasoning', tier: 'free', description: 'Testable hypotheses with experimental design', inputs: ['observation', 'domain'], docPath: '/docs/cognitive-patterns/free/hypothesis-generator' },
@@ -33,8 +33,9 @@ const PATTERNS: Pattern[] = [
   { name: 'ConflictResolver', category: 'Specialized', tier: 'free', description: 'Mediate disputes and find win-win resolutions', inputs: ['conflict', 'parties'], docPath: '/docs/cognitive-patterns/free/conflict-resolver' },
   { name: 'IntentRecognizer', category: 'Specialized', tier: 'free', description: 'Uncover the true intent behind any request', inputs: ['input', 'depth'], docPath: '/docs/cognitive-patterns/free/intent-recognizer' },
 
-  // ── ENTERPRISE (71) ──────────────────────────────────────────────────────
-  // Specialized Intelligence (2)
+  // ── ADVANCED (72) ──────────────────────────────────────────────────────
+  // Specialized Intelligence (3)
+  { name: 'QueryPlanner', category: 'Specialized Intelligence', tier: 'enterprise', description: 'Pre-retrieval query analysis: classify, decompose, and rewrite (HyDE + step-back) before retrieval', inputs: ['query', 'task_type', 'domain'] },
   { name: 'RagAnswerer', category: 'Specialized Intelligence', tier: 'enterprise', description: 'Grounded RAG with citation, abstention, and +15% evidence recall (CRAG/Self-RAG/Chain-of-Note)', inputs: ['question', 'context', 'mode'] },
   { name: 'MemoryCompressor', category: 'Specialized Intelligence', tier: 'enterprise', description: 'Structured state extraction — 2x recall over summarization at scale for agent memory', inputs: ['content', 'intent', 'existing_memory', 'goal'] },
   // Advanced Analysis (4)
@@ -126,10 +127,21 @@ const PATTERNS: Pattern[] = [
 
 const ALL_CATEGORIES = ['All', ...Array.from(new Set(PATTERNS.map(p => p.category))).sort()];
 
+// `tier` is taxonomy only — every pattern is open source. "free" = the 16 core
+// patterns, "enterprise" = the 72 advanced patterns. Both ship in every install.
+const TIER_LABELS: Record<Tier, string> = {
+  free: 'core',
+  enterprise: 'advanced',
+};
+
 const TIER_COLORS: Record<Tier, string> = {
   free: 'var(--ifm-color-success)',
-  enterprise: 'var(--ifm-color-warning)',
+  enterprise: 'var(--ifm-color-primary)',
 };
+
+const CORE_COUNT = PATTERNS.filter(p => p.tier === 'free').length;
+const ADVANCED_COUNT = PATTERNS.filter(p => p.tier === 'enterprise').length;
+const TOTAL_COUNT = PATTERNS.length;
 
 function PatternCard({ pattern }: { pattern: Pattern }) {
   const card = (
@@ -139,7 +151,7 @@ function PatternCard({ pattern }: { pattern: Pattern }) {
         <span
           className={styles.tierBadge}
           style={{ backgroundColor: TIER_COLORS[pattern.tier] }}>
-          {pattern.tier}
+          {TIER_LABELS[pattern.tier]}
         </span>
       </div>
       <span className={styles.categoryBadge}>{pattern.category}</span>
@@ -185,12 +197,12 @@ export default function PatternsPage(): JSX.Element {
   return (
     <Layout
       title="Pattern Browser"
-      description="Browse and filter all 87 cognitive patterns — 16 free, 71 enterprise. Search by name, category, or input.">
+      description="Browse and filter all 88 cognitive patterns — all open source. Search by name, category, or input.">
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <h1 className={styles.heroTitle}>Pattern Browser</h1>
           <p className={styles.heroSubtitle}>
-            87 cognitive patterns — 16 free, 71 enterprise. Each one encodes a proven analytical methodology so you bring the problem, not the framework.
+            {TOTAL_COUNT} cognitive patterns — all open source. Each one encodes a proven analytical methodology so you bring the problem, not the framework.
           </p>
           <input
             className={styles.searchInput}
@@ -210,7 +222,11 @@ export default function PatternsPage(): JSX.Element {
               key={t}
               className={`${styles.tierBtn} ${tier === t ? styles.tierBtnActive : ''}`}
               onClick={() => setTier(t)}>
-              {t === 'all' ? 'All (85)' : t === 'free' ? '✓ Free (16)' : '★ Enterprise (69)'}
+              {t === 'all'
+                ? `All (${TOTAL_COUNT})`
+                : t === 'free'
+                  ? `Core (${CORE_COUNT})`
+                  : `Advanced (${ADVANCED_COUNT})`}
             </button>
           ))}
         </div>
@@ -228,7 +244,7 @@ export default function PatternsPage(): JSX.Element {
       </div>
 
       <div className={styles.resultsBar}>
-        Showing <strong>{filtered.length}</strong> of <strong>85</strong> patterns
+        Showing <strong>{filtered.length}</strong> of <strong>{TOTAL_COUNT}</strong> patterns
         {search && <> matching "<strong>{search}</strong>"</>}
       </div>
 
@@ -247,8 +263,8 @@ export default function PatternsPage(): JSX.Element {
 
       <div className={styles.footer}>
         <p>
-          Enterprise patterns require a license key.{' '}
-          <Link to="/docs/advanced/enterprise-license">Learn more →</Link>
+          All {TOTAL_COUNT} patterns are open source and included in every install — no tiers, no license keys.{' '}
+          <Link to="/docs/cognitive-patterns/overview">Browse the docs →</Link>
         </p>
         <pre className={styles.installBlock}>pip install mycontext-ai</pre>
       </div>

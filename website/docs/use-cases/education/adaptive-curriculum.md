@@ -9,9 +9,9 @@ description: Build learning paths that adjust to each student's level using Scaf
 **Scenario:** A student is learning a complex subject — say, machine learning or financial modelling. Static course content ignores where they actually are. You want a curriculum that starts at their current level, builds progressively, avoids overwhelming them, and adjusts based on how they respond to each step.
 
 **Patterns used:**
-- `ScaffoldingFramework` (enterprise) — provides the right level of support, incrementally withdrawn as competence builds
-- `ZoneOfProximalDevelopment` (enterprise) — targets concepts just beyond current competence (Vygotsky-based)
-- `CognitiveLoadManager` (enterprise) — prevents overload by controlling complexity and pacing
+- `ScaffoldingFramework` — provides the right level of support, incrementally withdrawn as competence builds
+- `ZoneOfProximalDevelopment` — targets concepts just beyond current competence (Vygotsky-based)
+- `CognitiveLoadManager` — prevents overload by controlling complexity and pacing
 
 **Integration:** LangChain with `ConversationBufferMemory` — persistent session that updates as the student progresses
 
@@ -19,7 +19,6 @@ description: Build learning paths that adjust to each student's level using Scaf
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory

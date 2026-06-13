@@ -53,8 +53,6 @@ class DeadlineManager(Pattern):
         "checkpoints, and if the deadline is infeasible, propose scope or "
         "timeline negotiation options.\n\n"
         "Be pragmatic. Under-promise and over-deliver.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

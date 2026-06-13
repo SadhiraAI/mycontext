@@ -10,7 +10,7 @@ description: Conduct systematic literature reviews with HypothesisGenerator + Cr
 
 **Patterns used:**
 - `HypothesisGenerator` — generates hypotheses about theoretical frameworks and research gaps
-- `CrossDomainSynthesizer` (enterprise) — identifies connections across sub-fields and disciplines
+- `CrossDomainSynthesizer` — identifies connections across sub-fields and disciplines
 - `SynthesisBuilder` — produces the final synthesised narrative
 
 **Integration:** LlamaIndex RAG over paper corpus + `TemplateBenchmark` to validate model selection
@@ -19,7 +19,6 @@ description: Conduct systematic literature reviews with HypothesisGenerator + Cr
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.llms.openai import OpenAI as LlamaOpenAI

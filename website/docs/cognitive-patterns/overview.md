@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 title: Cognitive Patterns Overview
-description: 87 research-backed cognitive patterns for systematic reasoning — 16 free, 71 enterprise. Browse by category, understand the methodology, and pick the right pattern for your task.
+description: 88 research-backed cognitive patterns for systematic reasoning — all open source. Browse by category, understand the methodology, and pick the right pattern for your task.
 ---
 
 # Cognitive Patterns
@@ -30,9 +30,11 @@ ctx = RootCauseAnalyzer().build_context(
 result = ctx.execute(provider="openai")
 ```
 
-## All 87 Patterns at a Glance
+## All 88 Patterns at a Glance
 
-### Free Patterns (16) — Included in Every Install
+All patterns are open source and included in every install — the Core/Advanced split below is taxonomy, not access tiers.
+
+### Core Patterns (16)
 
 | Pattern | Category | What it does | Key inputs |
 |---------|----------|-------------|------------|
@@ -53,9 +55,9 @@ result = ctx.execute(provider="openai")
 | [ConflictResolver](./free/conflict-resolver) | Specialized | Mediate disputes, find win-win resolutions | `conflict`, `parties` |
 | [IntentRecognizer](./free/intent-recognizer) | Specialized | Uncover true intent behind a request | `input`, `depth` |
 
-### Enterprise Patterns (71) — Requires License
+### Advanced Patterns (72)
 
-Advanced patterns organized by category. Each requires a valid license key. [Learn more →](./enterprise-overview)
+Advanced patterns organized by category — all open source, included in every install. [Learn more →](./enterprise-overview)
 
 | Category | Patterns | Highlights |
 |----------|----------|------------|
@@ -187,7 +189,7 @@ The full citation list (150+ papers) is in the [Research Foundations](/docs/cogn
 
 ---
 
-**Browse the free patterns:**
+**Browse the patterns:**
 
 import DocCardList from '@theme/DocCardList';
 

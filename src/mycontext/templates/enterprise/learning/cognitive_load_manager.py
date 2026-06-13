@@ -60,8 +60,6 @@ class CognitiveLoadManager(Pattern):
         "schema activation, and varied practice.\n\n"
         "Stay within working memory limits (7 +/- 2 chunks). Provide a phased "
         "optimization plan and a chunking strategy with estimated durations.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

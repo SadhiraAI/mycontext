@@ -47,7 +47,6 @@ class BottleneckIdentifier(Pattern):
         "(5) Propose exploitation strategies (optimize the constraint without adding resources).\n"
         "(6) Provide an optimization roadmap: quick wins, subordination, and elevation options.\n\n"
         "Be data-driven and systematic. Focus on the true constraint, not symptoms.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

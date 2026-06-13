@@ -10,7 +10,7 @@ description: An Agent Skill + LangChain memory chatbot that adapts explanations 
 
 **Patterns used:**
 - `TechnicalTranslator` — adapts technical concepts to the reader's background
-- `ScaffoldingFramework` (enterprise) — builds understanding incrementally (ZPD-based)
+- `ScaffoldingFramework` — builds understanding incrementally (ZPD-based)
 - `SocraticQuestioner` — tests understanding through questions rather than just delivering answers
 
 **Integration:** Agent Skill loaded via `SkillRunner` + LangChain `ConversationBufferMemory`
@@ -47,7 +47,6 @@ Always check understanding before going deeper.
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from pathlib import Path
 from langchain_openai import ChatOpenAI

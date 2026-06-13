@@ -60,7 +60,6 @@ class FutureScenarioPlanner(Pattern):
         "(5) Identify robust strategies that work across all scenarios (no-regret moves).\n"
         "(6) Provide scenario-specific contingent strategies and a monitoring plan.\n\n"
         "Create diverse futures, not just best/worst case. Be strategic and imaginative.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

@@ -27,9 +27,4 @@ Every use case picks the integration style that fits the problem — raw `Contex
 
 ## Patterns Coverage
 
-These use cases collectively cover all 87 cognitive patterns — 16 free and 71 enterprise. Enterprise patterns require [activating a license key](/docs/advanced/enterprise-license).
-
-```python
-import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
-```
+These use cases collectively cover all 88 cognitive patterns. Every pattern is open source, ships in every install, and runs offline with your own LLM API key — no license keys, no tiers.

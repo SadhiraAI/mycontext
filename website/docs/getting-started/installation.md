@@ -49,7 +49,7 @@ conda install -c conda-forge mycontext-ai
   </TabItem>
 </Tabs>
 
-This installs the core SDK with **16 free cognitive patterns**, the full intelligence layer, quality metrics, and all 13 export formats.
+This installs the core SDK with **all 88 cognitive patterns** (open source — no tiers or license keys), the full intelligence layer, quality metrics, and all 13 export formats.
 
 ## Add LLM Execution (Recommended)
 
@@ -207,6 +207,25 @@ Expected output:
 mycontext-ai v0.6.0 installed successfully
 ```
 
+## Command-Line Interface
+
+The package installs a `mycontext` console script for working with patterns and exporting agent skills — all offline:
+
+```bash
+mycontext list                                 # list all 88 patterns
+mycontext run root_cause_analyzer --generic    # print a pre-authored prompt
+mycontext skills export all -o ./skills        # export progressive-disclosure SKILL.md packages
+mycontext mcp                                  # start the local stdio MCP server
+```
+
+The local MCP server requires the optional `mcp` extra:
+
+```bash
+pip install "mycontext-ai[mcp]"
+```
+
+See the [CLI reference](../cli/overview) for full details.
+
 ## Configure Your API Key
 
 Set the API key for your LLM provider as an environment variable:
@@ -267,7 +286,8 @@ You only need an API key when **executing** contexts against an LLM (`ctx.execut
 | Component | Description |
 |-----------|-------------|
 | **Core SDK** | `Context`, `Guidance`, `Directive`, `Constraints` classes |
-| **16 Free Patterns** | RootCauseAnalyzer, CodeReviewer, StepByStepReasoner, and 13 more |
+| **88 Cognitive Patterns** | All open source — RootCauseAnalyzer, CodeReviewer, DecisionFramework, and 85 more |
+| **CLI** | `mycontext` console script — `list`, `run`, `skills export`, `mcp` |
 | **Intelligence Layer** | `transform()`, `suggest_patterns()`, `smart_execute()`, `generate_context()` |
 | **Async Execution** | `ctx.aexecute()` — non-blocking LLM calls via `litellm.acompletion` |
 | **Token-Budget Assembly** | `ctx.assemble_for_model(model, max_tokens)` — tiktoken-accurate trimming |

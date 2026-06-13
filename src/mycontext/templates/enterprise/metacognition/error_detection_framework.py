@@ -59,8 +59,6 @@ class ErrorDetectionFramework(Pattern):
         "type, location, evidence, severity (critical/major/minor), and fix.\n\n"
         "Provide verification strategies to catch remaining errors and prevention "
         "recommendations for future work.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

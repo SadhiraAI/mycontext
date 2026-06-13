@@ -9,9 +9,9 @@ description: Structure consistent, fair performance reviews using RubricDesigner
 **Scenario:** Performance reviews in your organisation are inconsistent. Some managers write detailed, actionable feedback. Others write vague platitudes. The result: reviews don't drive development, don't differentiate performance fairly, and don't hold up under scrutiny. You want every manager using the same structured, rubric-driven approach.
 
 **Patterns used:**
-- `RubricDesigner` (enterprise) — designs objective, behavioural criteria for performance dimensions
-- `FeedbackComposer` (enterprise) — structures constructive, specific, developmentally useful feedback
-- `FormativeAssessmentFramework` (enterprise) — frames the review as a development input, not just a rating
+- `RubricDesigner` — designs objective, behavioural criteria for performance dimensions
+- `FeedbackComposer` — structures constructive, specific, developmentally useful feedback
+- `FormativeAssessmentFramework` — frames the review as a development input, not just a rating
 
 **Integration:** Blueprint — one template, consistent output across the whole organisation
 
@@ -19,7 +19,6 @@ description: Structure consistent, fair performance reviews using RubricDesigner
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

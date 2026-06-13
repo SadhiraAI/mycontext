@@ -63,8 +63,6 @@ class SelfAssessmentGuide(Pattern):
         "Promote growth mindset: reframe weaknesses as 'not yet proficient' with "
         "clear paths to improvement. Include a calibration check against external "
         "feedback.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

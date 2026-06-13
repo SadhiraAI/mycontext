@@ -14,7 +14,7 @@ from .version import __version__
 # Intelligence module (lazy loading)
 # Integrations module (lazy loading)
 # Agent Skills (executable, quality-assured, pattern-anchored skills)
-from . import fragments, integrations, intelligence, skills, templates, utils
+from . import fragments, integrations, intelligence, rac, skills, templates, utils
 from .core import THINKING_STRATEGIES, Context
 from .foundation import Constraints, Directive, Guidance, TaskContract
 from .intelligence import (
@@ -85,6 +85,8 @@ __all__ = [
     "BenchmarkResult",
     # Fragments
     "fragments",
+    # Requirements-as-Code authoring + scoring bridge
+    "rac",
     # Skills
     "skills",
     "Skill",

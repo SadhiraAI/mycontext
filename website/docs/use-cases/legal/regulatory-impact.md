@@ -9,9 +9,9 @@ description: Assess the impact of proposed regulation using ImpactAssessor + Con
 **Scenario:** A policy team or affected business needs to assess the full impact of proposed legislation or regulatory change. Beyond "what does this cost us" — they need to understand second-order effects, stakeholder impacts, and whether the regulation achieves its stated ethical objectives.
 
 **Patterns used:**
-- `ImpactAssessor` (enterprise) — maps direct, indirect, and second-order impacts
-- `ConsequentialistAnalyzer` (enterprise) — evaluates outcomes across all affected parties
-- `StakeholderEthicsAssessor` (enterprise) — assesses the regulation from each stakeholder's ethical position
+- `ImpactAssessor` — maps direct, indirect, and second-order impacts
+- `ConsequentialistAnalyzer` — evaluates outcomes across all affected parties
+- `StakeholderEthicsAssessor` — assesses the regulation from each stakeholder's ethical position
 
 **Integration:** Raw `Context` with `QualityMetrics` gate — suitable for CI/CD policy review pipelines
 
@@ -19,7 +19,6 @@ description: Assess the impact of proposed regulation using ImpactAssessor + Con
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext import Context
 from mycontext.foundation import Guidance, Directive, Constraints

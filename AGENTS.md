@@ -28,6 +28,13 @@ multi-template fusion, chain orchestration, and a web application.
 - Templates inherit from `Pattern`, must implement `build_context()` and `GENERIC_PROMPT`
 - All LLM calls route through LiteLLM
 
+## CLI, Skills export, local MCP, and RaC
+
+- **CLI** (`mycontext` console script, `src/mycontext/cli/`): `mycontext list`, `mycontext run <pattern>`, `mycontext skills export <name|all>`, `mycontext mcp`.
+- **Skills export**: emits progressive-disclosure `SKILL.md` packages (Tier-1 name/description, Tier-2 body with pre-authored prompt + SDK scaffold, Tier-3 `references/`). `--plugin` emits a Claude Code / Cowork plugin manifest.
+- **Local MCP** (`mycontext mcp`, optional `mcp` extra): a stdio FastMCP server exposing `suggest_patterns`, `transform`, and `score_output`. Local-only, $0.
+- **Requirements-as-Code** (`src/mycontext/rac/`): authoring + scoring ONLY. Drafts a `requirements.yaml` (task taxonomy, rubrics, action risk matrix, pre-mortem) from cognitive patterns and scores outputs via `OutputEvaluator`. ANTI-GOAL: never add a RaC compiler, CI gate executor, or HITL/budget runtime here — enforcement is the customer's stack.
+
 ## CRITICAL — LiteLLM (supply chain)
 
 - **Never upgrade or repin `litellm`** in `pyproject.toml` / `uv.lock` unless the **maintainer explicitly asks** in this chat.
@@ -35,14 +42,14 @@ multi-template fusion, chain orchestration, and a web application.
 - The repo pins an exact LiteLLM version on purpose; treat it as **frozen** for routine work.
 - Two skill systems exist — SDK SkillRunner demos in `docs/examples/skills/` (for research) vs Cursor Agent skills in `.cursor/skills/` (for development)
 
-## CRITICAL — Enterprise & Deployment Rules
+## CRITICAL — Open Source & Deployment Rules
 
-- **Enterprise templates** (`src/mycontext/templates/enterprise/`) are EXCLUDED from PyPI builds — `pyproject.toml` has explicit exclude rules for wheel and sdist. NEVER remove these.
-- **Enterprise gating tests** (`tests/unit/test_enterprise_gating.py`) MUST pass before any release.
+- **All 88 cognitive patterns are open source** and ship in the PyPI wheel — there are no license tiers. The `templates/free/` and `templates/enterprise/` folders are a TAXONOMY only; both are packaged. Do NOT re-add wheel/sdist excludes or `include_enterprise` gating.
+- **License shims**: `mycontext.activate_license` / `deactivate_license` / `is_enterprise_active` are deprecated no-op shims kept for one release; do not build new gating on them.
 - **NEVER use "Cursor"** in commit messages, PR titles, or any GitHub-facing text.
 - **NEVER commit** `.env`, API keys, PyPI tokens, or credentials.
 - **NEVER force-push** to main.
-- **Version** lives in TWO places that MUST match: `pyproject.toml` and `src/mycontext/__init__.py`.
+- **Version** lives in TWO places that MUST match: `pyproject.toml` and `src/mycontext/version.py`.
 - **Manual push only** — always provide git push commands for the user to run; do not auto-push.
 - **Full deployment guide**: `docs/DEPLOYMENT_GUIDE.md` — follow it for any release.
 - **CI/CD**: `backend.yml` (src/app/tests → Fly.io), `docs.yml` (website → Cloudflare Pages). Research pages excluded from production docs builds.

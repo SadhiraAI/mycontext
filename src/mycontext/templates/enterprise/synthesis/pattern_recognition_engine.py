@@ -58,7 +58,6 @@ class PatternRecognitionEngine(Pattern):
         "(6) Uncover hidden patterns that are not immediately obvious, with discovery evidence.\n"
         "(7) Distinguish signal from noise. Provide pattern-based predictions and actionable insights.\n\n"
         "Be analytical and systematic. Explain why patterns occur, not just that they exist.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

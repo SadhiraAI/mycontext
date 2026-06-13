@@ -15,7 +15,6 @@ from app.api import (
     execute_router,
     feedback_router,
     keys_router,
-    license_router,
     quality_router,
     templates_router,
     transform_router,
@@ -106,7 +105,6 @@ async def rate_limit_auth(request: Request, call_next):
 app.include_router(auth_router)
 app.include_router(architect_router)
 app.include_router(keys_router)
-app.include_router(license_router)
 app.include_router(templates_router)
 app.include_router(custom_templates_router)
 app.include_router(chains_router)

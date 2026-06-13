@@ -52,8 +52,6 @@ class SimplificationEngine(Pattern):
         "(6) Address common misconceptions — correct the top mistakes people make "
         "and explain why the confusion arises.\n\n"
         "Use plain language. Be patient and clear, never condescending.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

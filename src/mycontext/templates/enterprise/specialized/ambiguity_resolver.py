@@ -52,8 +52,6 @@ class AmbiguityResolver(Pattern):
         "reformulated versions for each major interpretation. "
         "(6) Recommend how to proceed given the remaining uncertainty.\n\n"
         "Be precise and helpful, never pedantic.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

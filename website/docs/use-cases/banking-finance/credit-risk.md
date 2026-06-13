@@ -10,9 +10,9 @@ description: Structure loan and credit decisions with RiskAssessor + RiskMitigat
 
 **Patterns used:**
 - `RiskAssessor` — evaluates risk dimensions and likelihood of adverse outcomes
-- `RiskMitigator` (enterprise) — identifies what would reduce or offset each risk
-- `ImpactAssessor` (enterprise) — quantifies the severity of each risk scenario
-- `CausalReasoner` (enterprise) — maps the causal chain from risk factors to potential default
+- `RiskMitigator` — identifies what would reduce or offset each risk
+- `ImpactAssessor` — quantifies the severity of each risk scenario
+- `CausalReasoner` — maps the causal chain from risk factors to potential default
 
 **Integration:** Blueprint + `to_openai()` direct call + JSON output
 
@@ -20,7 +20,6 @@ description: Structure loan and credit decisions with RiskAssessor + RiskMitigat
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from openai import OpenAI
 from mycontext.structure import Blueprint

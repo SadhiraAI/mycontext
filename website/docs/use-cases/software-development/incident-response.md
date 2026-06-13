@@ -10,8 +10,8 @@ description: A three-agent AutoGen system that triages production incidents — 
 
 **Patterns used:**
 - `RootCauseAnalyzer` — immediate cause + contributing factors + timeline
-- `DiagnosticRootCauseAnalyzer` (enterprise) — deeper diagnostic with differential reasoning
-- `SystemHealthAuditor` (enterprise) — assesses whether the system is in a stable state
+- `DiagnosticRootCauseAnalyzer` — deeper diagnostic with differential reasoning
+- `SystemHealthAuditor` — assesses whether the system is in a stable state
 
 **Integration:** AutoGen multi-agent conversation — triage agent, diagnostic agent, postmortem writer
 
@@ -19,7 +19,6 @@ description: A three-agent AutoGen system that triages production incidents — 
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
 from mycontext.templates.free.reasoning import RootCauseAnalyzer

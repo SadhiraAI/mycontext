@@ -39,6 +39,8 @@ _EXECUTE_KWARGS_BLOCKLIST = frozenset(
         "reasoning_strategies",
         "user_message",
         "task_contract",
+        "auto_generation_params",
+        "generation_profile",
     }
 )
 
@@ -126,7 +128,7 @@ class LiteLLMProvider(BaseProvider):
         context: "Context",
         user: str | None = None,
         model: str | None = None,
-        temperature: float = 0.7,
+        temperature: float | None = 0.7,
         max_tokens: int | None = None,
         use_cache: bool = True,
         **kwargs: Any,
@@ -172,13 +174,15 @@ class LiteLLMProvider(BaseProvider):
         _tracer = get_tracer()
 
         api_key = kwargs.pop("api_key", self.api_key)
+        kwargs = {k: v for k, v in kwargs.items() if k not in _EXECUTE_KWARGS_BLOCKLIST}
 
         call_kwargs: dict[str, Any] = {
             "model": litellm_model,
             "messages": messages,
-            "temperature": temperature,
             "timeout": kwargs.pop("timeout", self.timeout),
         }
+        if temperature is not None:
+            call_kwargs["temperature"] = temperature
         if api_key:
             call_kwargs["api_key"] = api_key
         if max_tokens:
@@ -275,7 +279,7 @@ class LiteLLMProvider(BaseProvider):
         context: "Context",
         user: str | None = None,
         model: str | None = None,
-        temperature: float = 0.7,
+        temperature: float | None = 0.7,
         max_tokens: int | None = None,
         use_cache: bool = True,
         **kwargs: Any,
@@ -322,9 +326,10 @@ class LiteLLMProvider(BaseProvider):
         call_kwargs: dict[str, Any] = {
             "model": litellm_model,
             "messages": messages,
-            "temperature": temperature,
             "timeout": kwargs.pop("timeout", self.timeout),
         }
+        if temperature is not None:
+            call_kwargs["temperature"] = temperature
         if api_key:
             call_kwargs["api_key"] = api_key
         if max_tokens:

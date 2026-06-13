@@ -13,9 +13,9 @@ This tool is for decision support only. All outputs require review by a qualifie
 :::
 
 **Patterns used:**
-- `DifferentialDiagnoser` (enterprise) — applies systematic differential diagnosis methodology
-- `RiskMitigator` (enterprise) — identifies what happens if high-risk diagnoses are missed
-- `AnomalyDetector` (enterprise) — flags atypical features that don't fit the most obvious diagnosis
+- `DifferentialDiagnoser` — applies systematic differential diagnosis methodology
+- `RiskMitigator` — identifies what happens if high-risk diagnoses are missed
+- `AnomalyDetector` — flags atypical features that don't fit the most obvious diagnosis
 
 **Integration:** Raw `Context` + strict quality gate + `to_anthropic()` for Claude's longer reasoning
 
@@ -23,7 +23,6 @@ This tool is for decision support only. All outputs require review by a qualifie
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from anthropic import Anthropic
 from mycontext.templates.enterprise.diagnostic import DifferentialDiagnoser

@@ -50,7 +50,7 @@ smart_execute(
 |-----------|------|---------|-------------|
 | `question` | `str` | required | Question or problem |
 | `provider` | `str` | `"openai"` | LLM provider |
-| `include_enterprise` | `bool` | `True` | Include enterprise patterns |
+| `include_enterprise` | `bool` | `True` | Deprecated and ignored — all 88 patterns are always available |
 | `model` | `str \| None` | `None` | Override model (e.g. `"gpt-4o"`) |
 | `**kwargs` | | | Extra provider params (temperature, max_tokens, etc.) |
 
@@ -153,7 +153,7 @@ smart_prompt(
 |-----------|------|---------|-------------|
 | `question` | `str` | required | Question or problem |
 | `provider` | `str` | `"openai"` | LLM provider for composition |
-| `include_enterprise` | `bool` | `True` | Include enterprise patterns |
+| `include_enterprise` | `bool` | `True` | Deprecated and ignored — all 88 patterns are always available |
 | `model` | `str \| None` | `None` | Override model |
 | `refine` | `bool` | `True` | Whether to LLM-refine each template prompt before composing |
 

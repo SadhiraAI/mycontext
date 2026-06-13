@@ -171,19 +171,17 @@ Get a single template's generic prompt with automatic enterprise fallback:
 ```python
 from mycontext.intelligence import get_generic_prompt_for
 
-# Get generic prompt for any template
+# Get generic prompt for any of the 88 patterns
 prompt = get_generic_prompt_for(
     template_name="root_cause_analyzer",
     question="Why did our API latency spike?",
-    include_enterprise=True,
 )
 print(prompt)
 
-# With enterprise fallback (if enterprise not licensed, uses free alternative)
+# Advanced patterns work the same way — no license needed
 prompt = get_generic_prompt_for(
-    template_name="causal_reasoner",  # enterprise pattern
+    template_name="causal_reasoner",
     question="Why did our revenue drop?",
-    include_enterprise=False,  # will use root_cause_analyzer as fallback
 )
 ```
 

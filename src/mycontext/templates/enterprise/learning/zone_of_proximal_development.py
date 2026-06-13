@@ -60,8 +60,6 @@ class ZoneOfProximalDevelopment(Pattern):
         "Provide a learning pathway from current to goal, with ZPD tasks, support "
         "plans, and criteria for when to reassess the ZPD boundaries as the "
         "learner progresses.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

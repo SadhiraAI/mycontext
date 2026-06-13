@@ -9,9 +9,9 @@ description: Investigate suspicious transaction patterns with AnomalyDetector + 
 **Scenario:** Your fraud team has flagged a cluster of suspicious transactions. They need to move from "this looks odd" to "here is the likely fraud typology, the probable mechanism, and the evidence chain" — fast. Manual investigation is time-consuming and inconsistent across analysts.
 
 **Patterns used:**
-- `AnomalyDetector` (enterprise) — surfaces statistically and behaviourally unusual patterns
-- `PatternRecognitionEngine` (enterprise) — identifies known fraud typologies in the transaction data
-- `CausalReasoner` (enterprise) — builds the causal chain from anomaly to fraud mechanism
+- `AnomalyDetector` — surfaces statistically and behaviourally unusual patterns
+- `PatternRecognitionEngine` — identifies known fraud typologies in the transaction data
+- `CausalReasoner` — builds the causal chain from anomaly to fraud mechanism
 
 **Integration:** AutoGen sequential investigator chain — anomaly analyst feeds pattern recogniser feeds causal modeller
 
@@ -19,7 +19,6 @@ description: Investigate suspicious transaction patterns with AnomalyDetector + 
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from autogen import AssistantAgent, UserProxyAgent
 from mycontext.templates.enterprise.analysis import AnomalyDetector

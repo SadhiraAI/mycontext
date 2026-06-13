@@ -13,9 +13,9 @@ All outputs require review by a qualified clinician before being delivered to pa
 :::
 
 **Patterns used:**
-- `SimplificationEngine` (enterprise) — strips jargon without losing clinical accuracy
+- `SimplificationEngine` — strips jargon without losing clinical accuracy
 - `AudienceAdapter` — calibrates vocabulary and examples to the specific audience
-- `ClarityOptimizer` (enterprise) — ensures instructions are unambiguous and actionable
+- `ClarityOptimizer` — ensures instructions are unambiguous and actionable
 
 **Integration:** Blueprint + LangChain streaming (FastAPI)
 
@@ -23,7 +23,6 @@ All outputs require review by a qualified clinician before being delivered to pa
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse

@@ -63,8 +63,6 @@ class FormativeAssessmentFramework(Pattern):
         "Include quick-check techniques (exit tickets, diagnostic questions) and a "
         "continuous feedback loop: assess, analyze gaps, adjust instruction, "
         "reassess.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

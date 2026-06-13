@@ -81,13 +81,11 @@ export default function Templates() {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const hasEnterprise = user?.enterprise_license === true;
 
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [licenseFilter, setLicenseFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selected, setSelected] = useState(null);
   const [params, setParams] = useState({});
@@ -294,8 +292,6 @@ export default function Templates() {
 
   const filtered = useMemo(() => {
     let list = templates;
-    if (licenseFilter === "free") list = list.filter((t) => t.license !== "enterprise");
-    else if (licenseFilter === "enterprise") list = list.filter((t) => t.license === "enterprise");
     if (categoryFilter !== "all") list = list.filter((t) => patternToCategory(t) === categoryFilter);
     if (search) {
       const q = search.toLowerCase();
@@ -307,18 +303,14 @@ export default function Templates() {
       );
     }
     return list;
-  }, [templates, licenseFilter, categoryFilter, search]);
+  }, [templates, categoryFilter, search]);
 
   const selectedTpl = selected ? templates.find((t) => t.name === selected) : null;
-  const isEnterpriseLocked = selectedTpl?.license === "enterprise" && !hasEnterprise;
 
   function handleSelectTemplate(name) {
     setSelected(name);
     setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
-
-  const freeCount = templates.filter((t) => t.license !== "enterprise").length;
-  const entCount = templates.filter((t) => t.license === "enterprise").length;
 
   return (
     <div className="templates-page">
@@ -327,7 +319,7 @@ export default function Templates() {
           <span className="page-header-icon">{"\uD83E\uDDE0"}</span>
           <div>
             <h1>Cognitive Studio</h1>
-            <p className="page-header-sub">87 research-backed cognitive frameworks. Master the patterns that amplify your AI.</p>
+            <p className="page-header-sub">88 research-backed cognitive frameworks. Master the patterns that amplify your AI.</p>
           </div>
         </div>
         <blockquote className="page-epigraph">
@@ -364,18 +356,6 @@ export default function Templates() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="tpl-search-input"
               />
-            </div>
-            <div className="tpl-sidebar-license">
-              {["all", "free", "enterprise"].map((val) => (
-                <button
-                  key={val}
-                  type="button"
-                  className={`tpl-license-btn ${licenseFilter === val ? "active" : ""}`}
-                  onClick={() => setLicenseFilter(val)}
-                >
-                  {val === "all" ? `All (${templates.length})` : val === "free" ? `Free (${freeCount})` : `Enterprise (${entCount})`}
-                </button>
-              ))}
             </div>
             <nav className="tpl-category-nav">
               <button
@@ -414,20 +394,17 @@ export default function Templates() {
             ) : (
               <div className="tpl-card-grid">
                 {filtered.map((t) => {
-                  const locked = t.license === "enterprise" && !hasEnterprise;
                   const isActive = selected === t.name;
                   return (
                     <button
                       key={t.name}
                       type="button"
-                      className={`tpl-card ${isActive ? "active" : ""} ${locked ? "locked" : ""}`}
+                      className={`tpl-card ${isActive ? "active" : ""}`}
                       onClick={() => handleSelectTemplate(t.name)}
                     >
                       <div className="tpl-card-top">
                         <span className="tpl-card-name">{t.name.replace(/_/g, " ")}</span>
                         <div className="tpl-card-badges">
-                          {t.license === "enterprise" && <span className="tpl-badge-ent">Enterprise</span>}
-                          {locked && <span className="tpl-badge-lock">{"\uD83D\uDD12"}</span>}
                           {t.has_generic_prompt && <span className="tpl-badge-generic" title="Generic prompt available">{"\u26A1"}</span>}
                         </div>
                       </div>
@@ -446,7 +423,6 @@ export default function Templates() {
                   <div>
                     <h2>{selected.replace(/_/g, " ")}</h2>
                     <div className="tpl-detail-pills">
-                      {selectedTpl?.license === "enterprise" && <span className="tpl-detail-category">Enterprise</span>}
                       {(paramMeta.theme || selectedTpl?.theme) && <span className="tpl-detail-theme">{paramMeta.theme || selectedTpl.theme}</span>}
                       <span className="tpl-detail-cat-pill">{patternToCategory(selectedTpl || {})}</span>
                     </div>
@@ -497,18 +473,7 @@ export default function Templates() {
                   );
                 })()}
 
-                {isEnterpriseLocked && (
-                  <div className="tpl-locked-banner">
-                    <span className="tpl-locked-icon">{"\uD83D\uDD12"}</span>
-                    <div>
-                      <strong>Enterprise License Required</strong>
-                      <p>Upgrade to generate prompts and context from this pattern.</p>
-                    </div>
-                    <button type="button" className="tpl-unlock-btn" onClick={() => navigate("/settings", { state: { tab: "License" } })}>Enter License Key</button>
-                  </div>
-                )}
-
-                {!isEnterpriseLocked && (
+                {(
                   <>
                     {/* ── Mode Tab Bar ──────────────────────── */}
                     <div className="tpl-mode-tabs">
@@ -721,7 +686,6 @@ export default function Templates() {
           </div>
         </div>
       )}
-
       {toast && <Toast message={toast} onClose={() => setToast("")} />}
     </div>
   );

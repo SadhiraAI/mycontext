@@ -22,6 +22,9 @@ from mycontext.intelligence import (
     QualityMetrics,             # Measure context quality
     ContextAmplificationIndex,  # CAI quality signal
     PromptArchitect,            # Parse → score → rewrite any raw prompt
+    classify_generation_intent,  # Heuristic task class for decoding presets
+    model_allows_sampling,     # Whether model id supports temperature/top_p
+    resolve_generation_kwargs, # Map task + model → LiteLLM kwargs (+ rationale)
     GuidanceOptimizer,          # Upgrade Guidance rules to binding language
     get_criteria,               # Pre-built DeepEval GEval criteria bundles
 )

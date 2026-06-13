@@ -47,7 +47,6 @@ class ConstraintOptimizer(Pattern):
         "(5) Generate feasible solutions that satisfy all constraints.\n"
         "(6) Recommend the optimal solution with expected outcomes and creative alternatives.\n\n"
         "Be creative within boundaries. Suggest constraint relaxation where high-value.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

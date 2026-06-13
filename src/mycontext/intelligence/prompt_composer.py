@@ -98,42 +98,33 @@ def _resolve_generic_template(
     """Resolve a template name to a (pattern_instance, actual_name) with fallback.
 
     Two-stage resolution:
-      1. Load the class; if inaccessible (enterprise in free mode), try fallback.
-      2. Check the loaded class has GENERIC_PROMPT; if not, try fallback.
+      1. Load the class; if the name is unknown, try a fallback mapping.
+      2. Check the loaded class has GENERIC_PROMPT; if not, route to a template
+         that does via the fallback mapping.
 
     Returns (instance, actual_name) or (None, None).
     """
-    import warnings
-
     from .pattern_catalog import GENERIC_PROMPT_FALLBACK
     from .pattern_suggester import get_pattern_class
 
     actual_name = template_name
-    klass = get_pattern_class(template_name, include_enterprise=include_enterprise)
+    klass = get_pattern_class(template_name)
 
     if klass is None:
         fb = GENERIC_PROMPT_FALLBACK.get(template_name)
         if not fb:
             return None, None
-        klass = get_pattern_class(fb, include_enterprise=False)
+        klass = get_pattern_class(fb)
         if klass is None:
             return None, None
         actual_name = fb
-        if warn_on_fallback:
-            warnings.warn(
-                f"Enterprise template '{template_name}' is not available in free mode. "
-                f"Using free fallback '{fb}' instead. For best results, activate an "
-                f"enterprise license: mycontext.activate_license('MC-ENT-...')",
-                UserWarning,
-                stacklevel=3,
-            )
 
     instance = klass()
     if instance.GENERIC_PROMPT is None:
         fb = GENERIC_PROMPT_FALLBACK.get(template_name)
         if not fb:
             return None, None
-        fb_klass = get_pattern_class(fb, include_enterprise=False)
+        fb_klass = get_pattern_class(fb)
         if fb_klass is None or getattr(fb_klass, "GENERIC_PROMPT", None) is None:
             return None, None
         instance = fb_klass()

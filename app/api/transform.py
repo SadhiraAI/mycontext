@@ -24,8 +24,7 @@ async def transform_question(
     """Transform question into context. No API key needed. Returns assembled, patterns, explanation, exports."""
     if not body.question.strip():
         raise HTTPException(400, detail="Question is required")
-    include_ent = getattr(user, "enterprise_license", False)
-    result = transform_service.transform_question(body.question.strip(), include_enterprise=include_ent)
+    result = transform_service.transform_question(body.question.strip())
     if not result:
         raise HTTPException(503, detail="Transform service unavailable")
     return result

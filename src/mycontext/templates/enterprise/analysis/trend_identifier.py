@@ -52,8 +52,6 @@ class TrendIdentifier(Pattern):
         "(6) Project future trajectories - provide cautious short-term and "
         "medium-term projections with confidence ranges and key scenarios.\n\n"
         "Be analytical but not overconfident in projections.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

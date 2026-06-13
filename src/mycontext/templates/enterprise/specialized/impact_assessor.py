@@ -53,8 +53,6 @@ class ImpactAssessor(Pattern):
         "Negative/Mixed), your confidence level, and a clear recommendation "
         "to Proceed, Modify, or Reject.\n\n"
         "Be thorough and balanced. Quantify where possible.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

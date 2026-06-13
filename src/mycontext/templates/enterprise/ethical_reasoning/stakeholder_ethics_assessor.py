@@ -33,8 +33,6 @@ class StakeholderEthicsAssessor(Pattern):
         "groups are adequately protected. (5) Assess whether there is meaningful "
         "consent and fair representation in the decision process.\n\n"
         "Focus on fairness to all groups, especially those with the least power.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

@@ -61,8 +61,6 @@ class CausalReasoner(Pattern):
         "happened if key causes were absent, and what interventions could "
         "change outcomes.\n\n"
         "Use evidence, logic, and systems thinking throughout.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

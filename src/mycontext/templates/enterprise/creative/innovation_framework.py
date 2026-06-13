@@ -53,8 +53,6 @@ class InnovationFramework(Pattern):
         "(6) Implementation roadmap - create a phased plan from MVP prototype "
         "through scaling to optimization with clear milestones.\n\n"
         "Be creative but systematic, ambitious but grounded.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

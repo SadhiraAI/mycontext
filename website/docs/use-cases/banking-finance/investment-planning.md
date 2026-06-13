@@ -9,9 +9,9 @@ description: Multi-scenario investment analysis with FutureScenarioPlanner + Mul
 **Scenario:** Your investment team needs to evaluate a major allocation decision under uncertainty. Multiple scenarios are plausible (rate cuts, recession, geopolitical shock), each implying different optimal positions. You want structured multi-perspective analysis that surfaces the decision's sensitivity to each scenario.
 
 **Patterns used:**
-- `FutureScenarioPlanner` (enterprise) — develops plausible futures with probability weights
-- `MultiObjectiveOptimizer` (enterprise) — finds allocations satisfying competing objectives
-- `DecisionFramework` (enterprise) — structures the final decision with explicit criteria
+- `FutureScenarioPlanner` — develops plausible futures with probability weights
+- `MultiObjectiveOptimizer` — finds allocations satisfying competing objectives
+- `DecisionFramework` — structures the final decision with explicit criteria
 
 **Integration:** CrewAI three-agent crew — macro analyst, risk manager, portfolio strategist
 
@@ -19,7 +19,6 @@ description: Multi-scenario investment analysis with FutureScenarioPlanner + Mul
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from crewai import Agent, Task, Crew
 from mycontext.templates.enterprise.temporal import FutureScenarioPlanner

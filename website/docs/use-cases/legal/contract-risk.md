@@ -10,8 +10,8 @@ description: Clause-by-clause contract risk analysis using RiskAssessor + RiskMi
 
 **Patterns used:**
 - `RiskAssessor` — evaluates each clause for legal and business risk
-- `RiskMitigator` (enterprise) — proposes specific language changes that reduce identified risks
-- `ImpactAssessor` (enterprise) — quantifies what each risk scenario could cost
+- `RiskMitigator` — proposes specific language changes that reduce identified risks
+- `ImpactAssessor` — quantifies what each risk scenario could cost
 
 **Integration:** LlamaIndex RAG over a clause precedent library + streaming LangChain output
 
@@ -19,7 +19,6 @@ description: Clause-by-clause contract risk analysis using RiskAssessor + RiskMi
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from langchain_openai import ChatOpenAI

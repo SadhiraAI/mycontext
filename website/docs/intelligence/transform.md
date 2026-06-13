@@ -35,7 +35,7 @@ context = transform(
 | `input` | `str` | required | The raw question, problem, or statement |
 | `metadata` | `dict \| None` | `None` | Optional hints: `domain`, `complexity`, `user_level` |
 | `patterns` | `str \| list \| None` | `"auto"` | Pattern selection strategy |
-| `include_enterprise` | `bool` | `True` | Include enterprise patterns in selection pool |
+| `include_enterprise` | `bool` | `True` | Deprecated and ignored — all 88 patterns are always in the selection pool |
 
 **Returns:** `Context` — fully assembled with `data["transformation_metadata"]`
 
@@ -221,15 +221,6 @@ ctx = transform(
     patterns=["data_analyzer"],
 )
 result = ctx.execute(provider="openai")
-```
-
-### Free Tier Only
-
-```python
-ctx = transform(
-    "What caused the production outage?",
-    include_enterprise=False,  # Only use the 16 free patterns
-)
 ```
 
 ## Fallback Behavior

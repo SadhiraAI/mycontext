@@ -23,7 +23,7 @@ export default function NotFound(): ReactNode {
             maxWidth: '480px',
             marginBottom: '2rem',
           }}>
-          This page doesn't exist — but 87 cognitive patterns do.
+          This page doesn't exist — but 88 cognitive patterns do.
         </p>
         <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center'}}>
           <Link

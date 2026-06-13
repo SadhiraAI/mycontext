@@ -6,6 +6,39 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.12.0] — 2026-06-13
+
+### Changed
+
+- **All 88 cognitive patterns are now open source.** Every pattern — core and advanced — ships in the PyPI wheel and runs offline with your own LLM key. The `templates/free/` and `templates/enterprise/` folders are now taxonomy only; both are packaged. The wheel/sdist no longer exclude `templates/enterprise`, and the Dockerfile no longer strips them.
+- **License tiers removed end to end** — SDK, web app (FastAPI), React frontend, and database. The `include_enterprise` parameter is now a no-op accepted only for backwards compatibility (all patterns are always available).
+
+### Added
+
+- **`mycontext` CLI** — `mycontext list`, `mycontext run <pattern> [--generic|--execute]`, `mycontext skills export <name|all> [--plugin]`, and `mycontext mcp`. Offline-first; only `run --execute` contacts an LLM (with your own key).
+- **Skills export** — emit progressive-disclosure `SKILL.md` packages (Tier-1 frontmatter, Tier-2 body with pre-authored prompt + SDK scaffold, Tier-3 `references/`), or a Claude Code / Cowork plugin directory.
+- **Local MCP server** (`mycontext mcp`, optional `mcp` extra) — a stdio FastMCP server exposing `suggest_patterns`, `transform`, and `score_output`. Local-only, $0.
+- **Requirements-as-Code authoring + scoring** (`mycontext.rac`) — drafts a `requirements.yaml` (task taxonomy, rubrics, action risk matrix, pre-mortem) from cognitive patterns and scores outputs via `OutputEvaluator`. Authoring and scoring only — no compiler, CI gate executor, or HITL/budget runtime.
+
+### Deprecated
+
+- `mycontext.activate_license`, `deactivate_license`, `get_license_key`, and `is_enterprise_active` are now no-op shims that emit `DeprecationWarning` and will be removed in a future release.
+
+### Fixed
+
+- `execute_service.smart_execute` now accepts and forwards `quality` overrides to the SDK instead of raising `TypeError`.
+
+### Removed
+
+- Web app license router, license-generation CLI, the `LicenseKey` model, and the `User.enterprise_license` column (Alembic migration `b1c2d3e4f5a6` drops the table and column). Dead code: `CategoryFilter.jsx`, the synchronous `execute_context`, and orphaned `SkillSelector`/RAG tests.
+
+### Migration
+
+- Delete any `activate_license(...)` / `is_enterprise_active()` calls and drop the `include_enterprise` argument — all 88 patterns are always available.
+- Apply the database migration: `alembic upgrade head` (back up first; it drops `license_keys` and `users.enterprise_license`).
+
+---
+
 ## [0.11.0] — 2026-03-31
 
 ### Added

@@ -8,10 +8,10 @@ import ThemeToggle from "../components/ThemeToggle";
 import Toast from "../components/Toast";
 import "./Settings.css";
 
-const TABS = ["API Keys", "License", "Preferences", "Legal"];
+const TABS = ["API Keys", "Preferences", "Legal"];
 
 export default function Settings() {
-  const { user, refreshUser } = useAuth();
+  useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { startTour } = useTour();
@@ -27,9 +27,6 @@ export default function Settings() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [toast, setToast] = useState("");
-
-  const [licenseKey, setLicenseKey] = useState("");
-  const [activating, setActivating] = useState(false);
 
   const fetchKeys = () =>
     api
@@ -90,25 +87,6 @@ export default function Settings() {
     }
   }
 
-  async function handleActivateLicense(e) {
-    e.preventDefault();
-    if (!licenseKey.trim()) return;
-    setActivating(true);
-    setError("");
-    setSuccess("");
-    try {
-      const res = await api.activateLicense(licenseKey.trim());
-      setSuccess(res.message || "Enterprise license activated!");
-      setLicenseKey("");
-      setToast("Enterprise license activated!");
-      if (refreshUser) await refreshUser();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setActivating(false);
-    }
-  }
-
   const hasKey = (p) => keys.some((k) => k.provider === p);
 
   const tierBadge = (tier) => {
@@ -122,7 +100,7 @@ export default function Settings() {
         <span className="page-header-icon">{"\u2699\uFE0F"}</span>
         <div>
           <h1>Settings</h1>
-          <p className="page-header-sub">API keys, license management, and app preferences.</p>
+          <p className="page-header-sub">API keys and app preferences.</p>
         </div>
       </div>
 
@@ -251,81 +229,6 @@ export default function Settings() {
         </div>
       )}
 
-      {/* ── License ──────────────────────────────────────────── */}
-      {tab === "License" && (
-        <div className="settings-panel fade-in">
-          <div className="settings-section">
-            <div className="settings-license-current">
-              <span className={`settings-plan-badge ${user?.enterprise_license ? "enterprise" : ""}`}>
-                {user?.enterprise_license ? "Enterprise" : "Free Edition"}
-              </span>
-              <p className="settings-license-desc">
-                {user?.enterprise_license
-                  ? "Full access to all 87 patterns."
-                  : "Access to 16 free patterns. Upgrade to Enterprise for 71 advanced patterns."}
-              </p>
-            </div>
-
-            {!user?.enterprise_license && (
-              <div className="settings-license-activate">
-                <h3>Activate Enterprise License</h3>
-                <p className="settings-intro-hint">Enter your license key to unlock all 87 cognitive patterns, advanced decision-making, systems thinking, and ethical reasoning frameworks.</p>
-                <form onSubmit={handleActivateLicense} className="settings-form">
-                  <input
-                    type="text"
-                    placeholder="MC-ENT-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                    value={licenseKey}
-                    onChange={(e) => setLicenseKey(e.target.value)}
-                    disabled={activating}
-                    style={{ fontFamily: "var(--font-mono, monospace)", letterSpacing: "0.04em" }}
-                  />
-                  <button type="submit" disabled={activating || !licenseKey.trim()}>
-                    {activating ? "Activating..." : "Activate"}
-                  </button>
-                </form>
-                <p className="settings-license-help">
-                  Need a license key? <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">Contact us</a> or visit our website.
-                </p>
-              </div>
-            )}
-
-            {user?.enterprise_license && (
-              <div className="settings-license-active-banner">
-                <span className="settings-license-check">&#x2705;</span>
-                <div>
-                  <strong>Enterprise license is active</strong>
-                  <p>You have full access to all 87 cognitive patterns and advanced features.</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="settings-section">
-            <h3>Feature Comparison</h3>
-            <table className="settings-compare-table">
-              <thead><tr><th>Feature</th><th>Free</th><th>Enterprise</th></tr></thead>
-              <tbody>
-                <tr><td>Cognitive patterns</td><td>16</td><td>87</td></tr>
-                <tr><td>Export formats</td><td>13</td><td>13</td></tr>
-                <tr><td>Custom templates</td><td>Yes</td><td>Yes</td></tr>
-                <tr><td>Quality scoring</td><td>Heuristic</td><td>Heuristic + LLM</td></tr>
-                <tr><td>Decision patterns</td><td>-</td><td>Yes</td></tr>
-                <tr><td>Systems thinking</td><td>-</td><td>Yes</td></tr>
-                <tr><td>Ethical reasoning</td><td>-</td><td>Yes</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="settings-disclaimer">
-            <span className="settings-disclaimer-icon">&#x1F4DC;</span>
-            <div>
-              <strong>License Terms</strong>
-              <p>Each enterprise license key is single-use and tied to one account upon activation. Keys are non-transferable and may not be shared, resold, or redistributed. Sadhira AI reserves the right to revoke keys that violate these terms. Enterprise features are provided under a limited, non-exclusive, revocable license. Attempting to reverse-engineer, circumvent, or bypass license restrictions is strictly prohibited. For questions, <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">contact us</a>. See the <button type="button" className="settings-disclaimer-link" onClick={() => { setTab("Legal"); setError(""); setSuccess(""); }}>Legal</button> tab for full terms.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ── Preferences ──────────────────────────────────────── */}
       {tab === "Preferences" && (
         <div className="settings-panel fade-in">
@@ -377,7 +280,6 @@ export default function Settings() {
               <ul>
                 <li><strong>Account information:</strong> Email address and a securely hashed password (bcrypt). We never store or have access to your plaintext password.</li>
                 <li><strong>API keys:</strong> Your LLM provider API keys (OpenAI, Anthropic, Google, etc.) are encrypted at rest using AES-256 Fernet symmetric encryption. They are decrypted only at the moment of an API call and are never logged, displayed after initial entry, or shared with any third party.</li>
-                <li><strong>License keys:</strong> We store license key activation records to manage enterprise access and prevent misuse.</li>
                 <li><strong>Feedback:</strong> If you submit feedback, we store the message, feedback type, and page URL to improve the product.</li>
                 <li><strong>Custom templates:</strong> Templates you create are stored in our database and tied to your account.</li>
               </ul>
@@ -414,18 +316,16 @@ export default function Settings() {
               <h4>Your Responsibilities</h4>
               <ul>
                 <li>You are responsible for your own LLM provider API keys, their security, and any costs incurred through their use on this platform.</li>
-                <li>You must not share your account credentials or enterprise license keys with others.</li>
+                <li>You must not share your account credentials with others.</li>
                 <li>You must comply with the terms of service of any LLM provider you use through this platform.</li>
                 <li>You must not use the service for any unlawful purpose or to generate harmful content.</li>
               </ul>
 
-              <h4>Enterprise License</h4>
+              <h4>Open-Source SDK</h4>
               <ul>
-                <li>Enterprise cognitive patterns require a valid, purchased license key.</li>
-                <li>Each license key is single-use and bound to one account upon activation.</li>
-                <li>License keys are non-transferable and may not be shared, resold, or redistributed.</li>
-                <li>Sadhira AI reserves the right to revoke licenses that violate these terms.</li>
-                <li>Attempting to reverse-engineer, circumvent, or bypass license restrictions is prohibited.</li>
+                <li>All cognitive patterns are open source and available to every user at no cost.</li>
+                <li>The mycontext SDK is distributed under the MIT license.</li>
+                <li>You may use, modify, and redistribute the SDK in accordance with the MIT license terms.</li>
               </ul>
 
               <h4>Intellectual Property</h4>
@@ -444,7 +344,7 @@ export default function Settings() {
               </ul>
 
               <h4>Limitation of Liability</h4>
-              <p>To the maximum extent permitted by law, Sadhira AI shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or business opportunities, arising from the use of or inability to use this service. Total liability shall not exceed the amount paid for enterprise licensing in the 12 months preceding the claim.</p>
+              <p>To the maximum extent permitted by law, Sadhira AI shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or business opportunities, arising from the use of or inability to use this service. Total liability shall not exceed the amount paid for the service in the 12 months preceding the claim.</p>
 
               <h4>Account Termination</h4>
               <p>We reserve the right to suspend or terminate accounts that violate these terms, engage in abusive behavior, or attempt to compromise system security. You may delete your account at any time by contacting us.</p>
@@ -454,7 +354,7 @@ export default function Settings() {
           <div className="settings-section">
             <h3>Contact</h3>
             <div className="settings-legal-text">
-              <p>For privacy inquiries, data deletion requests, legal questions, or license support:</p>
+              <p>For privacy inquiries, data deletion requests, or legal questions:</p>
               <p><strong>Contact:</strong> <a href="https://contact.sadhiraai.com" target="_blank" rel="noopener noreferrer">contact.sadhiraai.com</a></p>
               <p><strong>Website:</strong> <a href="https://mycontext.sadhiraai.com" target="_blank" rel="noopener noreferrer">mycontext.sadhiraai.com</a></p>
               <p className="settings-legal-muted">Sadhira AI reserves the right to update these terms. Material changes will be communicated via the application.</p>

@@ -10,8 +10,8 @@ description: Guide students to discover answers themselves with SocraticQuestion
 
 **Patterns used:**
 - `SocraticQuestioner` — probing questions that surface and challenge assumptions
-- `MetacognitiveMonitor` (enterprise) — helps the student observe and regulate their own thinking
-- `LearningFromExperience` (enterprise) — turns each exchange into a reusable mental model
+- `MetacognitiveMonitor` — helps the student observe and regulate their own thinking
+- `LearningFromExperience` — turns each exchange into a reusable mental model
 
 **Integration:** AutoGen conversation loop with LangChain for non-interactive demo mode
 
@@ -19,7 +19,6 @@ description: Guide students to discover answers themselves with SocraticQuestion
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage

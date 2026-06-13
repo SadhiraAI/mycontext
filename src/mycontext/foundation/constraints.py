@@ -136,6 +136,55 @@ class Constraints(BaseModel):
         ),
     )
 
+    def render_quality_segments(self) -> list[str]:
+        """Narrative paragraphs for 0.11+ quality fields.
+
+        Used by :meth:`render` and by research-flow assembly (GUARD RAILS) so
+        ``verbosity``, ``communication_posture``, ``answer_first``,
+        ``forbidden_phrases``, and ``self_check`` appear in ``assemble()`` when
+        ``research_flow=True``.
+        """
+        segments: list[str] = []
+
+        if self.verbosity == "minimal":
+            segments.append(
+                "Be concise. Lead with the essential answer. "
+                "Omit preamble, filler, and restatements of the question."
+            )
+        elif self.verbosity == "detailed":
+            segments.append(
+                "Provide thorough analysis with supporting evidence, "
+                "examples, and alternative perspectives where relevant."
+            )
+
+        if self.communication_posture == "direct":
+            segments.append("Respond directly. Skip meta-commentary about your process.")
+        elif self.communication_posture == "collaborative":
+            segments.append(
+                "Use a collaborative tone. Propose options, invite refinement, "
+                "and frame suggestions as starting points."
+            )
+        elif self.communication_posture == "educational":
+            segments.append(
+                "Explain your reasoning. Define terms that may be unfamiliar. "
+                "Use analogies where they aid understanding."
+            )
+
+        if self.answer_first is True:
+            segments.append(
+                "State your conclusion or answer first, then provide supporting reasoning."
+            )
+
+        if self.forbidden_phrases:
+            phrase_list = ", ".join(f'"{p}"' for p in self.forbidden_phrases)
+            segments.append(f"Do NOT use these phrases in your response: {phrase_list}")
+
+        if self.self_check:
+            checks = "\n".join(f"  - {c}" for c in self.self_check)
+            segments.append(f"SELF-VERIFICATION — before finalizing, confirm:\n{checks}")
+
+        return segments
+
     def render(self, provider: str = "generic") -> str:
         """
         Render constraints as formatted text.
@@ -180,44 +229,7 @@ class Constraints(BaseModel):
         if self.language:
             parts.append(f"Language: {self.language}")
 
-        # --- Quality controls (auto-suggested by PromptArchitect) ---
-
-        if self.verbosity == "minimal":
-            parts.append(
-                "Be concise. Lead with the essential answer. "
-                "Omit preamble, filler, and restatements of the question."
-            )
-        elif self.verbosity == "detailed":
-            parts.append(
-                "Provide thorough analysis with supporting evidence, "
-                "examples, and alternative perspectives where relevant."
-            )
-
-        if self.communication_posture == "direct":
-            parts.append("Respond directly. Skip meta-commentary about your process.")
-        elif self.communication_posture == "collaborative":
-            parts.append(
-                "Use a collaborative tone. Propose options, invite refinement, "
-                "and frame suggestions as starting points."
-            )
-        elif self.communication_posture == "educational":
-            parts.append(
-                "Explain your reasoning. Define terms that may be unfamiliar. "
-                "Use analogies where they aid understanding."
-            )
-
-        if self.answer_first is True:
-            parts.append(
-                "State your conclusion or answer first, then provide supporting reasoning."
-            )
-
-        if self.forbidden_phrases:
-            phrase_list = ", ".join(f'"{p}"' for p in self.forbidden_phrases)
-            parts.append(f"Do NOT use these phrases in your response: {phrase_list}")
-
-        if self.self_check:
-            checks = "\n".join(f"  - {c}" for c in self.self_check)
-            parts.append(f"SELF-VERIFICATION — before finalizing, confirm:\n{checks}")
+        parts.extend(self.render_quality_segments())
 
         return "\n\n".join(parts)
 

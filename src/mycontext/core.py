@@ -589,8 +589,9 @@ class Context(BaseModel):
         must_not = [i for i in (c.must_not_include or []) if i]
         must = [i for i in (c.must_include or []) if i]
         fmt = [i for i in (c.format_rules or []) if i]
+        quality = c.render_quality_segments()
 
-        has_content = must_not or must or fmt or c.max_length or c.language
+        has_content = bool(must_not or must or fmt or c.max_length or c.language or quality)
         if not has_content:
             return ""
 
@@ -609,6 +610,8 @@ class Context(BaseModel):
             body_parts.append(f"**Maximum length:** {c.max_length}")
         if c.language:
             body_parts.append(f"**Language:** {c.language}")
+        if quality:
+            body_parts.append("\n\n".join(quality))
 
         body = "\n\n".join(body_parts)
         if use_xml:

@@ -53,8 +53,6 @@ class GapAnalyzer(Pattern):
         "(6) Create bridge plans - develop specific, phased strategies to "
         "close each critical gap with timelines, resources, and milestones.\n\n"
         "Be realistic about effort and specific about actions.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

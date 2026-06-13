@@ -51,8 +51,6 @@ class ClarityOptimizer(Pattern):
         "(6) Summarize key gains: ambiguous terms removed, sentences shortened, "
         "and precision improvements made.\n\n"
         "Every word must earn its place. Be direct, precise, and actionable.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

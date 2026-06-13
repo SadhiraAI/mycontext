@@ -9,9 +9,9 @@ description: Generate complete assessment suites from learning objectives using 
 **Scenario:** A teacher or course designer has a learning objective. They need an assessment that actually measures whether students have achieved it — not just whether they can recall facts. Building a complete rubric with formative checkpoints, summative evaluation, and feedback criteria from scratch takes hours.
 
 **Patterns used:**
-- `RubricDesigner` (enterprise) — builds detailed assessment rubrics aligned to learning objectives
-- `FormativeAssessmentFramework` (enterprise) — designs checkpoints that reveal learning progress
-- `SummativeEvaluator` (enterprise) — creates summative assessments that measure deep understanding
+- `RubricDesigner` — builds detailed assessment rubrics aligned to learning objectives
+- `FormativeAssessmentFramework` — designs checkpoints that reveal learning progress
+- `SummativeEvaluator` — creates summative assessments that measure deep understanding
 
 **Integration:** Blueprint — reusable for any subject, level, or assessment type
 
@@ -19,7 +19,6 @@ description: Generate complete assessment suites from learning objectives using 
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints

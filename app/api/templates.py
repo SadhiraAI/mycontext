@@ -1,4 +1,4 @@
-"""Templates API: list 85 patterns, build context."""
+"""Templates API: list 88 patterns, build context."""
 
 from typing import Any
 
@@ -30,7 +30,7 @@ class GenericPromptRequest(BaseModel):
 async def list_templates(
     user: User = Depends(get_current_user),
 ) -> list[dict[str, Any]]:
-    """List all 85 templates from catalog."""
+    """List all 88 templates from catalog."""
     return template_service.list_templates()
 
 
@@ -53,8 +53,7 @@ async def generic_prompt(
     user: User = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Get the filled generic prompt for a template given a question."""
-    has_enterprise = getattr(user, "enterprise_license", False)
-    prompt = template_service.get_generic_prompt(name, body.question, include_enterprise=has_enterprise)
+    prompt = template_service.get_generic_prompt(name, body.question)
     if prompt is None:
         raise HTTPException(404, detail="No generic prompt available for this template")
     return {"prompt": prompt, "template": name, "chars": len(prompt)}
@@ -67,12 +66,6 @@ async def build_context(
     user: User = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Build context for a template, optionally export in a format."""
-    templates = template_service.list_templates()
-    tpl = next((t for t in templates if t["name"] == name), None)
-    if tpl and tpl.get("license") == "enterprise":
-        has_ent = getattr(user, "enterprise_license", False)
-        if not has_ent:
-            raise HTTPException(403, detail="Enterprise template. Upgrade to use.")
     ctx = template_service.build_context(name, body.params)
     if not ctx:
         raise HTTPException(404, detail="Template not found or failed to build")

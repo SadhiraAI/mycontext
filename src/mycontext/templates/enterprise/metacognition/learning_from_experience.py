@@ -61,8 +61,6 @@ class LearningFromExperience(Pattern):
         "start doing, and do differently.\n\n"
         "Focus on TRANSFERABLE lessons that apply beyond this specific situation. "
         "Provide a one-sentence key lesson and a success pattern for the future.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

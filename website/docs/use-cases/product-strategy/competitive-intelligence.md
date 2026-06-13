@@ -9,9 +9,9 @@ description: Systematic competitor analysis using ComparativeAnalyzer + TrendIde
 **Scenario:** Your product team needs to understand the competitive landscape: what competitors are doing, where the market is heading, and where genuine gaps exist that you could occupy. Manual competitive research is time-consuming and usually produces a stale slide deck. You want a living, queryable competitive intelligence pipeline.
 
 **Patterns used:**
-- `ComparativeAnalyzer` (enterprise) — structured head-to-head comparison across dimensions
-- `TrendIdentifier` (enterprise) — identifies directional market movements from fragmented signals
-- `GapAnalyzer` (enterprise) — finds underserved needs and market white spaces
+- `ComparativeAnalyzer` — structured head-to-head comparison across dimensions
+- `TrendIdentifier` — identifies directional market movements from fragmented signals
+- `GapAnalyzer` — finds underserved needs and market white spaces
 
 **Integration:** LangChain + LlamaIndex RAG over competitor websites, docs, and press releases
 
@@ -19,7 +19,6 @@ description: Systematic competitor analysis using ComparativeAnalyzer + TrendIde
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from langchain_openai import ChatOpenAI

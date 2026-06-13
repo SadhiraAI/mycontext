@@ -9,9 +9,9 @@ description: Convert complex legal opinions into accessible client briefings usi
 **Scenario:** Your firm produces detailed legal opinions in dense professional language. Clients often don't read them, don't understand the implications, or need to share them with non-lawyers (board members, investors). You want to generate plain-language client briefings that retain accuracy while being accessible and actionable.
 
 **Patterns used:**
-- `SimplificationEngine` (enterprise) — removes legal jargon without losing precision
+- `SimplificationEngine` — removes legal jargon without losing precision
 - `AudienceAdapter` — adapts structure and vocabulary to the specific client audience
-- `PersuasionFramework` (enterprise) — structures the briefing so the key message lands clearly
+- `PersuasionFramework` — structures the briefing so the key message lands clearly
 
 **Integration:** Blueprint + streaming FastAPI endpoint
 
@@ -19,7 +19,6 @@ description: Convert complex legal opinions into accessible client briefings usi
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse

@@ -52,8 +52,6 @@ class PersuasionFramework(Pattern):
         "(6) Close with a clear call to action — state exactly what to do, "
         "why now, and how easy the first step is.\n\n"
         "Be compelling but ethical, persuasive but respectful.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

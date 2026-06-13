@@ -58,7 +58,6 @@ class CrossDomainSynthesizer(Pattern):
         "(6) Assess innovation potential — novelty, feasibility, and expected impact of each solution.\n"
         "(7) Recommend the most promising cross-domain solution with a validation approach.\n\n"
         "Seek deep structural similarities, not superficial connections.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

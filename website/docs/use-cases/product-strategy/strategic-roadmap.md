@@ -9,8 +9,8 @@ description: Build a 3-year strategic roadmap using FutureScenarioPlanner + Reso
 **Scenario:** Your leadership team needs to align on a 3-year strategic direction. The process is usually either too top-down (leadership dictates) or too bottom-up (death by stakeholder workshop). You want a structured approach that develops scenarios, maps stakeholder realities, allocates resources against priorities, and produces a document everyone can react to.
 
 **Patterns used:**
-- `FutureScenarioPlanner` (enterprise) — develops the strategic landscape over the planning horizon
-- `ResourceAllocator` (enterprise) — optimises resource allocation across strategic initiatives
+- `FutureScenarioPlanner` — develops the strategic landscape over the planning horizon
+- `ResourceAllocator` — optimises resource allocation across strategic initiatives
 - `StakeholderMapper` — maps stakeholder interests, priorities, and likely resistance points
 
 **Integration:** Blueprint + `QualityMetrics` gate + `to_markdown()` export for document delivery
@@ -19,7 +19,6 @@ description: Build a 3-year strategic roadmap using FutureScenarioPlanner + Reso
 
 ```python
 import mycontext
-mycontext.activate_license("MC-ENT-YOUR-KEY")
 
 from mycontext.structure import Blueprint
 from mycontext.foundation import Guidance, Constraints
@@ -116,7 +115,7 @@ def generate_roadmap(company_info: dict, save_path: str | None = None) -> str:
 roadmap = generate_roadmap(
     company_info={
         "company": "mycontext-ai (SadhiraAI)",
-        "current_position": "v0.6.0, 87 cognitive patterns, growing developer community, pre-revenue",
+        "current_position": "v0.6.0, 88 cognitive patterns, growing developer community, pre-revenue",
         "ambition": "Become the standard context engineering SDK for enterprise AI teams",
         "resources": "$1.2M seed, team of 6, 18-month runway",
         "constraints": "Small team, no dedicated sales, competing with well-funded LangChain ecosystem",

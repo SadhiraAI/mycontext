@@ -60,8 +60,6 @@ class SelfRegulationFramework(Pattern):
         "not fixed traits or luck. Plan specific improvements for the next cycle.\n\n"
         "Self-regulation is cyclical: each phase informs the next. Always specify "
         "what to do in the NEXT phase of the cycle.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

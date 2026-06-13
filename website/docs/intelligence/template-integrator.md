@@ -191,7 +191,7 @@ TemplateIntegratorAgent(
 )
 ```
 
-The `include_enterprise` flag controls whether enterprise templates can be integrated. If `False` and enterprise templates are in `template_names`, the call raises `ValueError`.
+The `include_enterprise` flag is deprecated and ignored — all 88 patterns can always be integrated. It is kept only for backwards compatibility.
 
 ## Examples
 
@@ -237,19 +237,6 @@ result = agent.integrate(
         "audience_adapter": "Frames findings for executive vs. engineering audiences",
     },
 )
-```
-
-### Free Patterns Only
-
-```python
-agent = TemplateIntegratorAgent(include_enterprise=False)
-
-result = agent.suggest_and_integrate(
-    question="How can we improve our developer onboarding?",
-    provider="openai",
-    mode="keyword",
-)
-# Uses only the 16 free patterns
 ```
 
 ## Comparison: integrate() vs chain vs compose

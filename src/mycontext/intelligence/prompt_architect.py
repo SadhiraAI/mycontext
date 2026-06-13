@@ -24,12 +24,59 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from ..core import THINKING_STRATEGIES, Context, ProviderHint
 from ..foundation import Constraints, Directive, Guidance
 
 logger = logging.getLogger(__name__)
+
+GenerationProfile = Literal["internal", "downstream", "both"]
+
+
+def _merge_auto_generation_execute_kwargs(
+    *,
+    question: str,
+    provider: str,
+    model: str,
+    task_contract: Any | None,
+    auto_generation_params: bool,
+    generation_profile: GenerationProfile,
+    execute_kwargs: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Merge auto routing kwargs; caller ``execute_kwargs`` wins on key clashes."""
+    if not auto_generation_params:
+        return dict(execute_kwargs), {}
+    from .generation_routing import resolve_generation_kwargs
+
+    merged = dict(execute_kwargs)
+    meta: dict[str, Any] = {}
+
+    internal_kw, rationale_i = resolve_generation_kwargs(
+        question=question,
+        provider=provider,
+        model=model,
+        task_contract=task_contract,
+        mode="internal",
+    )
+    merged = {**internal_kw, **merged}
+
+    meta["internal_generation_kwargs"] = internal_kw
+    meta["internal_generation_kwargs_rationale"] = rationale_i
+
+    if generation_profile in ("downstream", "both"):
+        down_kw, rationale_d = resolve_generation_kwargs(
+            question=question,
+            provider=provider,
+            model=model,
+            task_contract=task_contract,
+            mode="downstream",
+        )
+        meta["suggested_execute_kwargs"] = down_kw
+        meta["suggested_execute_kwargs_rationale"] = rationale_d
+
+    return merged, meta
+
 
 # ── Section identifiers ──────────────────────────────────────────────────────
 
@@ -442,6 +489,9 @@ class PromptArchitect:
         user_message: str | None = None,
         task_contract: Any | None = None,
         reasoning_strategies: list[str] | None = None,
+        *,
+        auto_generation_params: bool = False,
+        generation_profile: GenerationProfile = "internal",
         **execute_kwargs: Any,
     ) -> ArchitectResult:
         """
@@ -458,12 +508,29 @@ class PromptArchitect:
                 When supplied, overrides whatever reasoning strategy the LLM inferred from
                 the task description. Valid slugs: atomic ones from ``REASONING_STRATEGY_CHOICES``
                 and archetype names from ``REASONING_ARCHETYPES``.
+            auto_generation_params: When True, merge ``temperature`` / ``top_p`` /
+                ``n`` (or ``reasoning_effort`` for reasoning-style model ids) before the
+                internal LLM call. Explicit ``execute_kwargs`` still win on conflicts.
+            generation_profile: ``internal`` only records internal routing metadata;
+                ``downstream`` / ``both`` also set ``metadata["suggested_execute_kwargs"]``
+                for the caller's eventual ``Context.execute`` on the improved prompt.
 
         Returns:
             ArchitectResult with the built context and scores.
         """
         provider = provider or self.provider
         model = model or self.model
+
+        q_for_route = (user_message or task or "").strip()
+        exec_merged, gen_meta = _merge_auto_generation_execute_kwargs(
+            question=q_for_route,
+            provider=provider,
+            model=model,
+            task_contract=task_contract,
+            auto_generation_params=auto_generation_params,
+            generation_profile=generation_profile,
+            execute_kwargs=dict(execute_kwargs),
+        )
 
         # Score a trivial context so we have a "before" baseline
         baseline_ctx = Context(
@@ -483,7 +550,7 @@ class PromptArchitect:
             model,
             user_message=user_message,
             task_contract=task_contract,
-            **execute_kwargs,
+            **exec_merged,
         )
 
         # Caller-supplied strategies override the LLM's inferred choice
@@ -514,6 +581,7 @@ class PromptArchitect:
                 "model": model,
                 "provider": provider,
                 "target_provider": self._resolve_assembly_provider_hint() or "generic",
+                **gen_meta,
             },
         )
 
@@ -524,6 +592,9 @@ class PromptArchitect:
         model: str | None = None,
         user_message: str | None = None,
         task_contract: Any | None = None,
+        *,
+        auto_generation_params: bool = False,
+        generation_profile: GenerationProfile = "internal",
         **execute_kwargs: Any,
     ) -> ArchitectResult:
         """
@@ -547,6 +618,8 @@ class PromptArchitect:
                 markers, and domain-specific terms from it.
             task_contract: Optional TaskContract (L0 metadata) — domain, audience,
                 genre, grounding. Calibrates every generated section.
+            auto_generation_params: Same as :meth:`build`.
+            generation_profile: Same as :meth:`build`.
 
         Returns:
             ArchitectResult with improved context, scores, and diffs.
@@ -556,6 +629,16 @@ class PromptArchitect:
 
         # Step 1 — Parse
         parsed = self._heuristic_parse(prompt)
+        q_for_route = (user_message or parsed.task or prompt or "").strip()
+        exec_merged, gen_meta = _merge_auto_generation_execute_kwargs(
+            question=q_for_route,
+            provider=provider,
+            model=model,
+            task_contract=task_contract,
+            auto_generation_params=auto_generation_params,
+            generation_profile=generation_profile,
+            execute_kwargs=dict(execute_kwargs),
+        )
 
         # Step 2 — Score original
         original_ctx = self._parsed_to_context(parsed, prompt)
@@ -573,7 +656,7 @@ class PromptArchitect:
             model,
             user_message=user_message,
             task_contract=task_contract,
-            **execute_kwargs,
+            **exec_merged,
         )
         improved_ctx = self._json_to_context(
             improved_json,
@@ -604,6 +687,7 @@ class PromptArchitect:
                 "model": model,
                 "provider": provider,
                 "target_provider": self._resolve_assembly_provider_hint() or "generic",
+                **gen_meta,
             },
         )
 
@@ -1270,13 +1354,28 @@ QUALITY CONTROLS — infer ALL of these from the TASK DESCRIPTION:
             ),
             directive=Directive(content=user),
         )
+        from .generation_routing import model_allows_sampling
+
         try:
-            result = ctx.execute(
-                provider=provider,
-                model=model,
-                temperature=kwargs.pop("temperature", 0.3),
-                **kwargs,
-            )
+            exec_params: dict[str, Any] = dict(kwargs)
+            if "temperature" in exec_params:
+                temp_val = exec_params.pop("temperature")
+                result = ctx.execute(
+                    provider=provider,
+                    model=model,
+                    temperature=temp_val,
+                    **exec_params,
+                )
+            elif model_allows_sampling(model):
+                result = ctx.execute(
+                    provider=provider,
+                    model=model,
+                    temperature=0.3,
+                    **exec_params,
+                )
+            else:
+                # Reasoning-style SKUs: omit temperature so LiteLLM does not send it.
+                result = ctx.execute(provider=provider, model=model, **exec_params)
             raw = result.response.strip()
             # Strip optional markdown fence
             if raw.startswith("```"):

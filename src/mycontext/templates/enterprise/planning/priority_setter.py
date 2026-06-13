@@ -52,8 +52,6 @@ class PrioritySetter(Pattern):
         "(6) Produce a concrete execution plan: what to tackle this week, this "
         "month, and this quarter.\n\n"
         "Be objective and data-driven, not arbitrary.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

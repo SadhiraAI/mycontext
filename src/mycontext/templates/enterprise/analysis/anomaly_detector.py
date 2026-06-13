@@ -51,8 +51,6 @@ class AnomalyDetector(Pattern):
         "(6) Recommend actions - provide specific, prioritized steps to "
         "address each anomaly and prevent recurrence.\n\n"
         "Be specific, evidence-based, and actionable in your analysis.\n\n"
-        "Note: For deeper analysis with specialized enterprise frameworks, "
-        "upgrade to mycontext Enterprise."
     )
 
     def __init__(self):

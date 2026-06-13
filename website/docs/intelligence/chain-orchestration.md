@@ -51,7 +51,7 @@ build_workflow_chain(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `question` | `str` | required | Question or task description |
-| `include_enterprise` | `bool` | `True` | Include enterprise patterns |
+| `include_enterprise` | `bool` | `True` | Deprecated and ignored — all 88 patterns are always available |
 | `max_patterns` | `int \| None` | `None` | Cap the chain length |
 | `use_question_analyzer` | `bool` | `True` | Run QuestionAnalyzer first for decomposition |
 | `provider` | `str` | `"openai"` | LLM provider |
@@ -207,22 +207,10 @@ result = build_workflow_chain(
 result = build_workflow_chain(
     question="Should we migrate from MongoDB to PostgreSQL? We have 50TB data, 200 services, 18 months runway.",
     provider="openai",
-    include_enterprise=True,
     max_patterns=4,
 )
 # Typical chain: tradeoff_analyzer → risk_assessor → decision_framework → scenario_planner
-```
-
-### Free Patterns Only
-
-```python
-result = build_workflow_chain(
-    question="Why is our new feature adoption so low?",
-    provider="openai",
-    include_enterprise=False,  # Only use the 16 free patterns
-    max_patterns=3,
-)
-# Enterprise patterns still appear in suggestions but with license notes
+# Chains are drawn from all 88 patterns — no gating.
 ```
 
 ### Without Question Decomposition (faster)
