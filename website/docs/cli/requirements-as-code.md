@@ -6,6 +6,14 @@ description: Author and score Requirements-as-Code with mycontext. Draft a requi
 
 # Requirements-as-Code (Authoring + Scoring)
 
+:::tip Looking for the full Requirements-as-Code guide?
+This page documents the original **authoring + scoring bridge**
+(`draft_requirements`, `score_output`). The modern workflow — `product()`,
+`technical()`, `trace()`, `project()`, `validate()`, and `analyze()` — has its
+own comprehensive section: **[Requirements-as-Code →](../rac/overview)**. New
+projects should start there.
+:::
+
 The `mycontext.rac` package helps you **author** and **score** agent requirements.
 It drafts the sections of a `requirements.yaml` using the open-source cognitive
 patterns and scores candidate outputs with the evaluation stack. The emitted

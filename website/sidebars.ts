@@ -89,6 +89,21 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Requirements-as-Code',
+      items: [
+        'rac/overview',
+        'rac/for-business-teams',
+        'rac/product-requirements',
+        'rac/technical-requirements',
+        'rac/trace-and-validation',
+        'rac/cognitive-grounding',
+        'rac/projections',
+        'rac/cli',
+        'rac/api-reference',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Quality & Metrics',
       items: [
         'quality/quality-metrics',

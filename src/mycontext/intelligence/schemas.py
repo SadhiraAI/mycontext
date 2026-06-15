@@ -51,13 +51,20 @@ try:
     import instructor as _instructor
 
     _INSTRUCTOR_AVAILABLE = True
-except ImportError:
+except Exception as _instructor_exc:  # noqa: BLE001 — optional enhancement must never break import
+    # Not just ImportError: instructor eagerly imports every installed provider
+    # (e.g. its Gemini provider pulls in the EOL google.generativeai →
+    # protobuf/proto-plus stack), so a broken optional dependency can raise
+    # AttributeError/RuntimeError here. Intelligence parsing has a Pydantic-only
+    # fallback, so degrade gracefully instead of crashing the whole SDK import.
     _instructor = None  # type: ignore[assignment]
     _INSTRUCTOR_AVAILABLE = False
     logger.debug(
-        "instructor not installed — intelligence parsing will use Pydantic-only "
-        "fallback (no auto-retry on malformed LLM responses). "
-        "Install with: pip install instructor"
+        "instructor unavailable (%s: %s) — intelligence parsing will use "
+        "Pydantic-only fallback (no auto-retry on malformed LLM responses). "
+        "Install/repair with: pip install instructor",
+        type(_instructor_exc).__name__,
+        _instructor_exc,
     )
 
 

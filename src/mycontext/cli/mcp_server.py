@@ -3,9 +3,13 @@
 Runs entirely on the user's machine — no network, no hosted service, no cost.
 Exposes three tools to any MCP client (Claude Code, Cursor, Cowork, etc.):
 
-- ``suggest_patterns``  — recommend cognitive patterns for a question (offline).
-- ``transform``         — turn raw input into a structured, portable context.
-- ``score_output``      — heuristic quality score of an LLM output vs. its context.
+- ``suggest_patterns``     — recommend cognitive patterns for a question (offline).
+- ``transform``            — turn raw input into a structured, portable context.
+- ``score_output``         — heuristic quality score of an LLM output vs. its context.
+- ``draft_requirements``   — natural language intent → PRODUCT requirements.yaml.
+- ``draft_technical``      — product spec (or intent) → TECHNICAL requirements.yaml.
+- ``trace_requirements``   — check product/technical sync (+ optional code diff).
+- ``project_requirements`` — project a spec to AGENTS.md / CLAUDE.md / adr / etc.
 
 The ``mcp`` package is an optional dependency; install with::
 
@@ -84,6 +88,76 @@ def build_server():
             "strengths": score.strengths,
             "weaknesses": score.weaknesses,
         }
+
+    @server.tool()
+    def draft_requirements(intent: str, tier: int = 1) -> dict:
+        """Turn a natural-language intent into a framework ``requirements.yaml``.
+
+        Generates the eval-first behavioral spec (tasks, rubrics, action risk
+        matrix, safety pre-mortem, datasets, baselines, gates, monitoring) fully
+        offline. Gaps never block: each becomes an ``open_questions`` entry with a
+        ``TODO(OQ-n)`` marker. Returns the YAML text, the open questions, and
+        best-practice validation issues.
+        """
+        from .. import rac
+
+        doc = rac.architect(intent, tier=tier, execute=False)
+        return {
+            "requirements_yaml": rac.to_yaml(doc),
+            "open_questions": doc.get("open_questions", []),
+            "validation": rac.validate(doc),
+        }
+
+    @server.tool()
+    def draft_technical(product_yaml: str = "", intent: str = "", frontier: bool = False) -> dict:
+        """Generate TECHNICAL requirements (the *how*).
+
+        Provide ``product_yaml`` (a product-requirements spec) for traceable
+        controls that reference product IDs, or ``intent`` (natural language) to
+        bootstrap. Set ``frontier=True`` for the fine-tune / RL / computer-use
+        layer. Returns the YAML, open questions, and validation issues.
+        """
+        import yaml
+
+        from .. import rac
+
+        product_doc = yaml.safe_load(product_yaml) if product_yaml.strip() else None
+        doc = rac.technical(text=intent or None, product=product_doc, frontier=frontier)
+        return {
+            "technical_yaml": rac.to_yaml(doc),
+            "open_questions": doc.get("open_questions", []),
+            "validation": rac.validate(doc),
+        }
+
+    @server.tool()
+    def trace_requirements(product_yaml: str, technical_yaml: str, diff: str = "") -> dict:
+        """Check whether product and technical requirements are in sync.
+
+        Optionally pass a unified ``diff`` to see which requirement IDs a change
+        touches and whether it violates a forbidden action. Returns the trace
+        report plus a markdown rendering.
+        """
+        import yaml
+
+        from .. import rac
+
+        report = rac.trace(yaml.safe_load(product_yaml), yaml.safe_load(technical_yaml), diff=diff or None)
+        report["markdown"] = rac.format_report(report)
+        return report
+
+    @server.tool()
+    def project_requirements(requirements_yaml: str, to: str) -> dict:
+        """Project a ``requirements.yaml`` (text) to a downstream target.
+
+        ``to`` is one of: ``agents-md``, ``claude``, ``cursor``, ``spec-kit``,
+        ``kiro``. Returns the rendered file contents.
+        """
+        import yaml
+
+        from .. import rac
+
+        doc = yaml.safe_load(requirements_yaml)
+        return {"target": to, "content": rac.project(doc, to=to)}
 
     return server
 

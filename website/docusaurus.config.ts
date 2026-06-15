@@ -131,6 +131,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/docs/rac/overview',
+          label: 'Requirements-as-Code',
+          position: 'left',
+        },
+        {
           to: '/docs/use-cases/overview',
           label: 'Use Cases',
           position: 'left',

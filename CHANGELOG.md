@@ -6,6 +6,31 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.13.0] — 2026-06-14
+
+### Added
+
+- **Requirements Architect** (`mycontext.rac`) — turn a plain-English intent into a complete, reviewable specification:
+  - `product(text, *, execute=False, provider, model)` — generates a **product-requirements** spec (the *what & why*): eval-first tasks, rubrics, an action risk matrix, a safety pre-mortem, datasets, baselines, release gates, and monitoring, with typed IDs. Gaps never block generation — each becomes a non-blocking `open_questions` entry plus an inline `TODO(OQ-n)` marker.
+  - `technical(text=None, *, product=None, frontier=False, execute=False, ...)` — generates a **technical-requirements** spec (the *how*): architecture, guardrails, tools, cost, deployment, observability, security (OWASP agentic), and failure behavior. Every control carries a `serves:` list linking it to the product requirement it implements.
+  - `trace(product, technical, diff=None)` — deterministic coverage/drift check: uncovered risk-bearing requirements, orphan `serves:` references, and code-diff impact (flags forbidden-tool usage). `format_report()` renders it as markdown.
+  - `project(doc, to=...)` — render a spec to `AGENTS.md`, `CLAUDE.md`, Cursor `.mdc`, GitHub Spec Kit, AWS Kiro (EARS), or an ADR.
+  - `validate(doc)` — structural lint for product and technical specs.
+  - `parse_intent(text)` / `Intake` — offline intent parsing (name, kind, must-never lines, volume, constraints).
+- **Cognitive-pattern grounding for `execute=True`** — `product()`/`technical()` now run a curated set of cognitive patterns over the intent and feed their analyses to the LLM fill pass, so answers are grounded in real reasoning (task decomposition, rubric design, pre-mortem, architecture trade-offs). The spec keeps a clean `meta.informed_by` provenance map.
+  - `analyze(text, *, kind="product"|"technical", provider, model)` and `format_brief(notes)` — read or render the pattern brief directly.
+  - `complete(doc, *, provider, model, extra_context=None)` — fill an existing draft's open questions with an LLM.
+- **Provider-aware default models** (`mycontext.rac.models.resolve_model`) — when `model` is omitted, RaC picks a provider-appropriate default (`openai` → `gpt-4o-mini`, `anthropic` → `claude-3-5-haiku-latest`, `gemini`/`google` → `gemini-1.5-flash`) and raises a clear error for providers with no built-in default instead of silently sending an OpenAI model id.
+- **`mycontext rac` CLI** — `product`, `technical`, `analyze`, `trace`, `validate`, and `project` subcommands, with `--from`, `--out`, `--execute`, `--provider`, `--model`, `--from-product`, `--frontier`, `--diff`, and `--to` flags. `trace` exits non-zero on detected drift (CI-friendly).
+- **Documentation** — a comprehensive **Requirements-as-Code** docs category (overview, a non-technical guide for business teams, deep dives on `product`/`technical`/`trace`/`validate`/grounding/projections, a CLI reference, and an API reference).
+
+### Notes
+
+- All Requirements-as-Code generation is offline and deterministic by default; only `execute=True` / `analyze` contact an LLM, and only through your own provider/key.
+- The original authoring + scoring bridge (`draft_requirements`, `RequirementsAuthor`, `score_output`) is retained for backwards compatibility.
+
+---
+
 ## [0.12.0] — 2026-06-13
 
 ### Changed
