@@ -6,7 +6,48 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.13.0] — 2026-06-14
+## [Unreleased]
+
+### Added
+
+- **AI-Native Requirements Guidebook** — 103-page, 6-chapter PDF guidebook on writing requirements for AI agents (GRADED framework, golden trajectories, rubric-based eval, Requirements-as-Code) now available at `/guidebooks` on the web app.
+
+---
+
+## [0.14.0] — 2026-06-20
+
+### Added
+
+- **LLM-native Requirements-as-Code rebuild** — every RaC generator (`assess`, `product`, `technical`, `validate`, `trace`, `project`) is fully LLM-driven; there is no offline/deterministic skeleton. A Pydantic structured-output contract (`mycontext.rac.schema`) enforces typed-ID grammar and referential integrity with a self-repair loop.
+- **`assess()` / `IntakeBrief`** — Step 0 intent assessment: natural language or `.txt`/`.md` → structured brief with system name, task types, must-never lines, tools, stakeholders, and open questions.
+- **`mycontext rac intake`** — CLI subcommand for intent assessment (`--format md|json`).
+- **`normalize_product()` / `normalize_technical()`** — mechanical fixes for common LLM structural mistakes (rubric criteria as sibling keys, empty gates, string open_questions, assumptions in meta).
+- **Two-pass technical generation** — 24 Fable sections authored in two focused LLM calls to avoid truncation; `technical()` accepts product specs as dict or YAML string.
+- **Expanded RaC documentation** — Docusaurus pages for CLI reference, API reference, and overview updated to reflect the LLM-native pipeline.
+
+### Changed
+
+- **`product()` / `technical()`** — removed `execute` flag; LLM is always required. Meta fields (`system_name`, `kind`, `intent`) are force-set from the intake brief / product spec so LLM placeholders never survive.
+- **`complete_json()`** — default `max_tokens=None` so the provider controls output length (prevents truncated specs).
+- **`OpenQuestion.id`** — optional with auto-assignment (`OQ-01`, …) during normalization.
+- **`validate()`** — combines structural contract checks with an optional LLM quality critique (`llm=True` by default).
+- **`trace()`** — LLM-driven coverage/drift report with optional unified diff analysis.
+- **README (PyPI landing page)** — Requirements-as-Code added to Core Strengths #28, At a Glance table, How It Works diagram, and CLI section.
+
+### Removed
+
+- Deterministic RaC authoring (`fill.py`, `diffparse.py`, regex-based generation).
+- Deprecated APIs: `parse_intent`, `Intake`, `RequirementsArchitect`, `TechnicalArchitect`, `complete()`, `draft_requirements`, `RequirementsAuthor`, `architect()` tier shim.
+- `--execute` flag from all `mycontext rac` CLI commands.
+
+### Fixed
+
+- `technical()` `AttributeError` when `product` was passed as a YAML string.
+- `_repair()` `IndexError` in technical spec self-repair loop on certain error message shapes.
+- Empty product/technical sections from LLM truncation — raised as `RuntimeError` instead of silently emitting unusable specs.
+- `open_questions` ValidationError when LLM returned bare strings instead of dicts with IDs.
+
+---
 
 ### Added
 

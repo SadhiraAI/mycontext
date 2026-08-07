@@ -30,6 +30,20 @@ const GUIDEBOOKS = [
     color: "#7c3aed",
     href: "/guidebooks/cursor-guide.html",
   },
+  {
+    id: "ai-native-requirements",
+    title: "AI-Native Requirements",
+    subtitle: "From Product Intent to a Running Agent Spec",
+    description:
+      "What replaces acceptance criteria when the system doesn't follow a fixed code path. GRADED requirements, golden trajectories, rubric-based eval, and Requirements-as-Code — for Product Owners, BAs, and TPMs shipping AI agents.",
+    tags: ["Requirements", "AI Agents", "Spec-Driven Development"],
+    chapters: 6,
+    readTime: "~90 min",
+    level: "PMs · BAs · TPMs",
+    icon: "◎",
+    color: "#c2622a",
+    href: "/guidebooks/ai-native-requirements.pdf",
+  },
 ];
 
 export default function Guidebooks() {
